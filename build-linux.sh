@@ -3,8 +3,8 @@ set -u
 ROOT="$(cd "$(dirname "$0")" && pwd)"; cd "$ROOT"
 BIN="$ROOT/out-linux/bin"; UNITS="$ROOT/out-linux/units"
 mkdir -p "$BIN" "$UNITS"
-FPC="${FPC:-../fpc264irc-git/bin/ppc386}"
-FPCROOT="${FPCROOT:-../fpc264irc-git}"
+FPC="${FPC:-../fpc264irc-clean/bin/ppc386}"
+FPCROOT="${FPCROOT:-../fpc264irc-clean}"
 XTOOLS="$FPCROOT/bin/tools/i386-linux"
 XUNITS="$FPCROOT/bin/units/i386-linux"
 FPCOPTS=(-Tlinux -Mdelphi -Fumdl -Fumystic -Fimdl -Fimystic -Fomdl

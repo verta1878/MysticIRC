@@ -255,6 +255,20 @@ Begin
     DestFile := TIC.FileName;
 
   // Move file to the base directory
+  // A4-02: Handle REPLACES — remove old file before copying new one
+  If TIC.Replaces <> '' Then Begin
+    If FileExist(DirLast(FBase.Path) + TIC.Replaces) Then Begin
+      Log(3, '+', '   Replacing ' + TIC.Replaces + ' with ' + DestFile);
+      FileErase(DirLast(FBase.Path) + TIC.Replaces);
+    End;
+  End;
+
+  // Check if destination already exists (prevent false duplicate)
+  If FileExist(DirLast(FBase.Path) + DestFile) Then Begin
+    Log(3, '+', '   Overwriting existing ' + DestFile);
+    FileErase(DirLast(FBase.Path) + DestFile);
+  End;
+
   If Not FileCopy(SrcPath + TIC.FileName, DirLast(FBase.Path) + DestFile) Then Begin
     Log(1, '!', '   Cannot copy ' + TIC.FileName + ' to ' + FBase.Path);
     Exit;

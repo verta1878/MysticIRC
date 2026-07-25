@@ -121,22 +121,8 @@ Begin
   Session.io.RemoteRestore(TmpImg);
 End;
 
-Procedure Configuration_RIPEditor;
-Var
-  Img : TConsoleImageRec;
-  ABox : TAnsiMenuBox;
-Begin
-  Console.GetScreenImage (15, 8, 65, 14, Img);
-  ABox := TAnsiMenuBox.Create;
-  ABox.Open (15, 8, 65, 14);
-  WriteXY (17, 10, 15, ' RIP Editor');
-  WriteXY (17, 11, 7,  ' Run mripedit from the command line:');
-  WriteXY (17, 12, 11, '   mripedit [filename.rip]');
-  Session.io.GetKey;
-  ABox.Close;
-  ABox.Free;
-  Session.io.RemoteRestore (Img);
-End;
+// RIP Editor removed — RIP requires graphical mode (640x350), not text 80x25.
+// RIP scene editing handled externally. See mystic_ripapi/ engines.
 
 Var
   MenuPtr : Byte = 0;
@@ -414,7 +400,7 @@ Begin
             Form.AddNone ('A', ' A ANSI Editor',              50,  5, 50,  5, 28, 'Launch ANSI art editor');
             Form.AddNone ('T', ' T Text Editor',              50,  6, 50,  6, 28, 'Edit text files');
             Form.AddNone ('L', ' L View Log Files',           50,  7, 50,  7, 28, 'View system log files');
-            Form.AddNone ('R', ' R RIP Editor',               50,  8, 50,  8, 28, 'Edit RIPscrip scene files');
+            // RIP Editor removed — requires graphical mode
             Form.AddNone ('-', ' --------------------------', 50,  9, 50,  9, 28, '');
             Form.AddNone ('N', ' N Edit Bad User Names',      50, 10, 50, 10, 28, 'Edit banned user names');
             Form.AddNone ('D', ' D Edit Bad E-mails',         50, 11, 50, 11, 28, 'Edit banned email list');
@@ -445,7 +431,7 @@ Begin
                 'A' : Configuration_AnsiEditor;
                 'T' : Configuration_EditFile('');
                 'L' : Configuration_ViewLogs;
-                'R' : Configuration_RIPEditor;
+                // 'R' : RIP Editor removed
                 'N' : Configuration_EditFile(bbsCfg.DataPath + 'badnames.txt');
                 'D' : Configuration_EditFile(bbsCfg.DataPath + 'bademail.txt');
                 'W' : Configuration_EditFile(bbsCfg.DataPath + 'newletter.txt');

@@ -118,6 +118,7 @@ Begin
   Form.AddStr  ('H', ' Theme',            17, 15, 26, 15,  7, 20, 20, @bbsCfg.DefThemeFile, Topic);
   Form.AddBol  ('K', ' Ask Theme',        13, 16, 26, 16, 11,  3, @bbsCfg.ThemeOnStart, Topic + 'Ask theme each connection');
   Form.AddTog  ('E', ' Terminal',         14, 17, 26, 17, 10, 10, 0, 4, 'Ask Detect Detect/Ask ANSI RIP', @bbsCfg.DefTermMode, Topic);
+  Form.AddTog  ('V', ' RIP Version',     52, 12, 69, 12, 15,  6, 0, 0, 'v1.54', @bbsCfg.RipVersion, Topic + 'RIPscrip protocol version');
 
   Form.AddBol  ('L', ' Chat Logging',     53,  7, 69,  7, 14,  3, @bbsCfg.ChatLogging, Topic);
   Form.AddByte ('R', ' Hours Start',      54,  8, 69,  8, 13,  2, 0, 24, @bbsCfg.ChatStart, Topic);
@@ -125,6 +126,9 @@ Begin
   Form.AddBol  ('D', ' Chat Feedback',    52, 10, 69, 10, 15,  3, @bbsCfg.ChatFeedback, Topic);
   Form.AddByte ('Z', ' Screen Size',      54, 11, 69, 11, 13,  2, 1, 25, @bbsCfg.DefScreenSize, Topic);
   Form.AddWord ('I', ' Inactivity',       55, 12, 69, 12, 12,  5, 0, 65535, @bbsCfg.Inactivity, Topic + 'Inactivity timeout (seconds) 0/Disable');
+  Form.AddWord ('W', ' RIP Width',        55, 13, 69, 13, 12,  5, 320, 1024, @bbsCfg.RipScreenW, Topic + 'RIP pixel width (default 640)');
+  Form.AddWord ('H', ' RIP Height',       55, 14, 69, 14, 12,  5, 200, 1280, @bbsCfg.RipScreenH, Topic + 'RIP pixel height (default 350)');
+  Form.AddBol  ('F', ' RIP Fallback',     52, 15, 69, 15, 15,  3, @bbsCfg.RipFallback, Topic + 'Fall back to ANSI if no .rip file');
 
   Form.Execute;
 

@@ -38,7 +38,8 @@ Uses
   BBS_DataBase,
   BBS_Core,
   BBS_FileBase,
-  BBS_User;
+  BBS_User,
+  BBS_MsgBase_Ansi;
 
 Var
   CurLine : Integer;
@@ -47,11 +48,16 @@ Var
 
 Procedure MessageUpload (Var CurLine: SmallInt);
 Var
-  FN : String[100];
-  TF : Text;
-  T1 : String[30];
-  T2 : String[60];
-  OK : Boolean;
+  FN       : String[100];
+  TF       : Text;
+  T1       : String[30];
+  T2       : String[60];
+  OK       : Boolean;
+  AnsiConv : TMsgBaseAnsi;
+  BinFile  : File;
+  AnsBuf   : Array[0..4095] of Byte;
+  AnsLen   : LongInt;
+  AnsLine  : Word;
 Begin
   OK := False;
 
@@ -77,15 +83,62 @@ Begin
   End;
 
   If OK Then Begin
+    // A1-12/13: Detect ANSI content and convert to pipe-coded lines
+    // so ANSI art fits within String[79] message lines
     Assign (TF, FN);
-    Reset  (TF);
+    {$I-} Reset (TF); {$I+}
 
-    While Not Eof(TF) and (CurLine < mysMaxMsgLines) Do Begin
-      ReadLn (TF, Session.Msgs.MsgText[CurLine]);
-      Inc    (CurLine);
+    If IOResult = 0 Then Begin
+      // Quick scan: check if file contains ESC sequences
+      OK := False;
+      While Not Eof(TF) Do Begin
+        ReadLn (TF, Session.Msgs.MsgText[1]);
+        If Pos(#27 + '[', Session.Msgs.MsgText[1]) > 0 Then Begin
+          OK := True;
+          Break;
+        End;
+      End;
+      Close (TF);
+
+      If OK Then Begin
+        // ANSI file: parse through TMsgBaseAnsi buffer then
+        // convert to pipe-coded lines
+        AnsiConv := TMsgBaseAnsi.Create(Session, False);
+
+        Assign  (BinFile, FN);
+        ioReset (BinFile, 1, fmReadWrite + fmDenyNone);
+
+        While Not Eof(BinFile) Do Begin
+          ioBlockRead (BinFile, AnsBuf, SizeOf(AnsBuf), AnsLen);
+          If AnsiConv.ProcessBuf(AnsBuf, AnsLen) Then Break;
+        End;
+
+        Close (BinFile);
+
+        For AnsLine := 1 to AnsiConv.Lines Do Begin
+          If CurLine >= mysMaxMsgLines Then Break;
+          Session.Msgs.MsgText[CurLine] := AnsiConv.GetLineAsPipe(AnsLine);
+          Inc(CurLine);
+        End;
+
+        AnsiConv.Free;
+      End Else Begin
+        // Plain text or pipe file: read directly
+        Assign (TF, FN);
+        Reset  (TF);
+
+        While Not Eof(TF) and (CurLine < mysMaxMsgLines) Do Begin
+          ReadLn (TF, Session.Msgs.MsgText[CurLine]);
+
+          If Ord(Session.Msgs.MsgText[CurLine][0]) > 79 Then
+            Session.Msgs.MsgText[CurLine][0] := Chr(79);
+
+          Inc (CurLine);
+        End;
+
+        Close (TF);
+      End;
     End;
-
-    Close (TF);
   End;
 
   If Not Session.LocalMode Then FileErase(FN);
@@ -116,6 +169,11 @@ Begin
 
         While Not Eof(InFile) Do Begin
                 Inc (Lines);
+                // A4-04: Prevent crash if quote file exceeds max lines
+                If Lines > mysMaxMsgLines Then Begin
+                  Dec(Lines);
+                  Break;
+                End;
                 ReadLn (InFile, Text[Lines]);
         End;
 

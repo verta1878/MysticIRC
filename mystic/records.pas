@@ -234,7 +234,7 @@ Type
     DefStartMenu    : String[20];                               // Default start menu
     UNUSED          : String[20];
     DefThemeFile    : String[20];
-    DefTermMode     : Byte;                                     // 0=ask 1=detect 2=detect/ask 3=ansi 4=rip
+    DefTermMode     : Byte;                                     // 0=ask 1=detect 2=detect/ask 3=ansi
     DefScreenSize   : Byte;
     DefScreenCols   : Byte;
     ChatStart       : Byte;                                     // Chat hour start
@@ -421,7 +421,6 @@ Type
     inetBINKPExempt   : Boolean;
 
     Reserved          : Array[1..552] of Char;
-    UseRipDetect     : Boolean;
   End;
 
 Const
@@ -762,14 +761,12 @@ Const
   ThmAllowASCII = $00000001;
   ThmAllowANSI  = $00000002;
   ThmLightbarYN = $00000004;
-  ThmAllowRIP   = $00000004;
   ThmFallback   = $00000008;
 
 Const
   { Terminal graphics/emulation modes (Session.io.Graphics) }
   TERM_ASCII = 0;
   TERM_ANSI  = 1;
-  TERM_RIP   = 2;   { RIPscrip v1.54 graphical terminal }
 
 Type
   RecTheme = Record

@@ -50,6 +50,7 @@ Uses
   MIS_Client_FTP,
   MIS_Client_NNTP,
   MIS_Client_BINKP,
+  MIS_Client_HTTP,
   MIS_Events,
   BBS_Records,
   BBS_DataBase,
@@ -73,6 +74,7 @@ Var
   SMTPServer   : TServerManager;
   NNTPServer   : TServerManager;
   BINKPServer  : TServerManager;
+  HTTPServer   : TServerManager;
   EventThread  : TEventEngine;
   FocusPTR     : TServerManager;
   FocusCurrent : Byte;
@@ -380,8 +382,10 @@ Begin
     // A45: drop root privileges after binding ports.  fpSetEUID/fpSetEGID
     // set the effective UID/GID only, so file ownership matches MIS binary.
     // Available in fpc264irc r3.1 (commit edb234e7, PPU rebuilt).
+    {$IFDEF VER2}
     fpSetEGID (Info.st_GID);
     fpSetEUID (Info.st_UID);
+    {$ENDIF}
   End;
 End;
 {$ENDIF}
@@ -424,6 +428,7 @@ Begin
   SMTPServer   := NIL;
   NNTPServer   := NIL;
   BINKPServer  := NIL;
+  HTTPServer   := NIL;
   NodeData     := TNodeData.Create(bbsCfg.INetTNNodes);
 
   If bbsCfg.InetTNUse Then Begin
@@ -497,6 +502,17 @@ Begin
 
     Result := True;
   End;
+
+  // HTTP file server on port 8080 (webroot: SystemPath/webroot/)
+  HTTPServer := TServerManager.Create(bbsCfg, 8080, 10, NodeData, @CreateHTTP);
+
+  HTTPServer.Server.FTelnetServer := False;
+  HTTPServer.ClientMaxIPs         := 5;
+  HTTPServer.BanMaxConns          := bbsCfg.inetBanIP;
+  HTTPServer.BanTimeSecs          := bbsCfg.inetBanSecs;
+  HTTPServer.LogFile              := 'http';
+
+  Result := True;
 
   If Result Then
     EventThread := TEventEngine.Create(bbsCfg);
@@ -740,6 +756,7 @@ Begin
 
   Console.WriteStr (' BINKP');
   BINKPServer.Free;
+  If HTTPServer <> NIL Then HTTPServer.Free;
 
   Console.WriteLine (' (DONE)');
 

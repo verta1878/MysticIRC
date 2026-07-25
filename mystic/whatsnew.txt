@@ -853,3 +853,43 @@
 ================================================================
  End of 1.10IRC whatsnew
 ================================================================
+
+================================================================
+ Mystic BBS 1.11IRC whatsnew
+ This file lists changes made in the 1.11IRC development branch.
+================================================================
+
+--- 1.11IRC A1 (untested) ---
+ + MDL refactor Phase 1: MIS -- replace mdl wrappers with FPC RTL
+ + HS/Link Pascal port (clean-room from HDK spec)
+ + FTP download prompt wiring (prompts 528-531)
+ + HTTP server configuration in mystic.dat (port, max connections)
+ + Web download option ([W] in prompt 528/530)
+ + Protocol menu strings in language file
+ + Print API backport to v3/v2/v1
+ + Serial port / UART / FOSSIL configuration screen in Mystic config
+ + Wire m_fossil / m_serial / m_fossil_io into MIS for DOS serial support
+ + HS/Link standalone program (hslink.exe / hslink DOS)
+
+--- 1.11IRC A7 additions (Kiddo) ---
+
+ + chg2rip v2.3: ANSI to RIPscrip converter (pixel-perfect)
+   44KB output for 62KB ANSI, 31x reduction from v1.0
+   VGA 8x16 font ROM, CGA 171/87 palette, text-based emission
+   RIPtermJS-verified, charsize 2 for 16px text height
+ + ans2png: ANSI to BMP renderer (100% pixel-perfect match)
+ + vgafont.inc: VGA 8x16 CP437 font ROM (4096 bytes)
+ + examples/riptermJS/ added (Carl Gorringe, GPLv3 reference)
+ + m_archive.pas: 13-format archive library with internal readers
+   ZIP RAR ARJ LHA ARC PAK SQZ HYP UC2 (pure Pascal, no external tools)
+ + aviewarc/sqz/hyp/uc2.pas: internal archive header readers
+ + m_io_fossil.pas: TIOFossil TIOBase adapter for DOS serial
+   mystic -COM1 -FOSSIL -B38400 (no MIS needed for dial-up)
+ + m_mouse.pas: real implementation replaced placeholder (278 lines)
+ + g00r00 1.11 A1-A6: all 38 items fully ported
+ + MIDE Help system: Index, Under Cursor, Help on Help
+ + MPL: records, multi-dim arrays, TimerMS, FormatDate
+ + 20 MPL test scripts, 237-function reference (mplfunc.txt)
+ + DOS-DESQVIEW-SETUP.md: full multi-node DOS BBS guide
+ + ANSI-TO-RIP-PROGRESS.md: 36KB development log
+

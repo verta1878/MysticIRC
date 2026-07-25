@@ -785,12 +785,12 @@ Begin
   Form.AddPath ('T', ' Text Path'      , 12,  9, 25,  9, 11, 30, 80, @Theme.TextPath, Topic + 'Text path');
   Form.AddPath ('M', ' Menu Path'      , 12, 10, 25, 10, 11, 30, 80, @Theme.MenuPath, Topic + 'Menu path');
   Form.AddPath ('S', ' Script Path'    , 10, 11, 25, 11, 13, 30, 80, @Theme.ScriptPath, Topic + 'Script path');
-  Form.AddPath ('I', ' Icon Path'      , 12, 12, 25, 12, 11, 30, 80, @Theme.IconPath, Topic + 'RIPscrip icon path (.ICN files)');
-  Form.AddPath ('O', ' Font Path'      , 12, 13, 25, 13, 11, 30, 80, @Theme.FontPath, Topic + 'RIPscrip font path (.CHR files)');
+  // Icon Path removed — RIP editor moved to mystic_test/
+  // Font Path removed — RIP editor moved to mystic_test/
   Form.AddBits ('F', ' Allow Fallback' ,  7, 13, 25, 13, 16, ThmFallback, @Theme.Flags, Topic + 'Allow fallback to default paths?');
   Form.AddBits ('C', ' Allow ASCII'    , 10, 14, 25, 14, 13, ThmAllowASCII, @Theme.Flags, Topic + 'Allow ASCII users to use this theme?');
   Form.AddBits ('N', ' Allow ANSI'     , 11, 15, 25, 15, 12, ThmAllowANSI, @Theme.Flags, Topic + 'Allow ANSI users to use this theme?');
-  Form.AddBits ('R', ' Allow RIP'      , 11, 16, 25, 16, 12, ThmAllowRIP, @Theme.Flags, Topic + 'Allow RIPscrip terminals for this theme');
+  // Allow RIP removed — RIP editor moved to mystic_test/
   Form.AddTog  ('O', ' Column Size'    , 10, 16, 25, 16, 13, 9, 0, 1, '80_Column 40_Column', @Theme.ColumnSize, Topic + 'Column size of this theme');
 
   Form.AddNone ('1', ' 1: Prompts'     , 57,  7, 57, 7, 17, Topic + 'Edit prompts for this theme');
@@ -882,8 +882,8 @@ Begin
                         TextPath     := bbsCfg.TextPath;
                         MenuPath     := bbsCfg.MenuPath;
                         ScriptPath   := bbsCfg.ScriptPath;
-                        IconPath     := bbsCfg.TextPath + 'icons' + PathSep;
-                        FontPath     := bbsCfg.TextPath + 'fonts' + PathSep;
+                        // IconPath removed -- RIP moved to mystic_test/
+                        // FontPath removed -- RIP moved to mystic_test/
                         TemplatePath := bbsCfg.TextPath; // retired field, kept for record compatibility
                         Colors[0]    := 1;
                         Colors[1]    := 9;

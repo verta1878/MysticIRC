@@ -50,6 +50,7 @@ Var
   WinEnd       : Byte    = 22;
   WinText      : Byte    = 7;
   InsertMode   : Boolean = True;
+  DrawMode     : Boolean = False;  // A6-01: ANSI draw mode in FSE
   CutPasted    : Boolean = False;
   CutTextPos   : Word    = 0;
   CutText      : Array[1..MaxCutText] of CutTextPTR;
@@ -437,7 +438,13 @@ Begin
   Session.io.AnsiColor  (Session.io.ScreenInfo[3].A);
   Session.io.AnsiGotoXY (Session.io.ScreenInfo[3].X, Session.io.ScreenInfo[3].Y);
 
-  If InsertMode Then Session.io.BufAddStr('INS') else Session.io.BufAddStr('OVR'); { ++lang }
+  // A6-01: Show draw mode status
+  If DrawMode Then
+    Session.io.BufAddStr('DRW')
+  Else If InsertMode Then
+    Session.io.BufAddStr('INS')
+  Else
+    Session.io.BufAddStr('OVR');
 
   Session.io.AnsiGotoXY (CurX, CurY);
   Session.io.AnsiColor  (WinText);
@@ -745,7 +752,7 @@ Begin
   Repeat
     Session.io.OutFull (Session.GetPrompt(354));
 
-    Ch := Session.io.OneKey ('?ACHQRSTU', True);
+    Ch := Session.io.OneKey ('?ACDHQRSTU', True);
 
     Case Ch of
       '?' : Session.io.OutFullLn (Session.GetPrompt(355));
@@ -757,6 +764,12 @@ Begin
               Exit;
             End;
       'C' : Exit;
+      'D' : Begin
+              // A6-01: Toggle ANSI draw mode
+              DrawMode := Not DrawMode;
+              ToggleInsert(False);
+              Exit;
+            End;
       'H' : Begin
               Session.io.OutFile ('fshelp', True, 0);
               Exit;
@@ -818,6 +831,14 @@ Begin
     Ch := Session.io.GetKey;
 
     If Session.io.IsArrow Then Begin
+      // A6-01: In draw mode, arrow keys place a space at cursor before moving
+      If DrawMode Then Begin
+        If Length(Session.Msgs.MsgText[CurLine]) < CurX Then
+          Session.Msgs.MsgText[CurLine] := Session.Msgs.MsgText[CurLine] + strRep(' ', CurX - Length(Session.Msgs.MsgText[CurLine]));
+        If CurX <= Length(Session.Msgs.MsgText[CurLine]) Then
+          Session.Msgs.MsgText[CurLine][CurX] := ' ';
+      End;
+
       Case Ch of
         #71 : Begin
                 CurX := 1;

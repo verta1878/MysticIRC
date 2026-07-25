@@ -159,9 +159,9 @@ Begin
       Session.io.OutFull (Session.GetPrompt(146));
 
       Case Session.io.OneKeyRange('?Q', 1, bbsCfg.INetTNNodes) of
-        #00 : Break;
+        #00 : Exit;  // A1-10: ENTER aborts send node message
         '?' : WhosOnline;
-        'Q' : Break;
+        'Q' : Exit;  // A1-10: Q also aborts
       End;
     Until False;
 

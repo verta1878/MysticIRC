@@ -52,6 +52,7 @@ Type
     GotQuit    : Boolean;
     IsPassive  : Boolean;
     InTransfer : Boolean;
+    RestPos    : Int64;
     Cmd        : String;
     Data       : String;
     DataPort   : Word;
@@ -188,6 +189,7 @@ Begin
   IsPassive  := False;
   FBasePos   := -1;
   InTransfer := False;
+  RestPos    := 0;
 End;
 
 Procedure TFTPServer.UpdateUserStats (TFBase: RecFileBase; FDir: RecFileList; DirPos: LongInt; IsUpload: Boolean);
@@ -510,12 +512,30 @@ Var
   Tmp : LongInt;
   Res : LongInt;
 Begin
+  Result := False;
+
   Assign  (F, Str);
   ioReset (F, 1, fmRWDN);
 
+  // Resume support: seek to RestPos if set by REST command
+  If RestPos > 0 Then Begin
+    {$I-} Seek(F, RestPos); {$I+}
+    If IOResult <> 0 Then Begin
+      Close(F);
+      Client.WriteLine('451 Seek failed');
+      RestPos := 0;
+      Exit;
+    End;
+    RestPos := 0;
+  End;
+
   InTransfer := True;
 
-  OpenDataSession;
+  If Not OpenDataSession Then Begin
+    Close(F);
+    InTransfer := False;
+    Exit;
+  End;
 
   Server.Status(ProcessID, 'Sending: ' + Str);
 
@@ -525,15 +545,16 @@ Begin
     Repeat
       Tmp := DataSocket.WriteBuf(Buf, Res);
 
+      If Tmp <= 0 Then Break;
       Dec (Res, Tmp);
     Until Res <= 0;
+
+    If Tmp <= 0 Then Break;
   End;
 
   Close (F);
 
-  Result := Res = 0;
-
-  // need to send failed here if failed what do we send?
+  Result := True;
 
   Server.Status(ProcessID, 'Send complete');
   Client.WriteLine (re_XferOK);
@@ -1196,8 +1217,41 @@ Begin
 End;
 
 Procedure TFTPServer.cmdSIZE;
+Var
+  TempPos  : LongInt;
+  TempBase : RecFileBase;
+  DirFile  : TFileBuffer;
+  Dir      : RecFileList;
+  FullPath : String;
 Begin
-  Client.WriteLine('550 Not implemented');
+  If Not LoggedIn Then Begin
+    Client.WriteLine('530 Not logged in');
+    Exit;
+  End;
+
+  TempPos := FindDirectory(TempBase);
+  If TempPos = -1 Then Begin
+    Client.WriteLine('550 File not found');
+    Exit;
+  End;
+
+  DirFile := TFileBuffer.Create(FileBufSize);
+  If DirFile.OpenStream(bbsCfg.DataPath + TempBase.FileName + '.dir', SizeOf(RecFileList), fmOpenCreate, fmRWDN) Then Begin
+    While Not DirFile.EOF Do Begin
+      DirFile.ReadRecord(Dir);
+      If WildMatch(FileMask, Dir.FileName, False) Then Begin
+        FullPath := TempBase.Path + Dir.FileName;
+        If FileExist(FullPath) Then Begin
+          Client.WriteLine('213 ' + strI2S(Dir.Size));
+          DirFile.Free;
+          Exit;
+        End;
+      End;
+    End;
+    DirFile.Free;
+  End;
+
+  Client.WriteLine('550 File not found');
 End;
 
 Procedure TFTPServer.Execute;
@@ -1244,6 +1298,13 @@ Begin
     If Cmd = 'PORT' Then cmdPORT Else
     If Cmd = 'PWD'  Then cmdPWD  Else
     If Cmd = 'REIN' Then cmdREIN Else
+    If Cmd = 'REST' Then Begin
+      If LoggedIn Then Begin
+        RestPos := strS2I(Data);
+        Client.WriteLine('350 Restarting at ' + strI2S(RestPos));
+      End Else
+        Client.WriteLine('530 Not logged in');
+    End Else
     If Cmd = 'RETR' Then cmdRETR Else
     If Cmd = 'RMD'  Then Client.WriteLine(re_NoAccess) Else
     If Cmd = 'SIZE' Then cmdSIZE Else

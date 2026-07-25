@@ -261,6 +261,7 @@ Type
                     OneSize : Word;
                     Offset  : Word;
                     ArrDem  : Word;
+                    ArrDim  : TArrayInfo;  // A5-02: dimension sizes for multi-dim record field arrays
                   End;
 
 (*

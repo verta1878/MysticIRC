@@ -155,6 +155,11 @@ Begin
 
   PrintStatus (NIL, 1, 'Polling FTP node ' + Addr2Str(EchoNode.Address));
 
+  If EchoNode.ftpOutHost = '' Then Begin
+    PrintStatus (NIL, 1, 'FTP hostname is blank, skipping');
+    Exit;
+  End;
+
   FTP := TFTPClient.Create(bbsCfg.iNetInterface);
 
   If FTP.OpenConnection(EchoNode.ftpOutHost) Then Begin
@@ -293,6 +298,11 @@ Begin
   If OnlyNew and (Queue.QSize = 0) Then Exit;
 
   PrintStatus(NIL, 1, 'Polling BINKP node ' + Addr2Str(EchoNode.Address));
+
+  If EchoNode.binkHost = '' Then Begin
+    PrintStatus (NIL, 1, 'BINKP hostname is blank, skipping');
+    Exit;
+  End;
 
   Client := TIOSocket.Create;
 

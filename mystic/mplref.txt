@@ -1,0 +1,276 @@
+// Copyright (C) 2026 Kiddo -- GPLv3 -- Mystic BBS IRC Fork
+
+================================================================
+ MPL Language Reference ÄÄ Mystic BBS 1.11IRC New Features
+================================================================
+
+
+--- Record Parameters (1.11IRC A1) ---
+
+Records can be passed to procedures by value or by VAR reference.
+
+  Type
+    PlayerRec = Record
+      Name  : String[30];
+      Score : LongInt;
+      Level : Byte;
+    End;
+
+  // By VAR reference Ä changes persist in caller
+  Procedure SetPlayer (Var P: PlayerRec);
+  Begin
+    P.Name  := 'Hero';
+    P.Score := 1000;
+    P.Level := 5;
+  End;
+
+  // By value Ä changes do NOT persist in caller
+  Procedure ShowPlayer (P: PlayerRec);
+  Begin
+    WriteLn('Name:  ' + P.Name);
+    WriteLn('Score: ' + Int2Str(P.Score));
+  End;
+
+  Var MyPlayer : PlayerRec;
+  Begin
+    SetPlayer(MyPlayer);    // modifies MyPlayer
+    ShowPlayer(MyPlayer);   // reads MyPlayer, no changes
+  End.
+
+NOTE: The record type must match exactly. Passing a different
+record type to a VAR parameter will cause a compile error:
+  "Type mismatch. Check: VAR record params must match the exact
+   record type"
+
+
+--- Record Function Results (1.11IRC A3) ---
+
+Functions can return records. Assign with FuncName := RecordVar
+inside the function, and call with Var := Func() at the call site.
+
+  Type
+    PointRec = Record
+      X : LongInt;
+      Y : LongInt;
+    End;
+
+  Function MakePoint (PX, PY: LongInt) : PointRec;
+  Var P : PointRec;
+  Begin
+    P.X := PX;
+    P.Y := PY;
+    MakePoint := P;
+  End;
+
+  Var Pt : PointRec;
+  Begin
+    Pt := MakePoint(10, 20);
+    WriteLn('X=' + Int2Str(Pt.X) + ' Y=' + Int2Str(Pt.Y));
+    // Output: X=10 Y=20
+  End.
+
+If you get "Unknown identifier" on the return type, define the
+Record type BEFORE the Function declaration.
+
+
+--- Multi-Dimensional Arrays in Records (1.11IRC A5) ---
+
+Records can contain arrays up to 3 dimensions.
+
+  Type
+    BoardRec = Record
+      Cells : Array[1..8, 1..8] of Byte;
+      Name  : String[20];
+    End;
+
+  Var Board : BoardRec;
+  Begin
+    Board.Name := 'Chess';
+    Board.Cells[3, 5] := 42;
+    WriteLn('Cell[3,5] = ' + Int2Str(Board.Cells[3, 5]));
+    // Output: Cell[3,5] = 42
+  End.
+
+3D arrays also work:
+
+  Type
+    CubeRec = Record
+      Data : Array[1..3, 1..4, 1..5] of Byte;
+    End;
+
+  Var C : CubeRec;
+  Begin
+    C.Data[2, 3, 4] := 77;
+    WriteLn(Int2Str(C.Data[2, 3, 4]));  // Output: 77
+  End.
+
+If you get "Expected: ]" the array has fewer dimensions than
+you are indexing. Check your Type declaration.
+
+
+--- TimerMS Function (1.11IRC A3) ---
+
+  Function TimerMS : LongInt
+
+Returns milliseconds since midnight. ~10ms resolution.
+Use for benchmarking or animation timing.
+
+  Var Start, Elapsed : LongInt;
+      Count : LongInt;
+  Begin
+    Start := TimerMS;
+
+    // Do some work
+    For Count := 1 to 10000 Do;
+
+    Elapsed := TimerMS - Start;
+    WriteLn('Loop took ' + Int2Str(Elapsed) + ' ms');
+    // Output: Loop took 12 ms
+  End.
+
+Compare with Timer (seconds) and TimerMin (minutes).
+
+
+--- FormatDate Function (1.11IRC A3) ---
+
+  Function FormatDate (DosDate: LongInt; Mask: String) : String
+
+Formats a DOS date/time value using a mask string.
+Mask tokens (case sensitive):
+
+  YYYY  4-digit year     (2026)
+  YY    2-digit year     (26)
+  MM    2-digit month    (07)
+  DD    2-digit day      (24)
+  DDD   3-char weekday   (Thu)
+  NNN   3-char month     (Jul)
+  HH    2-digit hour     (14)
+  II    2-digit minute   (30)
+  SS    2-digit second   (05)
+
+  Var D : LongInt;
+  Begin
+    D := DateTime;  // current date/time
+
+    WriteLn(FormatDate(D, 'YYYY-MM-DD'));
+    // Output: 2026-07-24
+
+    WriteLn(FormatDate(D, 'DDD NNN DD, YYYY'));
+    // Output: Thu Jul 24, 2026
+
+    WriteLn(FormatDate(D, 'HH:II:SS'));
+    // Output: 14:30:05
+
+    WriteLn(FormatDate(D, 'MM/DD/YY HH:II'));
+    // Output: 07/24/26 14:30
+  End.
+
+
+--- DateDos2Str Formats 4-6 (1.11IRC A3) ---
+
+  Function DateStr (Date: LongInt; Format: Byte) : String
+
+Existing formats (2-digit year):
+  1 = MM/DD/YY     07/24/26
+  2 = DD/MM/YY     24/07/26
+  3 = YY/MM/DD     26/07/24
+
+New formats (4-digit year):
+  4 = MM/DD/YYYY   07/24/2026
+  5 = DD/MM/YYYY   24/07/2026
+  6 = YYYY/MM/DD   2026/07/24
+
+  Var D : LongInt;
+  Begin
+    D := DateTime;
+    WriteLn('US:   ' + DateStr(D, 4));   // 07/24/2026
+    WriteLn('Euro: ' + DateStr(D, 5));   // 24/07/2026
+    WriteLn('ISO:  ' + DateStr(D, 6));   // 2026/07/24
+  End.
+
+DateStrJulian also supports formats 4-6.
+
+
+--- AppendText Procedure (1.10 A60) ---
+
+  Procedure AppendText (FileName, Text: String)
+
+Appends one line of text to a file. Creates the file if
+it doesn't exist. Useful for logging or data collection.
+
+  Begin
+    AppendText('mylog.txt', 'User logged in at ' +
+               FormatDate(DateTime, 'YYYY-MM-DD HH:II:SS'));
+    AppendText('mylog.txt', 'Session started');
+  End.
+
+
+--- CfgChatStart / CfgChatEnd Variables (1.10 A60) ---
+
+  CfgChatStart : Byte     (read/write)
+  CfgChatEnd   : Byte     (read/write)
+
+IMPORTANT: Requires "Uses CFG;" at the top of your script.
+
+Chat hours configured in Mystic. 0-23 range.
+
+  Uses CFG;
+
+  Begin
+    WriteLn('Chat available: ' +
+            Int2Str(CfgChatStart) + ':00 to ' +
+            Int2Str(CfgChatEnd) + ':00');
+    // Output: Chat available: 8:00 to 22:00
+  End.
+
+
+--- MCI Pipe Codes (1.11IRC A3) ---
+
+  |-Y   Force the NEXT Yes/No prompt to default to Yes
+  |-N   Force the NEXT Yes/No prompt to default to No
+
+Use in prompt/display files before a Yes/No prompt:
+
+  |-Y|09Delete this message?
+  (user sees prompt defaulted to Yes instead of No)
+
+  |-N|09Are you sure you want to quit?
+  (user sees prompt defaulted to No)
+
+The override is consumed after one Yes/No prompt and
+resets to the normal default automatically.
+
+
+--- Uses Modules ---
+
+Some variables require a Uses statement:
+
+  Uses CFG;     CfgSysPath, CfgDataPath, CfgChatStart, etc.
+  Uses USER;    UserName, UserAlias, UserEmail, etc.
+  Uses MBASE;   Message base functions
+  Uses MGROUP;  Message group functions
+  Uses FBASE;   File base functions
+  Uses FGROUP;  File group functions
+
+If you get "Unknown identifier" for a cfg or user variable,
+add the appropriate Uses line at the top of your script.
+
+
+--- Compile Commands ---
+
+  mplc script.mps          Compile one script
+  mplc -P scripts          Compile all in a directory
+  mplc -C                  Compile all in current directory
+  mplc -ALL                Compile all recursively
+
+IMPORTANT: After upgrading to 1.11IRC, run mplc -ALL to
+recompile all scripts. The bytecode format changed.
+
+
+================================================================
+ Sample scripts:
+   scripts/testrec.mps   Record VAR parameters
+   scripts/testarr.mps   Multi-dim arrays in records
+
+ Full function list: mplfunc.txt (236 entries)
+================================================================

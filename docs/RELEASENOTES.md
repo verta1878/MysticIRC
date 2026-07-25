@@ -116,12 +116,104 @@ Version-bumped to 1.10IRC final. No code changes.
 - Web download option ([W]) not implemented (HTTP stub was empty)
 - MPL scripts may need recompilation after upgrade
 
-## Next Version: 1.11IRC
+## Mystic BBS 1.11IRC Alpha 1 (July 24, 2026) — Final (untested alpha)
 
-Roadmap:
-- MDL refactor (replace mdl wrappers with FPC RTL)
-- HS/Link Pascal port (clean-room from HDK spec)
-- FTP/Web download prompt wiring
+**g00r00 1.11 A1 port — 13 items:**
+- MPL: Records passed by VAR reference (compiler + interpreter fix)
+- Embedded ANSI support in message reading
+- ANSI upload/edit in full screen editor with auto pipe-code conversion
+- ANSI abort: waits for sequence completion, time-based checking
+- File listing search performance (6x I/O reduction)
+- FIDOPOLL blank hostname check
+- Node chat /topic lockup fix + blank topic reset
+- Install F2/ESC selectable with arrow keys
+- ENTER aborts send node message
+
+**IRC fork items:**
+- HS/Link clean-room Pascal port (1,067 lines, 55 tests, all C features)
+- HS/Link standalone program (DOS + Win32)
+- FOSSIL/serial stack imported to mdl/ (m_fossil, m_serial, m_fossil_io)
+- m_mouse.pas restored for cross-platform text-mode mouse
+- RIP code isolated to mystic_rip/ (not in BBS core)
+- ansi2pipe.pas utility compiles clean
+- docs/PORT-111.md: g00r00 1.11 A1-A6 porting checklist (38 items)
+
+**Test scripts** (all compile, none runtime tested):
+- `scripts/testrec.mps` — Record VAR parameters
+- `scripts/testarr.mps` — Multi-dim arrays in records
+- `scripts/testrecfn.mps` — Record function return + `Var := Func()` call site
+- `scripts/testdate.mps` — TimerMS, FormatDate masks, DateStr formats 4-6
+- `scripts/appendtext_demo.mps` — AppendText procedure
+- `scripts/chatcheck_demo.mps` — CfgChatStart/CfgChatEnd (Uses CFG)
+
+**Reference files:**
+- `mplfunc.txt` — 237 functions/variables, all with descriptions
+- `mplref.txt` — Detailed examples for every new feature
+
+**MIDE improvements:**
+- RECORD and ARRAY added to syntax highlighting
+- Help > Index: searchable function list from mplfunc.txt
+- Help > Under Cursor: look up word at cursor position
+- Improved error messages with fix hints
+
+**Upgrade notes:** Run `mplc -ALL` to recompile all MPL scripts.
+
+### 1.11IRC Alpha 4 (July 24, 2026)
+- MUTIL echomail export resume tracking (user 0 lastread)
+- TIC REPLACES keyword handling
+- Editor strips kludge/tear/origin on load, regenerates on save
+- Quote buffer overflow crash fix
+
+### 1.11IRC Alpha 5 (July 24, 2026)
+- Forward message strips and regenerates network info
+- MPL multi-dim arrays in records: proper offset calculation (bytecode change)
+- MPL FormatDate(DosDate, Mask) function (fn 563)
+- MPL record function Var := Func() call site fully working
+- MIDE Help system: Index, Under Cursor, Help on Help
+- mplfunc.txt (237 entries) + mplref.txt (full examples)
+
+### 1.11IRC Alpha 6 (pending)
+- g00r00 1.11 A6: ANSI draw mode FSE + Amiga font Linux fix
+- Last g00r00 alpha to port
+
+### 1.11IRC Alpha 7 (July 24, 2026 — IRC fork Phase 2)
+- FOSSIL/serial wired into mystic.exe: TIOFossil adapter,
+  -COM and -FOSSIL command line flags, no MIS needed for dial-up
+- Print API backport to v1-v4: version-independent, any framebuffer
+  resolution, 6 drivers (ESC/P, PCL, PostScript, BMP, Raw)
+- mis_client_serial removed — MIS is TCP only, FOSSIL is direct-run
+- MDL refactor: pending
+- OS/2 target via fpc264irc EMX linker (working, slow compile)
+
+**ANSI to RIP Converter (chg2rip v2.3):**
+- Pixel-perfect ANSI→RIP conversion (100% ImageMagick verified)
+- 44KB output for 62KB ANSI (31x smaller than v1.0 pixel bars)
+- VGA 8x16 font ROM for exact glyph rendering
+- CGA palette 171/87 (not 170/85 — key discovery)
+- Text-based emission: !|@ commands instead of per-pixel bars
+- RIPtermJS-verified: ! safe in text, charsize 2 = 16px height
+- -pd flag for PabloDraw compatibility (ASCII-only text)
+- ans2png: pixel-perfect ANSI→BMP renderer (100% match)
+
+**Reference material added:**
+- examples/ripterm154/ — Original RIPterm 1.54 DOS binary (Carl Gorringe archive)
+- examples/riptermJS/ — Carl Gorringe's JavaScript RIP viewer (GPLv3)
+
+**Deferred to 1.12IRC:** FTP prompts, HTTP config
+
+### 1.11IRC Alpha 2 (July 24, 2026)
+- TZUTC kludge on echomail messages (FTS-4008 compliant)
+- ANSI escape sequences stripped from quoted text
+
+### 1.11IRC Alpha 3 (July 24, 2026)
+- MPL: Functions can return record types
+- MPL: TimerMS millisecond timer (function 562)
+- MCI codes |-Y and |-N for Yes/No prompt defaults
+- DateDos2Str/DateJulian2Str formats 4-6 (4-digit year)
+- FormatDate mask function ready (YYYY YY MM DDD DD HH II SS NNN)
+- MUTIL mass upload: better DIZ logging, temp dir purge
+- Reset inactivity timeout after file transfer
+- Searchlight prompt menus: functional, unverified vs g00r00 rework
 - HTTP server configuration in mystic.dat
 - Protocol menu strings in language file
 

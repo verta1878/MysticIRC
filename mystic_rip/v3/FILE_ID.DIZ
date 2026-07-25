@@ -1,0 +1,28 @@
+  RIPscrip v3.0 Server-Side Rendering Engine
+  ============================================
+  Mystic BBS IRC Fork — rip3api.pas
+  8,294 lines | 69 commands | 304 methods
+  16M TrueColor | World coords | 125 codecs
+
+  ALL 24 PHASES COMPLETE — 300 items done
+
+  TrueColor (RGB24/RGB32) pixel buffers
+  Resolution-independent world coordinates
+  11 image formats (JPEG/GIF/PNG/BMP/TGA+6)
+  Scalable fonts (RFF v2.2 + MAF + CHR)
+  4-stream audio, 13 format decoders
+  MIDI + FM synth, cue points, WAV streaming
+  Gradients, shadows, bezier, texture map
+  Clipping paths, alpha compositing
+  Server/client architecture, scoped vars
+  Data tables, forms, variable binding
+  5 progressive rendering codecs
+  4 test audio files in testdata/
+
+  img/22 wav/39 prg/6 pasjpeg/58 codecs
+  Pure Pascal | Zero dependencies
+  FPC 2.6.4irc | All platforms | GPLv3
+  Tests: 592/592 (14 suites)
+
+  Part of the Mystic BBS IRC Fork
+  July 2026

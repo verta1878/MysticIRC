@@ -25,7 +25,10 @@ Unit BBS_IO;
 
 Interface
 
-{.$DEFINE USEUTF8}
+// A6-02: Enable UTF-8 output on Unix for proper Amiga/CP437 font rendering
+{$IFDEF UNIX}
+  {$DEFINE USEUTF8}
+{$ENDIF}
 
 Uses
   {$IFDEF WINDOWS}
@@ -62,6 +65,7 @@ Type
     InMacroStr     : String;
     BaudEmulator   : LongInt;
     AllowPause     : Boolean;
+    NextYNForce    : Byte;     // A3-06/07: 0=none, 1=force Yes, 2=force No
     AllowMCI       : Boolean;
     LocalInput     : Boolean;
     AllowArrow     : Boolean;
@@ -74,7 +78,7 @@ Type
     AllowAbort     : Boolean;
     NoFile         : Boolean;
     Graphics       : Byte;
-    UseRipTerm     : Boolean;
+    // UseRipTerm removed — RIP moved to mystic_test/
     SavedScreen    : TConsoleImageRec;  // A52: |SS / |RS screen save/restore
     PausePtr       : Byte;
     InputData      : Array[1..mysMaxInputHistory] of String[255];
@@ -238,6 +242,7 @@ Begin
   InMacroPos     := 0;
   InMacroStr     := '';
   AllowPause     := False;
+  NextYNForce    := 0;
   AllowMCI       := True;
   LocalInput     := False;
   AllowArrow     := False;
@@ -249,7 +254,7 @@ Begin
   InSize         := 0;
   NoFile         := False;
   Graphics       := 1;
-  UseRipTerm     := False;
+  // UseRipTerm removed
   PausePtr       := 1;
   LastMCIValue   := '';
   InputPos       := 0;
@@ -563,6 +568,13 @@ Begin
   End;
 
   Case Code[1] of
+    '-' : Case Code[2] of
+            'Y' : NextYNForce := 1;  // A3-06: force next Yes/No to default Yes
+            'N' : NextYNForce := 2;  // A3-07: force next Yes/No to default No
+          Else
+            Result := False;
+            Exit;
+          End;
     '!' : If Code[2] in ['0'..'9'] Then Begin
             A := strS2I(Code[2]);
 
@@ -1307,6 +1319,9 @@ Var
   Str        : String;
   Ch         : Char;
   Done       : Boolean;
+  InSequence : Boolean;
+  SeqCount   : Byte;
+  LastAbortCheck : LongInt;
 
   Function CheckFileInPath (Path: String) : Boolean;
   Var
@@ -1399,6 +1414,9 @@ Begin
   BufSize      := 0;
   Ch           := #0;
   BaudEmulator := Speed;
+  InSequence   := False;
+  SeqCount     := 0;
+  LastAbortCheck := TimerSeconds;
 
   // A61: Map DI## value to actual baud rate for accurate emulation
   // 00 = full speed, 01-09 = 300, 10-19 = 1200, 20-29 = 2400,
@@ -1435,10 +1453,16 @@ Begin
         WaitMS(10);
     End;
 
-    If AllowAbort And (BufPos MOD 128 = 0) And Not Session.LocalMode Then
-      If InKey(0) = #32 Then Begin
-        AnsiColor(7);
-        Break;
+    // A1-04: Time-based abort check (every half second)
+    If AllowAbort And Not Session.LocalMode Then
+      If TimerSeconds <> LastAbortCheck Then Begin
+        LastAbortCheck := TimerSeconds;
+        // A1-03: Don't abort mid-ANSI-sequence
+        If (Not InSequence) or (SeqCount > 10) Then
+          If InKey(0) = #32 Then Begin
+            AnsiColor(7);
+            Break;
+          End;
       End;
 (*
     If AllowAbort And (InKey(0) = #32) Then Begin
@@ -1446,6 +1470,16 @@ Begin
       Break;
     End;
 *)
+
+    // A1-03: Track ANSI escape sequence state
+    If Ch = #27 Then Begin
+      InSequence := True;
+      SeqCount   := 0;
+    End Else If InSequence Then Begin
+      Inc(SeqCount);
+      If Ch in ['A'..'Z', 'a'..'z'] Then
+        InSequence := False;
+    End;
 
     Case Ch of
       #10 : Begin
@@ -1862,6 +1896,10 @@ End;
 
 Function TBBSIO.GetYN (Str: String; Yes: Boolean) : Boolean;
 Begin
+  // A3-06/07: Apply forced Yes/No default
+  If NextYNForce = 1 Then Begin Yes := True;  NextYNForce := 0; End;
+  If NextYNForce = 2 Then Begin Yes := False; NextYNForce := 0; End;
+
   If (TBBSCore(Core).Theme.Flags AND ThmLightbarYN <> 0) and (Graphics = 1) Then Begin
     GetYN := GetYNL(Str, Yes);
     Exit;

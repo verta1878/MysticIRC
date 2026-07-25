@@ -24,7 +24,7 @@
 //
 // Usage: ripview <scene.rip> [output.bmp]
 //
-// Fonts and icons are loaded from examples/ripterm154/
+// Fonts and icons are loaded from examples/ripterm154js/
 //
 // This file is part of Mystic BBS (GPLv3).
 // ====================================================================

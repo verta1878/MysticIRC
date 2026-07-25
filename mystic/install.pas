@@ -376,8 +376,8 @@ Begin
   MakeDir (Config.SystemPath + 'files' + PathChar + 'uploads' + PathChar);
   MakeDir (Config.InBoundPath);
   MakeDir (Config.OutBoundPath);
-  MakeDir (Lang.TextPath + 'rip' + PathChar);     { RIPscrip display files }
-  MakeDir (Lang.TextPath + 'icons' + PathChar);   { RIPscrip icon files }
+  MakeDir (Lang.TextPath + 'icon' + PathChar);     { icon files }
+  MakeDir (Lang.TextPath + 'font' + PathChar);     { font files }
 End;
 
 Procedure ExtractFile (Y : Byte; Desc, FN, EID, DestPath : String);
@@ -611,7 +611,8 @@ Begin
   Screen.WriteXY (13, 20, 7, 'Attach Directory');
   Screen.WriteXY (15, 21, 7, 'Logs Directory');
 
-  Screen.WriteXYPipe (19, 23, 7, 64, 'Press |08[|15F2|08] |07to begin install or |08[|15ESC|08] |07to Quit');
+  // A1-09: F2 and ESC selectable with arrow keys
+  Screen.WriteXYPipe (19, 23, 7, 64, '|08[|15F2/ENTER|08] |07Begin install    |08[|15ESC|08] |07Quit');
 
 	Pos := 1;
 
@@ -680,8 +681,12 @@ Begin
 							GetPaths := True;
               Break;
 						End;
-			#72 : If Pos > 1 Then Dec(Pos) Else Pos := 9;
-			#80 : If Pos < 9 Then Inc(Pos) Else Pos := 1;
+			#72 : If Pos > 1 Then Dec(Pos) Else Pos := 11;
+			#80 : If Pos < 11 Then Inc(Pos) Else Pos := 1;
+			#13 : Case Pos of
+							10 : Begin GetPaths := True; Break; End;
+							11 : Begin GetPaths := False; Break; End;
+						End;
 		End;
 	Until False;
 

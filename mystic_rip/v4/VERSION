@@ -1,0 +1,25 @@
+RIPscrip v4.0 Server-Side Rendering Engine
+Version: 4.0.0-dev
+Status:  v3.0.24 base + all v4 extensions
+Lines:   8572 (rip4api.pas)
+
+v4.0 Features:
+  Unicode:    cp437u8, u8render, ttfglyph, rip4uni
+  MPEG:       mpgdemux, mpgvdec, mpgvbuf, mpgplay, mpgstrm
+  HTML 1.0:   htmlpars, htmltree, htmllayo, htmlrip, htmlrend
+  Print API:  prnapi, prnraw, prnbmp, prnescp, prnpcl, prnps
+  Animation:  flidec (FLI/FLC Autodesk format)
+
+Codec directories (DOS 8.3 compliant):
+  img/ — 32 image/animation/graphics/font/HTML codecs
+  wav/ — 44 audio + 3 ASM fast-paths/video/streaming codecs
+  prg/ — 6 progressive rendering codecs
+  prt/ — 6 printer driver codecs
+  pasjpeg/ — 58 JPEG library files
+
+Total codec files: 146 (88 units + 58 pasjpeg)
+Tests: 629/629 (15 suites — 14 inherited + 1 v4-new)
+License: GPLv3
+Compile: ppcx64 -Mdelphi -Fuimg -Fuwav -Fuprg -Fuprn -Fupasjpeg
+
+Editor: RIPforge (planned)

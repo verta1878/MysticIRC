@@ -1,20 +1,33 @@
-Mystic BBS 1.10IRC
+Mystic BBS 1.11IRC A7 (untested)
 Community Fork (IRC) - GPLv3
 Ecstasy BBS - FTN 1:152/158
 Linux, Windows, DOS, OS/2
-Built with FPC 2.6.4irc r3.1+
 
-RIPscrip Engines (1,433 tests passing):
-  v1 ripscr.pas    4,041 lines  51 cmds
-  v2 rip2api.pas   5,304 lines  67 cmds
-  v3 rip3api.pas   8,294 lines  69 cmds
-  v4 rip4api.pas   8,572 lines  69+ cmds
+g00r00 1.11 A1-A6 fully ported (38 items)
+MPL: Records VAR/functions/multi-dim arrays
+     TimerMS, FormatDate, DateStr fmt 4-6
+     20 scripts, 237-function reference
+MIDE: Help Index, Under Cursor, syntax
+FOSSIL: TIOFossil for DOS serial dial-up
+FidoNet: TZUTC FTS-4008, TIC REPLACES
+Print API: ESC/P PCL PostScript BMP (v1-v4)
+Archive: ZIP RAR ARJ LHA ARC PAK SQZ HYP UC2
 
-Protocols: Xmodem Ymodem Ymodem-G
-  Zmodem Zmodem-8K Zmodem-32K Kermit
+chg2rip v2.3 — ANSI to RIPscrip converter
+  Pixel-perfect (100% ImageMagick verified)
+  44KB output (31x smaller than v1.0)
+  VGA 8x16 font ROM, CGA 171/87 palette
+  -pd flag for PabloDraw compatibility
+  
+ans2png, ripviewer (SDL2/BMP) — ANSI to BMP renderer (100% match)
 
+RIPscrip Engines v1-v4 (1,433 tests)
+  Based on Carl Gorringe's RIPtermJS (GPLv3)
+  Ported by wrench, extended by evga + Kiddo
+
+Protocols: Zmodem-32K Xmodem Ymodem Kermit
+  HS/Link (clean-room Pascal port, 55 tests)
 MIS: Telnet FTP HTTP SMTP POP3 NNTP BINKP
-  FTP: SIZE/REST/PASV fixed
-  HTTP: new file server (port 8080)
 
+Team: sysop/0, evga, Kiddo, wrench
 July 2026

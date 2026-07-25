@@ -82,6 +82,8 @@ Type
     Theme          : RecTheme;
     Template       : RecTemplateData;
     LocalMode      : Boolean;
+    UseFossil      : Boolean;   // A7: Use FOSSIL/serial instead of socket
+    SerialPort     : Byte;      // A7: COM port number (1-4)
     Baud           : LongInt;
     ExitLevel      : Byte;
     EventWarn      : Boolean;
@@ -173,6 +175,8 @@ Begin
   SemUseNet     := False;
   CommHandle    := -1;
   LocalMode     := False;
+  UseFossil     := False;
+  SerialPort    := 1;
   Baud          := 38400;
   ExitLevel     := 0;
   EventWarn     := False;
@@ -511,24 +515,7 @@ Begin
         WriteLn('  Script path: ' + Theme.ScriptPath);
         PathError := True;
       End;
-      If Theme.IconPath = '' Then Begin
-        SystemLog('ERROR: Icon path not configured for theme: ' + Theme.FileName);
-        WriteLn('  Icon path: (not set)');
-        PathError := True;
-      End Else If Not DirExists(Theme.IconPath) Then Begin
-        SystemLog('ERROR: Icon path not found: ' + Theme.IconPath);
-        WriteLn('  Icon path: ' + Theme.IconPath);
-        PathError := True;
-      End;
-      If Theme.FontPath = '' Then Begin
-        SystemLog('ERROR: Font path not configured for theme: ' + Theme.FileName);
-        WriteLn('  Font path: (not set)');
-        PathError := True;
-      End Else If Not DirExists(Theme.FontPath) Then Begin
-        SystemLog('ERROR: Font path not found: ' + Theme.FontPath);
-        WriteLn('  Font path: ' + Theme.FontPath);
-        PathError := True;
-      End;
+      
       If PathError Then Begin
         WriteLn('ERROR: Theme paths missing for theme: ' + Theme.FileName);
         WriteLn('Run: maketheme cfgtheme  to set the missing paths.');

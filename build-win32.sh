@@ -7,8 +7,8 @@ set -u
 ROOT="$(cd "$(dirname "$0")" && pwd)"; cd "$ROOT"
 BIN="$ROOT/out-win32/bin"; UNITS="$ROOT/out-win32/units"
 mkdir -p "$BIN" "$UNITS"
-FPC="${FPC:-../fpc264irc-git/bin/ppc386}"
-FPCROOT="${FPCROOT:-../fpc264irc-git}"
+FPC="${FPC:-../fpc264irc-clean/bin/ppc386}"
+FPCROOT="${FPCROOT:-../fpc264irc-clean}"
 XTOOLS="$FPCROOT/bin/tools/i386-win32"
 XUNITS="$FPCROOT/bin/units/i386-win32"
 FPCOPTS=(-Twin32 -Mdelphi -Fumdl -Fumystic -Fimdl -Fimystic -Fomdl

@@ -1,0 +1,21 @@
+  RIPscrip v2.0 Server-Side Rendering Engine
+  ============================================
+  Mystic BBS IRC Fork — rip2api.pas
+  5,304 lines | 67 commands | 170 methods
+  256-color | 1280x1024 | RFF scalable fonts
+
+  Backward-compatible v1.54 + v2.0 extensions:
+  Configurable resolution (320x200-1280x1024)
+  256-color palette, extended polyline/polygon
+  RFF font loading, JPEG/BMP/PAL support
+  3D transforms, sprites, Wu antialiasing
+  Palette fade/rotate, block resize/rotate
+  WAV streaming + PNG + JPEG streaming
+
+  Codec: img/ (JPEG decoder + pasjpeg)
+  Pure Pascal | Zero dependencies
+  FPC 2.6.4irc | All platforms | GPLv3
+  Tests: 115/115 (2 suites)
+
+  Part of the Mystic BBS IRC Fork
+  July 2026

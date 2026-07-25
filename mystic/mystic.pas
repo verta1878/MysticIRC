@@ -31,6 +31,9 @@ Uses
   {$IFDEF WINDOWS}
     m_io_Base,
     m_io_Sockets,
+    {$IFDEF GO32V2}
+    m_io_Fossil,
+    {$ENDIF}
   {$ENDIF}
   {$IFDEF UNIX}
     BaseUnix,
@@ -549,7 +552,15 @@ Begin
     Else
     If Temp = '-L' Then Session.LocalMode := True
     Else
-    If Temp = '-R' Then Session.io.Graphics := TERM_RIP;
+    // A7: FOSSIL/serial port support for DOS
+    If Copy(Temp, 1, 4) = '-COM' Then Begin
+      Session.SerialPort := strS2I(Copy(Temp, 5, Length(Temp)));
+      Session.UseFossil  := True;
+    End Else
+    If Temp = '-FOSSIL' Then
+      Session.UseFossil := True
+    Else
+    // -R flag removed — RIP moved to mystic_test/
   End;
 
   {$IFDEF UNIX}
@@ -567,6 +578,25 @@ Begin
   End;
 
   CheckPathsAndDataFiles;
+
+  // A7: FOSSIL/serial port initialization for DOS
+  {$IFDEF GO32V2}
+  If Session.UseFossil Then Begin
+    Session.LocalMode := False;
+    // Replace socket client with FOSSIL client
+    Session.Client.Free;
+    Session.Client := TIOFossil.Create(Session.SerialPort, Session.Baud);
+
+    If Not TIOFossil(Session.Client).Connected Then Begin
+      WriteLn('FOSSIL: Cannot open COM' + strI2S(Session.SerialPort));
+      DisposeClasses;
+      Halt;
+    End;
+
+    Session.SystemLog('FOSSIL mode: COM' + strI2S(Session.SerialPort) +
+                      ' at ' + strI2S(Session.Baud) + ' baud');
+  End;
+  {$ENDIF}
 
   {$IFDEF WINDOWS}
     Session.LocalMode := Session.CommHandle = -1;

@@ -64,3 +64,62 @@
  6. MPL scripts may need recompilation if upgrading from an older version.
     Run your .mps files through the MPL compiler to regenerate .mpx files.
 
+================================================================
+ Upgrading to Mystic BBS 1.11IRC Alpha 1
+================================================================
+
+ 1. Replace mystic, mis, mplc, mutil, fidopoll binaries.
+
+ 2. IMPORTANT: Recompile ALL MPL scripts:
+      mplc -ALL
+    The MPL bytecode format changed for record VAR parameters.
+    Old .mpx files will crash. Run this from your Mystic directory.
+
+ 3. The following record fields were removed from theme data:
+      - UseRipDetect (RecConfig)
+      - ThmAllowRIP constant
+      - TERM_RIP constant
+    RIP support moved to mystic_rip/ for future development.
+    IconPath and FontPath remain for ANSI icons and theme fonts.
+
+ 4. The -R command line flag (RIP terminal mode) was removed.
+    DefTermMode max is now 3 (ANSI). RIP option (4) removed.
+
+ 5. Configuration RIP Editor menu option removed.
+    RIP requires graphical mode, not text 80x25.
+
+ 6. Protocol Editor: HS/Link can be added as external protocol.
+    Compile hslink.pas from examples/hslink-src/ for your platform.
+    Protocol Editor setup:
+      Key=H  Desc=HS/Link  Batch=No
+      Send: hslink -P%%1 -B%%2 %%3
+      Recv: hslink -P%%1 -B%%2 -U%%3
+
+ 7. New MPL feature: Records can be passed by VAR reference.
+    Example: Procedure MyProc (Var T: MyRecord);
+    See scripts/testrec.mps for usage.
+
+ 8. Messages containing ANSI escape codes are now displayed
+    with embedded colors. ANSI art can be uploaded in the
+    full screen editor and auto-converted to pipe codes.
+
+ 9. install program now creates icon/ and font/ directories
+    under the text path (previously rip/ and icons/).
+
+================================================================
+ Upgrading to Mystic BBS 1.11IRC Alpha 3
+================================================================
+
+ 1. Replace mystic, mis, mplc, mutil, fidopoll binaries.
+
+ 2. Recompile ALL MPL scripts: mplc -ALL
+    New function: TimerMS (function 562)
+
+ 3. New MCI codes available in prompt files:
+      |-Y  Force next Yes/No prompt to default Yes
+      |-N  Force next Yes/No prompt to default No
+
+ 4. DateDos2Str and DateJulian2Str now support formats 4-6
+    for 4-digit year display (4=MM/DD/YYYY, 5=DD/MM/YYYY,
+    6=YYYY/MM/DD). Existing formats 1-3 unchanged.
+

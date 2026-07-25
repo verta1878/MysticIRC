@@ -1,10 +1,21 @@
-HS/Link External Protocol BETA TEST
-GERMAN LANGUAGE VERSION
-As of 8:37 pm, Tuesday, February 8, 1994 
-HS/Link is a high speed, single and bi-
-directional file transfer protocol with many
-advanced features.  It is EASY to set up and
-runs very fast with all kinds of modems.
-Now includes ONLINE CHAT mode.
-FHSLINK.EXE now supports FOSSIL drivers.
-See HS-INST##.ZIP for install instructions.
+  HS/Link File Transfer Protocol
+  ======================================
+  Clean-room Pascal implementation
+  Mystic BBS IRC Fork — GPLv3
+
+  Bidirectional send+receive
+  24-bit CRC error detection
+  Sliding window flow control
+  Crash recovery / resume
+  Ready packet negotiation
+  Chat during transfer
+  16 packet types, all handled
+
+  1,067 lines | Pure Pascal
+  Compiles: Linux, Win32, DOS, FreeBSD
+
+  From HDK spec — no C code copied
+  Original protocol: Samuel H. Smith
+
+  m_protocol_hslink.pas
+  July 2026

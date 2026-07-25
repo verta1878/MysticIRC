@@ -54,7 +54,10 @@ Uses
   {$ELSE}
     m_Protocol_Queue,
     m_Protocol_Base,
-    m_Protocol_Zmodem;
+    m_Protocol_Xmodem,
+    m_Protocol_Ymodem,
+    m_Protocol_Zmodem,
+    m_Protocol_Kermit;
   {$ENDIF}
 
 Type
@@ -443,9 +446,23 @@ Var
       Protocol := TProtocolZmodem.Create(Client, Queue)
     Else If Command = '@ZMODEM8' Then Begin
       Protocol := TProtocolZmodem.Create(Client, Queue);
-
       TProtocolZmodem(Protocol).CurBufSize := 8 * 1024;
-    End Else Begin
+    End
+    Else If Command = '@ZMODEM32' Then Begin
+      Protocol := TProtocolZmodem.Create(Client, Queue);
+      TProtocolZmodem(Protocol).CurBufSize := 32 * 1024;
+    End
+    Else If Command = '@YMODEM' Then
+      Protocol := TProtocolYmodem.Create(Client, Queue)
+    Else If Command = '@YMODEMG' Then Begin
+      Protocol := TProtocolYmodem.Create(Client, Queue);
+      TProtocolYmodem(Protocol).UseG := True;
+    End
+    Else If Command = '@XMODEM' Then
+      Protocol := TProtocolXmodem.Create(Client, Queue)
+    Else If Command = '@KERMIT' Then
+      Protocol := TProtocolKermit.Create(Client, Queue)
+    Else Begin
       {$IFDEF UNIX}
       Client.Free;
       {$ENDIF}
@@ -533,6 +550,10 @@ Var
     {$IFDEF UNIX}
       Client.Free;
     {$ENDIF}
+
+    // A3-08: Reset inactivity timeout after file transfer
+    // prevents getting logged out if transfer took longer than inactivity period
+    Session.TimeOut := TimerSeconds;
   End;
   {$ENDIF}
 
@@ -2240,15 +2261,26 @@ Var
             T2 := Bool_Search(Data, FDir.FileName);
 
             If Not T2 Then Begin
+              // A1-05: Read all description lines in one BlockRead
+              // instead of seeking per line for better performance
               Seek (DataFile, FDir.DescPtr);
 
-              For A := 1 to FDir.DescLines Do Begin
+              If FDir.DescLines > 0 Then Begin
+                // Read all description bytes at once
                 BlockRead (DataFile, Temp[0], 1);
-                BlockRead (DataFile, Temp[1], Length(Temp));
+                BlockRead (DataFile, Temp[1], Ord(Temp[0]));
 
-                If Bool_Search(Data, Temp) Then Begin
+                If Bool_Search(Data, Temp) Then
                   T2 := True;
-                  Break;
+
+                For A := 2 to FDir.DescLines Do Begin
+                  BlockRead (DataFile, Temp[0], 1);
+                  BlockRead (DataFile, Temp[1], Ord(Temp[0]));
+
+                  If Bool_Search(Data, Temp) Then Begin
+                    T2 := True;
+                    Break;
+                  End;
                 End;
               End;
             End;

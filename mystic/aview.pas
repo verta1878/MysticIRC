@@ -67,6 +67,10 @@ Uses
   AViewARJ,
   AViewLZH,
   AViewRAR,
+  AViewARC,
+  AViewSQZ,
+  AViewHYP,
+  AViewUC2,
   AViewMeta;
 
 Function GetArchiveType (Name: String) : Char;
@@ -98,7 +102,25 @@ Begin
     Result := 'Z'
   Else
   If (Buf[3] = '-') and (Buf[4] = 'l') and (Buf[5] in ['h', 'z']) Then
-    Result := 'L';
+    Result := 'L'
+  Else
+  // ARC/PAK: 0x1A marker byte
+  If Buf[1] = #$1A Then
+    Result := 'C'
+  Else
+  // SQZ: HLSQZ
+  If (Buf[1] = 'H') and (Buf[2] = 'L') and (Buf[3] = 'S') and
+     (Buf[4] = 'Q') and (Buf[5] = 'Z') Then
+    Result := 'S'
+  Else
+  // HYP: HP
+  If (Buf[1] = 'H') and (Buf[2] = 'P') Then
+    Result := 'H'
+  Else
+  // UC2: UC2\x1A
+  If (Buf[1] = 'U') and (Buf[2] = 'C') and (Buf[3] = '2') and
+     (Buf[4] = #$1A) Then
+    Result := 'U';
 
   // Media files: detect by extension (no single magic number)
   If Result = '?' Then Begin
@@ -161,6 +183,10 @@ Begin
     'Z' : _Archive := New(PZipArchive, Init);
     'L' : _Archive := New(PLzhArchive, Init);
     'R' : _Archive := New(PRarArchive, Init);
+    'C' : _Archive := New(PArcArchive, Init);
+    'S' : _Archive := New(PSqzArchive, Init);
+    'H' : _Archive := New(PHypArchive, Init);
+    'U' : _Archive := New(PUC2Archive, Init);
     'M' : _Archive := New(PMediaArchive, Init);
   End;
 

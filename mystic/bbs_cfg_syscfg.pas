@@ -117,7 +117,7 @@ Begin
   Form.AddStr  ('Q', ' QWK Net Menu',     10, 14, 26, 14, 14, 20, 20, @bbsCfg.QwkNetMenu, Topic + 'QWK menu for QWK network users');
   Form.AddStr  ('H', ' Theme',            17, 15, 26, 15,  7, 20, 20, @bbsCfg.DefThemeFile, Topic);
   Form.AddBol  ('K', ' Ask Theme',        13, 16, 26, 16, 11,  3, @bbsCfg.ThemeOnStart, Topic + 'Ask theme each connection');
-  Form.AddTog  ('E', ' Terminal',         14, 17, 26, 17, 10, 10, 0, 4, 'Ask Detect Detect/Ask ANSI RIP', @bbsCfg.DefTermMode, Topic);
+  Form.AddTog  ('E', ' Terminal',         14, 17, 26, 17, 10, 10, 0, 3, 'Ask Detect Detect/Ask ANSI', @bbsCfg.DefTermMode, Topic);
 
   Form.AddBol  ('L', ' Chat Logging',     53,  7, 69,  7, 14,  3, @bbsCfg.ChatLogging, Topic);
   Form.AddByte ('R', ' Hours Start',      54,  8, 69,  8, 13,  2, 0, 24, @bbsCfg.ChatStart, Topic);

@@ -47,7 +47,7 @@ Compiles 44/46 on Linux (2 Windows-only expected).
 - [ ] Audit mystic/*.pas for stale code
 - [ ] Verify build scripts work
 - [ ] Clean out-win32/ build artifacts
-- [ ] Review mystic_test/ vs mystic/ for drift
+- [ ] Review mystic_rip/engine/ vs mystic/ for drift
 - [ ] Remove stale .a library files
 - [ ] Verify all 15 Linux binaries build
 - [ ] Verify all 15 Win32 binaries build

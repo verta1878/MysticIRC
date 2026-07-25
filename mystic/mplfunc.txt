@@ -1,0 +1,562 @@
+// Copyright (C) 2026 Kiddo — GPLv3 — Mystic BBS IRC Fork
+
+================================================================
+ MPL Function Quick Reference — Mystic BBS 1.11IRC
+ 237 built-in functions, procedures, and variables
+ Search with your editor or MIDE Help > Under Cursor
+================================================================
+
+  abs(LongInt) : LongInt
+    Returns absolute value
+
+  acs(String) : Boolean
+    Check access string. Returns True if user has access
+
+  addslash(String) : String
+    Add trailing path separator if not present
+
+  appendtext(String, String)
+    Append text line to a file
+
+  bitcheck(Byte, Any) : Boolean
+    Check if bit is set in value
+
+  bitset(Byte, Any, Boolean)
+    Set a bit in value
+
+  bittoggle(Byte, Any)
+    Toggle a bit in value
+
+  boxclose(LongInt)
+    Close a menu box by handle
+
+  boxheader(LongInt, Byte, Byte, String)
+    Set box header text
+
+  boxopen(LongInt, Byte, Byte, Byte, Byte)
+    Open a menu box. Returns box handle
+
+  boxoptions(LongInt, Byte, Boolean, Byte, Byte, Byte, Byte, Boolean, Byte)
+    Set box display options
+
+  bufflush
+    Flush output buffer to terminal
+
+  chr(Byte) : Char
+    Convert byte to character
+
+  classcreate(Var LongInt, String)
+    Create a class instance
+
+  classfree(LongInt)
+    Free a class instance
+
+  clreol
+    Clear to end of line
+
+  clrscr
+    Clear screen
+
+  copy(String, LongInt, LongInt) : String
+    Copy substring. copy(Str, Start, Len)
+
+  date2dos(String) : LongInt
+    Convert date string to DOS date format
+
+  date2julian(String) : LongInt
+    Convert date string to Julian date
+
+  dateg2j(LongInt, LongInt, LongInt, Var LongInt)
+    Convert Gregorian date to Julian
+
+  datej2g(LongInt, Integer, Integer, Integer)
+    Convert Julian date to Gregorian (year, month, day)
+
+  datejulian() : LongInt
+    Get current Julian date
+
+  datestr(LongInt, Byte) : String
+    Convert DOS date to string. Fmt: 1-3=2yr, 4-6=4yr
+
+  datestrjulian(LongInt, Byte) : String
+    Convert Julian date to string. Fmt: 1-3=2yr, 4-6=4yr
+
+  datetime() : LongInt
+    Get current DOS date/time as LongInt
+
+  datevalid(String) : String
+    Check if date string is valid
+
+  dayofweek(LongInt) : Byte
+    Get day of week (1=Sun..7=Sat)
+
+  daysago(LongInt) : LongInt
+    Days since a date
+
+  delay(LongInt)
+    Pause for milliseconds
+
+  delete(Var String, LongInt, LongInt)
+    Delete characters from string
+
+  direxist(String) : Boolean
+    Check if directory exists
+
+  dispfile(String) : Boolean
+    Display an ANSI/text file to user
+
+  fassign(Var File, String, LongInt)
+    Assign filename to file variable
+
+  fclose(Var File)
+    Close file
+
+  feof(Var File) : Boolean
+    Check for end of file
+
+  filecopy(String, String) : Boolean
+    Copy a file
+
+  fileerase(String)
+    Delete a file
+
+  fileexist(String) : Boolean
+    Check if file exists
+
+  formatdate(LongInt, String) : String
+    Format date using mask: YYYY YY MM DD DDD NNN HH II SS
+
+  fillchar(Any, LongInt, Char)
+    Fill variable with character
+
+  findclose
+    Close a directory search
+
+  findfirst(String, Word)
+    Start directory search
+
+  findnext
+    Continue directory search
+
+  fpos(Var File) : LongInt
+    Get file position
+
+  fread(Var File, Any, Word)
+    Read from binary file
+
+  freadln(Var File, Var String)
+    Read line from text file
+
+  freadrec(Var File, Record)
+    Read record from file
+
+  freset(Var File)
+    Open file for reading
+
+  frewrite(Var File)
+    Create/overwrite file
+
+  fseek(Var File, LongInt)
+    Seek to position in file
+
+  fsize(Var File) : LongInt
+    Get file size
+
+  fwrite(Var File, Any, Word)
+    Write to binary file
+
+  fwriteln(Var File, String)
+    Write line to text file
+
+  fwriterec(Var File, Record)
+    Write record to file
+
+  getattrxy(Byte, Byte) : Byte
+    Get text attribute at screen position
+
+  getcharxy(Byte, Byte) : Char
+    Get character at screen position
+
+  getfbase(LongInt) : Boolean
+    Load file base record by index
+
+  getfgroup(LongInt) : Boolean
+    Load file group record by index
+
+  getmailstats(Var LongInt, Var LongInt)
+    Get email statistics
+
+  getmbase(LongInt) : Boolean
+    Load message base record by index
+
+  getmbasetotal(Boolean) : LongInt
+    Get total message bases
+
+  getmbstats(LongInt, Boolean, Boolean, Var LongInt, Var LongInt, Var LongInt) : Boolean
+    Get message base statistics
+
+  getmgroup(LongInt) : Boolean
+    Load message group record by index
+
+  getprompt(LongInt) : String
+    Get prompt string by number
+
+  getscreeninfo(Byte, Var Byte, Var Byte, Var Byte)
+    Get screen info (X, Y, Attr) for slot
+
+  getthisuser
+    Load current user record
+
+  getuser(LongInt) : Boolean
+    Load user record by number
+
+  getusertime() : Integer
+    Get remaining user time in minutes
+
+  gotoxy(Byte, Byte)
+    Move cursor to X, Y position
+
+  hangup
+    Disconnect the user
+
+  imageget(LongInt, Byte, Byte, Byte, Byte)
+    Save screen region to buffer
+
+  imageput(LongInt)
+    Restore screen region from buffer
+
+  initials(String) : String
+    Get initials from name (e.g. "JC> ")
+
+  input(Byte, Byte, Byte, String) : String
+    Get text input from user
+
+  inputenter(LongInt, Byte, Byte, Byte, String) : Boolean
+    Wait for Enter key
+
+  inputexit(LongInt) : Char
+    Get exit key from last input
+
+  inputnumber(LongInt, Byte, Byte, Byte, Byte, LongInt, LongInt, LongInt) : LongInt
+    Get numeric input from user
+
+  inputny(String) : Boolean
+    Prompt No/Yes (default No)
+
+  inputoptions(LongInt, Byte, Byte, Char, String, String)
+    Set input field options
+
+  inputstring(LongInt, Byte, Byte, Byte, Byte, Byte, String) : String
+    Get string input with options
+
+  inputyn(String) : Boolean
+    Prompt Yes/No (default Yes)
+
+  insert(String, Var String, LongInt)
+    Insert string into another at position
+
+  int2hex(LongInt) : String
+    Convert integer to hex string
+
+  int2str(LongInt) : String
+    Convert integer to string
+
+  isuser(String) : Boolean
+    Check if user exists by name
+
+  justfile(String) : String
+    Extract filename with extension from path
+
+  justfileext(String) : String
+    Extract file extension from path
+
+  justfilename(String) : String
+    Extract filename without extension
+
+  justpath(String) : String
+    Extract directory path from filename
+
+  keypressed() : Boolean
+    Check if a key is waiting
+
+  length(String) : LongInt
+    Get string length
+
+  lower(String) : String
+    Convert string to lowercase
+
+  mci2str(String) : String
+    Process MCI codes and return result string
+
+  mcilength(String) : Byte
+    Get visible length of string (minus pipe codes)
+
+  menucmd(String, String)
+    Execute a menu command
+
+  moreprompt() : Char
+    Show "more" pause prompt
+
+  movex(Byte)
+    Move cursor to column X
+
+  movey(Byte)
+    Move cursor to row Y
+
+  msgeditget(Integer) : String
+    Get message editor line
+
+  msgeditor(Integer, Var Integer, Integer, Integer, Boolean, String, Var String) : Boolean
+    Open message editor
+
+  msgeditset(Integer, String)
+    Set message editor line
+
+  odd(LongInt) : Boolean
+    Check if number is odd
+
+  onekey(String, Boolean) : Char
+    Wait for one keypress from allowed chars
+
+  onekeyrange(String, LongInt, LongInt) : Char
+    Wait for key or number in range
+
+  ord(String) : Byte
+    Get ASCII value of character
+
+  padct(String, Byte, String) : String
+    Pad string centered
+
+  padlt(String, Byte, String) : String
+    Pad string left
+
+  padrt(String, Byte, String) : String
+    Pad string right
+
+  paramcount() : Byte
+    Number of command line parameters
+
+  paramstr(Byte) : String
+    Get command line parameter by index
+
+  pathchar() : Char
+    Get OS path separator (/ or \)
+
+  pause
+    Show pause prompt, wait for key
+
+  pos(String, String) : LongInt
+    Find substring position in string
+
+  purgeinput
+    Clear keyboard input buffer
+
+  putthisuser
+    Save current user record
+
+  putuser(LongInt)
+    Save user record by number
+
+  random(LongInt) : LongInt
+    Generate random number
+
+  randomize
+    Seed random number generator
+
+  readenv(String) : String
+    Read environment variable
+
+  readkey() : String
+    Read one key from keyboard
+
+  real2str(Real, Byte) : String
+    Convert real to string with decimals
+
+  replace(String, String, String) : String
+    Replace substring in string
+
+  setprompt(LongInt, String)
+    Set prompt string by number
+
+  setpromptinfo(Byte, String)
+    Set prompt info variable (1-9)
+
+  setusertime(Integer)
+    Set user time remaining in minutes
+
+  sizeof(Any) : LongInt
+    Get size of variable in bytes
+
+  str2int(String) : LongInt
+    Convert string to integer
+
+  strcomma(LongInt) : String
+    Format number with commas
+
+  stripb(String, String) : String
+    Strip char from both ends of string
+
+  stripl(String, String) : String
+    Strip char from left of string
+
+  striplow(String) : String
+    Strip control characters from string
+
+  stripmci(String) : String
+    Strip MCI codes from string
+
+  strippipe(String) : String
+    Strip pipe color codes from string
+
+  stripr(String, String) : String
+    Strip char from right of string
+
+  strmci(String) : String
+    Process MCI codes in string
+
+  strrep(String, Byte) : String
+    Repeat character N times
+
+  strwrap(Var String, Var String, Byte) : Byte
+    Word-wrap string at position
+
+  stuffkey(String)
+    Stuff string into keyboard buffer
+
+  sysoplog(String)
+    Write to system log
+
+  textattr() : Byte
+    Set text attribute byte
+
+  textcolor(Byte)
+    Set text color
+
+  timer() : LongInt
+    Seconds since midnight
+
+  timermin() : LongInt
+    Minutes since midnight
+
+  timerms() : LongInt
+    Milliseconds since midnight (~10ms resolution)
+
+  timestr(LongInt, Boolean) : String
+    Convert DOS date to time string
+
+  upper(String) : String
+    Convert string to uppercase
+
+  upuser(Integer)
+    Load user record by index (relative)
+
+  wherex() : Byte
+    Get cursor X position
+
+  wherey() : Byte
+    Get cursor Y position
+
+  wordcount(String, String) : Byte
+    Count words in string
+
+  wordget(Byte, String, String) : String
+    Get word N from string
+
+  wordpos(Byte, String, String) : Byte
+    Get position of word N in string
+
+  write(String)
+    Write text (no newline)
+
+  writeln(String)
+    Write text with newline
+
+  writepipe(String)
+    Write text with pipe codes
+
+  writepipeln(String)
+    Write text with pipe codes + newline
+
+  writeraw(String)
+    Write raw text (no MCI processing)
+
+  writerawln(String)
+    Write raw text + newline
+
+  writexy(Byte, Byte, Byte, String)
+    Write text at X,Y position
+
+  writexypipe(Byte, Byte, Byte, Integer, String)
+    Write pipe-coded text at X,Y
+
+
+--- Variables (read/write) ---
+
+  allowarrow : Boolean
+  allowmci : Boolean
+  cfgattpath : String
+    Requires: Uses CFG;
+  cfgchatend : Byte
+    Requires: Uses CFG;
+  cfgchatstart : Byte
+    Requires: Uses CFG;
+  cfgdatapath : String
+    Requires: Uses CFG;
+  cfglogspath : String
+    Requires: Uses CFG;
+  cfgmenupath : String
+    Requires: Uses CFG;
+  cfgmpepath : String
+    Requires: Uses CFG;
+  cfgmsgspath : String
+    Requires: Uses CFG;
+  cfgnetdesc : String
+    Requires: Uses CFG;
+  cfgqwkpath : String
+    Requires: Uses CFG;
+  cfgseeinvis : String
+    Requires: Uses CFG;
+  cfgsyspath : String
+    Requires: Uses CFG;
+  cfgtemppath : String
+    Requires: Uses CFG;
+  cfgtextpath : String
+    Requires: Uses CFG;
+  cfgtimeout : Word
+    Requires: Uses CFG;
+  cfgtnnodes : Byte
+    Requires: Uses CFG;
+  dirattr : LongInt
+  dirname : String
+  dirsize : LongInt
+  dirtime : LongInt
+  doserror : Integer
+  graphics : Byte
+  ignoregroups : Boolean
+  ioresult : LongInt
+  isarrow : Boolean
+  lastscannew : Boolean
+  local : Boolean
+  nodenum : Byte
+  pausepos : Byte
+  progname : String
+  progparams : String
+  rangevalue : LongInt
+  userloginname : String
+    Requires: Uses USER;
+  userloginpw : String
+    Requires: Uses USER;
+
+================================================================
+ New in 1.11IRC:
+   timerms        — Millisecond timer (A3-05)
+   formatdate     — Format date with mask string (A3-11)
+   datestr fmt 4-6 — 4-digit year (A3-12)
+   Record VAR params  — Procedure X(Var R: MyRec) (A1-02)
+   Record functions   — Function X : MyRec (A3-04)
+   Multi-dim arrays   — Array[1..N, 1..M] in records (A5-02)
+   MCI |-Y |-N        — Force Yes/No defaults (A3-06/07)
+
+ See mplref.txt for detailed examples.
+ See scripts/testrec.mps and scripts/testarr.mps for samples.
+================================================================

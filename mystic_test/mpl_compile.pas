@@ -254,14 +254,14 @@ Begin
     mpsFileRecurse     : Result := 'Too many include files: Max ' + strI2S(mplMaxFiles);
     mpsOutputFile      : Result := 'Error writing output file: ' + Str;
     mpsExpected        : Result := 'Expected: ' + Str;
-    mpsUnknownIdent    : Result := 'Unknown identifier: ' + Str;
+    mpsUnknownIdent    : Result := 'Unknown identifier: ' + Str + '. Check spelling or add Uses CFG/USER/MBASE/FBASE';
     mpsInStatement     : Result := 'Error in statement';
     mpsIdentTooLong    : Result := 'Identifier too long: ' + Str + ' (Max ' + strI2S(mplMaxIdentLen) + ')';
     mpsExpIdentifier   : Result := 'Identifier expected';
     mpsTooManyVars     : Result := 'Too many variables: Max ' + strI2S(mplMaxVars);
     mpsDupIdent        : Result := 'Duplicate identifier: '+ Str;
     mpsOverMaxDec      : Result := 'Too many vars in statement: Max ' + strI2S(mplMaxVarDeclare);
-    mpsTypeMismatch    : Result := 'Type mismatch';
+    mpsTypeMismatch    : Result := 'Type mismatch. Check: VAR record params must match the exact record type';
     mpsSyntaxError     : Result := 'Syntax error ' + Str;
     mpsStringNotClosed : Result := 'String exceeds end of line';
     mpsStringTooLong   : Result := 'String too long: Max 255 characters';
@@ -276,11 +276,11 @@ Begin
     mpsDupLabel        : Result := 'Duplicate label: ' + Str;
     mpsLabelNotFound   : Result := 'Label not found: ' + Str;
     mpsFileParamVar    : Result := 'File parameters must be type FILE';
-    mpsBadFunction     : Result := 'Invalid function result type';
+    mpsBadFunction     : Result := 'Invalid function result type. Use: String, LongInt, Boolean, or a Record type';
     mpsOperation       : Result := 'Operand types do not match';
     mpsOverMaxCase     : Result := 'Too many vars in one case statement: Max ' + strI2S(mplMaxCaseNums);
     mpsTooManyFields   : Result := 'Too many fields in record: Max ' + strI2S(mplMaxRecFields);
-    mpsDataTooBig      : Result := 'Structure too large: Max ' + strI2S(mplMaxDataSize) + ' bytes';
+    mpsDataTooBig      : Result := 'Structure too large: Max ' + strI2S(mplMaxDataSize) + ' bytes. Reduce array size or field count';
     mpsMaxConsts       : Result := 'Too many const vars: Max ' + strI2S(mplMaxConsts);
   End;
 End;
@@ -864,16 +864,13 @@ Begin
       If RecData[VarData[VN]^.RecID]^.Fields[Count].ArrDem > 0 Then Begin
         GetStr(tkw[wOpenArray], True, False);
 
-        // output if zero based here asdf asdf
-
         For X := 1 to RecData[VarData[VN]^.RecID]^.Fields[Count].ArrDem Do Begin
 
           OutWord(RecData[VarData[VN]^.RecID]^.Fields[Count].ArrStart[X]);
 
-//          If RecData[VarData[VN]^.RecID]^.Fields[Count].ArrStart[X] = 0 Then
-//            OutWord(0)
-//          Else
-//            OutWord(1);
+          // A5-02: Output dimension size for multi-dim offset calculation
+          OutWord(RecData[VarData[VN]^.RecID]^.Fields[Count].ArrEnd[X] -
+                  RecData[VarData[VN]^.RecID]^.Fields[Count].ArrStart[X] + 1);
 
           ParseVarNumber(True);
 
@@ -1345,14 +1342,24 @@ Begin
 
   VarNum := FindVariable(IdentStr);
 
+  If VarNum = 0 Then
+    Error (mpsUnknownIdent, IdentStr + '. Expected a Record variable')
+  Else
+  If VarData[VarNum]^.Proc Then Begin
+    // A3-04: Record-returning function call
+    If VarData[VarNum]^.vType <> iRecord Then
+      Error (mpsTypeMismatch, IdentStr + ' does not return a Record type')
+    Else
+      ExecuteProcedure (VarNum, True);
+  End Else
   If VarData[VarNum]^.vType <> iRecord Then
-    Error (mpsTypeMismatch, '');
+    Error (mpsTypeMismatch, IdentStr + ' is not a Record type')
+  Else Begin
+    OutWord (VarData[VarNum]^.VarID);
 
-  OutWord (VarData[VarNum]^.VarID);
-
-  ParseArray   (VarNum, True);
-  ParseElement (VarNum, False, iLongInt);
-  // added array and element 1.10a14 for onecard := deck[1] problem
+    ParseArray   (VarNum, True);
+    ParseElement (VarNum, False, iLongInt);
+  End;
 End;
 
 Procedure TParserEngine.NewBooleanCrap;
@@ -2024,13 +2031,15 @@ End;
 
 Procedure TParserEngine.DefineProc;
 Var
-  Info    : TParserVarInfoRec;
-  IsVar   : Boolean;
-  Params  : Word;
-  Count   : Word;
-  ProcVar : Word;
-  VarChar : Char;
-  VarType : TIdentTypes;
+  Info      : TParserVarInfoRec;
+  IsVar     : Boolean;
+  Params    : Word;
+  Count     : Word;
+  ProcVar   : Word;
+  VarChar   : Char;
+  VarType   : TIdentTypes;
+  RecResult : Integer;
+  RecSize   : Word;
 Begin
   OutString (Char(opProcDef));
 
@@ -2106,6 +2115,7 @@ Begin
 
            Ident := Info.Ident[Count];
            vType := Info.vType;
+           RecID := Info.RecID;
 
            FillChar (Params, SizeOf(Params), 0);
 
@@ -2135,14 +2145,23 @@ Begin
     If IdentStr = tkv[iBool    ] Then VarType := iBool     Else
     If IdentStr = tkv[iFile    ] Then
       Error (mpsBadFunction, '')
-    Else
-      Error (mpsUnknownIdent, IdentStr);
-
-    // need to support records here
+    Else Begin
+      // A3-04: Support record as function result type
+      RecResult := FindRecord(IdentStr);
+      If RecResult > 0 Then Begin
+        VarType := iRecord;
+        RecSize := RecData[RecResult]^.DataSize;
+      End Else
+        Error (mpsUnknownIdent, IdentStr + '. Define Record type before the Function');
+    End;
 
     VarChar := VarType2Char(VarType);
 
     VarData[ProcVar]^.vType := VarType;
+
+    // A3-04: Set RecID for record function result type
+    If VarType = iRecord Then
+      VarData[ProcVar]^.RecID := RecResult;
 
     OutString (Char(opProcType));
     OutString (VarChar);
@@ -2180,7 +2199,7 @@ Begin
         RV := FindVariable(IdentStr);
 
         If (VarData[RV]^.vType <> Char2VarType(VarData[VN]^.Params[Count])) And (VarData[VN]^.Params[Count] <> '*') Then
-          Error (mpsTypeMismatch, '');
+          Error (mpsTypeMismatch, 'VAR param ' + strI2S(Count) + ': wrong type passed');
 
         OutWord      (VarData[RV]^.VarID);
         ParseArray   (RV, False);

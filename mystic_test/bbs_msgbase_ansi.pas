@@ -79,6 +79,8 @@ Type
     Procedure   DrawPage     (pStart, pEnd, pLine: Word);
     Procedure   SetLineColor (NewAttr, Line: Word);
     Procedure   RemoveLine   (Line: Word);
+    // A1-13: Convert buffer line to pipe-coded string (79 chars max)
+    Function    GetLineAsPipe (Line: Word) : String;
   End;
 
 Implementation
@@ -573,6 +575,65 @@ Begin
     Data[Count] := Data[Count + 1];
 
   Dec (Lines);
+End;
+
+// A1-13: Convert a buffer line to pipe-coded string for 79-char message storage
+// Matches g00r00's ansi2pipe.pas conversion logic: emit |XX pipe codes only
+// when foreground or background color changes
+Function TMsgBaseAnsi.GetLineAsPipe (Line: Word) : String;
+Var
+  Col      : Byte;
+  CurAttr  : Byte;
+  CurFG    : Byte;
+  CurBG    : Byte;
+  NewFG    : Byte;
+  NewBG    : Byte;
+  Ch       : Char;
+  Result2  : String;
+  LastCol  : Byte;
+Begin
+  Result2  := '';
+  CurAttr  := 7;  // default grey on black
+
+  If Line > Lines Then Begin
+    GetLineAsPipe := '';
+    Exit;
+  End;
+
+  // Find last non-empty column to trim trailing spaces
+  LastCol := 80;
+  While (LastCol > 0) and (Data[Line][LastCol].Ch in [#0, #255, ' ']) Do
+    Dec(LastCol);
+
+  For Col := 1 to LastCol Do Begin
+    CurBG := (CurAttr SHR 4) AND 7;
+    CurFG := CurAttr AND $F;
+    NewBG := (Data[Line][Col].Attr SHR 4) AND 7;
+    NewFG := Data[Line][Col].Attr AND $F;
+
+    // Emit foreground pipe code if changed
+    If CurFG <> NewFG Then Begin
+      If Length(Result2) + 3 > 79 Then Break;
+      Result2 := Result2 + '|' + Copy(strI2S(100 + NewFG), 2, 2);
+    End;
+
+    // Emit background pipe code if changed
+    If CurBG <> NewBG Then Begin
+      If Length(Result2) + 3 > 79 Then Break;
+      Result2 := Result2 + '|' + Copy(strI2S(100 + 16 + NewBG), 2, 2);
+    End;
+
+    CurAttr := Data[Line][Col].Attr;
+
+    Ch := Data[Line][Col].Ch;
+    If Ch in [#0, #255] Then Ch := ' ';
+
+    If Length(Result2) >= 79 Then Break;
+
+    Result2 := Result2 + Ch;
+  End;
+
+  GetLineAsPipe := Result2;
 End;
 
 End.

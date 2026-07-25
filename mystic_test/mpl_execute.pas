@@ -586,9 +586,21 @@ Begin
 
         ArrStart := W;
 
-        Temp[Count] := Trunc(EvaluateNumber);
+        // A5-02: Read dimension size for multi-dim offset calculation
+        NextWord;
+        R.ArrDim[Count] := W;
 
-        Offset := Offset + ((Temp[Count] - ArrStart) * R.OneSize);
+        Temp[Count] := Trunc(EvaluateNumber);
+      End;
+
+      // A5-02: Calculate offset using proper multi-dim indexing
+      // For [a,b,c]: offset = ((a-start)*dim2*dim3 + (b-start)*dim3 + (c-start)) * OneSize
+      Case R.ArrDem of
+        1 : Offset := (Temp[1] - 1) * R.OneSize;
+        2 : Offset := ((Temp[1] - 1) * R.ArrDim[2] + (Temp[2] - 1)) * R.OneSize;
+        3 : Offset := ((Temp[1] - 1) * (R.ArrDim[2] * R.ArrDim[3]) +
+                        (Temp[2] - 1) * R.ArrDim[3] +
+                        (Temp[3] - 1)) * R.OneSize;
       End;
 
       R.Offset := R.Offset + Offset;
@@ -1112,13 +1124,35 @@ Begin
     iReal     : Real(GetDataPtr(VarNum, ArrayData, RecInfo)^)     := EvaluateNumber;
     iBool     : ByteBool(GetDataPtr(VarNum, ArrayData, RecInfo)^) := EvaluateBoolean;
     iRecord   : Begin
-                  NextWord;
+                  // A3-04: Check if source is a function call or a variable
+                  NextChar;
 
-                  RecID := FindVariable(W);
+                  If Ch = Char(opProcExec) Then Begin
+                    // Function call returning a record
+                    // Peek the ProcID before ExecuteProcedure consumes it
+                    NextWord;
+                    RecID := FindVariable(W);
+                    PrevChar;
+                    PrevChar;
+                    PrevChar;
 
-                  CheckArray (RecID, AD, RI);
+                    // Execute the function
+                    ExecuteProcedure(NIL);
 
-                  Move (GetDataPtr(RecID, AD, RI)^, GetDataPtr(VarNum, ArrayData, RecInfo)^, RecInfo.OneSize {VarData[RecID]^.VarSize});
+                    // Copy function's result data to target variable
+                    If RecID > 0 Then
+                      Move (VarData[RecID]^.Data^[1], GetDataPtr(VarNum, ArrayData, RecInfo)^, RecInfo.OneSize);
+                  End Else Begin
+                    // Normal variable-to-variable record copy
+                    PrevChar;
+                    NextWord;
+
+                    RecID := FindVariable(W);
+
+                    CheckArray (RecID, AD, RI);
+
+                    Move (GetDataPtr(RecID, AD, RI)^, GetDataPtr(VarNum, ArrayData, RecInfo)^, RecInfo.OneSize);
+                  End;
                 End;
   End;
 End;
@@ -1414,6 +1448,7 @@ Var
   TempLong  : LongInt;
   TempChar  : Char;
   TempInt   : SmallInt;
+  DT        : DateTime;
   Sub       : LongInt;
   ArrayData : TArrayInfo;
   RecInfo   : TRecInfo;
@@ -1513,7 +1548,7 @@ Begin
         ProcPos   := 0;
         ArrPos    := 0;
 
-        If vType = iString Then
+        If (vType = iString) or (vType = iRecord) Then
           VarSize := Param[Count].vSize
         Else
           VarSize := GetVarSize(vType);
@@ -1541,6 +1576,8 @@ Begin
             'l' : LongInt(Pointer(Data)^)  := Param[Count].L;
             'r' : Real(Pointer(Data)^)     := Param[Count].R;
             'o' : Boolean(Pointer(Data)^)  := Param[Count].O;
+            'x' : If Param[Count].vData <> NIL Then
+                    Move (Param[Count].vData^, Data^, DataSize);
           End;
 
           Kill := True;
@@ -2159,6 +2196,17 @@ Begin
             Session.io.RemoteRestore(TConsoleImageRec(ClassData[Param[1].L].ClassPtr^));
     // A60: AppendText(FileName, Text)
     561 : AppendText(Param[1].S, Param[2].S);
+    // A3-05: TimerMS — millisecond resolution timer
+    562 : Begin
+            TempLong := TimerMS;
+            Store (TempLong, 4);
+          End;
+    // A3-11: FormatDate(DosDate, Mask) — format date using mask string
+    563 : Begin
+            UnPackTime(Param[1].L, DT);
+            TempStr := FormatDate(DT, Param[2].S);
+            Store (TempStr, 256);
+          End;
   End;
 End;
 

@@ -346,6 +346,8 @@ Begin
           AddProc    ({$IFDEF MPLPARSER} 'imageget',       {$ENDIF} 'lbbbb',     iNone);    // 559
           AddProc    ({$IFDEF MPLPARSER} 'imageput',       {$ENDIF} 'l',         iNone);    // 560
           AddProc    ({$IFDEF MPLPARSER} 'appendtext',     {$ENDIF} 'ss',        iNone);    // 561 A60
+          AddProc    ({$IFDEF MPLPARSER} 'timerms',        {$ENDIF} '',          iLongInt); // 562 A3-05
+          AddProc    ({$IFDEF MPLPARSER} 'formatdate',     {$ENDIF} 'ls',        iString);  // 563 A3-11
 
 { END OF PROCEDURE DEFINITIONS }
 

@@ -166,6 +166,8 @@ Begin
             If IoResult = 0 Then Begin
               List.DescLines := 0;
 
+              Log (2, '+', '   DIZ: Importing file_id.diz for ' + List.FileName);
+
               While Not Eof(DizFile) Do Begin
                 Inc    (List.DescLines);
                 ReadLn (DizFile, Desc[List.DescLines]);
@@ -180,17 +182,25 @@ Begin
 
               Close (DizFile);
 
+              Log (3, '+', '   DIZ: ' + strI2S(List.DescLines) + ' line(s) imported');
+
               While (Desc[1] = '') and (List.DescLines > 0) Do
                 RemoveDesc(1);
 
               While (Desc[List.DescLines] = '') And (List.DescLines > 0) Do
                 Dec (List.DescLines);
             End Else Begin
+              Log (2, '+', '   DIZ: No file_id.diz found for ' + List.FileName);
+
               List.DescLines := 1;
               Desc[1]        := INI.ReadString(Header_UPLOAD, 'no_description', 'No Description');
             End;
 
             FileErase (DizName);
+
+            // A3-02: Purge entire temp directory after each mass upload
+            // to prevent DIZ residue on case-sensitive operating systems
+            DirClean (TempPath, '');
           End Else Begin
             List.DescLines := 1;
             Desc[1]        := INI.ReadString(Header_UPLOAD, 'no_description', 'No Description');

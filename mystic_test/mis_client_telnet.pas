@@ -37,7 +37,7 @@ Interface
   {$ENDIF}
 
   {$IFDEF USEFORK}
-    // uforkpty replaces libutil.a — pure FPC syscalls, no libc needed
+    // ForkPTY_Pure inlined below — pure FPC syscalls, no libc needed
   {$ENDIF}
 {$ENDIF}
 
@@ -49,9 +49,6 @@ Uses
   {$IFDEF UNIX}
     BaseUnix,
     Unix,
-    {$IFDEF USEFORK}
-    uforkpty,
-    {$ENDIF}
   {$ENDIF}
   {$IFDEF WINDOWS}
     Windows,
@@ -70,7 +67,7 @@ Uses
   BBS_DataBase;
 
 {$IFDEF USEFORK}
-  // forkpty now provided by uforkpty unit — pure FPC, no libc
+  // ForkPTY_Pure is inlined in Implementation section
 {$ENDIF}
 
 Function CreateTelnet (Owner: TServerManager; Config: RecConfig; ND: TNodeData; CliSock: TIOSocket) : TServerClient;
@@ -85,6 +82,85 @@ Type
   End;
 
 Implementation
+
+// ====================================================================
+// Inlined forkpty — pure FPC, no libc/libutil dependency
+// Originally from uforkpty.pas (fpc264irc contributors, GPLv3)
+// ====================================================================
+{$IFDEF USEFORK}
+Const
+  PTY_O_RDWR   = $02;
+  PTY_O_NOCTTY = $100;
+
+Function ForkPTY_Pure (amaster: PLongInt; name: PChar;
+  termp: Pointer; winp: Pointer): LongInt;
+Var
+  masterfd, slavefd : LongInt;
+  ptsn              : LongInt;
+  ptspath           : String[64];
+  slavename         : Array[0..63] of Char;
+  zero              : LongInt;
+  pid               : LongInt;
+Begin
+  ForkPTY_Pure := -1;
+
+  // Open master: /dev/ptmx
+  masterfd := fpOpen('/dev/ptmx', PTY_O_RDWR or PTY_O_NOCTTY);
+  If masterfd < 0 Then Exit;
+
+  // grantpt + unlockpt via ioctl
+  zero := 0;
+  If fpIOCtl(masterfd, $5431, @zero) < 0 Then Begin // TIOCSPTLCK = unlock
+    fpClose(masterfd);
+    Exit;
+  End;
+
+  // ptsname via ioctl TIOCGPTN
+  If fpIOCtl(masterfd, $80045430, @ptsn) < 0 Then Begin
+    fpClose(masterfd);
+    Exit;
+  End;
+
+  // Build slave path: /dev/pts/N
+  Str(ptsn, ptspath);
+  ptspath := '/dev/pts/' + ptspath;
+  Move(ptspath[1], slavename[0], Length(ptspath));
+  slavename[Length(ptspath)] := #0;
+
+  // Open slave
+  slavefd := fpOpen(@slavename[0], PTY_O_RDWR);
+  If slavefd < 0 Then Begin
+    fpClose(masterfd);
+    Exit;
+  End;
+
+  // Fork
+  pid := fpFork;
+  If pid < 0 Then Begin
+    fpClose(masterfd);
+    fpClose(slavefd);
+    Exit;
+  End;
+
+  If pid = 0 Then Begin
+    // Child: attach slave PTY to stdin/stdout/stderr
+    fpClose(masterfd);
+    fpSetSid;
+    fpIOCtl(slavefd, $540E, Nil); // TIOCSCTTY
+    fpDup2(slavefd, 0);
+    fpDup2(slavefd, 1);
+    fpDup2(slavefd, 2);
+    If slavefd > 2 Then fpClose(slavefd);
+    ForkPTY_Pure := 0;
+  End Else Begin
+    // Parent: return master fd
+    fpClose(slavefd);
+    If amaster <> Nil Then amaster^ := masterfd;
+    ForkPTY_Pure := pid;
+  End;
+End;
+{$ENDIF}
+// ====================================================================
 
 Function CreateTelnet (Owner: TServerManager; Config: RecConfig; ND: TNodeData; CliSock: TIOSocket) : TServerClient;
 Begin

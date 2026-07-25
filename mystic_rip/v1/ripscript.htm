@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>RIPscrip v1.54 — API Reference v1.0.0</title>
+<style>
+body{font-family:"Cascadia Code","Fira Code","JetBrains Mono","Consolas","Courier New",monospace;background:#1a1a2e;color:#d0d0d0;max-width:90em;margin:2em auto;padding:0 2em;font-size:18px;line-height:1.65}
+h1{color:#00ff00;border-bottom:2px solid #00ff00;padding-bottom:.3em}
+h2{color:#00ccff;border-bottom:1px solid #333;padding-bottom:.2em;margin-top:2em}
+h3{color:#ffcc00;margin-top:1.5em}
+code{color:#ff6600}
+.done{color:#00ff00;font-weight:bold}
+.todo{color:#ff4444}
+.phase{color:#ffcc00;font-weight:bold;margin-top:1.5em;font-size:17px}
+.complete{color:#00ff00;font-size:14px}
+.gpl{color:#888;font-size:14px;margin-top:3em;border-top:1px solid #333;padding-top:1em}
+</style></head><body>
+<h1>RIPSCRIPT.PAS — API REFERENCE</h1>
+<h2>RIPscrip v1.54 Server-Side Rendering Engine</h2>
+<br>
+<p>Version:           1.0.0</p>
+<p>Release:           July 19, 2026</p>
+<p>Protocol Version:  RIPscrip v1.54</p>
+<p>Unit Name:         ripscript</p>
+<p>Compiled Unit:     ripscript.ppu (i386-linux, FPC 2.6.4irc)</p>
+<p>Source:            mystic_ripapi/ripscript.pas</p>
+<p>Dependencies:      None (standalone unit, no MDL required)</p>
+<p>License:           GNU General Public License v3</p>
+<br>
+<p>Files</p>
+<br>
+<p style="margin-left:2em">mystic_ripapi/</p>
+<p style="margin-left:2em">ripscript.pas      Source (standalone, no external dependencies)</p>
+<p style="margin-left:2em">ripscript.ppu      Precompiled unit (i386-linux, FPC 2.6.4irc)</p>
+<p style="margin-left:2em">ripscript.o        Object file for linking</p>
+<p style="margin-left:2em">rip_font8x8.inc    CP437 8x8 VGA ROM font (256 characters)</p>
+<p style="margin-left:2em">rip_chrfont.inc    CHR font loader helper data</p>
+<p style="margin-left:2em">rip_chrfont.inc    CHR font loader helper data</p>
+<p style="margin-left:2em">ripscript.doc      This API reference (plain text)</p>
+<p style="margin-left:2em">ripscript.txt      This API reference (identical to .doc)</p>
+<p style="margin-left:2em">ripscript.htm      This API reference (HTML)</p>
+<p style="margin-left:2em">README.md          Overview</p>
+<br>
+<br>
+<br>
+<p style="margin-left:2em">examples/ripterm154/  Original RIPterm 1.54 freeware distribution</p>
+<p style="margin-left:2em">Source: https://github.com/cgorringe/RIPterm154</p>
+<p style="margin-left:2em">Archived by Carl Gorringe. Freeware by TeleGrafix Communications.</p>
+<p style="margin-left:2em">FONTS/  10 Borland BGI CHR vector fonts</p>
+<p style="margin-left:2em">ICONS/  212 ICN icon files</p>
+<br>
+<p style="margin-left:2em">docs/rip/</p>
+<p style="margin-left:2em">ripscrip-v154-spec.zip       RIPscrip v1.54 specification</p>
+<p style="margin-left:2em">ripscrip-v153-spec.zip       RIPscrip v1.53 specification</p>
+<p style="margin-left:2em">ripscrip-v3-whitepaper.htm   RIPscrip v3.0 technical whitepaper</p>
+<br>
+<p>Using ripscript.ppu</p>
+<br>
+<p style="margin-left:2em">Uses ripscript;</p>
+<br>
+<p style="margin-left:2em">Var RIP : TRIPEngine;</p>
+<p style="margin-left:2em">Begin</p>
+<p style="margin-left:2em">RIP := TRIPEngine.Create;</p>
+<br>
+<p style="margin-left:2em">// Load a CHR font and render vector text</p>
+<p style="margin-left:2em">RIP.LoadCHR(1, 'fonts/TRIP.CHR');</p>
+<p style="margin-left:2em">RIP.SetTextStyle(1, 0, 2);</p>
+<p style="margin-left:2em">RIP.SetColor(14);</p>
+<p style="margin-left:2em">RIP.OutTextXY(50, 100, 'Hello RIP!');</p>
+<br>
+<p style="margin-left:2em">// Load and display an icon (EGA planar format)</p>
+<p style="margin-left:2em">RIP.LoadIcon('icons/logo.icn', 10, 10, 0);</p>
+<br>
+<p style="margin-left:2em">// Process a RIP scene file</p>
+<p style="margin-left:2em">RIP.LoadScene('display/mainmenu.rip');</p>
+<br>
+<p style="margin-left:2em">// Export to BMP</p>
+<p style="margin-left:2em">RIP.SaveBMP('output.bmp');</p>
+<br>
+<p style="margin-left:2em">RIP.Free;</p>
+<p style="margin-left:2em">End.</p>
+<br>
+<p>Compile with:  ppc386 -Mdelphi -Fu&lt;path-to-mystic_ripapi&gt; yourprogram.pas</p>
+<p>No -Fumdl or -Fumystic needed. The unit is fully standalone.</p>
+<br>
+<br>
+<h2>1. CONSTANTS</h2>
+<br>
+<p>Screen Dimensions</p>
+<p style="margin-left:2em">RIP_MAX_X          = 639</p>
+<p style="margin-left:2em">RIP_MAX_Y          = 349</p>
+<p style="margin-left:2em">RIP_MAX_COLORS     = 16</p>
+<br>
+<p>Limits</p>
+<p style="margin-left:2em">RIP_MAX_MOUSE      = 128</p>
+<p style="margin-left:2em">RIP_MAX_BUTTONS    = 64</p>
+<p style="margin-left:2em">RIP_MAX_POLY       = 512</p>
+<p style="margin-left:2em">RIP_MAX_VARS       = 64</p>
+<p style="margin-left:2em">RIP_MAX_CHR_CHARS  = 256</p>
+<p style="margin-left:2em">RIP_MAX_STROKES    = 16384</p>
+<br>
+<p>Fill Styles (BGI)         Line Styles (BGI)</p>
+<p style="margin-left:2em">0  EMPTY                  0  SOLID</p>
+<p style="margin-left:2em">1  SOLID                  1  DOTTED  ($CCCC)</p>
+<p style="margin-left:2em">2  LINE                   2  CENTER  ($FC78)</p>
+<p style="margin-left:2em">3  LTSLASH                3  DASHED  ($F8F8)</p>
+<p style="margin-left:2em">4  SLASH                  4  USER (16-bit)</p>
+<p style="margin-left:2em">5  BKSLASH</p>
+<p style="margin-left:2em">6  LTBKSLASH            Write Modes</p>
+<p style="margin-left:2em">7  HATCH                  0  COPY_PUT</p>
+<p style="margin-left:2em">8  XHATCH                1  XOR_PUT</p>
+<p style="margin-left:2em">9  INTERLEAVE</p>
+<p style="margin-left:2em">10 WIDEDOT              Fonts</p>
+<p style="margin-left:2em">11 CLOSEDOT               0  DEFAULT (8x8 bitmap)</p>
+<p style="margin-left:2em">12 USER (8x8)             1  TRIPLEX    2  SMALL</p>
+<p style="margin-left:2em">3  SANSSERIF  4  GOTHIC</p>
+<br>
+<p>EGA_RGB : Array[0..15] of TRIPRgb</p>
+<p style="margin-left:2em">Standard EGA hardware RGB values for true-color rendering.</p>
+<br>
+<br>
+<h2>2. TYPES</h2>
+<br>
+<p>TRIPColor        = Byte (0..15)</p>
+<p>TRIPPoint        = Record { X, Y : SmallInt }</p>
+<p>TRIPPalette      = Array[0..15] of Byte</p>
+<p>TRIPFillPattern  = Array[0..7] of Byte</p>
+<p>TRIPRgb          = Record { R, G, B : Byte }</p>
+<br>
+<p>TRIPMouseField   = Record</p>
+<p style="margin-left:2em">Active  : Boolean          Field is active</p>
+<p style="margin-left:2em">X0, Y0  : SmallInt         Top-left corner</p>
+<p style="margin-left:2em">X1, Y1  : SmallInt         Bottom-right corner</p>
+<p style="margin-left:2em">HostCmd : String[80]       Command sent to host on click</p>
+<p style="margin-left:2em">Text    : String[80]       Status bar text</p>
+<p style="margin-left:2em">Invert  : Boolean          Invert on click</p>
+<br>
+<p>TRIPVariable     = Record</p>
+<p style="margin-left:2em">Active   : Boolean         Variable is defined</p>
+<p style="margin-left:2em">Name     : String[12]      Identifier (1-12 alphanumeric)</p>
+<p style="margin-left:2em">Value    : String[255]     Current value</p>
+<p style="margin-left:2em">Persist  : Boolean         Save to database</p>
+<p style="margin-left:2em">Required : Boolean         Cannot be blank</p>
+<br>
+<p>TRIPFileQueryResult = Record</p>
+<p style="margin-left:2em">Exists : Boolean           File was found</p>
+<p style="margin-left:2em">Size   : LongInt           File size in bytes</p>
+<p style="margin-left:2em">Date   : String[10]        Date (mode 3)</p>
+<p style="margin-left:2em">Time   : String[8]         Time (mode 3)</p>
+<br>
+<p>TRIPButtonStyle  = Record</p>
+<p style="margin-left:2em">Width, Height, Orient, Flags, BevelSize,</p>
+<p style="margin-left:2em">DFore, DBack, BRight, DDark, Surface,</p>
+<p style="margin-left:2em">GrpID, Flags2, ULineCol, CornerCol</p>
+<br>
+<p>TRIPStroke       = Record { Op: Byte; X, Y: SmallInt }</p>
+<p style="margin-left:2em">CHR stroke command: 0=end, 1=move, 2=draw</p>
+<br>
+<p>TRIPCHRFont      = Record</p>
+<p style="margin-left:2em">Loaded, Name, FirstChar, NumChars,</p>
+<p style="margin-left:2em">OrgToCap, OrgToBase, OrgToDec,</p>
+<p style="margin-left:2em">Widths[0..255], Offsets[0..255],</p>
+<p style="margin-left:2em">Strokes[0..16383], NumStrokes</p>
+<br>
+<p>TRIPPixelBuffer  = Array[0..349, 0..639] of Byte</p>
+<p>PRIPPixelBuffer  = ^TRIPPixelBuffer</p>
+<br>
+<br>
+<h2>3. TRIPEngine CLASS — PUBLIC API</h2>
+<br>
+<p>Public Data:</p>
+<p style="margin-left:2em">Pixels : PRIPPixelBuffer   — 640x350 pixel buffer. Pixels^[Y, X]</p>
+<br>
+<h2>3.1  Constructor / Destructor</h2>
+<br>
+<p><code>Constructor Create</code></p>
+<p style="margin-left:2em">Allocates the 640x350 pixel buffer (224,000 bytes on heap).</p>
+<p style="margin-left:2em">Initializes all 10 CHR font slots to Nil.</p>
+<p style="margin-left:2em">Initializes all 10 saved screen slots to Nil.</p>
+<p style="margin-left:2em">Sets clipboard to Nil.</p>
+<p style="margin-left:2em">Calls Reset to set default state.</p>
+<p style="margin-left:2em">After Create, the engine is ready to accept commands.</p>
+<br>
+<p><code>Destructor Destroy</code></p>
+<p style="margin-left:2em">Frees all loaded CHR fonts (Dispose on non-Nil slots).</p>
+<p style="margin-left:2em">Frees all saved screens (Dispose on non-Nil slots).</p>
+<p style="margin-left:2em">Frees clipboard (FreeMem if non-Nil).</p>
+<p style="margin-left:2em">Frees the pixel buffer.</p>
+<p style="margin-left:2em">Call Free (not Destroy directly) per standard Pascal convention.</p>
+<br>
+<h2>3.2  RIP Command Processing</h2>
+<br>
+<p><code>Procedure ProcessLine (Line: String)</code></p>
+<p style="margin-left:2em">Feed a line of RIP data. Handles backslash (\) line continuation.</p>
+<p style="margin-left:2em">Extracts all !| (and #1|, #2|) command sequences and dispatches</p>
+<p style="margin-left:2em">each one through ProcessCommand. Non-RIP text is ignored.</p>
+<br>
+<p><code>Procedure ProcessCommand (Cmd: String)</code></p>
+<p style="margin-left:2em">Process a single RIP command (the text after !|). Parses level</p>
+<p style="margin-left:2em">digit(s) and command character, dispatches to Level 0, 1, or 9.</p>
+<br>
+<h2>3.3  Screen Management</h2>
+<br>
+<p><code>Procedure Reset</code></p>
+<p style="margin-left:2em">Restores all state to defaults:</p>
+<p style="margin-left:2em">Position: (0,0)</p>
+<p style="margin-left:2em">Draw color: 15 (white), fill color: 0 (black)</p>
+<p style="margin-left:2em">Fill style: solid, line style: solid, line thickness: 1</p>
+<p style="margin-left:2em">Write mode: copy (overwrite)</p>
+<p style="margin-left:2em">Font: default 8x8, size 1, horizontal, left/top justify</p>
+<p style="margin-left:2em">Text window: (0,0)-(79,42), size 0</p>
+<p style="margin-left:2em">Viewport: (0,0)-(639,349)</p>
+<p style="margin-left:2em">Palette: default EGA 16-color</p>
+<p style="margin-left:2em">Fill pattern: all $FF (solid)</p>
+<p style="margin-left:2em">Button style: BevelSize=1, DFore=15, BRight=15, DDark=8,</p>
+<p style="margin-left:2em">Surface=7, CornerCol=16 (disabled)</p>
+<p style="margin-left:2em">Mouse fields: all cleared (count=0, all records zeroed)</p>
+<p style="margin-left:2em">Text variables: all cleared</p>
+<p style="margin-left:2em">CHR fonts: all freed and set to Nil</p>
+<p style="margin-left:2em">Saved screens: all 10 slots freed</p>
+<p style="margin-left:2em">Saved text window / mouse fields: cleared</p>
+<p style="margin-left:2em">Clipboard: freed</p>
+<p style="margin-left:2em">Line buffer: cleared</p>
+<p style="margin-left:2em">Clears the screen after resetting state.</p>
+<br>
+<p style="margin-left:2em">ParseLevel0 '*' (RIP_RESET_WINDOWS) resets text window,</p>
+<p style="margin-left:2em">viewport, TextWinSize, and kills all mouse fields. This is</p>
+<p style="margin-left:2em">a partial reset — it does NOT reset colors, fonts, or styles.</p>
+<br>
+<p><code>Procedure ClearScreen</code></p>
+<p style="margin-left:2em">Zeros the entire 640x350 pixel buffer (all pixels to color 0).</p>
+<br>
+<p><code>Procedure ClearViewport</code></p>
+<p style="margin-left:2em">Zeros only the pixels within the current viewport rectangle.</p>
+<br>
+<h2>3.4  Drawing Primitives</h2>
+<br>
+<p><code>Procedure PutPixel (X, Y: SmallInt; Color: Byte)</code></p>
+<p style="margin-left:2em">Set a single pixel. Respects viewport clipping and write mode.</p>
+<p style="margin-left:2em">RIP command: !|X</p>
+<br>
+<p><code>Function GetPixel (X, Y: SmallInt) : Byte</code></p>
+<p style="margin-left:2em">Read a pixel color. Returns 0 if outside viewport.</p>
+<br>
+<p><code>Procedure Line (X0, Y0, X1, Y1: SmallInt)</code></p>
+<p style="margin-left:2em">Bresenham line with line pattern support (dotted, dashed, etc).</p>
+<p style="margin-left:2em">Updates current position to (X1, Y1).</p>
+<p style="margin-left:2em">RIP command: !|L</p>
+<br>
+<p><code>Procedure LineTo (X, Y: SmallInt)</code></p>
+<p style="margin-left:2em">Line from current position to (X, Y). BGI extension.</p>
+<br>
+<p><code>Procedure LineRel (DX, DY: SmallInt)</code></p>
+<p style="margin-left:2em">Line from current position by relative offset. BGI extension.</p>
+<br>
+<p><code>Procedure Rectangle (X0, Y0, X1, Y1: SmallInt)</code></p>
+<p style="margin-left:2em">Unfilled rectangle outline in draw color.</p>
+<p style="margin-left:2em">RIP command: !|R</p>
+<br>
+<p><code>Procedure Bar (X0, Y0, X1, Y1: SmallInt)</code></p>
+<p style="margin-left:2em">Filled rectangle using current fill color and fill pattern.</p>
+<p style="margin-left:2em">All 12 BGI patterns supported plus user-defined 8x8.</p>
+<p style="margin-left:2em">RIP command: !|B</p>
+<br>
+<p><code>Procedure Bar3D (X0, Y0, X1, Y1: SmallInt; Depth: SmallInt; Top: Boolean)</code></p>
+<p style="margin-left:2em">3D bar with perspective edges. BGI extension.</p>
+<br>
+<p><code>Procedure Circle (XC, YC, Radius: SmallInt)</code></p>
+<p style="margin-left:2em">Circle using midpoint algorithm. RIP command: !|C</p>
+<br>
+<p><code>Procedure Ellipse (XC, YC: SmallInt; StartAng, EndAng, XR, YR: SmallInt)</code></p>
+<p style="margin-left:2em">Full ellipse (0-360) or elliptical arc.</p>
+<p style="margin-left:2em">RIP commands: !|O (oval), !|V (oval arc)</p>
+<br>
+<p><code>Procedure FillEllipse (XC, YC, XR, YR: SmallInt)</code></p>
+<p style="margin-left:2em">Filled ellipse using horizontal scanlines.</p>
+<p style="margin-left:2em">RIP command: !|o</p>
+<br>
+<p><code>Procedure Arc (XC, YC: SmallInt; StartAng, EndAng, Radius: SmallInt)</code></p>
+<p style="margin-left:2em">Circular arc. Angles counter-clockwise from 3 o'clock.</p>
+<p style="margin-left:2em">RIP command: !|A</p>
+<br>
+<p><code>Procedure PieSlice (XC, YC: SmallInt; StartAng, EndAng, Radius: SmallInt)</code></p>
+<p style="margin-left:2em">Circular pie slice (arc + two radial lines).</p>
+<p style="margin-left:2em">RIP command: !|I</p>
+<br>
+<p><code>Procedure Sector (XC, YC: SmallInt; StartAng, EndAng, XR, YR: SmallInt)</code></p>
+<p style="margin-left:2em">Elliptical pie slice. RIP command: !|i</p>
+<br>
+<p><code>Procedure DrawBezier (X0,Y0,X1,Y1,X2,Y2,X3,Y3: SmallInt; Count: SmallInt)</code></p>
+<p style="margin-left:2em">Cubic Bezier through 4 control points. Count = segments (default 20).</p>
+<p style="margin-left:2em">RIP command: !|Z</p>
+<br>
+<p><code>Procedure DrawPoly (NumPoints: Integer; Var PolyPoints)</code></p>
+<p style="margin-left:2em">Closed polygon outline. PolyPoints = array of TRIPPoint.</p>
+<p style="margin-left:2em">RIP command: !|P</p>
+<br>
+<p><code>Procedure FillPoly (NumPoints: Integer; Var PolyPoints)</code></p>
+<p style="margin-left:2em">Filled polygon using scanline intersection algorithm.</p>
+<p style="margin-left:2em">Handles convex and concave shapes.</p>
+<p style="margin-left:2em">RIP command: !|p</p>
+<br>
+<p><code>Procedure FloodFill (X, Y: SmallInt; Border: Byte)</code></p>
+<p style="margin-left:2em">Flood fill from seed point. Stops at Border color.</p>
+<p style="margin-left:2em">Stack-based, 4096 depth. RIP command: !|F</p>
+<br>
+<h2>3.5  Text Output</h2>
+<br>
+<p><code>Procedure OutTextXY (X, Y: SmallInt; S: String)</code></p>
+<p style="margin-left:2em">Draw text at (X,Y). Expands $VARNAME$ text variables via ExpandVars</p>
+<p style="margin-left:2em">before rendering. If a CHR font is loaded for the current font</p>
+<p style="margin-left:2em">number, uses vector stroke rendering. Otherwise uses 8x8 CP437</p>
+<p style="margin-left:2em">bitmap font. RIP command: !|@</p>
+<br>
+<p style="margin-left:2em">The engine's ParseLevel0 handler for '@' calls OutTextXY directly,</p>
+<p style="margin-left:2em">ensuring all text rendered by RIP commands gets variable expansion</p>
+<p style="margin-left:2em">and CHR font support.</p>
+<br>
+<p><code>Procedure OutText (S: String)</code></p>
+<p style="margin-left:2em">Draw text at current position. Same variable expansion and font</p>
+<p style="margin-left:2em">selection as OutTextXY. RIP command: !|T</p>
+<br>
+<p style="margin-left:2em">ParseLevel0 'T' and ParseLevel1 't' (region text) both route</p>
+<p style="margin-left:2em">through OutText/OutTextXY. This means text variables like $CURX$,</p>
+<p style="margin-left:2em">$DATE$, user-defined variables, etc. are expanded automatically</p>
+<p style="margin-left:2em">in all text rendering paths.</p>
+<br>
+<p><code>Procedure DrawTextCHR (X, Y: SmallInt; S: String; AFont, ASize: Byte)</code></p>
+<p style="margin-left:2em">Render text using a specific loaded CHR vector font at the given</p>
+<p style="margin-left:2em">scale. AFont = font slot (1-10), ASize = magnification (1+).</p>
+<p style="margin-left:2em">Each character is rendered as a series of move/draw stroke commands.</p>
+<p style="margin-left:2em">Does NOT expand variables — called after expansion by OutText.</p>
+<br>
+<h2>3.6  Position</h2>
+<br>
+<p><code>Procedure MoveTo (X, Y: SmallInt)      — Set current position. RIP: !|g, !|m</code></p>
+<p><code>Procedure MoveRel (DX, DY: SmallInt)   — Offset current position.</code></p>
+<p><code>Function GetX : SmallInt               — Return current X.</code></p>
+<p><code>Function GetY : SmallInt               — Return current Y.</code></p>
+<br>
+<h2>3.7  Color and Palette</h2>
+<br>
+<p><code>Procedure SetColor (Color: Byte)              — Set draw color (0-15). RIP: !|c</code></p>
+<p><code>Function GetColor : Byte                      — Return current draw color.</code></p>
+<p><code>Procedure SetBkColor (Color: Byte)            — Set background (palette[0]).</code></p>
+<p><code>Function GetBkColor : Byte                    — Return background color.</code></p>
+<p><code>Procedure SetPalette (Index, Color: Byte)     — Set one palette entry. RIP: !|a</code></p>
+<p><code>Procedure SetAllPalette (Var Pal: TRIPPalette) — Replace all 16 entries. RIP: !|Q</code></p>
+<p><code>Procedure GetPalette (Var Pal: TRIPPalette)   — Copy current palette out.</code></p>
+<br>
+<h2>3.8  Fill Settings</h2>
+<br>
+<p><code>Procedure SetFillStyle (Style: Word; Color: Byte)</code></p>
+<p style="margin-left:2em">Set fill pattern (0-12) and color. RIP: !|S</p>
+<br>
+<p><code>Procedure SetFillPattern (Var Pattern: TRIPFillPattern; Color: Byte)</code></p>
+<p style="margin-left:2em">Set user-defined 8x8 fill pattern. Auto-sets style to USER.</p>
+<p style="margin-left:2em">RIP: !|s</p>
+<br>
+<p><code>Procedure GetFillSettings (Var Style: Word; Var Color: Byte)</code></p>
+<br>
+<h2>3.9  Line Settings</h2>
+<br>
+<p><code>Procedure SetLineStyle (Style, Pattern, Thick: Word)</code></p>
+<p style="margin-left:2em">Set line style (0-4), user pattern (16-bit), thickness.</p>
+<p style="margin-left:2em">RIP: !|=</p>
+<br>
+<p><code>Procedure GetLineSettings (Var Style, Pattern, Thick: Word)</code></p>
+<br>
+<h2>3.10  Write Mode / Text Style / Viewport</h2>
+<br>
+<p><code>Procedure SetWriteMode (Mode: Byte)            — COPY or XOR. RIP: !|W</code></p>
+<p><code>Function GetWriteMode : Byte</code></p>
+<p><code>Procedure SetTextStyle (Font, Direction, CharSize: Word)  — RIP: !|Y</code></p>
+<p><code>Procedure SetTextJustify (Horiz, Vert: Word)</code></p>
+<p><code>Procedure SetViewPort (X0, Y0, X1, Y1: SmallInt; Clip: Boolean) — RIP: !|v</code></p>
+<p><code>Procedure GetViewPort (Var X0, Y0, X1, Y1: SmallInt)</code></p>
+<p><code>Procedure SetTextWindow (X0, Y0, X1, Y1: SmallInt; Size: Byte) — RIP: !|w</code></p>
+<br>
+<h2>3.11  Mouse Fields</h2>
+<br>
+<p><code>Function AddMouseField (X0,Y0,X1,Y1: SmallInt; HostCmd,Text: String) : Integer</code></p>
+<p style="margin-left:2em">Register a clickable region. Returns index (1-128) or 0 if full.</p>
+<p style="margin-left:2em">RIP: !|1M</p>
+<br>
+<p><code>Procedure KillMouseField (Index: Integer)   — Deactivate one. RIP: !|1K</code></p>
+<p><code>Procedure KillAllMouseFields                — Deactivate all. RIP: !|1K</code></p>
+<p><code>Function FindMouseField (X, Y: SmallInt) : Integer — Hit test (top-down).</code></p>
+<p><code>Function GetMouseCount : Integer</code></p>
+<p><code>Function GetMouseField (Index: Integer) : TRIPMouseField</code></p>
+<br>
+<h2>3.12  Buttons</h2>
+<br>
+<p><code>Procedure SetButtonStyle (Var Style: TRIPButtonStyle)</code></p>
+<p style="margin-left:2em">Set button appearance for DrawButton/DrawButtonEx. RIP: !|1B</p>
+<br>
+<p style="margin-left:2em">TRIPButtonStyle fields:</p>
+<p style="margin-left:2em">Width, Height   Button dimensions (used by some callers)</p>
+<p style="margin-left:2em">Orient          0=horizontal, 1=vertical</p>
+<p style="margin-left:2em">Flags           Bit flags: $0002=radio, $0004=checkbox, $0008=init selected</p>
+<p style="margin-left:2em">BevelSize       Bevel thickness in pixels (1 = single-pixel bevel)</p>
+<p style="margin-left:2em">DFore           Label text foreground color</p>
+<p style="margin-left:2em">DBack           Label text background color</p>
+<p style="margin-left:2em">BRight          Bevel highlight color (top-left edges)</p>
+<p style="margin-left:2em">DDark           Bevel shadow color (bottom-right edges)</p>
+<p style="margin-left:2em">Surface         Button face fill color</p>
+<p style="margin-left:2em">GrpID           Radio button group ID (0-255)</p>
+<p style="margin-left:2em">Flags2          Additional flags</p>
+<p style="margin-left:2em">ULineCol        Underline color for hotkey character</p>
+<p style="margin-left:2em">CornerCol       Corner pixel color (where bevel edges meet)</p>
+<br>
+<p><code>Procedure DrawButton (X0,Y0,X1,Y1: SmallInt; Label_,HostCmd: String)</code></p>
+<p style="margin-left:2em">Draw 3D beveled button. Renders:</p>
+<p style="margin-left:2em">1. Filled rectangle in Surface color</p>
+<p style="margin-left:2em">2. BevelSize-thick highlight lines (BRight) on top and left</p>
+<p style="margin-left:2em">3. BevelSize-thick shadow lines (DDark) on bottom and right</p>
+<p style="margin-left:2em">4. Corner pixels in CornerCol</p>
+<p style="margin-left:2em">5. Centered label text in DFore color (via OutTextXY — uses</p>
+<p style="margin-left:2em">CHR vector font if loaded, 8x8 bitmap otherwise)</p>
+<p style="margin-left:2em">Auto-registers a mouse field. RIP: !|1U</p>
+<br>
+<p style="margin-left:2em">ParseLevel0 'T' and '@' text commands now route through OutText</p>
+<p style="margin-left:2em">and OutTextXY, so text on buttons gets CHR font rendering and</p>
+<p style="margin-left:2em">$VARNAME$ expansion automatically.</p>
+<br>
+<h2>3.13  Image Operations</h2>
+<br>
+<p><code>Procedure GetImage (X0, Y0, X1, Y1: SmallInt; Var Buf)</code></p>
+<p style="margin-left:2em">Copy screen region to buffer. Buffer format: width(Word) +</p>
+<p style="margin-left:2em">height(Word) + pixel data (one byte per pixel, row-major).</p>
+<p style="margin-left:2em">Caller must allocate buffer with ImageSize bytes.</p>
+<p style="margin-left:2em">RIP command: !|1C</p>
+<br>
+<p style="margin-left:2em">ParseLevel1 'C' handler allocates a heap clipboard buffer via</p>
+<p style="margin-left:2em">GetMem and calls GetImage to capture the region. Any previous</p>
+<p style="margin-left:2em">clipboard is freed first.</p>
+<br>
+<p><code>Procedure PutImage (X, Y: SmallInt; Var Buf; Mode: Byte)</code></p>
+<p style="margin-left:2em">Draw captured image at (X,Y). Reads width/height from buffer</p>
+<p style="margin-left:2em">header, then renders pixel data. Mode = write mode (0=copy, 1=XOR).</p>
+<p style="margin-left:2em">RIP command: !|1P</p>
+<br>
+<p style="margin-left:2em">ParseLevel1 'P' handler pastes the heap clipboard to screen</p>
+<p style="margin-left:2em">if one exists.</p>
+<br>
+<p><code>Function ImageSize (X0, Y0, X1, Y1: SmallInt) : LongInt</code></p>
+<p style="margin-left:2em">Calculate buffer size needed for GetImage: (W * H) + 4 bytes</p>
+<p style="margin-left:2em">(4 bytes for width + height header).</p>
+<br>
+<h2>3.14  Icon Files (BGI GetImage Format)</h2>
+<br>
+<p>All icon files (ICN, MSK, HIC) use the Borland BGI GetImage format:</p>
+<br>
+<p style="margin-left:2em">Header:   width-1 (Word) + height-1 (Word)</p>
+<p style="margin-left:2em">Data:     4 EGA bit planes interleaved per scanline</p>
+<p style="margin-left:2em">Plane order: 3, 2, 1, 0 (MSB first)</p>
+<p style="margin-left:2em">Each plane: ceil(width/8) bytes per row</p>
+<p style="margin-left:2em">Footer:   2 bytes padding (ignored)</p>
+<br>
+<p style="margin-left:2em">Example: a 22x17 icon has header 21,16 and data = ceil(22/8) * 4 * 17</p>
+<p style="margin-left:2em">= 3 * 4 * 17 = 204 bytes + 2 padding = 206 total.</p>
+<br>
+<p><code>Function LoadIcon (FileName: String; X, Y: SmallInt; Mode: Byte) : Boolean</code></p>
+<p style="margin-left:2em">Load .ICN file and render at (X,Y). Mode = write mode (0=copy, 1=XOR).</p>
+<p style="margin-left:2em">Reads BGI header, decodes 4 EGA planes per row, combines plane bits</p>
+<p style="margin-left:2em">into 4-bit color index per pixel, calls DrawPixel for each.</p>
+<p style="margin-left:2em">Returns False if file not found or header invalid.</p>
+<p style="margin-left:2em">RIP command: !|1I</p>
+<br>
+<p><code>Function SaveIcon (FileName: String; X0, Y0, X1, Y1: SmallInt) : Boolean</code></p>
+<p style="margin-left:2em">Save screen region as .ICN file. Writes BGI header (w-1, h-1),</p>
+<p style="margin-left:2em">splits each pixel into 4 EGA planes, writes interleaved, adds</p>
+<p style="margin-left:2em">2 bytes padding. RIP command: !|1W</p>
+<br>
+<h2>3.15  Icon Masks and Highlights (Phase 2)</h2>
+<br>
+<p><code>Function LoadMask (FileName: String; X, Y: SmallInt) : Boolean</code></p>
+<p style="margin-left:2em">Load a .MSK mask file and apply as AND transparency mask.</p>
+<p style="margin-left:2em">Same BGI GetImage format as ICN. Where all 4 planes are zero</p>
+<p style="margin-left:2em">(mask value = 0), the corresponding screen pixel is cleared to</p>
+<p style="margin-left:2em">color 0 (transparent). Where any plane bit is set (mask &gt; 0),</p>
+<p style="margin-left:2em">the pixel is left unchanged (opaque).</p>
+<br>
+<p style="margin-left:2em">Usage: draw icon first, then apply mask to punch out transparent</p>
+<p style="margin-left:2em">areas. The mask file must be the same dimensions as the icon.</p>
+<br>
+<p style="margin-left:2em">MSK files in RIPterm154: BUBBLE.MSK, CHROME.MSK, MOUSE.MSK, TANK.MSK</p>
+<br>
+<p><code>Function LoadIconMasked (IconFile, MaskFile: String; X, Y: SmallInt) : Boolean</code></p>
+<p style="margin-left:2em">Convenience: loads icon at (X,Y) then applies mask on top.</p>
+<p style="margin-left:2em">Internally calls LoadIcon followed by LoadMask.</p>
+<p style="margin-left:2em">Returns False if icon file fails to load.</p>
+<br>
+<p><code>Function LoadHotIcon (FileName: String; X, Y: SmallInt) : Boolean</code></p>
+<p style="margin-left:2em">Load a .HIC highlighted icon file. Same BGI GetImage format.</p>
+<p style="margin-left:2em">Used for button hover/selected states — the HIC replaces the</p>
+<p style="margin-left:2em">normal ICN when the button is selected or the mouse hovers.</p>
+<br>
+<p style="margin-left:2em">HIC files in RIPterm154: BUTTON.HIC, RADIO.HIC, RADIOBUT.HIC</p>
+<br>
+<h2>3.16  Buttons (Phase 2 Enhancements)</h2>
+<br>
+<p><code>Procedure SetButtonStyle (Var Style: TRIPButtonStyle)</code></p>
+<p style="margin-left:2em">Set button appearance for DrawButton/DrawButtonEx. RIP: !|1B</p>
+<br>
+<p><code>Procedure DrawButton (X0,Y0,X1,Y1: SmallInt; Label_, HostCmd: String)</code></p>
+<p style="margin-left:2em">Draw 3D beveled button. Centers label text via OutTextXY (uses</p>
+<p style="margin-left:2em">CHR vector font if loaded). Auto-registers mouse</p>
+<p style="margin-left:2em">field. RIP: !|1U</p>
+<br>
+<p><code>Procedure DrawButtonEx (X0, Y0, X1, Y1: SmallInt;</code></p>
+<p style="margin-left:2em">Label_, HostCmd, IconFile, HotIconFile: String;</p>
+<p style="margin-left:2em">IsRadio, IsCheckbox, InitSelected: Boolean)</p>
+<br>
+<p style="margin-left:2em">Full-featured button creation with icon and state support.</p>
+<br>
+<p style="margin-left:2em">IconFile:       Normal icon displayed on the button face.</p>
+<p style="margin-left:2em">If empty, label text is drawn via OutTextXY</p>
+<p style="margin-left:2em">(CHR font if loaded, 8x8 bitmap otherwise).</p>
+<p style="margin-left:2em">HotIconFile:    Highlighted icon shown when button is selected.</p>
+<p style="margin-left:2em">If empty, InvertRegion is used instead.</p>
+<p style="margin-left:2em">IsRadio:        Radio button — only one can be selected per group.</p>
+<p style="margin-left:2em">Group determined by BtnStyle.GrpID.</p>
+<p style="margin-left:2em">IsCheckbox:     Checkbox — toggles on each click.</p>
+<p style="margin-left:2em">InitSelected:   If True, button starts in selected state</p>
+<p style="margin-left:2em">(hot icon shown or region inverted on creation).</p>
+<br>
+<p style="margin-left:2em">Registers a TRIPMouseField with IsButton=True and the appropriate</p>
+<p style="margin-left:2em">state flags. The mouse field tracks Selected state for subsequent</p>
+<p style="margin-left:2em">ClickButton calls.</p>
+<br>
+<p><code>Procedure ClickButton (Index: Integer)</code></p>
+<p style="margin-left:2em">Simulate a click on button at mouse field Index.</p>
+<br>
+<p style="margin-left:2em">Radio button:   Deselects all other buttons in the same GroupID.</p>
+<p style="margin-left:2em">Selects this button. Swaps to hot icon if available,</p>
+<p style="margin-left:2em">otherwise XOR inverts the region.</p>
+<br>
+<p style="margin-left:2em">Checkbox:       Toggles Selected state. Swaps between normal icon</p>
+<p style="margin-left:2em">and hot icon, or XOR inverts/un-inverts.</p>
+<br>
+<p style="margin-left:2em">Plain button:   XOR inverts the region (visual click feedback).</p>
+<br>
+<p style="margin-left:2em">Does nothing if Index is out of range, inactive, or not a button.</p>
+<br>
+<p><code>Procedure InvertRegion (X0, Y0, X1, Y1: SmallInt)</code></p>
+<p style="margin-left:2em">XOR all pixels in the rectangle with $0F. Inverts all 4 color</p>
+<p style="margin-left:2em">bits, effectively flipping each color to its complement</p>
+<p style="margin-left:2em">(0&lt;-&gt;15, 1&lt;-&gt;14, etc). Used for button click feedback and</p>
+<p style="margin-left:2em">the INVERT flag in mouse regions.</p>
+<br>
+<p>TRIPMouseField (expanded for Phase 2 and 5):</p>
+<p style="margin-left:2em">Active        Boolean     Field is active</p>
+<p style="margin-left:2em">X0, Y0        SmallInt    Top-left corner</p>
+<p style="margin-left:2em">X1, Y1        SmallInt    Bottom-right corner</p>
+<p style="margin-left:2em">HostCmd       String[80]  Command sent to host on click</p>
+<p style="margin-left:2em">Text          String[80]  Status bar text</p>
+<p style="margin-left:2em">Invert        Boolean     Invert region on click</p>
+<p style="margin-left:2em">IsButton      Boolean     This is a button (not just a region)</p>
+<p style="margin-left:2em">IsRadio       Boolean     Radio button (one per group)</p>
+<p style="margin-left:2em">IsCheckbox    Boolean     Checkbox (toggle)</p>
+<p style="margin-left:2em">GroupID       Byte        Button group for radio buttons</p>
+<p style="margin-left:2em">Selected      Boolean     Currently selected/checked</p>
+<p style="margin-left:2em">IconFile      String[80]  Normal icon filename</p>
+<p style="margin-left:2em">HotIconFile   String[80]  Highlighted/selected icon filename</p>
+<p style="margin-left:2em">HotKey        Char        Keyboard shortcut (Phase 5)</p>
+<p style="margin-left:2em">TabIndex      Integer     Tab navigation order (Phase 5, 0=not tabbable)</p>
+<br>
+<h2>3.17  Button Hotkeys and Tab Navigation (Phase 5)</h2>
+<br>
+<p>Public Data:</p>
+<p style="margin-left:2em">HotKeysEnabled : Boolean  — button hotkeys active (default True)</p>
+<p style="margin-left:2em">TabEnabled     : Boolean  — tab navigation active (default True)</p>
+<p style="margin-left:2em">Text variable: $HKEYON$/$HKEYOFF$ toggle HotKeysEnabled</p>
+<p style="margin-left:2em">Text variable: $TABON$/$TABOFF$ toggle TabEnabled</p>
+<br>
+<p><code>Function FindButtonByHotkey (Key: Char) : Integer</code></p>
+<p style="margin-left:2em">Find first active button whose HotKey matches Key.</p>
+<p style="margin-left:2em">Case-insensitive comparison. Returns mouse field index</p>
+<p style="margin-left:2em">(1-based) or 0 if not found. Returns 0 if HotKeysEnabled</p>
+<p style="margin-left:2em">is False.</p>
+<br>
+<p style="margin-left:2em">Hotkeys are set two ways:</p>
+<p style="margin-left:2em">1. Auto-parsed from label: (M) or [F] patterns -&gt; hotkey = M or F</p>
+<p style="margin-left:2em">2. RIP command: !|1U hotkey param (2-digit MegaNum ASCII code)</p>
+<p style="margin-left:2em">overrides label-based detection.</p>
+<br>
+<p style="margin-left:2em">DrawButtonEx also draws an underline under the hotkey character</p>
+<p style="margin-left:2em">in BtnStyle.ULineCol color (if &lt; 16 and no icon).</p>
+<br>
+<p><code>Function GetNextTabField : Integer</code></p>
+<p style="margin-left:2em">Find next tabbable field after current FocusedField.</p>
+<p style="margin-left:2em">Searches forward, wraps to first field. Returns 0 if</p>
+<p style="margin-left:2em">TabEnabled is False or no tabbable fields exist.</p>
+<br>
+<p><code>Function GetPrevTabField : Integer</code></p>
+<p style="margin-left:2em">Find previous tabbable field. Searches backward, wraps to last.</p>
+<br>
+<p><code>Procedure FocusField (Index: Integer)</code></p>
+<p style="margin-left:2em">Set focus to mouse field Index. Unfocuses previous field first.</p>
+<p style="margin-left:2em">Highlights the field by XOR-inverting its region.</p>
+<br>
+<p><code>Procedure UnfocusField</code></p>
+<p style="margin-left:2em">Remove focus from current field. Un-inverts the region.</p>
+<br>
+<p><code>Function GetFocusedField : Integer</code></p>
+<p style="margin-left:2em">Returns currently focused field index (0 = none).</p>
+<br>
+<p>KillAllMouseFields resets NextTabIndex and FocusedField.</p>
+<p>ResetWindows ('*') calls KillAllMouseFields.</p>
+<br>
+<p>ResolveVar returns current state for mode queries:</p>
+<p style="margin-left:2em">$HKEYON$ -&gt; "YES" if hotkeys enabled, "NO" if not</p>
+<p style="margin-left:2em">$TABON$  -&gt; "YES" if tab enabled, "NO" if not</p>
+<br>
+<h2>3.18  CHR Vector Fonts</h2>
+<br>
+<p><code>Function LoadCHR (AFontNum: Byte; FileName: String) : Boolean</code></p>
+<p style="margin-left:2em">Load Borland BGI .CHR file into font slot AFontNum (1-10).</p>
+<p style="margin-left:2em">Parses: PK header, 0x1A marker, binary prefix, '+' signature,</p>
+<p style="margin-left:2em">offset table (nchars*2), width table (nchars*1), stroke data</p>
+<p style="margin-left:2em">(2 bytes per command: 7-bit signed X/Y, 2-bit opcode).</p>
+<p style="margin-left:2em">Returns True on success.</p>
+<br>
+<p><code>Procedure DrawTextCHR (X, Y: SmallInt; S: String; AFont, ASize: Byte)</code></p>
+<p style="margin-left:2em">Render text with loaded CHR font. Walks stroke commands per</p>
+<p style="margin-left:2em">character: Op=1 moves pen, Op=2 draws line, Op=0 ends char.</p>
+<p style="margin-left:2em">ASize scales all coordinates.</p>
+<br>
+<h2>3.19  System Font Modes (Phase 6)</h2>
+<br>
+<p>RIPterm v1.54 supports 5 system text modes, selected via the</p>
+<p>TextWinSize parameter of SetTextWindow (RIP command !|w).</p>
+<br>
+<p style="margin-left:2em">Mode  Cols  Rows  Font     Pixels</p>
+<p style="margin-left:2em">0    80    43   8x8      Default EGA mode</p>
+<p style="margin-left:2em">1    80    25   8x14     Standard VGA text</p>
+<p style="margin-left:2em">2    40    25   16x14    Double-width (each pixel drawn twice)</p>
+<p style="margin-left:2em">3    91    43   7x8      Narrow columns</p>
+<p style="margin-left:2em">4    91    25   7x14     Narrow tall</p>
+<br>
+<p>Font data files:</p>
+<p style="margin-left:2em">rip_font8x8.inc  — 2048 bytes, 256 chars, CP437 8x8 VGA ROM</p>
+<p style="margin-left:2em">rip_font8x14.inc — 3584 bytes, 256 chars, CP437 8x14</p>
+<p style="margin-left:2em">(derived from 8x8: 3 blank rows top, 8 glyph rows, 3 bottom)</p>
+<br>
+<p>DrawText8x8 selects the font based on TextWinSize:</p>
+<p style="margin-left:2em">- Modes 0, 3: use Font8x8 data, CharW pixels wide</p>
+<p style="margin-left:2em">- Modes 1, 2, 4: use Font8x14 data, CharH=14</p>
+<p style="margin-left:2em">- Mode 2: double-width, each font pixel drawn as 2 screen pixels</p>
+<p style="margin-left:2em">- Modes 3, 4: 7 of 8 font columns rendered (narrow)</p>
+<br>
+<p><code>Function GetSysFontW : Integer</code></p>
+<p style="margin-left:2em">Character width in pixels for current mode:</p>
+<p style="margin-left:2em">Mode 0: 8, Mode 1: 8, Mode 2: 16, Mode 3: 7, Mode 4: 7</p>
+<br>
+<p><code>Function GetSysFontH : Integer</code></p>
+<p style="margin-left:2em">Character height in pixels:</p>
+<p style="margin-left:2em">Modes 0, 3: 8.  Modes 1, 2, 4: 14.</p>
+<br>
+<p><code>Function GetSysCols : Integer</code></p>
+<p style="margin-left:2em">Text columns for current mode:</p>
+<p style="margin-left:2em">Modes 0, 1: 80.  Mode 2: 40.  Modes 3, 4: 91.</p>
+<br>
+<p><code>Function GetSysRows : Integer</code></p>
+<p style="margin-left:2em">Text rows for current mode:</p>
+<p style="margin-left:2em">Modes 0, 3: 43.  Modes 1, 2, 4: 25.</p>
+<br>
+<p>All text rendering paths use GetSysFontW/H:</p>
+<p style="margin-left:2em">- DrawText8x8: selects font table and character dimensions</p>
+<p style="margin-left:2em">- DrawButton/DrawButtonEx: label centering</p>
+<p style="margin-left:2em">- DrawButtonEx: hotkey underline position</p>
+<p style="margin-left:2em">- ParseLevel1 't' (region text): CurY line advance</p>
+<p style="margin-left:2em">- ResolveVar $TWFONT$: returns TextWinSize (mode number)</p>
+<br>
+<h2>3.20  Scene / Export</h2>
+<br>
+<p><code>Function LoadScene (FileName: String) : Boolean</code></p>
+<p style="margin-left:2em">Load and process a .RIP scene file. Reads each line and passes</p>
+<p style="margin-left:2em">it through ProcessLine. Returns False if file not found.</p>
+<p style="margin-left:2em">RIP command: !|1R</p>
+<br>
+<p><code>Function SaveScene (FileName: String) : Boolean</code></p>
+<p style="margin-left:2em">Serialize current screen to a .RIP file. Writes:</p>
+<p style="margin-left:2em">1. !|* (reset windows)</p>
+<p style="margin-left:2em">2. !|e (clear screen)</p>
+<p style="margin-left:2em">3. !|Q... (palette, 16 colors in MegaNum)</p>
+<p style="margin-left:2em">4. !|c.. + !|X.... for each non-black pixel</p>
+<p style="margin-left:2em">Groups same-color pixels to minimize color change commands.</p>
+<p style="margin-left:2em">Returns False if file cannot be created.</p>
+<p style="margin-left:2em">Note: produces large files for complex screens — use SaveBMP</p>
+<p style="margin-left:2em">for archival when .RIP format is not required.</p>
+<br>
+<p><code>Function SaveBMP (FileName: String) : Boolean</code></p>
+<p style="margin-left:2em">Export entire 640x350 canvas as 24-bit BMP file.</p>
+<p style="margin-left:2em">Maps 4-bit EGA palette indices to 24-bit RGB via EGA_RGB table.</p>
+<br>
+<h2>3.21  Image Loading (Phase 4)</h2>
+<br>
+<p><code>Function LoadPCX (FileName: String; X, Y: SmallInt) : Boolean</code></p>
+<p style="margin-left:2em">Load a 16-color EGA PCX file and render at (X,Y).</p>
+<br>
+<p style="margin-left:2em">Supported format:</p>
+<p style="margin-left:2em">Manufacturer: 0x0A (ZSoft)</p>
+<p style="margin-left:2em">Encoding: RLE (type 1)</p>
+<p style="margin-left:2em">Bits per pixel: 1</p>
+<p style="margin-left:2em">Planes: 4 (= 16 colors)</p>
+<p style="margin-left:2em">Max dimensions: 640x350</p>
+<br>
+<p style="margin-left:2em">Decodes RLE-compressed scanlines: if top 2 bits of a byte are set,</p>
+<p style="margin-left:2em">lower 6 bits = run count, next byte = repeated value. Otherwise</p>
+<p style="margin-left:2em">the byte is a literal pixel value.</p>
+<br>
+<p style="margin-left:2em">Each scanline has 4 planes of BytesPerRow bytes. Planes are combined</p>
+<p style="margin-left:2em">into 4-bit color indices the same way as ICN/MSK files.</p>
+<br>
+<p style="margin-left:2em">Tested with RIPTERM.PCX (640x301 EGA splash screen).</p>
+<br>
+<p><code>Function LoadBMP (FileName: String; X, Y: SmallInt) : Boolean</code></p>
+<p style="margin-left:2em">Load a 4-bit (16-color) or 24-bit BMP file and render at (X,Y).</p>
+<br>
+<p style="margin-left:2em">4-bit mode: reads nibble-packed pixels directly as EGA color indices.</p>
+<p style="margin-left:2em">Handles row padding to 4-byte boundaries. Supports bottom-up and</p>
+<p style="margin-left:2em">top-down row order.</p>
+<br>
+<p style="margin-left:2em">24-bit mode: reads BGR pixel data and maps each pixel to the nearest</p>
+<p style="margin-left:2em">EGA color using Manhattan distance against the EGA_RGB palette table.</p>
+<p style="margin-left:2em">This allows importing screenshots or external images into the</p>
+<p style="margin-left:2em">640x350 EGA canvas.</p>
+<br>
+<p style="margin-left:2em">Returns False if file format is unsupported or dimensions exceed</p>
+<p style="margin-left:2em">640x350.</p>
+<br>
+<h2>3.22  Screen State Save/Restore</h2>
+<br>
+<p>The RIPterm save/restore system allows complete graphics state to be</p>
+<p>preserved and recalled. BBS software uses this to save the screen</p>
+<p>before displaying a sub-menu or dialog, then restore it when done.</p>
+<br>
+<p><code>Procedure SaveScreen (Slot: Byte)</code></p>
+<p style="margin-left:2em">Save the entire 640x350 pixel buffer to a memory slot (0-9).</p>
+<p style="margin-left:2em">Allocates 224,000 bytes on the heap per slot. If the slot already</p>
+<p style="margin-left:2em">contains a saved screen, it is overwritten.</p>
+<p style="margin-left:2em">Text variable: $SAVE$ (slot 0), $SAVE0$ through $SAVE9$</p>
+<br>
+<p><code>Procedure RestoreScreen (Slot: Byte)</code></p>
+<p style="margin-left:2em">Restore a previously saved screen. The saved data is copied back</p>
+<p style="margin-left:2em">to the pixel buffer and the slot is freed. Per RIPterm behavior,</p>
+<p style="margin-left:2em">numbered slots (0-9) are deleted after restore. If the slot is</p>
+<p style="margin-left:2em">empty, the call is silently ignored.</p>
+<p style="margin-left:2em">Text variable: $RESTORE$ (slot 0), $RESTORE0$ through $RESTORE9$</p>
+<br>
+<p><code>Procedure SaveTextWin</code></p>
+<p style="margin-left:2em">Save the current text window coordinates (X0, Y0, X1, Y1) and</p>
+<p style="margin-left:2em">font size. Only one text window state can be saved at a time;</p>
+<p style="margin-left:2em">a second call overwrites the first.</p>
+<p style="margin-left:2em">Text variable: $STW$</p>
+<br>
+<p><code>Procedure RestoreTextWin</code></p>
+<p style="margin-left:2em">Restore the previously saved text window state. The saved data</p>
+<p style="margin-left:2em">is cleared after restore. If nothing was saved, call is ignored.</p>
+<p style="margin-left:2em">Text variable: $RTW$</p>
+<br>
+<p><code>Procedure SaveMouseAll</code></p>
+<p style="margin-left:2em">Save all active mouse field definitions (up to 128 fields),</p>
+<p style="margin-left:2em">the current mouse count, NextTabIndex, and FocusedField.</p>
+<p style="margin-left:2em">All Phase 2/5 fields (HotKey, TabIndex, IsRadio, etc) are</p>
+<p style="margin-left:2em">preserved via full record copy. Only one mouse state at a time.</p>
+<p style="margin-left:2em">Text variable: $SMF$</p>
+<br>
+<p><code>Procedure RestoreMouseAll</code></p>
+<p style="margin-left:2em">Restore all previously saved mouse fields. Calls UnfocusField</p>
+<p style="margin-left:2em">first to remove any current highlight, then restores MouseCount,</p>
+<p style="margin-left:2em">NextTabIndex, FocusedField, and all field records. Current fields</p>
+<p style="margin-left:2em">are replaced entirely. Saved data is cleared after restore.</p>
+<p style="margin-left:2em">Text variable: $RMF$</p>
+<br>
+<p><code>Procedure SaveClip</code></p>
+<p style="margin-left:2em">Save the current GetImage clipboard to a backup buffer.</p>
+<p style="margin-left:2em">If a backup already exists, it is freed first. Saves the</p>
+<p style="margin-left:2em">clipboard data, size, and dimensions (ClipW/ClipH).</p>
+<p style="margin-left:2em">Text variable: $SCB$</p>
+<br>
+<p><code>Procedure RestoreClip</code></p>
+<p style="margin-left:2em">Restore the saved clipboard. Frees current clipboard and</p>
+<p style="margin-left:2em">replaces it with the backup copy. Clipboard data, size,</p>
+<p style="margin-left:2em">and dimensions are all restored.</p>
+<p style="margin-left:2em">Text variable: $RCB$</p>
+<br>
+<p><code>Procedure SaveAll</code></p>
+<p style="margin-left:2em">Shorthand for: SaveScreen(0) + SaveTextWin + SaveClip + SaveMouseAll.</p>
+<p style="margin-left:2em">Text variable: $SAVEALL$</p>
+<br>
+<p><code>Procedure RestoreAll</code></p>
+<p style="margin-left:2em">Shorthand for: RestoreScreen(0) + RestoreTextWin + RestoreClip +</p>
+<p style="margin-left:2em">RestoreMouseAll.</p>
+<p style="margin-left:2em">Text variable: $RESTOREALL$</p>
+<br>
+<p>Memory Management:</p>
+<p style="margin-left:2em">Screen saves are heap-allocated on demand. Each slot = 224KB.</p>
+<p style="margin-left:2em">Full set of 10 slots = 2.2MB. Freed on restore or engine Destroy.</p>
+<p style="margin-left:2em">Clipboard uses GetMem/FreeMem. All memory cleaned up in Destroy.</p>
+<br>
+<p>Text Variable Quick Reference:</p>
+<p style="margin-left:2em">$SAVE$              Save screen to slot 0 (persistent)</p>
+<p style="margin-left:2em">$RESTORE$           Restore screen from slot 0 (persistent)</p>
+<p style="margin-left:2em">$SAVE0$..$SAVE9$    Save screen to numbered slot</p>
+<p style="margin-left:2em">$RESTORE0$..$RESTORE9$  Restore and delete numbered slot</p>
+<p style="margin-left:2em">$STW$               Save text window state</p>
+<p style="margin-left:2em">$RTW$               Restore text window state</p>
+<p style="margin-left:2em">$SCB$               Save clipboard</p>
+<p style="margin-left:2em">$RCB$               Restore clipboard</p>
+<p style="margin-left:2em">$SMF$               Save mouse field definitions</p>
+<p style="margin-left:2em">$RMF$               Restore mouse field definitions</p>
+<p style="margin-left:2em">$SAVEALL$           Save all (screen + textwin + clip + mouse)</p>
+<p style="margin-left:2em">$RESTOREALL$        Restore all</p>
+<p style="margin-left:2em">$RESET$             Full engine reset</p>
+<br>
+<h2>3.23  Text Variables</h2>
+<br>
+<p><code>Procedure DefineVar (Name, Value: String; Persist, Required: Boolean)</code></p>
+<p style="margin-left:2em">Define or update a text variable. Name = 1-12 alphanumeric chars.</p>
+<p style="margin-left:2em">Value = up to 255 chars. Persist = save to database file.</p>
+<p style="margin-left:2em">Required = cannot be left blank by user.</p>
+<p style="margin-left:2em">RIP command: !|1D</p>
+<br>
+<p style="margin-left:2em">ParseLevel1 'D' handler parses the full RIP format:</p>
+<p style="margin-left:2em">flags(3) res(2) name,size:?question?default</p>
+<br>
+<p style="margin-left:2em">flags:  bit 0 = persist (save to database)</p>
+<p style="margin-left:2em">bit 1 = required (cannot be blank)</p>
+<p style="margin-left:2em">name:   variable identifier (up to first , or :)</p>
+<p style="margin-left:2em">size:   field width (skipped, after comma)</p>
+<p style="margin-left:2em">?question?: prompt text shown to user (skipped server-side)</p>
+<p style="margin-left:2em">default: value assigned if user provides none</p>
+<br>
+<p style="margin-left:2em">Example: !|1D00100USERNAME,20:?Enter your name?Guest</p>
+<p style="margin-left:2em">Defines $USERNAME$ with default value "Guest".</p>
+<br>
+<p><code>Function GetVar (Name: String) : String</code></p>
+<p style="margin-left:2em">Return value of a user-defined variable, or empty if not found.</p>
+<br>
+<p><code>Procedure SetVar (Name, Value: String)</code></p>
+<p style="margin-left:2em">Set value of an existing variable, or define a new one.</p>
+<br>
+<p><code>Function FindVar (Name: String) : Integer</code></p>
+<p style="margin-left:2em">Return variable index (1-based) or 0 if not found.</p>
+<br>
+<p><code>Procedure KillAllVars</code></p>
+<p style="margin-left:2em">Remove all user-defined variables.</p>
+<br>
+<p><code>Function SaveVars (FileName: String) : Boolean</code></p>
+<p style="margin-left:2em">Save all persistent variables to a text file. Only variables</p>
+<p style="margin-left:2em">with Persist=True are written. Format: one line per variable,</p>
+<p style="margin-left:2em">NAME=VALUE. Returns False if file cannot be created.</p>
+<br>
+<p><code>Function LoadVars (FileName: String) : Boolean</code></p>
+<p style="margin-left:2em">Load variables from a text file (NAME=VALUE format, one per</p>
+<p style="margin-left:2em">line). Variables with matching names are updated; new names</p>
+<p style="margin-left:2em">are added as persistent variables. Existing variables not in</p>
+<p style="margin-left:2em">the file are kept unchanged (merge behavior).</p>
+<p style="margin-left:2em">Returns False if file not found.</p>
+<br>
+<h2>3.24  Pre-defined Text Variables (Phase 3)</h2>
+<br>
+<p><code>Function ResolveVar (Name: String) : String</code></p>
+<p style="margin-left:2em">Resolve a variable name to its value. Checks built-in variables</p>
+<p style="margin-left:2em">first, then user-defined variables. Name should NOT include the</p>
+<p style="margin-left:2em">$ delimiters. Returns empty string if not found.</p>
+<br>
+<p style="margin-left:2em">Built-in variables resolved:</p>
+<br>
+<p style="margin-left:2em">System Info:</p>
+<p style="margin-left:2em">DATE        Current date (MM/DD/YY)</p>
+<p style="margin-left:2em">TIME        Current time (HH:MM:SS)</p>
+<p style="margin-left:2em">RUNDATE     Date RIPterm was started</p>
+<p style="margin-left:2em">RUNTIME     Time RIPterm was started</p>
+<br>
+<p style="margin-left:2em">Screen State:</p>
+<p style="margin-left:2em">CURX        Current X cursor coordinate (as decimal string)</p>
+<p style="margin-left:2em">CURY        Current Y cursor coordinate (as decimal string)</p>
+<p style="margin-left:2em">CURSOR      Returns "YES" (cursor always visible server-side)</p>
+<br>
+<p style="margin-left:2em">Text Window:</p>
+<p style="margin-left:2em">TWX0        Text window left X</p>
+<p style="margin-left:2em">TWY0        Text window top Y</p>
+<p style="margin-left:2em">TWX1        Text window right X</p>
+<p style="margin-left:2em">TWY1        Text window bottom Y</p>
+<p style="margin-left:2em">TWW         Text window width (X1 - X0 + 1)</p>
+<p style="margin-left:2em">TWH         Text window height (Y1 - Y0 + 1)</p>
+<p style="margin-left:2em">TWWIN       "YES" if text window is non-default, "NO" otherwise</p>
+<p style="margin-left:2em">TWFONT      Current system font number</p>
+<br>
+<p style="margin-left:2em">Sound (no-op server-side, but recognized):</p>
+<p style="margin-left:2em">ALARM       Alarm sound</p>
+<p style="margin-left:2em">PHASER      Descending phaser sound</p>
+<p style="margin-left:2em">REVPHASER   Ascending phaser sound</p>
+<br>
+<p style="margin-left:2em">Mode Control (returns current state as YES/NO):</p>
+<p style="margin-left:2em">HKEYON      "YES" if hotkeys enabled, "NO" if not</p>
+<p style="margin-left:2em">HKEYOFF     "YES" if hotkeys disabled, "NO" if not</p>
+<p style="margin-left:2em">TABON       "YES" if tab enabled, "NO" if not</p>
+<p style="margin-left:2em">TABOFF      "YES" if tab disabled, "NO" if not</p>
+<p style="margin-left:2em">VT102ON     VT-102 mode (no-op server-side)</p>
+<p style="margin-left:2em">VT102OFF    VT-102 mode (no-op server-side)</p>
+<p style="margin-left:2em">DWAYON      Doorway mode (no-op server-side)</p>
+<p style="margin-left:2em">DWAYOFF     Doorway mode (no-op server-side)</p>
+<p style="margin-left:2em">CON         Show text cursor (no-op server-side)</p>
+<p style="margin-left:2em">COFF        Hide text cursor (no-op server-side)</p>
+<br>
+<p style="margin-left:2em">Action Variables (handled in RIP_Viewer.OnTextCmd):</p>
+<p style="margin-left:2em">SAVE, RESTORE, SAVE0..SAVE9, RESTORE0..RESTORE9</p>
+<p style="margin-left:2em">STW, RTW, SCB, RCB, SMF, RMF</p>
+<p style="margin-left:2em">SAVEALL, RESTOREALL, RESET</p>
+<p style="margin-left:2em">HKEYON, HKEYOFF, TABON, TABOFF (toggle engine flags)</p>
+<br>
+<p style="margin-left:2em">Total: 24 value variables + 19 action variables = 43 implemented.</p>
+<p style="margin-left:2em">(RIPterm v1.54 spec lists ~103 including client-side variables</p>
+<p style="margin-left:2em">like APP0-APP9, sound, and doorway — not applicable server-side.)</p>
+<br>
+<p><code>Function ExpandVars (S: String) : String</code></p>
+<p style="margin-left:2em">Scan a string for $VARNAME$ patterns and replace each with its</p>
+<p style="margin-left:2em">resolved value. Called automatically by OutText and OutTextXY</p>
+<p style="margin-left:2em">before rendering. Unrecognized variables are passed through</p>
+<p style="margin-left:2em">unchanged. Nested expansion is not supported.</p>
+<br>
+<p style="margin-left:2em">Example: "Hello $CURX$ $CURY$" -&gt; "Hello 100 50"</p>
+<br>
+<h2>3.25  File Query</h2>
+<br>
+<p><code>Function FileQuery (FileName: String; Mode: Byte) : TRIPFileQueryResult</code></p>
+<p style="margin-left:2em">Mode 0: existence. Mode 2: existence + size. Mode 3: + date/time.</p>
+<p style="margin-left:2em">RIP: !|1F</p>
+<br>
+<h2>3.26  Copy Region</h2>
+<br>
+<p><code>Procedure CopyRegion (X0, Y0, X1, Y1, DestY: SmallInt)</code></p>
+<p style="margin-left:2em">Vertical scroll with 8-pixel X boundary alignment.</p>
+<p style="margin-left:2em">Overlap-safe copy direction. RIP: !|1G</p>
+<br>
+<h2>3.27  Dimensions</h2>
+<br>
+<p><code>Function GetMaxX : SmallInt  — 639</code></p>
+<p><code>Function GetMaxY : SmallInt  — 349</code></p>
+<p><code>Function GetWidth : SmallInt — 640</code></p>
+<p><code>Function GetHeight : SmallInt — 350</code></p>
+<br>
+<h2>3.28  Public Data</h2>
+<br>
+<p>Pixels : PRIPPixelBuffer</p>
+<p style="margin-left:2em">Pointer to the 640x350 pixel buffer. Access as Pixels^[Y, X].</p>
+<br>
+<p>Clipboard : Pointer   — GetImage capture buffer (public)</p>
+<p>ClipSize  : LongInt   — buffer size in bytes</p>
+<p>ClipW     : Word      — captured region width</p>
+<p>ClipH     : Word      — captured region height</p>
+<br>
+<br>
+<p>3A. RIP_Viewer (examples/rip/RIP_Viewer.pas — Phase 7)</p>
+<br>
+<p>TRIPViewer extends TRIPParser with event handlers that route all</p>
+<p>RIP commands through TRIPEngine. The viewer provides a complete</p>
+<p>rendering pipeline: feed RIP data in, get a rendered BMP out.</p>
+<br>
+<p>Usage:</p>
+<p style="margin-left:2em">Viewer := TRIPViewer.Create;</p>
+<p style="margin-left:2em">Viewer.LoadFonts('path/to/FONTS');</p>
+<p style="margin-left:2em">Viewer.SetIconPath('path/to/ICONS');</p>
+<p style="margin-left:2em">Viewer.ProcessStr(RIPData);</p>
+<p style="margin-left:2em">Viewer.Engine.SaveBMP('output.bmp');</p>
+<p style="margin-left:2em">Viewer.Free;</p>
+<br>
+<p>37 event handlers implemented (Phase 7):</p>
+<br>
+<p style="margin-left:2em">Screen:     OnTextWindow, OnViewport, OnResetWindows,</p>
+<p style="margin-left:2em">OnEraseWindow, OnEraseView, OnGotoXY, OnHome,</p>
+<p style="margin-left:2em">OnEraseEOL</p>
+<p style="margin-left:2em">Color:      OnColor, OnSetPalette, OnOnePalette, OnWriteMode</p>
+<p style="margin-left:2em">Text:       OnTextCmd ($SAVE$/$RESTORE$/etc action variables,</p>
+<p style="margin-left:2em">$HKEYON$/$TABOFF$/etc mode control),</p>
+<p style="margin-left:2em">OnTextXY, OnFontStyle, OnMove</p>
+<p style="margin-left:2em">Drawing:    OnPixel, OnLine, OnRectangle, OnBar, OnCircle,</p>
+<p style="margin-left:2em">OnOval, OnFilledOval, OnArc, OnOvalArc, OnPieSlice,</p>
+<p style="margin-left:2em">OnOvalPieSlice, OnBezier, OnFill</p>
+<p style="margin-left:2em">Style:      OnLineStyle, OnFillStyle, OnFillPattern</p>
+<p style="margin-left:2em">Mouse:      OnMouseRegion, OnKillMouse</p>
+<p style="margin-left:2em">Level 1:    OnBeginText, OnRegionText, OnEndText,</p>
+<p style="margin-left:2em">OnGetImage, OnPutImage, OnWriteIcon,</p>
+<p style="margin-left:2em">OnButtonStyle, OnButton, OnDefine,</p>
+<p style="margin-left:2em">OnLoadIcon, OnCopyRegion, OnReadScene,</p>
+<p style="margin-left:2em">OnFileQuery, OnNoMore</p>
+<br>
+<p>OnGetImage captures to Engine.Clipboard with ClipW/ClipH.</p>
+<p>OnPutImage pastes Engine.Clipboard with write mode.</p>
+<p>OnRegionText advances CurY by GetSysFontH.</p>
+<p>OnReadScene/OnFileQuery use IconPath prefix.</p>
+<br>
+<br>
+<h2>4. RIPscrip v1.54 COMMAND CROSS-REFERENCE (51 commands)</h2>
+<br>
+<p>Level 0 (36 commands):</p>
+<br>
+<table><tr><th>&#x2713;</th><th>Code</th><th>Command</th><th>API</th></tr>
+<tr><td class="done">&#x2713;</td><td><code>w</code></td><td>RIP_TEXT_WINDOW</td><td><code>SetTextWindow</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>v</code></td><td>RIP_VIEWPORT</td><td><code>SetViewPort</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>*</code></td><td>RIP_RESET_WINDOWS</td><td><code>(inline)</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>e</code></td><td>RIP_ERASE_WINDOW</td><td><code>ClearScreen</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>E</code></td><td>RIP_ERASE_VIEW</td><td><code>ClearViewport</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>g</code></td><td>RIP_GOTOXY</td><td><code>MoveTo</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>H</code></td><td>RIP_HOME</td><td><code>MoveTo(0,0)</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>></code></td><td>RIP_ERASE_EOL</td><td><code>(inline)</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>c</code></td><td>RIP_COLOR</td><td><code>SetColor</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>Q</code></td><td>RIP_SET_PALETTE</td><td><code>SetAllPalette</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>a</code></td><td>RIP_ONE_PALETTE</td><td><code>SetPalette</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>W</code></td><td>RIP_WRITE_MODE</td><td><code>SetWriteMode</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>m</code></td><td>RIP_MOVE</td><td><code>MoveTo</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>T</code></td><td>RIP_TEXT</td><td><code>OutText</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>@</code></td><td>RIP_TEXT_XY</td><td><code>OutTextXY</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>Y</code></td><td>RIP_FONT_STYLE</td><td><code>SetTextStyle</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>X</code></td><td>RIP_PIXEL</td><td><code>PutPixel</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>L</code></td><td>RIP_LINE</td><td><code>Line</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>R</code></td><td>RIP_RECTANGLE</td><td><code>Rectangle</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>B</code></td><td>RIP_BAR</td><td><code>Bar</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>C</code></td><td>RIP_CIRCLE</td><td><code>Circle</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>O</code></td><td>RIP_OVAL</td><td><code>Ellipse</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>o</code></td><td>RIP_FILLED_OVAL</td><td><code>FillEllipse</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>A</code></td><td>RIP_ARC</td><td><code>Arc</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>V</code></td><td>RIP_OVAL_ARC</td><td><code>Ellipse</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>I</code></td><td>RIP_PIE_SLICE</td><td><code>PieSlice</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>i</code></td><td>RIP_OVAL_PIE</td><td><code>Sector</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>Z</code></td><td>RIP_BEZIER</td><td><code>DrawBezier</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>P</code></td><td>RIP_POLYGON</td><td><code>DrawPoly</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>p</code></td><td>RIP_FILL_POLYGON</td><td><code>FillPoly</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>l</code></td><td>RIP_POLYLINE</td><td><code>(inline)</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>F</code></td><td>RIP_FILL</td><td><code>FloodFill</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>=</code></td><td>RIP_LINE_STYLE</td><td><code>SetLineStyle</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>S</code></td><td>RIP_FILL_STYLE</td><td><code>SetFillStyle</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>s</code></td><td>RIP_FILL_PATTERN</td><td><code>SetFillPattern</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>#</code></td><td>RIP_NO_MORE</td><td><code>(no-op)</code></td></tr>
+</table>
+<br>
+<p>Level 1 (15 commands):</p>
+<br>
+<table><tr><th>&#x2713;</th><th>Code</th><th>Command</th><th>API</th></tr>
+<tr><td class="done">&#x2713;</td><td><code>1M</code></td><td>RIP_MOUSE</td><td><code>AddMouseField</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1K</code></td><td>RIP_KILL_MOUSE</td><td><code>KillMouseField/All</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1T</code></td><td>RIP_BEGIN_TEXT</td><td><code>(inline)</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1t</code></td><td>RIP_REGION_TEXT</td><td><code>(inline)</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1E</code></td><td>RIP_END_TEXT</td><td><code>(no-op)</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1C</code></td><td>RIP_GET_IMAGE</td><td><code>GetImage</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1P</code></td><td>RIP_PUT_IMAGE</td><td><code>PutImage</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1W</code></td><td>RIP_WRITE_ICON</td><td><code>SaveIcon</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1I</code></td><td>RIP_LOAD_ICON</td><td><code>LoadIcon</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1B</code></td><td>RIP_BUTTON_STYLE</td><td><code>SetButtonStyle</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1U</code></td><td>RIP_BUTTON</td><td><code>DrawButton</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1D</code></td><td>RIP_DEFINE</td><td><code>DefineVar</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1G</code></td><td>RIP_COPY_REGION</td><td><code>CopyRegion</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1R</code></td><td>RIP_READ_SCENE</td><td><code>LoadScene</code></td></tr>
+<tr><td class="done">&#x2713;</td><td><code>1F</code></td><td>RIP_FILE_QUERY</td><td><code>FileQuery</code></td></tr>
+</table>
+<br>
+<p style="margin-left:2em">51/51 commands implemented.</p>
+<br>
+<br>
+<h2>5. IMPLEMENTATION STATUS</h2>
+<br>
+<p>Core Engine:</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  All 51 RIPscrip v1.54 commands (36 Level 0 + 15 Level 1)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Standalone unit — no MDL or external dependencies</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  MegaNum base-36 decoding</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Line continuation (backslash at EOL)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  RIP command prefixes: !| and #1| and #2|</p>
+<br>
+<p>Drawing Primitives:</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Pixel, line (Bresenham), rectangle, filled bar</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Circle (midpoint), ellipse (midpoint two-region)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Filled ellipse (horizontal scanlines)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Arc, oval arc, pie slice, oval pie slice</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Cubic Bezier curves</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Polygon outline, polyline</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Filled polygon (scanline intersection algorithm)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Flood fill (stack-based, 4096 depth)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Viewport clipping on all drawing operations</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  XOR write mode</p>
+<br>
+<p>Styles:</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Line patterns: solid, dotted, dashed, center, user 16-bit</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Fill patterns: all 12 BGI styles + user-defined 8x8</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Line thickness</p>
+<br>
+<p>Fonts:</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  CP437 8x8 VGA ROM font (256 characters)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  CHR vector font loading (Borland BGI stroke format)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  CHR stroke rendering with scaling</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  10 font slots, auto-select CHR vs 8x8 in OutText/OutTextXY</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  System font modes (80x25, 80x43, 40x25, 91x43, 91x25)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  8x14 font bitmap (8x16 not needed for v1.54)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Font switching via $SYSFONT$ text variable</p>
+<br>
+<p>Color / Palette:</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  16-color EGA palette (remappable)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  SetColor, SetPalette, SetAllPalette</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  EGA RGB lookup table (EGA_RGB constant)</p>
+<br>
+<p>Icons:</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  ICN icon load (EGA planar: 4 bit planes per row)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  ICN icon save</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Icon rendering with write mode support</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  .MSK mask file loading (1-bit transparency)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  LoadIconMasked (icon + mask for transparency)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  .HIC highlighted icon loading (hover/selected state)</p>
+<br>
+<p>Buttons:</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  3D beveled button rendering (surface, highlight, shadow)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Centered label text</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Auto mouse field registration</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  14-parameter TRIPButtonStyle</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Hot-icon mode (ICN normal, HIC selected)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Radio button group behavior (one selected per group)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Checkbox toggle behavior</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  INVERT flag (XOR region on click)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Button label underline hotkey character</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Button hotkey activation (keyboard -&gt; button)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Tab navigation through button/mouse fields</p>
+<br>
+<p>Mouse Fields:</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Add/kill mouse fields (128 max)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Kill all mouse fields</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Hit testing (FindMouseField)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Host command and status text per field</p>
+<br>
+<p>Screen State:</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Screen save/restore (10 slots, heap-allocated, 224KB each)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Text window save/restore</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Mouse field save/restore</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Clipboard save/restore</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  SaveAll / RestoreAll combined</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  15 action text variables ($SAVE$, $RESTORE$, $STW$, etc)</p>
+<br>
+<p>Text Variables:</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  DefineVar / GetVar / SetVar / FindVar / KillAllVars</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Persist and Required flags</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  RIP_DEFINE command parsing</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Pre-defined: $DATE$, $TIME$, $RUNDATE$, $RUNTIME$</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Pre-defined: $CURX$, $CURY$, $CURSOR$</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Pre-defined: $TWH$, $TWW$, $TWX0$-$TWY1$, $TWWIN$, $TWFONT$</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Pre-defined: $ALARM$, $PHASER$, $REVPHASER$</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Pre-defined: $HKEYON$, $HKEYOFF$, $TABON$, $TABOFF$</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  $VARNAME$ expansion in text output</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  User variable persistence (SaveVars/LoadVars)</p>
+<br>
+<p>Image Formats:</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  BMP export (24-bit, SaveBMP)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Get/Put image (width/height header + pixel data)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  PCX loading (16-color EGA 640x350, RLE decode)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  BMP loading</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Heap-based clipboard (variable size)</p>
+<br>
+<p>Other:</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Copy region (8-pixel X alignment, overlap-safe)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  File query (existence and size)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Scene file loading (LoadScene)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  SaveScene (pixel-level .RIP serialization)</p>
+<br>
+<p style="margin-left:2em">Assets (in examples/ripterm154/ and examples/rip/):</p>
+<p style="margin-left:2em">10 CHR vector fonts, 212 ICN icon files</p>
+<p style="margin-left:2em">Source: https://github.com/cgorringe/RIPterm154 (freeware)</p>
+<br>
+<p>Summary: 57 done, 25 planned across 8 phases.</p>
+<br>
+<p>Phases:</p>
+<br>
+<p class="phase">Phase 1: Screen State Management                         <span class="complete">COMPLETE</span></p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  SaveScreen / RestoreScreen (10 slots)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  SaveTextWin / RestoreTextWin</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  SaveMouseAll / RestoreMouseAll</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  SaveClip / RestoreClip</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  SaveAll / RestoreAll</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  15 action text variables</p>
+<br>
+<p class="phase">Phase 2: Icon Masks and Highlights                       <span class="complete">COMPLETE</span></p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  .MSK mask file loading (1-bit transparency mask)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  LoadIconMasked (icon + mask rendering)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  .HIC highlighted icon loading (hover/selected state)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  DrawButton: hot-icon mode (ICN normal, HIC selected)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  DrawButton: radio button group behavior</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  DrawButton: checkbox toggle behavior</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  DrawButton: INVERT flag (XOR region on click)</p>
+<br>
+<p class="phase">Phase 3: Pre-defined Text Variables                      <span class="complete">COMPLETE</span></p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  System info: $DATE$, $TIME$, $RUNDATE$, $RUNTIME$</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Screen state: $CURX$, $CURY$, $CURSOR$</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Text window: $TWH$, $TWW$, $TWX0$-$TWY1$, $TWWIN$, $TWFONT$</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Sound: $ALARM$, $PHASER$, $REVPHASER$</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Mode control: $HKEYON$, $HKEYOFF$, $TABON$, $TABOFF$</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Variable resolver ($VARNAME$ expansion in text output)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  User variable persistence (SaveVars/LoadVars)</p>
+<br>
+<p class="phase">Phase 4: Image Format Support                            <span class="complete">COMPLETE</span></p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  PCX loading (16-color EGA 640x350, RLE decode)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  PCX as splash screen / logo overlay</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  BMP loading (in addition to existing SaveBMP)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Heap-based clipboard (variable size Get/PutImage)</p>
+<br>
+<p class="phase">Phase 5: Advanced Button System                          <span class="complete">COMPLETE</span></p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Full TRIPButtonStyle rendering (all 14 parameters)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Button label with underline hotkey character</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Button group management (radio: one selected per group)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Checkbox state tracking (toggle on click)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Button hotkey system (keyboard char -&gt; button activation)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Tab navigation through button/mouse fields</p>
+<br>
+<p class="phase">Phase 6: System Font Modes                               <span class="complete">COMPLETE</span></p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  80x43 mode (8x8 font, default)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  80x25 mode (8x14 font)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  40x25 mode (16x14 font, double-width)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  91x43 mode (7x8 font)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  91x25 mode (7x14 font)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Font switching via SetTextStyle / $SYSFONT$</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Text window reflow on font change</p>
+<br>
+<p class="phase">Phase 7: Parser and Viewer Updates                       <span class="complete">COMPLETE</span></p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  RIP_Viewer: wire Phase 2-6 engine APIs to parser events</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  RIP_Parser: text variable trigger events</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Icon path fallback search (BBS subdir -&gt; ICONS/)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Text variable expansion in OnTextCmd / OnTextXY</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  ripview: test harness for all phases</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Test with real RIPterm154 scenes</p>
+<br>
+<p class="phase">Phase 8: Documentation                                   <span class="complete">COMPLETE</span></p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Update ripscript.doc/txt/htm with all new APIs</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Document MSK/HIC file formats (see 3.14, 3.15)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Document PCX loading constraints (see 3.22)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Document pre-defined text variable list (43 implemented)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Document button system flags and behavior (see 3.12, 3.16, 3.17)</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Update mystic/whatsnew.txt</p>
+<p style="margin-left:2em"><span class="done">&#x2713;</span>  Update README.md files</p>
+<br>
+<br>
+<p>Copyright (c) 2026 Mystic BBS IRC Fork</p>
+<br>
+<p>This program is free software: you can redistribute it and/or modify</p>
+<p>it under the terms of the GNU General Public License as published by</p>
+<p>the Free Software Foundation, either version 3 of the License, or</p>
+<p>(at your option) any later version.</p>
+<br>
+<p>This program is distributed in the hope that it will be useful, but</p>
+<p>WITHOUT ANY WARRANTY; without even the implied warranty of</p>
+<p>MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU</p>
+<p>General Public License for more details.</p>
+<br>
+<p>You should have received a copy of the GNU General Public License</p>
+<p>along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.</p>
+<div class="gpl"><p>Licensed under the GNU General Public License v3.</p></div>
+</body></html>

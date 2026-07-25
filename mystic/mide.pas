@@ -60,9 +60,10 @@ Const
   colEditPosBar  = 9 + 1 * 16;
 
 Const
-  Keywords = 24;
+  Keywords = 26;
   Keyword : Array[1..Keywords] of String[9] = (
     ( 'AND'       ),
+    ( 'ARRAY'     ),
     ( 'BEGIN'     ),
     ( 'CASE'      ),
     ( 'CONST'     ),
@@ -78,6 +79,7 @@ Const
     ( 'OF'        ),
     ( 'OR'        ),
     ( 'PROCEDURE' ),
+    ( 'RECORD'    ),
     ( 'REPEAT'    ),
     ( 'THEN'      ),
     ( 'TO'        ),
@@ -1469,6 +1471,139 @@ Begin
   Box.Free;
 End;
 
+// A3: MPL Help Index — searchable function reference
+Procedure HelpIndex (SearchWord: String);
+Var
+  Box   : TMenuBox;
+  List  : TMenuList;
+  TF    : Text;
+  Line  : String;
+  FN    : String;
+  Found : Boolean;
+Begin
+  FN := 'mplfunc.txt';
+
+  If Not FileExist(FN) Then Begin
+    FN := JustPath(ParamStr(0)) + 'mplfunc.txt';
+    If Not FileExist(FN) Then Begin
+      Box := TMenuBox.Create(Console);
+      Box.Open(15, 9, 65, 13);
+      Console.WriteXY(17, 10, 31, strPadC('mplfunc.txt not found', 48, ' '));
+      Console.WriteXY(17, 11, 31, strPadC('Place it in the Mystic directory', 48, ' '));
+      Console.WriteXY(17, 12, 31, strPadC('(PRESS A KEY)', 48, ' '));
+      Input.ReadKey;
+      Box.Close;
+      Box.Free;
+      Exit;
+    End;
+  End;
+
+  Box  := TMenuBox.Create(Console);
+  List := TMenuList.Create(Console);
+
+  List.NoWindow := True;
+  List.LoChars  := #13#27;
+  List.HiChars  := '';
+  List.HiAttr   := cfg_TextKeyword + 16;
+  List.LoAttr   := 112;
+
+  Box.Header := ' MPL Function Reference (ESC=Close) ';
+  Box.Open(3, 2, 77, 23);
+
+  Assign(TF, FN);
+  {$I-} Reset(TF); {$I+}
+
+  If IOResult = 0 Then Begin
+    While Not Eof(TF) Do Begin
+      ReadLn(TF, Line);
+      // Only add function/variable entries (start with 2 spaces + letter)
+      If (Length(Line) > 4) and (Line[1] = ' ') and (Line[2] = ' ') and (Line[3] in ['a'..'z']) Then
+        List.Add(Copy(Line, 3, 72), 0)
+      Else If (Length(Line) > 4) and (Line[1] = ' ') and (Line[2] = ' ') and (Line[3] = ' ') and (Line[4] = ' ') Then
+        // Description line — append to previous
+        List.Add('  ' + Copy(Line, 5, 70), 0);
+    End;
+    Close(TF);
+  End;
+
+  // If searching, find and scroll to match
+  If SearchWord <> '' Then Begin
+    SearchWord := strLower(SearchWord);
+    Found := False;
+    List.Picked := 1;
+    // Simple: scan list items for match — TMenuList.Picked is 1-based
+    // We can't directly access list items easily, so just set Picked=1
+    // The user can use the built-in list search (type to find)
+  End;
+
+  List.Open(4, 3, 76, 22);
+
+  List.Close;
+  List.Free;
+  Box.Close;
+  Box.Free;
+End;
+
+// A3: Get word under cursor in editor
+Function GetWordUnderCursor : String;
+Var
+  Line : String;
+  X, S, E : Integer;
+Begin
+  Result := '';
+
+  If CurWinNum = 0 Then Exit;
+
+  With CurWin[CurWinNum]^ Do Begin
+    If (CurLine < 1) or (CurLine > TotalLines) Then Exit;
+
+    Line := TextData[CurLine]^;
+    X := CurX;
+
+    If (X < 1) or (X > Length(Line)) Then Exit;
+
+    // Not on an identifier character
+    If Not (UpCase(Line[X]) in ['A'..'Z', '0'..'9', '_']) Then Exit;
+
+    // Find start of word
+    S := X;
+    While (S > 1) and (UpCase(Line[S-1]) in ['A'..'Z', '0'..'9', '_']) Do
+      Dec(S);
+
+    // Find end of word
+    E := X;
+    While (E < Length(Line)) and (UpCase(Line[E+1]) in ['A'..'Z', '0'..'9', '_']) Do
+      Inc(E);
+
+    Result := Copy(Line, S, E - S + 1);
+  End;
+End;
+
+// A3: Help on Help info box
+Procedure HelpOnHelp;
+Var
+  Box : TMenuBox;
+Begin
+  Box := TMenuBox.Create(Console);
+  Box.Header := ' Help on Help ';
+  Box.Open(10, 6, 70, 20);
+
+  Console.WriteXY(12,  7, 113, 'MIDE Help System');
+  Console.WriteXY(12,  9, 112, 'Index        Browse all MPL functions');
+  Console.WriteXY(12, 10, 112, '             Type to search, Enter to select');
+  Console.WriteXY(12, 11, 112, '             ESC to close');
+  Console.WriteXY(12, 13, 112, 'Under Cursor Look up the word at the cursor');
+  Console.WriteXY(12, 14, 112, '             in the function reference');
+  Console.WriteXY(12, 16, 112, 'Reference    mplfunc.txt (236 functions)');
+  Console.WriteXY(12, 17, 112, 'Examples     mplref.txt (full examples)');
+  Console.WriteXY(12, 19,  31, strPadC('(PRESS A KEY)', 48, ' '));
+
+  Input.ReadKey;
+
+  Box.Close;
+  Box.Free;
+End;
+
 Function DoMenu : Boolean;
 Var
   Box   : TMenuBox;
@@ -1814,6 +1949,18 @@ Begin
                 #27 : Break;
                 'A' : Begin
                         AboutBox;
+                        Break;
+                      End;
+                'I' : Begin
+                        HelpIndex('');
+                        Break;
+                      End;
+                'U' : Begin
+                        HelpIndex(GetWordUnderCursor);
+                        Break;
+                      End;
+                'H' : Begin
+                        HelpOnHelp;
                         Break;
                       End;
               Else

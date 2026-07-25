@@ -35,6 +35,7 @@ Const
 Procedure WaitMS            (MS: Word);
 Function  TimerMinutes      : LongInt;
 Function  TimerSeconds      : LongInt;
+Function  TimerMS           : LongInt;
 Function  TimerSet          (Secs: LongInt) : LongInt;
 Function  TimerUp           (Secs: LongInt) : Boolean;
 Function  CurDateDos        : LongInt;
@@ -204,33 +205,48 @@ Begin
   Result := (Hour * 60) + Min;
 End;
 
+// A3-05: Millisecond-resolution timer for MPL
+Function TimerMS : LongInt;
+Var
+  Hour,
+  Min,
+  Sec,
+  Sec100 : Word;
+Begin
+  GetTime (Hour, Min, Sec, Sec100);
+  Result := (LongInt(Hour) * 3600000) + (LongInt(Min) * 60000) +
+            (LongInt(Sec) * 1000) + (LongInt(Sec100) * 10);
+End;
+
 Function DateDos2Str (Date: LongInt; Format: Byte) : String;
-{1 = MM/DD/YY  2 = DD/MM/YY  3 = YY/DD/MM}
+{1 = MM/DD/YY  2 = DD/MM/YY  3 = YY/DD/MM  4 = MM/DD/YYYY  5 = DD/MM/YYYY  6 = YYYY/MM/DD}
 Var
   DT : DateTime;
   M,
-  D,
-  Y  : String[2];
+  D  : String[2];
+  Y  : String[4];
 Begin
   UnPackTime (Date, DT);
 
   M := strZero(DT.Month);
   D := strZero(DT.Day);
-  Y := Copy(strI2S(DT.Year), 3, 2);
 
   Case Format of
-    1 : Result := M + '/' + D + '/' + Y;
-    2 : Result := D + '/' + M + '/' + Y;
-    3 : Result := Y + '/' + M + '/' + D;
+    1 : Begin Y := Copy(strI2S(DT.Year), 3, 2); Result := M + '/' + D + '/' + Y; End;
+    2 : Begin Y := Copy(strI2S(DT.Year), 3, 2); Result := D + '/' + M + '/' + Y; End;
+    3 : Begin Y := Copy(strI2S(DT.Year), 3, 2); Result := Y + '/' + M + '/' + D; End;
+    4 : Begin Y := strI2S(DT.Year); Result := M + '/' + D + '/' + Y; End;
+    5 : Begin Y := strI2S(DT.Year); Result := D + '/' + M + '/' + Y; End;
+    6 : Begin Y := strI2S(DT.Year); Result := Y + '/' + M + '/' + D; End;
   End;
 End;
 
 Function DateJulian2Str (Date: LongInt; Format: Byte) : String;
-{1 = MM/DD/YY  2 = DD/MM/YY  3 = YY/DD/MM}
+{1 = MM/DD/YY  2 = DD/MM/YY  3 = YY/DD/MM  4 = MM/DD/YYYY  5 = DD/MM/YYYY  6 = YYYY/MM/DD}
 Var
   M     : String[2];
   D     : String[2];
-  Y     : String[2];
+  Y     : String[4];
   Temp1 : Real;
   Temp2 : Real;
   Temp3 : Real;
@@ -248,14 +264,16 @@ Begin
   Temp4 := Temp4 + 2 - 12 * Temp1;
   Temp3 := 100 * (Temp2 - 49) + Temp3 + Temp1;
 
-  Y := Copy(strI2S(Trunc(Temp3)), 3, 2);
   M := strZero(Trunc(Temp4));
   D := strZero(Trunc(Temp5));
 
   Case Format of
-    1 : Result := M + '/' + D + '/' + Y;
-    2 : Result := D + '/' + M + '/' + Y;
-    3 : Result := Y + '/' + M + '/' + D;
+    1 : Begin Y := Copy(strI2S(Trunc(Temp3)), 3, 2); Result := M + '/' + D + '/' + Y; End;
+    2 : Begin Y := Copy(strI2S(Trunc(Temp3)), 3, 2); Result := D + '/' + M + '/' + Y; End;
+    3 : Begin Y := Copy(strI2S(Trunc(Temp3)), 3, 2); Result := Y + '/' + M + '/' + D; End;
+    4 : Begin Y := strI2S(Trunc(Temp3)); Result := M + '/' + D + '/' + Y; End;
+    5 : Begin Y := strI2S(Trunc(Temp3)); Result := D + '/' + M + '/' + Y; End;
+    6 : Begin Y := strI2S(Trunc(Temp3)); Result := Y + '/' + M + '/' + D; End;
   End;
 End;
 

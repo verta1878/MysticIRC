@@ -1,0 +1,119 @@
+RIPscrip v2.0 Server-Side Rendering Engine
+================================================================
+5,160 lines | 166 methods | 67 commands | GPLv3
+Compiler: FPC 2.6.4irc r3.1+ (-Mdelphi, {$H-})
+================================================================
+
+  COMPARISON                v1.0 (1.54)        v2.0.0
+  ────────────────────────────────────────────────────
+  Lines                     4,041              5,160
+  Methods                   132                166
+  Commands                  51                 67
+  Colors                    16 (EGA)           256
+  Max Resolution            640x350            1280x1024
+  Font Systems              CHR only           CHR + RFF
+  Image Formats             PCX, BMP, ICN      + JPEG, BMH, PAL
+  3D Graphics               None               Full 3D transform
+  Animation                 None               Frame-based + cycling
+  Audio                     None               WAV playback hooks
+  Sprites                   None               Collision detection
+  Tests                     97 (64 + 33)       102 (67 + 35 stress)
+
+================================================================
+v1.54 BASE (Complete — 51/51 commands)
+================================================================
+
+Drawing: pixel, line, rect, bar, circle, oval, arc, pie,
+         bezier, polygon, filled polygon, polyline, flood fill
+Fonts:   CHR vector fonts (11) + 5 system font modes (8x8,
+         8x14, 16x14, 7x8, 7x14)
+Icons:   ICN, MSK, HIC (BGI format + transparency)
+Images:  PCX (16-color RLE), BMP (4/24-bit load + export)
+Buttons: 3D beveled, radio groups, checkboxes, hotkeys,
+         tab navigation, underline hotkey character
+Screen:  10 save/restore slots + text window + clipboard
+Vars:    43 built-in text variables ($CURX$, $DATE$, etc)
+Mouse:   128 mouse fields with hit detection
+Palette: Full EGA palette management (16 colors)
+
+================================================================
+v2.0 EXTENSIONS (Complete — 16 new commands)
+================================================================
+
+Phase 9: Protocol & Color
+  - Configurable resolution (640x480 to 1280x1024)
+  - 256-color palette (up from 16)
+  - Dynamic pixel buffer allocation
+  - Extended MegaNum encoding
+
+Phase 10: New Drawing Commands
+  - Pen width / line thickness
+  - Drawing layers (compositing)
+  - Clear bounded regions
+  - Extended polyline/path + filled polygon
+  - Text on path
+  - Palette gradients and cycling
+
+Phase 11: New File Formats
+  - JPEG loading (full pixel rendering via jpegdecraw.pas)
+  - RFF scalable vector fonts (full stroke rendering)
+  - BMH highlight icons
+  - PAL palette files (16-byte + 868-byte)
+  - WAV audio (via pcmdec.pas / wavplay.pas)
+  - Extended icon/button/putimage commands
+
+Phase 12: SVGACC-Inspired Enhancements
+  - Block resize and rotate (raster transforms)
+  - 2D transforms: rotate, scale, translate
+  - 3D transforms: rotate, scale, translate, project
+  - 256-color palette fade/dim/rotate
+  - Sprite system (transparency + background save)
+  - Sprite collision detection
+  - 4-direction region scrolling
+  - Antialiased line drawing (Wu algorithm)
+
+Phase 13: Animation & Multimedia
+  - Frame-based BMP animation (sprite sequences)
+  - Palette cycling (fade transitions)
+  - FADEIN/FADEOUT screen transitions
+  - WAV audio playback hooks
+  - Animation timer (1-60 FPS)
+
+Phase 14: Documentation
+  - rip2api.doc/txt/htm API reference
+  - RFF_FORMAT_NOTESv2.md font format notes
+  - RIPAINT_FINDINGS.md binary analysis
+  - AUDIT.md audit report
+
+================================================================
+DEPENDENCIES: Zero. Pure Pascal. Compiles standalone.
+PLATFORMS:    All FPC 2.6.4irc targets (Win32, Linux, DOS,
+              FreeBSD, Darwin, OS/2)
+LICENSE:      GNU General Public License v3
+TESTS:        102/102 passing (67 functional + 35 stress)
+================================================================
+mystic_ripapi2 — July 21, 2026
+Part of the Mystic BBS IRC Fork
+
+================================================================
+v2.0 Phase 15 Backports (from v3)
+================================================================
+
+  PNG image loading (pngdecr.pas — LoadPNG)
+  JPEG streaming (JPEGStreamInit/Feed/Complete)
+  FLAC decoder (flacdec.pas)
+  MP3 decoder (mp3dec.pas)
+  Audio codec pipeline (pcmdecraw → pcmmix → wavplay)
+  WAV streaming (WAVStreamInit/Feed/Stop/IsPlaying)
+
+  Codec directories:
+    img/ — 2 files (jpegdecraw, pngdecr)
+    wav/ — 8 files (flacdec, mp3dec, pcmdec, pcmdecraw,
+                    pcmmix, wavdec, wavplay, dosplay)
+    pasjpeg/ — 58 files
+
+  Total: 68 codec files (10 units + 58 pasjpeg)
+
+  PRINT API: Available via mystic_ripapi4/prt/ (backport to all versions)
+  Drivers: ESC/P (Epson), PCL5 (LaserJet), PostScript, BMP, Raw
+  Call PrnRenderFrame with this engine's framebuffer pointer.

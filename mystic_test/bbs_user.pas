@@ -505,10 +505,14 @@ End;
 {$ENDIF}
 
 Procedure TBBSUser.GetGraphics;
+Var
+  Ch: Char;
 Begin
   Session.io.OutFull (Session.GetPrompt(154));
 
-  Session.io.Graphics := strS2I(Session.io.OneKey('01', True));
+  Ch := Session.io.OneKey('012', True);
+  Session.io.Graphics := strS2I(Ch);
+  Session.io.UseRipTerm := (Session.io.Graphics = TERM_RIP);
 End;
 
 Procedure TBBSUser.GetEmail (Edit : Boolean);
@@ -1391,8 +1395,12 @@ Begin
     GetGraphics
   Else
   If bbsCfg.DefTermMode = 3 Then
-    Session.io.Graphics := 1
-  Else Begin
+    Session.io.Graphics := TERM_ANSI
+  Else
+  If bbsCfg.DefTermMode = 4 Then Begin
+    Session.io.Graphics := TERM_RIP;
+    Session.io.UseRipTerm := True;
+  End Else Begin
     DetectGraphics;
 
     If (Session.io.Graphics = 0) and (bbsCfg.DefTermMode = 2) Then GetGraphics;
@@ -1412,6 +1420,12 @@ Begin
     Session.io.OutFullLn (Session.GetPrompt(322));
     Session.SystemLog ('ANSI login disabled');
     Halt(0);
+  End Else
+  If (Session.Theme.Flags AND ThmAllowRIP = 0) and (Session.io.Graphics = TERM_RIP) Then Begin
+    Session.io.OutFullLn ('RIP login disabled by theme');
+    Session.SystemLog ('RIP login disabled');
+    Session.io.Graphics := TERM_ANSI;
+    Session.io.UseRipTerm := False;
   End;
 
   If Session.UserLoginName <> '' Then Begin

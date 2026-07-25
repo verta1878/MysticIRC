@@ -612,8 +612,14 @@ Begin
 
       TotalBase := 0;
 
-      // use a lastread for export
-      MsgBase^.SeekFirst(1);
+      // A4-01: Resume export from last exported position
+      // Use user 0 lastread as export tracking pointer
+      Count := MsgBase^.GetLastRead(0);
+
+      If Count > 0 Then
+        MsgBase^.SeekFirst(Count + 1)
+      Else
+        MsgBase^.SeekFirst(1);
 
       While MsgBase^.SeekFound Do Begin
         MsgBase^.MsgStartUp;
@@ -629,6 +635,9 @@ Begin
 
         MsgBase^.SeekNext;
       End;
+
+      // A4-01: Save last export position for resume on next run
+      MsgBase^.SetLastRead(0, MsgBase^.GetHighMsgNum);
 
       MsgBase^.CloseMsgBase;
 
