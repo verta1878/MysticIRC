@@ -14,7 +14,7 @@ Maintained by sysop/0 (Antonio Rico), Ecstasy BBS, FTN 1:152/158.
 | Handle | Role |
 |--------|------|
 | verta1878 | Project lead, Ecstasy BBS |
-| sysop/0 | IRC for foundation - Free Pascal Compiler 2.6.4irc |
+| sysop/0 | IRC fork foundation - Free Pascal Compiler 2.6.4irc|
 | evga | IRC fork foundation — RIP engines, MDL, build system  |
 | wrench | ClamAV integration, RIPtermJS reference port  |
 | Kiddo | 1.11IRC porting, MPL compiler, FOSSIL, chg2rip converter |
