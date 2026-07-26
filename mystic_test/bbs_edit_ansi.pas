@@ -1693,7 +1693,12 @@ Begin
   Box.Free;
   Session.io.RemoteRestore (Img);
   Session.io.BufFlush;
-  ReDrawTemplate (False);
+
+  { Update ATTR display on status bar }
+  WriteXY (16, 1, CurAttr, 'ATTR');
+
+  DrawPage (1, WinSize, False);
+  LocateCursor;
 End;
 
 Procedure TEditorANSI.MessageUpload;

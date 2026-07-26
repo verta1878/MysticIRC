@@ -3619,8 +3619,11 @@ Begin
       Session.io.PromptInfo[1] := MsgTo;
 
       Session.io.OutFullLn (Session.GetPrompt(108));
-    End Else
+    End Else Begin
+      Session.io.PromptInfo[1] := MsgTo;
+      Session.io.OutFullLn (Session.GetPrompt(156));
       MsgTo := '';
+    End;
   End Else Begin
     Session.io.OutFull (Session.GetPrompt(119));
 

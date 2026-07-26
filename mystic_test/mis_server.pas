@@ -371,9 +371,12 @@ Begin
   Status(-1, 'Opening server socket on port ' + strI2S(Port));
 
   Repeat
-    NewClient := Server.WaitConnection(0);
+    NewClient := Server.WaitConnection(1000);
 
-    If NewClient = NIL Then Break; // time to shutdown the server...
+    If NewClient = NIL Then Begin
+      If Terminated Then Break;  // clean shutdown
+      Continue;                   // timeout, loop back and listen again
+    End;
 
     If (ClientMax > 0) And (ClientActive >= ClientMax) Then Begin
       Inc (ClientRefused);

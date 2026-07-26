@@ -23,6 +23,10 @@ Program MIS;
 
 {$I M_OPS.PAS}
 
+{$IFDEF WINDOWS}
+  {$R mystic.res}
+{$ENDIF}
+
 Uses
   {$IFDEF DEBUG}
     HeapTrc,

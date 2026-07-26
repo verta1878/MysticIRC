@@ -1,33 +1,21 @@
-Mystic BBS 1.11IRC A7 (untested)
-Community Fork (IRC) - GPLv3
-Ecstasy BBS - FTN 1:152/158
-Linux, Windows, DOS, OS/2
+Mystic BBS 1.11IRC A7
+GPLv3 Community Fork (IRC)
+Ecstasy BBS — FTN 1:152/158
+Linux, Win32, DOS, OS/2
 
-g00r00 1.11 A1-A6 fully ported (38 items)
-MPL: Records VAR/functions/multi-dim arrays
-     TimerMS, FormatDate, DateStr fmt 4-6
-     20 scripts, 237-function reference
-MIDE: Help Index, Under Cursor, syntax
-FOSSIL: TIOFossil for DOS serial dial-up
-FidoNet: TZUTC FTS-4008, TIC REPLACES
-Print API: ESC/P PCL PostScript BMP (v1-v4)
-Archive: ZIP RAR ARJ LHA ARC PAK SQZ HYP UC2
+RIPscrip v1.54 (42/42 commands)
+RIPView + Free Vision TUI
+chg2rip/ans2png pixel-perfect
+BINKP FTS-1026 FidoNet AreaFix
+MARC ZIP + MP3/MP4 metadata
+MIS Telnet FTP HTTP SMTP POP3
+NNTP BINKP + system tray icon
+20 MPL scripts, 237 functions
+MIDE help system (mplfunc.txt)
+FOSSIL serial for DOS dial-up
 
-chg2rip v2.3 — ANSI to RIPscrip converter
-  Pixel-perfect (100% ImageMagick verified)
-  44KB output (31x smaller than v1.0)
-  VGA 8x16 font ROM, CGA 171/87 palette
-  -pd flag for PabloDraw compatibility
-  
-ans2png, ripviewer (SDL2/BMP) — ANSI to BMP renderer (100% match)
+Built with FPC 2.6.4irc r3.1
+18 PE32 i386 Win32 binaries
 
-RIPscrip Engines v1-v4 (1,433 tests)
-  Based on Carl Gorringe's RIPtermJS (GPLv3)
-  Ported by wrench, extended by evga + Kiddo
-
-Protocols: Zmodem-32K Xmodem Ymodem Kermit
-  HS/Link (clean-room Pascal port, 55 tests)
-MIS: Telnet FTP HTTP SMTP POP3 NNTP BINKP
-
-Team: sysop/0, evga, Kiddo, wrench
-July 2026
+verta1878, sysop/0, evga,
+  kiddo, wrench — July 2026

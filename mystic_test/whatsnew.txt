@@ -907,3 +907,10 @@
 
 ! mystic_test synced with mystic/ — 30 files updated from main source
   to include all session 1-5 fixes.  Only 3 files differ (RIP changes).
+
+! Fixed: Stale node detection. If a node crashes without cleanup,
+  its chat file stays Active and the node is permanently BUSY.
+  CalculateNodeNumber now checks the chat file age — if older than
+  5 minutes and still Active, considers it a ghost node and reclaims
+  it. No more permanent BUSY from crashed sessions.
+  Future: configurable timeout in System Config.

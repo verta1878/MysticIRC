@@ -178,7 +178,11 @@ function ConsoleIcon: HICON;
 var
   cw: HWND;
 begin
-  Result := 0;
+  { Try embedded resource first (MAINICON from mystic.res) }
+  Result := LoadIcon(GetModuleHandleW(nil), 'MAINICON');
+  if Result <> 0 then Exit;
+  
+  { Fall back to console window class icon }
   cw := XGetConsoleWindow;
   if cw <> 0 then
   begin

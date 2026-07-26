@@ -702,3 +702,22 @@ and then to 1.09 before following the instructions above.
 
  Built with FPC 2.6.4irc r3.1 — PE32 i386 Win32.
  GPLv3 — The Crew: verta1878, sysop/0, evga, kiddo, wrench
+
+ MANUAL STEP:
+   - Copy mplfunc.txt to your BBS docs directory
+     (e.g. copy mplfunc.txt c:\mystic\docs\)
+   - MIDE Help > Index reads mplfunc.txt from the BBS root
+     or docs directory
+
+ STALE NODE DETECTION:
+   If mystic.exe crashes or is killed, the node's chat file
+   (chatN.dat in Data path) may be left with Active=True.
+   This previously caused permanent BUSY for that node.
+
+   Now: nodes idle for 5+ minutes with Active=True are
+   automatically reclaimed. No manual intervention needed.
+
+   To manually clear a stuck node immediately:
+     del c:\mystic\data\chatN.dat  (where N = node number)
+
+   Future: configurable ghost timeout in System Config.

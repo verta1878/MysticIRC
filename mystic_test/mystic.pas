@@ -23,6 +23,10 @@ Program Mystic;
 
 {$I M_OPS.PAS}
 
+{$IFDEF WINDOWS}
+  {$R mystic.res}
+{$ENDIF}
+
 Uses
   {$IFDEF DEBUG}
     HeapTrc,
@@ -264,8 +268,10 @@ End;
 
 Procedure CalculateNodeNumber;
 Var
-  Count : Word;
-  TChat : ChatRec;
+  Count    : Word;
+  TChat    : ChatRec;
+  FileAge  : LongInt;
+  FileTime : TDateTime;
 Begin
   Session.NodeNum := 0;
 
@@ -284,6 +290,18 @@ Begin
         Session.NodeNum := Count;
 
         Break;
+      End Else Begin
+        { Stale node detection: if chat file is older than 5 minutes
+          and still marked Active, the node crashed without cleanup }
+        FileAge := SysUtils.FileAge(bbsCfg.DataPath + 'chat' + strI2S(Count) + '.dat');
+        If FileAge <> -1 Then Begin
+          FileTime := FileDateToDateTime(FileAge);
+          If (Now - FileTime) > (5.0 / 1440.0) Then Begin { 5 minutes }
+            FileErase(bbsCfg.DataPath + 'chat' + strI2S(Count) + '.dat');
+            Session.NodeNum := Count;
+            Break;
+          End;
+        End;
       End;
     End;
   End;

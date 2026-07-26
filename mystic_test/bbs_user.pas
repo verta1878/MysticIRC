@@ -1134,10 +1134,18 @@ Begin
 
   If bbsCfg.NewUserEmail Then Begin
     Session.SystemLog('DEBUG NewUser: email prompt starting');
-    Session.io.OutFile('feedback', True, 0);
-    Session.SystemLog('DEBUG NewUser: calling MW command to ' + bbsCfg.FeedbackTo);
-    If Session.Menu.ExecuteCommand ('MW', '/TO:' + strReplace(bbsCfg.FeedbackTo, ' ', '_') + ' /SUBJ:New_User_Feedback /F') Then;
-    Session.SystemLog('DEBUG NewUser: email prompt complete');
+
+    { Check if feedback recipient exists }
+    If Not Session.User.FindUser(bbsCfg.FeedbackTo, False) Then Begin
+      Session.SystemLog('ERROR: Feedback user "' + bbsCfg.FeedbackTo + '" not found - new user email skipped');
+      Session.io.OutFullLn('|12System notice: |14No sysop account found to receive feedback.');
+      Session.io.OutFullLn('|12Please contact the sysop to set up their account.|07');
+    End Else Begin
+      Session.io.OutFile('feedback', True, 0);
+      Session.SystemLog('DEBUG NewUser: calling MW command to ' + bbsCfg.FeedbackTo);
+      If Session.Menu.ExecuteCommand ('MW', '/TO:' + strReplace(bbsCfg.FeedbackTo, ' ', '_') + ' /SUBJ:New_User_Feedback /F') Then;
+      Session.SystemLog('DEBUG NewUser: email prompt complete');
+    End;
   End Else
     Session.SystemLog('DEBUG NewUser: NewUserEmail is FALSE - skipped');
 
