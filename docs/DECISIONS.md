@@ -103,3 +103,19 @@ Clean shutdown within 1 second.
 - PabloDraw CP437 crash fix (chg2rip compat mode)
 - Cross-platform verification
 - FidoNet mail testing
+
+## IPv6 Dual Stack Verification
+
+**Current (1.11IRC A7):** IPv4 only. PF_INET sockets.
+Comment in m_io_sockets.pas says AF_INET6 broke XP — removed.
+
+**1.12 (mysticbbs.com):** Claims "IPV4 and IPV6 dual stack for all servers."
+Needs verification — does 1.12 actually bind AF_INET6 sockets?
+Or does it just have the code path without using it on XP?
+
+**Action:** When 1.12 source (m_io_sockets.pas) is available, verify:
+- Does it create AF_INET6 sockets?
+- Does it use IPV6_V6ONLY=0 for dual stack?
+- Does it fall back to IPv4 on XP?
+
+**Phase 6 item.** Do not add IPv6 until verified against 1.12.

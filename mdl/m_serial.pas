@@ -12,18 +12,42 @@
 // ====================================================================
 
 // ====================================================================
-// mystic_modem : legacy dialup / serial support for Mystic BBS A38
+// m_serial.pas — OOP serial wrapper for Mystic BBS
 // ====================================================================
 //
-// This file is part of an optional add-on module for Mystic BBS and is
-// released under the same GNU General Public License v3 as Mystic BBS.
-// Mystic BBS is Copyright 1997-2013 By James Coyle.
+// THIS IS THE BBS LAYER. NOT THE HARDWARE LAYER.
 //
-// mdm_serial - a thin, cross-platform serial-port layer built on Free
-// Pascal's standard `Serial` unit.  Works on Win32 (COM ports, named
-// "COM1", "COM2", ... or "\.\COMxx" for high ports) and on Unix/Linux
-// (/dev/ttyS0, /dev/ttyUSB0, ...).  No platform #ifdefs are needed in
-// callers - they just pass a device name.
+// This unit wraps sysop/0's serial.pas (in mdl/) into a TModemSerial
+// class that m_fossil_io.pas uses. Do NOT edit serial.pas here — edit
+// the master copy in examples/serial/ and sync to mdl/.
+//
+// DEPENDENCY CHAIN:
+//   m_serial.pas (this file, OOP wrapper)
+//     → serial.pas (sysop/0's hardware layer, in mdl/)
+//       → serial_irq.pas (kiddo's IRQ ring buffer, in mdl/, DOS only)
+//
+// WIRING INTO MYSTIC:
+//   mystic.pas -COM1 -FOSSIL
+//     → m_io_fossil.pas (TIOBase adapter)
+//       → m_fossil_io.pas (FOSSIL API shape)
+//         → m_serial.pas (THIS FILE — TModemSerial class)
+//           → serial.pas (direct UART/OS serial access)
+//
+// FEATURES (all delegated to serial.pas):
+//   Open/Close, Read/Write, DTR/RTS/CTS/DSR/DCD/RI,
+//   UART detection (8250/16450/16550A/16750),
+//   FIFO control (16550+ trigger level),
+//   IRQ-driven ring buffer (DOS FOSSIL-grade),
+//   DataAvailable (non-blocking check),
+//   SerFlush (input + output)
+//
+// CREDITS:
+//   sysop/0  — serial.pas hardware layer, DOS UART/IRQ implementation
+//   evga     — m_fossil_io.pas FOSSIL abstraction, m_io_fossil.pas adapter
+//   wrench   — tork netmodem2irc integration
+//
+// DO NOT put serial.pas in mystic/ or mystic_test/.
+// It lives in mdl/ (compile path) and examples/serial/ (standalone).
 // ====================================================================
 
 Unit m_serial;
@@ -33,7 +57,14 @@ Unit m_serial;
 Interface
 
 Uses
-  Serial;    // FPC RTL unit: SerOpen/SerClose/SerRead/SerWrite/Ser*state lines
+  Serial    // FPC RTL unit: SerOpen/SerClose/SerRead/SerWrite/Ser*state lines
+  {$IFDEF GO32V2}
+  , serial_irq  // kiddo: IRQ-driven ring buffer for DOS UART
+  {$ENDIF}
+  {$IFDEF MSDOS}
+  , serial_irq
+  {$ENDIF}
+  ;
 
 Type
   TSerialParity = (spNone, spOdd, spEven);
@@ -72,6 +103,20 @@ Type
     Function  GetCTS: Boolean;                 // clear to send
     Function  GetDSR: Boolean;                 // data set ready
     Function  GetRing: Boolean;                // ring indicator (RI)
+    Function  GetDCD: Boolean;                 // data carrier detect
+
+    // Data available check (non-blocking)
+    Function  DataAvailable: Boolean;
+
+    // UART detection (DOS: 8250/16450/16550A/16750, others: 'native')
+    Function  DetectUART: String;
+
+    // FIFO control (16550+ UART)
+    Procedure SetFIFO(Enable: Boolean; TriggerLevel: Byte);
+
+    // IRQ-driven receive for DOS (FOSSIL-grade ring buffer)
+    Procedure EnableIRQ;
+    Procedure DisableIRQ;
 
     // Dropping DTR is the standard "hang up the modem" hardware signal.
     Procedure DropDTR;
@@ -126,12 +171,28 @@ Begin
   FDevice := DeviceName;
   FBaud   := Baud;
   FIsOpen := True;
+
+  {$IFDEF GO32V2}
+  SerEnableIRQ(FHandle);    // kiddo: activate IRQ ring buffer on DOS
+  {$ENDIF}
+  {$IFDEF MSDOS}
+  SerEnableIRQ(FHandle);
+  {$ENDIF}
+
   Result  := True;
 End;
 
 Procedure TModemSerial.Close;
 Begin
   If Not FIsOpen Then Exit;
+
+  {$IFDEF GO32V2}
+  SerDisableIRQ(FHandle);   // kiddo: deactivate IRQ ring buffer
+  {$ENDIF}
+  {$IFDEF MSDOS}
+  SerDisableIRQ(FHandle);
+  {$ENDIF}
+
   SerClose(FHandle);
   FHandle := -1;
   FIsOpen := False;
@@ -198,6 +259,35 @@ Begin Result := FIsOpen and SerGetDSR(FHandle); End;
 
 Function TModemSerial.GetRing: Boolean;
 Begin Result := FIsOpen and SerGetRI(FHandle); End;
+
+Function TModemSerial.GetDCD: Boolean;
+Begin Result := FIsOpen and SerGetDCD(FHandle); End;
+
+Function TModemSerial.DataAvailable: Boolean;
+Begin Result := FIsOpen and SerDataAvailable(FHandle); End;
+
+Function TModemSerial.DetectUART: String;
+Begin
+  If FIsOpen Then
+    Result := SerDetectUART(FHandle)
+  Else
+    Result := 'closed';
+End;
+
+Procedure TModemSerial.SetFIFO(Enable: Boolean; TriggerLevel: Byte);
+Begin
+  If FIsOpen Then SerSetFIFO(FHandle, Enable, TriggerLevel);
+End;
+
+Procedure TModemSerial.EnableIRQ;
+Begin
+  If FIsOpen Then SerEnableIRQ(FHandle);
+End;
+
+Procedure TModemSerial.DisableIRQ;
+Begin
+  If FIsOpen Then SerDisableIRQ(FHandle);
+End;
 
 Procedure TModemSerial.DropDTR;
 Begin
