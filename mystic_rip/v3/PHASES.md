@@ -1,6 +1,6 @@
 # RIPscrip v3.0 Server-Side Rendering Engine — Implementation Phases
 
-Based on mystic_ripapi2 (RIPscrip v2.0, all 14 phases complete).
+Based on mystic_rip/v2 (RIPscrip v2.0, all 14 phases complete).
 RIPscrip 3.0 confirmed via RIPtel Visual Telnet v3.1 (Driver v3.0.7).
 TeleGrafix Communications, Inc. 1996-97.
 

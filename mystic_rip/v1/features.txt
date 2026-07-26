@@ -69,9 +69,9 @@ PLATFORMS:    All FPC 2.6.4irc targets (Win32, Linux, DOS,
 LICENSE:      GNU General Public License v3
 TESTS:        97/97 passing (64 functional + 33 stress)
 ================================================================
-mystic_ripapi — July 21, 2026
+mystic_rip/v1 — July 21, 2026
 Part of the Mystic BBS IRC Fork
 
-  PRINT API: Available via mystic_ripapi4/prt/ (backport to all versions)
+  PRINT API: Available via mystic_rip/v4/prt/ (backport to all versions)
   Drivers: ESC/P (Epson), PCL5 (LaserJet), PostScript, BMP, Raw
   Call PrnRenderFrame with this engine's framebuffer pointer.

@@ -8,7 +8,7 @@
 // Demonstrates: form input handling, focus cycling, checkbox toggling,
 // dropdown selection, field rendering, and pixel buffer export.
 //
-// Compile: ppcx64 -Mdelphi -Fu<path-to-mystic_ripapi3>
+// Compile: ppcx64 -Mdelphi -Fu<path-to-mystic_rip/v3>
 //          -Fu<path>/img -Fu<path>/wav -Fu<path>/pasjpeg rip3client.pas
 //
 // This simulates what runs on the terminal/viewer. The client:
@@ -193,7 +193,7 @@ Begin
     WriteLn('  test_beep.wav: found (', FileSize(TestF), ' bytes, 440Hz beep)');
     Close(TestF);
   End Else
-    WriteLn('  test_beep.wav: not found (run from mystic_ripapi3/ dir)');
+    WriteLn('  test_beep.wav: not found (run from mystic_rip/v3/ dir)');
 
   Assign(TestF, 'testdata/test_silence.wav');
   {$I-} System.Reset(TestF, 1); {$I+}

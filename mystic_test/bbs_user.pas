@@ -1281,6 +1281,11 @@ Begin
     Read  (Session.ConfigFile, bbsCfg);
     Inc   (bbsCfg.SystemCalls);
 
+    { Sanitize RIP fields — existing mystic.dat won't have these }
+    If bbsCfg.RipScreenW = 0 Then bbsCfg.RipScreenW := 640;
+    If bbsCfg.RipScreenH = 0 Then bbsCfg.RipScreenH := 350;
+    { RipVersion 0 = v1.54 (default), RipFallback defaults to False = OK }
+
     Reset (Session.ConfigFile);
     Write (Session.ConfigFile, bbsCfg);
     Close (Session.ConfigFile);

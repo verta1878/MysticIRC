@@ -6,13 +6,13 @@ Release:           July 20, 2026
 Protocol Version:  RIPscrip v3.0 (backward compatible with v2.0 and v1.54)
 Unit Name:         rip3api
 Compiled Unit:     rip3api.ppu (x86_64-linux, FPC 2.6.4irc)
-Source:            mystic_ripapi3/rip3api.pas (7736 lines)
+Source:            mystic_rip/v3/rip3api.pas (7736 lines)
 Dependencies:      None (standalone unit, no MDL required)
 License:           GNU General Public License v3
 
 Files
 
-mystic_ripapi3/
+mystic_rip/v3/
 rip3api.pas      Source (standalone, no external dependencies)
 rip3api.ppu      Precompiled unit (x86_64-linux, FPC 2.6.4irc)
 rip3api.o        Object file for linking
@@ -75,7 +75,7 @@ RIP.SaveBMP('output.bmp');
 RIP.Free;
 End.
 
-Compile with:  ppcx64 -Mdelphi -Fu<path-to-mystic_ripapi3> -Fu<path-to-mystic_ripapi3>/img -Fu<path-to-mystic_ripapi3>/wav -Fu<path-to-mystic_ripapi3>/pasjpeg yourprogram.pas
+Compile with:  ppcx64 -Mdelphi -Fu<path-to-mystic_rip/v3> -Fu<path-to-mystic_rip/v3>/img -Fu<path-to-mystic_rip/v3>/wav -Fu<path-to-mystic_rip/v3>/pasjpeg yourprogram.pas
 No -Fumdl or -Fumystic needed. The unit is fully standalone.
 
 NOTE: The engine uses {$H-} (short strings) to avoid BUG-029.

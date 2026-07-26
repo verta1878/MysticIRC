@@ -151,7 +151,7 @@ PLATFORMS:    All FPC 2.6.4irc targets (Win32, Linux, DOS,
 LICENSE:      GNU General Public License v3
 TESTS:        592/592 passing (14 test suites)
 ================================================================
-mystic_ripapi3 — July 21, 2026
+mystic_rip/v3 — July 21, 2026
 Part of the Mystic BBS IRC Fork
 
 ================================================================
@@ -178,6 +178,6 @@ ENGINE STATS
   Root files:       19
   Total files:      154
 
-  PRINT API: Available via mystic_ripapi4/prt/ (backport to all versions)
+  PRINT API: Available via mystic_rip/v4/prt/ (backport to all versions)
   Drivers: ESC/P (Epson), PCL5 (LaserJet), PostScript, BMP, Raw
   Call PrnRenderFrame with this engine's framebuffer pointer.

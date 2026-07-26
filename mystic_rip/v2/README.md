@@ -1,6 +1,6 @@
 # RIPscrip v2.0 Server-Side Rendering Engine
 
-Extension of mystic_ripapi v1.0.0 (RIPscrip v1.54) with v2.0 features.
+Extension of mystic_rip/v1 v1.0.0 (RIPscrip v1.54) with v2.0 features.
 
 ## Status: ALL PHASES COMPLETE
 
@@ -9,7 +9,7 @@ Extension of mystic_ripapi v1.0.0 (RIPscrip v1.54) with v2.0 features.
 ## v1.54 Base (Complete)
 
 All 51 v1.54 commands, standalone, zero dependencies.
-See `../mystic_ripapi/` for the v1.54 engine.
+See `../mystic_rip/v1/` for the v1.54 engine.
 
 ## v2.0 Extensions (Complete)
 
@@ -65,7 +65,7 @@ All file I/O uses `Assign`/`Reset`/`BlockRead`.
 ## Compile
 
 ```
-ppc386 -Mdelphi -Fu<path-to-mystic_ripapi2> -Fu<path>/img -Fu<path>/pasjpeg yourprogram.pas
+ppc386 -Mdelphi -Fu<path-to-mystic_rip/v2> -Fu<path>/img -Fu<path>/pasjpeg yourprogram.pas
 ```
 
 ## Directory Structure

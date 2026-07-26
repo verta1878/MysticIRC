@@ -81,7 +81,8 @@ End;
 Procedure Set_Node_Action (Action: String);
 Begin
   Assign  (Session.ChatFile, bbsCfg.DataPath + 'chat' + strI2S(Session.NodeNum) + '.dat');
-  ReWrite (Session.ChatFile);
+  {$I-} ReWrite (Session.ChatFile); {$I+}
+  If IoResult <> 0 Then Exit;
 
   If Action <> '' Then Begin
     Session.Chat.Active    := True;

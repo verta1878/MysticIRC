@@ -100,7 +100,7 @@ LICENSE:      GNU General Public License v3
 TESTS:        629/629 passing (15 test suites)
 EDITOR:       RIPforge (planned)
 ================================================================
-mystic_ripapi4 — July 22, 2026
+mystic_rip/v4 — July 22, 2026
 Part of the Mystic BBS IRC Fork
 
   PRINT API BACKPORT (1.11IRC A7)

@@ -248,6 +248,12 @@ Begin
   If ioReset (TempFile, SizeOf(RecConfig), fmRWDN) Then Begin
     ioRead (TempFile, TempCfg);
     Close  (TempFile);
+
+    { Sanitize RIP fields — old mystic.dat won't have these }
+    If (TempCfg.RipScreenW = 0) Or (TempCfg.RipScreenW > 4096) Then
+      TempCfg.RipScreenW := 640;
+    If (TempCfg.RipScreenH = 0) Or (TempCfg.RipScreenH > 4096) Then
+      TempCfg.RipScreenH := 350;
   End Else Begin
     Result := CfgNotFound;
 

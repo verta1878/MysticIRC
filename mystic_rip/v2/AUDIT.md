@@ -2,7 +2,7 @@
 
 **Date:** July 20-21, 2026
 **Auditor:** Claude (Anthropic), session with maintainer
-**Engine:** mystic_ripapi2/rip2api.pas
+**Engine:** mystic_rip/v2/rip2api.pas
 
 ---
 
@@ -51,7 +51,7 @@
 
 ### Documentation cleanup
 - Removed all "stub", "TBD", "not yet implemented" references
-- Fixed directory name mystic_ripapi → mystic_ripapi2
+- Fixed directory name mystic_rip/v1 → mystic_rip/v2
 - Fixed summary count 41 → 52 v2.0 items
 - Fixed command count 15 → 16 new commands
 - Added img/, wav/, pasjpeg/ to Files section

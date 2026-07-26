@@ -8,7 +8,7 @@
 // Demonstrates: table creation, rendering, scrolling, form definitions,
 // variable binding, validation, and BMP export of rendered output.
 //
-// Compile: ppcx64 -Mdelphi -Fu<path-to-mystic_ripapi3>
+// Compile: ppcx64 -Mdelphi -Fu<path-to-mystic_rip/v3>
 //          -Fu<path>/img -Fu<path>/wav -Fu<path>/pasjpeg rip3server.pas
 //
 // This is what runs on the BBS host. The server:

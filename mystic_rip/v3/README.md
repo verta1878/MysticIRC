@@ -1,6 +1,6 @@
 # RIPscrip v3.0 Server-Side Rendering Engine
 
-Extension of mystic_ripapi2 (RIPscrip v2.0) with v3.0 features.
+Extension of mystic_rip/v2 (RIPscrip v2.0) with v3.0 features.
 
 ## Status: Phase 18 IN PROGRESS
 
@@ -57,7 +57,7 @@ TeleGrafix Communications, Inc. 1996-97.
 
 ## Architecture
 
-Extends `mystic_ripapi2/rip2api.pas` (v2.0 engine).
+Extends `mystic_rip/v2/rip2api.pas` (v2.0 engine).
 Same standalone approach: `{$H-}`, zero MDL dependencies.
 NOTE: `{$H-}` (short strings) is required to avoid BUG-029.
 `Classes`/`TStream` require `{$H+}` and are incompatible.
@@ -69,7 +69,7 @@ Decoders (img/, wav/) follow the same convention.
 ## Compile
 
 ```
-ppcx64 -Mdelphi -Fu<path-to-mystic_ripapi3> -Fu<path>/img -Fu<path>/wav -Fu<path>/pasjpeg yourprogram.pas
+ppcx64 -Mdelphi -Fu<path-to-mystic_rip/v3> -Fu<path>/img -Fu<path>/wav -Fu<path>/pasjpeg yourprogram.pas
 ```
 
 No -Fumdl or -Fumystic needed. The unit is fully standalone.

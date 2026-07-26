@@ -36,6 +36,7 @@ Var
   InFN       : String;
   OutFN      : String;
   Action     : String;
+
   ConfigFile : File of RecConfig;
   ThemeFile  : File of RecPrompt;
   Theme      : RecPrompt;
@@ -228,6 +229,8 @@ Begin
 
   If IoResult <> 0 Then Begin
     WriteLn ('ERROR: Unable to open ' + bbsConfig.DataPath + 'theme.dat');
+    WriteLn;
+    WriteLn ('Or use: MakeTheme cfgpath <DataPath>');
     Halt (1);
   End;
 
@@ -316,6 +319,8 @@ Begin
 
   If IoResult <> 0 Then Begin
     WriteLn ('ERROR: Unable to open ' + bbsConfig.DataPath + 'theme.dat');
+    WriteLn;
+    WriteLn ('Or use: MakeTheme cfgpath <DataPath>');
     Halt (1);
   End;
 
@@ -370,6 +375,7 @@ Begin
     WriteLn ('   EXTRACT : Decompiles [Input File] into a text file ([Output File])');
     WriteLn ('   LIST    : List the themes in theme.dat and their paths');
     WriteLn ('   CFGTHEME: Edit a theme''s Text/Menu/Script paths in theme.dat');
+    WriteLn ('   CFGPATH : Set Data path directly (bypasses mystic.dat)');
     WriteLn;
     WriteLn ('Examples:');
     WriteLn ('   MakeTheme compile default.txt');
@@ -377,46 +383,107 @@ Begin
     WriteLn ('   MakeTheme list');
     WriteLn ('   MakeTheme cfgtheme               (edits the default theme)');
     WriteLn ('   MakeTheme cfgtheme default');
+    WriteLn ('   MakeTheme cfgpath c:\mystic\data\');
     WriteLn;
     WriteLn ('Note: Since MakeTheme does not compile comments into a compiled theme file,');
     WriteLn ('      comments will not be included when decompiling a theme file.');
     Halt (1);
   End;
 
-  Action   := strUpper(ParamStr(1));
-  InFN     := ParamStr(2);
-  OutFN    := ParamStr(3);
+  Action   := '';
+  InFN     := '';
+  OutFN    := '';
   FileMode := 2;
 
-  Assign (ConfigFile, 'mystic.dat');
-  {$I-} Reset (ConfigFile); {$I+}
+  Action := strUpper(ParamStr(1));
+  InFN   := ParamStr(2);
+  OutFN  := ParamStr(3);
 
-  If IoResult <> 0 Then Begin
-    BasePath := GetENV('mysticbbs');
+  { CFGPATH: Set Data path in mystic.dat directly }
+  If (Action = 'CFGPATH') Then Begin
+    If InFN = '' Then Begin
+      WriteLn ('Usage: MakeTheme cfgpath <DataPath>');
+      WriteLn;
+      WriteLn ('Example: MakeTheme cfgpath c:\mystic\data\');
+      Halt (1);
+    End;
 
-    If BasePath <> '' Then BasePath := DirSlash(BasePath);
-
-    Assign (ConfigFile, BasePath + 'mystic.dat');
+    Assign (ConfigFile, 'mystic.dat');
     {$I-} Reset (ConfigFile); {$I+}
 
     If IoResult <> 0 Then Begin
-      WriteLn ('ERROR: Unable to read MYSTIC.DAT');
-      WriteLn;
-      WriteLn ('MYSTIC.DAT must exist in the same directory as MakeTheme, or in the');
-      WriteLn ('path defined by the MYSTICBBS environment variable.');
-      Halt    (1);
+      BasePath := GetENV('mysticbbs');
+      If BasePath <> '' Then BasePath := DirSlash(BasePath);
+      Assign (ConfigFile, BasePath + 'mystic.dat');
+      {$I-} Reset (ConfigFile); {$I+}
+      If IoResult <> 0 Then Begin
+        WriteLn ('ERROR: Unable to read MYSTIC.DAT');
+        Halt (1);
+      End;
     End;
+
+    Read  (ConfigFile, bbsConfig);
+
+    WriteLn ('Current Data path: ', bbsConfig.DataPath);
+    bbsConfig.DataPath := DirSlash(InFN);
+    WriteLn ('New Data path:     ', bbsConfig.DataPath);
+
+    If Not DirExists(bbsConfig.DataPath) Then Begin
+      {$I-} MkDir(bbsConfig.DataPath); {$I+}
+      If IOResult = 0 Then
+        WriteLn ('Created: ', bbsConfig.DataPath)
+      Else
+        WriteLn ('WARNING: Directory does not exist and could not be created.');
+    End;
+
+    Reset   (ConfigFile);
+    Write   (ConfigFile, bbsConfig);
+    Close   (ConfigFile);
+
+    WriteLn;
+    WriteLn ('Saved. Data path updated in mystic.dat.');
+    Halt (0);
   End;
 
-  Read  (ConfigFile, bbsConfig);
-  Close (ConfigFile);
+  { Load mystic.dat }
+  Begin
+    Assign (ConfigFile, 'mystic.dat');
+    {$I-} Reset (ConfigFile); {$I+}
 
-  If bbsConfig.DataChanged <> mysDataChanged Then Begin
-    WriteLn ('ERROR: MakeTheme has detected a version mismatch');
-    WriteLn;
-    WriteLn ('MakeTheme or another BBS utility is an older incompatible version.  Make');
-    WriteLn ('sure you have upgraded properly!');
-    Halt (1);
+    If IoResult <> 0 Then Begin
+      BasePath := GetENV('mysticbbs');
+
+      If BasePath <> '' Then BasePath := DirSlash(BasePath);
+
+      Assign (ConfigFile, BasePath + 'mystic.dat');
+      {$I-} Reset (ConfigFile); {$I+}
+
+      If IoResult <> 0 Then Begin
+        WriteLn ('ERROR: Unable to read MYSTIC.DAT');
+        WriteLn;
+        WriteLn ('MYSTIC.DAT must exist in the same directory as MakeTheme, or in the');
+        WriteLn ('path defined by the MYSTICBBS environment variable.');
+        WriteLn ('Or use: MakeTheme cfgpath <DataPath>');
+        Halt    (1);
+      End;
+    End;
+
+    Read  (ConfigFile, bbsConfig);
+    Close (ConfigFile);
+
+    If bbsConfig.DataChanged <> mysDataChanged Then Begin
+      WriteLn ('ERROR: MakeTheme has detected a version mismatch');
+      WriteLn;
+      WriteLn ('MakeTheme or another BBS utility is an older incompatible version.  Make');
+      WriteLn ('sure you have upgraded properly!');
+      Halt (1);
+    End;
+
+    { Sanitize RIP fields }
+    If (bbsConfig.RipScreenW = 0) Or (bbsConfig.RipScreenW > 4096) Then
+      bbsConfig.RipScreenW := 640;
+    If (bbsConfig.RipScreenH = 0) Or (bbsConfig.RipScreenH > 4096) Then
+      bbsConfig.RipScreenH := 350;
   End;
 
   // COMPILE and EXTRACT both need an input file.  Without one, InFN is empty and

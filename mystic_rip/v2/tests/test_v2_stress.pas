@@ -5,7 +5,7 @@
 // Licensed under GNU General Public License v3.
 //
 // RIPscrip v2.0 Engine Stress Tests — 35 tests
-// Compile: ppcx64 -Mdelphi -Fu<path-to-mystic_ripapi2> -Fu<path>/img -Fu<path>/pasjpeg test_v2_stress.pas
+// Compile: ppcx64 -Mdelphi -Fu<path-to-mystic_rip/v2> -Fu<path>/img -Fu<path>/pasjpeg test_v2_stress.pas
 //
 // Edge cases and adversarial inputs:
 //   Rapid resolution switching (5 changes),

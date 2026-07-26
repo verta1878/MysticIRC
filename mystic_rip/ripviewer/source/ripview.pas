@@ -22,7 +22,7 @@ Program RIPView;
 }
 
 Uses
-  SysUtils, DateUtils, StrUtils,
+  SysUtils,
   RIPEngine, RIPDraw, RIPText, RIPBMP, RIP1Parse, RIP1Exec
   {$IFDEF FREEVISION}
   , App, Objects, Views, Menus, Drivers, Dialogs, StdDlg, MsgBox
@@ -269,16 +269,18 @@ Begin
     ReadLn(F, Line);
     Inc(LCount);
     If Pos('!|', Line) > 0 Then Begin
-      If DebugMode Then
-        WriteLn('[', CCount + 1, '] ', Copy(Line, 1, 40),
-                IfThen(Length(Line) > 40, '...', ''));
+      If DebugMode Then Begin
+        Write('[', CCount + 1, '] ', Copy(Line, 1, 40));
+        If Length(Line) > 40 Then Write('...');
+        WriteLn;
+      End;
       ExecuteRIP(Line);
       Inc(CCount);
     End;
   End;
   Close(F);
   
-  Elapsed := MilliSecondsBetween(Now, StartT);
+  Elapsed := Round((Now - StartT) * 86400000);
   
   WriteLn;
   WriteLn('Parsed: ', LCount, ' lines, ', CCount, ' RIP command lines');

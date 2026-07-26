@@ -1,6 +1,6 @@
 # RIPscrip v2.0 Server-Side Rendering Engine — Implementation Phases
 
-Based on mystic_ripapi v1.0.0 (RIPscrip v1.54, all 8 phases complete).
+Based on mystic_rip/v1 v1.0.0 (RIPscrip v1.54, all 8 phases complete).
 New features decoded from RIPaint 2.1 scene files — no code taken.
 
 ## Inherited from v1.54 (COMPLETE)

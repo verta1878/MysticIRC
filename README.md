@@ -1,6 +1,9 @@
-# Mystic BBS 1.11IRC A6 — Community Fork
+# Mystic BBS 1.11IRC — Community Fork
 
-> **Release: 2026-07-24** — All 38 g00r00 1.11 A1-A6 items ported.
+> **GitHub:** https://github.com/verta1878/mystic-bbs-irc
+>
+> **Release: 2026-07-25** — All 38 g00r00 1.11 A1-A6 items ported.
+> RIPscrip v1.54 support (42/42 commands, pixel-perfect).
 > Built with **FPC 2.6.4irc r3.1+**. GPLv3.
 
 Based on **Mystic BBS** GPL source by James Coyle (g00r00).
@@ -40,7 +43,7 @@ examples/
   riptermJS/               RIPtermJS JavaScript viewer (Carl Gorringe, GPLv3)
   hslink-src/              HS/Link protocol (clean-room Pascal port)
   ansilove-src/            Ansilove (VGA font source)
-  marc/                    MARC archive library standalone
+  marc/                    MARC — built-in ZIP archiver + MP3/MP4 metadata (MediaTag)
 docs/                    Documentation (17 files)
   ANSI-TO-RIP-PROGRESS.md   chg2rip development log (39KB)
 out-linux/               Linux build output

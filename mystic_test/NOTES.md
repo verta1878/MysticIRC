@@ -5,18 +5,18 @@
 ```
 mystic/              Main BBS codebase (CLEAN — no RIP code)
   |
-mystic_ripapi/       Standalone v1.54 engine (zero MDL deps)
-mystic_ripapi2/      Standalone v2.0 engine (zero MDL deps)
+mystic_rip/v1/       Standalone v1.54 engine (zero MDL deps)
+mystic_rip/v2/      Standalone v2.0 engine (zero MDL deps)
   |
 mystic_test/         Integration workspace
   |-- (server code)    RIP scene serving — BBS sends RIP to client
   |-- (client code)    RIP terminal detection + input routing
-  |-- (bridge code)    Wires mystic_ripapi → Mystic terminal layer
+  |-- (bridge code)    Wires mystic_rip/v1 → Mystic terminal layer
 ```
 
 ## Rules
 
-1. **mystic_ripapi/** is STANDALONE — never uses MDL, m_Types, m_Strings
+1. **mystic_rip/v1/** is STANDALONE — never uses MDL, m_Types, m_Strings
 2. **mystic/** stays CLEAN — no RIP rendering code in the main tree
 3. **mystic_test/** is the ONLY place engine meets BBS
 4. Legacy files are REFERENCE ONLY — not compiled, not modified

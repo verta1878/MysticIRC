@@ -5,7 +5,7 @@
 // Licensed under GNU General Public License v3.
 //
 // RIPscrip v2.0 Engine Test Suite — 67 tests
-// Compile: ppcx64 -Mdelphi -Fu<path-to-mystic_ripapi2> -Fu<path>/img -Fu<path>/pasjpeg test_v2.pas
+// Compile: ppcx64 -Mdelphi -Fu<path-to-mystic_rip/v2> -Fu<path>/img -Fu<path>/pasjpeg test_v2.pas
 //
 // Tests v1.54 inherited core:
 //   Create/Reset, Pixels (corners, OOB), Lines (H/V/diagonal),

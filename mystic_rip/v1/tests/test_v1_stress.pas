@@ -5,7 +5,7 @@
 // Licensed under GNU General Public License v3.
 //
 // RIPscrip v1.54 Engine Stress Tests — 33 tests
-// Compile: ppcx64 -Mdelphi -Fu<path-to-mystic_ripapi> test_v1_stress.pas
+// Compile: ppcx64 -Mdelphi -Fu<path-to-mystic_rip/v1> test_v1_stress.pas
 //
 // Edge cases and adversarial inputs:
 //   Full screen pixel fill (640x350, all 16 colors),

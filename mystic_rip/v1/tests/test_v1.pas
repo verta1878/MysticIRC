@@ -5,7 +5,7 @@
 // Licensed under GNU General Public License v3.
 //
 // RIPscrip v1.54 Engine Test Suite — 64 tests
-// Compile: ppcx64 -Mdelphi -Fu<path-to-mystic_ripapi> test_v1.pas
+// Compile: ppcx64 -Mdelphi -Fu<path-to-mystic_rip/v1> test_v1.pas
 //
 // Core engine tests:
 //   Create/Destroy — engine creation, default dimensions

@@ -606,3 +606,99 @@ and then to 1.09 before following the instructions above.
 
 ; Months of the year (long name) one word per, Jan-Dec separated by a space
 527 January February March April May June July August September October November December
+
+ .---------------------------------------,
+ | UPGRADING TO RIP BUILD                 |-------------------------------
+ `---------------------------------------'
+
+ IMPORTANT: This build adds RIPscrip v1.54 support. The system
+ configuration record (RecConfig) has new fields. You MUST run
+ the upgrade steps below or mystic.dat will be corrupted.
+
+ STEP 1: BACKUP
+   - Stop all Mystic programs (mystic, mis, mutil)
+   - BACKUP your entire BBS directory (especially mystic.dat)
+
+ STEP 2: REPLACE EXECUTABLES
+   - Extract mystic-win32-upd.zip over your BBS directory
+   - This replaces all 18 executables
+
+ STEP 3: UPGRADE DATA FILES
+   - Run: mystic -cfg
+   - Go to System Config
+   - The new RIP fields will initialize to defaults:
+       Terminal:    unchanged (your current setting)
+       RIP Version: v1.54
+       RIP Width:   640
+       RIP Height:  350
+   - Save and exit
+
+ STEP 4: RECOMPILE MPL SCRIPTS
+   - cd scripts
+   - mplc -all
+   - This recompiles all .mps scripts to .mpx
+
+ STEP 5: VERIFY
+   - Start mystic and log in
+   - Check |SE MCI code shows correct terminal type
+   - RIP users should see .mrp files if present
+
+ NEW EXECUTABLES IN THIS BUILD:
+   mystic.exe       BBS server (RIP terminal support)
+   mis.exe          Internet server
+   mplc.exe         MPL compiler
+   mide.exe         MPL IDE editor
+   mutil.exe        Maintenance utility
+   fidopoll.exe     FidoNet BINKP poller
+   marc.exe         ZIP archiver + MP3/MP4 metadata
+   install.exe      Installation setup
+   mbbsutil.exe     BBS utility
+   nodespy.exe      Node spy
+   qwkpoll.exe      QWK poller
+   mystpack.exe     Data packer
+   maketheme.exe    Theme maker
+   install_make.exe Install builder
+   109to110.exe     1.09 to 1.10 upgrade
+   ripview.exe      RIPscrip v1.54 viewer (42/42 commands)
+   chg2rip.exe      ANSI-to-RIP converter
+   ans2png.exe      ANSI-to-BMP reference renderer
+
+ NEW CONFIGURATION OPTIONS:
+   System Config -> Terminal: new "RIP" option (mode 4)
+   System Config -> RIP Version: v1.54
+   System Config -> RIP Width: 640 (default)
+   System Config -> RIP Height: 350 (default)
+   System Config -> RIP Fallback: Yes (fall back to ANSI)
+
+ NEW DISPLAY FILE EXTENSIONS:
+   .mrp = Mystic RIP menu (buttons + host commands)
+   .rip = RIP art/graphics
+   Display priority for RIP terminals: .mrp -> .rip -> .ans
+
+ NEW COMMAND LINE FLAGS:
+   mystic -R    Force RIP terminal mode for this node
+   mystic -A    Force ANSI terminal mode for this node
+
+ NEW RECORD FIELDS (RecConfig):
+   RipScreenW   : Word     (default 640)
+   RipScreenH   : Word     (default 350)
+   RipFallback  : Boolean  (default True)
+   RipVersion   : Byte     (default 0 = v1.54)
+
+ NEW RECORD FIELDS (TIOBase):
+   UseRipTerm   : Boolean  (runtime, not saved to disk)
+
+ NEW CONSTANTS:
+   TERM_RIP     = 2
+   ThmAllowRIP  = $00000004
+
+ COMPATIBILITY:
+   - users.dat: no changes, fully compatible
+   - mystic.dat: new fields appended to RecConfig
+     First run of mystic -cfg will initialize defaults
+   - Menus (.mnu): no changes, fully compatible
+   - Themes: ThmAllowRIP flag defaults to 0 (RIP allowed)
+   - MPL scripts: must recompile (mplc -all)
+
+ Built with FPC 2.6.4irc r3.1 — PE32 i386 Win32.
+ GPLv3 — The Crew: verta1878, sysop/0, evga, kiddo, wrench

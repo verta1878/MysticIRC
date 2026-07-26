@@ -122,7 +122,7 @@ Begin
 End;
 
 // RIP Editor removed — RIP requires graphical mode (640x350), not text 80x25.
-// RIP scene editing handled externally. See mystic_ripapi/ engines.
+// RIP scene editing handled externally. See mystic_rip/v1/ engines.
 
 Var
   MenuPtr : Byte = 0;

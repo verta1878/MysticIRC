@@ -2,7 +2,7 @@
 
 **Date:** July 21, 2026
 **Auditor:** Claude (Anthropic), session with maintainer
-**Engine:** mystic_ripapi/ripscript.pas
+**Engine:** mystic_rip/v1/ripscript.pas
 
 ---
 

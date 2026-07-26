@@ -409,11 +409,13 @@ Begin
   Assign (Session.ThemeFile, bbsCfg.DataPath + 'theme.dat');
   {$I-} Reset (Session.ThemeFile); {$I+}
   If IoResult <> 0 Then Begin
-    Console.WriteLine ('ERROR: No theme configuration');
-    DisposeClasses;
-    Halt(1);
-  End;
-  Close (Session.ThemeFile);
+    If Not Session.ConfigMode Then Begin
+      Console.WriteLine ('ERROR: No theme configuration');
+      DisposeClasses;
+      Halt(1);
+    End;
+  End Else
+    Close (Session.ThemeFile);
 
   If Not Session.LoadThemeData(bbsCfg.DefThemeFile) Then Begin
     If Not Session.ConfigMode Then Begin
@@ -578,9 +580,9 @@ Begin
     InitializeUnix;
   {$ENDIF}
 
-  If Session.NodeNum = 0 Then CalculateNodeNumber;
+  If (Session.NodeNum = 0) And (Not Session.ConfigMode) Then CalculateNodeNumber;
 
-  If Session.NodeNum = 0 Then Begin
+  If (Session.NodeNum = 0) And (Not Session.ConfigMode) Then Begin
     WriteLn ('BUSY');
 
     DisposeClasses;

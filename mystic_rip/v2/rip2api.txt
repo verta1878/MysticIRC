@@ -6,13 +6,13 @@ Release:           July 19, 2026
 Protocol Version:  RIPscrip v2.0 (backward compatible with v1.54)
 Unit Name:         rip2api
 Compiled Unit:     rip2api.ppu (i386-linux, FPC 2.6.4irc)
-Source:            mystic_ripapi2/rip2api.pas
+Source:            mystic_rip/v2/rip2api.pas
 Dependencies:      None (standalone unit, no MDL required)
 License:           GNU General Public License v3
 
 Files
 
-mystic_ripapi2/
+mystic_rip/v2/
 rip2api.pas      Source (standalone, no external dependencies)
 rip2api.ppu      Precompiled unit (x86_64-linux, FPC 2.6.4irc)
 rip2api.o        Object file for linking
@@ -69,7 +69,7 @@ RIP.SaveBMP('output.bmp');
 RIP.Free;
 End.
 
-Compile with:  ppc386 -Mdelphi -Fu<path-to-mystic_ripapi2> -Fu<path-to-mystic_ripapi2>/img -Fu<path-to-mystic_ripapi2>/pasjpeg yourprogram.pas
+Compile with:  ppc386 -Mdelphi -Fu<path-to-mystic_rip/v2> -Fu<path-to-mystic_rip/v2>/img -Fu<path-to-mystic_rip/v2>/pasjpeg yourprogram.pas
 No -Fumdl or -Fumystic needed. The unit is fully standalone.
 
 1. CONSTANTS

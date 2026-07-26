@@ -241,10 +241,6 @@ Type
     ChatEnd         : Byte;                                     // Chat hour end
     ChatFeedback    : Boolean;                                  // E-mail sysop if page isn't answered
     ChatLogging     : Boolean;                                  // Record SysOp chat to CHAT.LOG?
-    RipScreenW      : Word;                                     // RIP pixel width (default 640)
-    RipScreenH      : Word;                                     // RIP pixel height (default 350)
-    RipFallback     : Boolean;                                  // Fall back to ANSI if no .rip file
-    RipVersion      : Byte;                                     // 0=v1.54 (only supported version)
     AcsSysop        : String[mysMaxAcsSize];
  // LOGIN/MATRIX
     LoginTime       : Byte;
@@ -424,7 +420,13 @@ Type
     inetBINKPRename   : Byte;
     inetBINKPExempt   : Boolean;
 
-    Reserved          : Array[1..552] of Char;
+    { RIPscrip fields — carved from Reserved to preserve record size }
+    RipScreenW      : Word;                                     // RIP pixel width (default 640)
+    RipScreenH      : Word;                                     // RIP pixel height (default 350)
+    RipFallback     : Boolean;                                  // Fall back to ANSI if no .rip file
+    RipVersion      : Byte;                                     // 0=v1.54 (only supported version)
+
+    Reserved          : Array[1..546] of Char;                  // was 552, minus 6 for RIP fields
   End;
 
 Const

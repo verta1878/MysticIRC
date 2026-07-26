@@ -842,3 +842,68 @@
 [RIP] Added 10 BGI CHR fonts (BOLD EURO GOTH LCOM LITT SANS SCRI SIMP TRIP TSCR)
 [RIP] Added 8 ICN icons (chat door files logo mail quit sysinfo who)
 [RIP] Analyzed 32 RIP scene files — all commands verified implemented
+
+================================================================
+ Session 6 — RIPscrip Integration + RIPView (2026-07-25)
+================================================================
+
++ RIPView v1.0.0: standalone RIPscrip v1.54 viewer — 42/42 commands
+  implemented, 100% pixel-perfect against ans2png reference (819,200
+  pixels, 0 mismatches). Modular: 7 units, 1,656 lines total.
+  CLI mode: -d debug, -b RATE baud emulation, -l directory listing.
+  Free Vision TUI mode: menu bar, file dialog, baud/debug controls.
+  Win32 build included (ripview.exe, 165KB PE32).
+
++ RIP terminal mode: TERM_RIP = 2 added to records.pas alongside
+  TERM_ASCII and TERM_ANSI.  UseRipTerm field in TIOBase tracks
+  active RIP sessions.
+
++ Display file priority for RIP terminals: .mrp (Mystic RIP menu)
+  first, then .rip (RIP art/graphics), then .ans (ANSI fallback).
+  RIP terminals fall back to ANSI gracefully.
+
++ .mrp file extension: Mystic RIP menu files — contain RIPscrip
+  button commands (!|1U) with host command strings for interactive
+  graphical menus.  Separate from .rip (general art/display).
+
++ DefTermMode = 4 (RIP): sysop can force RIP terminal mode in config.
+  Config editor: Terminal toggle now includes RIP option.
+  RIP Version field added (v1.54, currently the only supported version).
+
++ Command line -R flag: forces RIP terminal mode for a node.
+  -A flag forces ANSI mode.  Both bypass detection.
+
++ GetGraphics updated: user can select 0=ASCII, 1=ANSI, 2=RIP
+  at login.  MCI |SE now reports "RIP" for RIP terminals.
+
++ Theme flag ThmAllowRIP ($00000004): when set, RIP logins are
+  allowed.  If not set, RIP users fall back to ANSI with a message.
+
++ chg2rip v2.3: ANSI-to-RIP converter (pixel-perfect, 880 lines)
+  ans2png: ANSI-to-BMP reference renderer (656 lines)
+
++ RIPView modular architecture:
+  Shared units (all versions): ripengine, ripdraw, riptext, ripbmp
+  v1-specific: v1/rip1parse, v1/rip1exec
+  Ready for v2/v3/v4 version subdirectories.
+
++ RIPView drawing engine (ported from RIPtermJS BGI.js):
+  Bresenham line/circle/ellipse, trig arc with angle clipping,
+  pie slice with floodfill, cubic Bezier, scanline polygon fill,
+  stack-based flood fill, VGA 8x16 CP437 font (MSB-first).
+
++ Win32 build: all 11 executables cross-compiled (fpc264irc).
+  mystic.exe, mis.exe, mplc.exe, mide.exe, mutil.exe, fidopoll.exe,
+  marc.exe, install.exe, ripview.exe, chg2rip.exe, ans2png.exe.
+
+! Fixed m_ops.pas: added {$IFDEF WIN64} block for Win64 cross-compile
+  (was missing — only WIN32 was handled).
+
+! Fixed ripview.pas: removed DateUtils/StrUtils dependencies for
+  fpc264irc compatibility (FPC 2.6.4 ppu checksum mismatch).
+
+! Cleaned all stale mystic_ripapi/2/3/4 references across 33 files.
+  Old top-level directories replaced with mystic_rip/v1-v4.
+
+! mystic_test synced with mystic/ — 30 files updated from main source
+  to include all session 1-5 fixes.  Only 3 files differ (RIP changes).
