@@ -1,0 +1,346 @@
+  =========================================================================
+  FUNCTION AND PROCEDURE REFERENCE
+  =========================================================================
+
+  OPENDOOR
+  -------------------------------------------------------------------------
+  Function OpenDoor (DF : String) : Byte;
+
+  This procedure should always be ran before calling other procedures in
+  the library.  This function will read the drop file, and initialize all
+  internal functionality of the library.
+
+  The DF variable should be contain the path / file name of any drop file
+  which is supported by the D32 library.  D32 will automatically determine
+  which type of drop file is passed and read the data appropriately.
+
+  The following drop files are supported by the DOS version of DOOR32:
+
+      DORINFOx.DEF
+      DOOR.SYS
+      CHAIN.TXT
+
+  The following drop files are supported by the WIN32 and OS/2 versions:
+
+      DOOR32.SYS
+
+  The following drop files are supported by the Linux version:
+
+      DORINFOx.DEF
+      DOOR.SYS
+      CHAIN.TXT
+      DOOR32.SYS
+
+  The function returns a byte value error code which can be used to check
+  if the OpenDoor function was successful:
+
+      0 = OpenDoor successful
+      1 = Drop file not found
+      2 = Error reading drop file
+      3 = Invalid drop file type
+      4 = Unable to open communication driver (com port)
+
+
+  OUT
+  --------------------------------------------------------------------------
+  Procedure Out (S : String);
+
+  This procedure will send a line of text to both the local and remote user
+  screens.
+
+
+  OUTLN
+  --------------------------------------------------------------------------
+  Procedure OutLn (S : String);
+
+  This procedure will send a line of text to both the local and remote user
+  screens.  This function will also send a carrage return and line feed
+  afterwards to move the cursor down to the next line.
+
+
+  SEND
+  --------------------------------------------------------------------------
+  Procedure Send (S : String);
+
+  This procedure will send a line of text to both the local and remote user
+  screens.  This function is identical to the OUT procedure with the
+  exception that it will accept pipe color codes as part of the text.
+
+  The following pipe codes can be used to change the FOREGROUND color:
+
+          |01 - Blue            |02 - Green         |03 - Cyan
+          |04 - Red             |05 - Magenta       |06 - Brown
+          |07 - Lt Grey         |08 - Grey          |09 - Lt Blue
+          |10 - Lt Green        |11 - Lt Cyan       |12 - Lt Red
+          |13 - Lt Magenta      |14 - Yellow        |15 - White
+
+  The following pipe codes can be used to change the BACKGROUND color:
+
+          |16 - Black           |17 - Blue
+          |18 - Green           |19 - Cyan
+          |20 - Red             |21 - Magenta
+          |22 - Brown           |23 - Grey
+
+  The following pipe codes are also supported:
+
+          |CR - Sends a carrage return (moves to the next line)
+          |CL - Clears the screen
+
+
+  SENDLN
+  --------------------------------------------------------------------------
+  Procedure SendLn (S : String);
+
+  This procedure sends text to the screen and filters out pipe codes just
+  like the SEND procedure.  This procedure will additionally add a carrage
+  return after the text is sent so the cursor will move to the next line.
+
+
+  SENDCLS
+  --------------------------------------------------------------------------
+  Procedure SendCLS;
+
+  This procedure will clear the screen
+
+
+  SENDBS
+  --------------------------------------------------------------------------
+  Procedure SendBS (N : Byte);
+
+  This procedure will send a backspace sequence "N" number of times, which
+  will back the cursor up over already displayed characters.
+
+
+  SENDFILE
+  --------------------------------------------------------------------------
+  Procedure SendFile (FN : String; Pause: Boolean);
+
+  This procedure will display a text file to the screen.  The FN variable
+  should hold the file name of the file to be displayed.  If the file
+  extention is not supplied, SENDFILE will attempt to add the appropriate
+  extention according to the user's terminal settings: .ANS for ANSI or
+  .ASC for ASCII.
+
+  If the PAUSE variable is set to true, SENDFILE will pause after each
+  screenful giving the user the option to continue or abort displaying
+  the file.  The pause procedure can optionally be replaced by
+  redefining the procedure.  See the section on "redefinable procedures"
+  for more information.
+
+  If a call to SENDFILE is made and the supplied file name does not exist,
+  the ISNOFILE variable will be set to TRUE and the function will be
+  aborted.
+
+
+  ANSI_COLOR
+  --------------------------------------------------------------------------
+  Procedure ansi_Color (FG, BG : Byte);
+
+  This procedure will set the current foreground and background colors if
+  the user supports ANSI graphics.  The following colors are available:
+
+  FOREGROUND COLORS:
+
+          01 - Blue            02 - Green         03 - Cyan
+          04 - Red             05 - Magenta       06 - Brown
+          07 - Lt Grey         08 - Grey          09 - Lt Blue
+          10 - Lt Green        11 - Lt Cyan       12 - Lt Red
+          13 - Lt Magenta      14 - Yellow        15 - White
+
+  BACKGROUND COLORS:
+
+          16 - Black           17 - Blue
+          18 - Green           19 - Cyan
+          20 - Red             21 - Magenta
+          22 - Brown           23 - Grey
+
+
+  ANSI_GOTOXY
+  -------------------------------------------------------------------------
+  Procedure ansi_GotoXY (X, Y : Byte);
+
+  This procedure will move the cursor to the passed X and Y coordinate on
+  the screen.  The user must support ANSI graphics for this function to
+  work.
+
+
+  ANSI_CLREOL
+  -------------------------------------------------------------------------
+  Procedure ansi_ClrEOL;
+
+  This procedure will clear all text from the current cursor location to
+  the end of the line.  The cursor location will return to it's original
+  position after the text has been cleared.
+
+  This function requires ANSI graphics emulation.  If the user does not
+  support ANSI graphics, calls to this function will be ignored.
+
+
+  KEYWAITING
+  -------------------------------------------------------------------------
+  Function KeyWaiting : Boolean;
+
+  This function will return TRUE if there is a key waiting in the local or
+  remote user's key buffer.
+
+
+  GETKEY
+  -------------------------------------------------------------------------
+  Function GetKey : Char;
+
+  This function will read a single key from the keyboard buffer.  If there
+  is no key waiting in the buffer, GETKEY will wait until a key is pressed
+  and return that key.
+
+  If the key returned was entered from the local keyboard, the boolean
+  variable ISLOCALKEY will be set to TRUE.  If the key was entered from the
+  remote user's keyboard, ISLOCALKEY will be set to a FALSE value.
+
+  If the key entered was an extended keypress, ISARROWKEY will be set to
+  TRUE and the returned character will be one of the characters listed
+  below.  See SAMPLE2.PAS in the EXAMPLES directory for a demonstration of
+  extended input with GETKEY.
+
+     #71 = Home
+     #72 = Up Arrow
+     #73 = Page Up
+     #75 = Left Arrow
+     #77 = Right Arrow
+     #79 = End
+     #80 = Down Arrow
+     #81 = Page Down
+     #83 = Delete
+
+  ONEKEY
+  -------------------------------------------------------------------------
+  Function OneKey (S : String; Echo: Boolean);
+
+  This function will wait for a single valid key to be entered.  The S
+  variable contains a string of valid characters.  If the ECHO variable is
+  passed as TRUE, ONEKEY will echo the character to the screen when it is
+  entered by the user.
+
+
+  INPUT
+  -------------------------------------------------------------------------
+  Function Input (Mode: Byte; MaxLen: Byte; Valid, Default: String) : String;
+
+  This function reads a series of characters from the user and returns them
+  in a string variable.
+
+  The MODE variable is used to specify how INPUT will handle each character
+  when it is entered.  Valid options are:
+
+     0 = As typed
+     1 = Convert all characters to uppercase letters
+     2 = Convert all characters to lowercase letters
+     3 = Convert the first letter in each word to uppercase letters
+
+  The MAXLEN variable is used to specify the maximum length of characters
+  that INPUT will allow.
+
+  The VALID variable is a string of characters which specify which keys
+  input will accept.  D32 has already pre-defined several possible valid
+  input strings, as listed below - but any series of characters can be
+  supplied if none of the following defaults will do:
+
+     inNormal   = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV' +
+                  'WXYZ1234567890~!@#$%^&*()-+\[]{};:`''".,/<> =_?|';
+
+     inAny      = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV' +
+                  'WXYZ1234567890~!@#$%^&*()-+\[]{};:`''".,/<> =_?|' +
+                  'ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®©™´¨≠Æ' +
+                  'Ø∞±≤≥¥µ∂∫∏π∫ªºΩæø¿¡¬√ƒ≈∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸ⁄€‹›ﬁ' +
+                  'ﬂ‡·‚„‰ÂÊÁËÈÍÎÏÌÓÔÒÚÛÙıˆ˜¯˘˙˚¸˝˛';
+
+     inNumber   = '1234567890-';
+
+     inFileName = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV' +
+                  'WXYZ1234567890~!@#$%^&()-_{}.';
+
+     inFileSpec = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV' +
+                  'WXYZ1234567890~!@#$%^&()-_{}.?*';
+
+     inFilePath = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUV' +
+                  'WXYZ1234567890~!@#$%^&()-_{}.?*:\';
+
+  The DEFAULT variable is a string variable which holds the default value
+  of the input.  When a non-blank value is passed to INPUT, it will
+  automatically put the string into the keyboard buffer as if the user had
+  just typed it.
+
+
+  SETTIMELEFT
+  -------------------------------------------------------------------------
+  Procedure SetTimeLeft (Time : Integer);
+
+  This function sets the amount of time (in minutes) that the user has
+  remaining online.
+
+
+  GETTIMELEFT
+  -------------------------------------------------------------------------
+  Function GetTimeLeft : Integer;
+
+  This function returns the amount of time (in minutes) that the user has
+  remaining online.
+
+
+  TIMERMIN
+  -------------------------------------------------------------------------
+  Function TimerMin : Integer;
+
+  This function returns the number of minutes that have passed in the day
+  since midnight.  This function is used internally by the library, but it
+  may come in handy for some door authors.
+
+
+  TIMERSEC
+  -------------------------------------------------------------------------
+  Function TimerSec : LongInt;
+
+  This function works similar to the TIMERMIN function, except it will
+  return the number of seconds since midnight.
+
+
+  INT2STR
+  -------------------------------------------------------------------------
+  Function Int2Str (N : LongInt) : String;
+
+  This function converts a numercal variable into a string variable.  The
+  numerical variable can be a Byte, Word, Integer, or LongInt.
+
+
+  STR2INT
+  -------------------------------------------------------------------------
+  Function Str2Int (Str : String) : LongInt;
+
+  This function converts a string type variable into a numerical variable.
+
+
+  FEXIST
+  -------------------------------------------------------------------------
+  Function FExist (Str : String) : Boolean;
+
+  This function returns TRUE or FALSE based on whether the passed file
+  name exists or not.  The STR parameter is the file name to check
+  existance of and can include just a file name or a path and file name.
+
+
+  UPPER
+  -------------------------------------------------------------------------
+  Function Upper (Str : String) : String;
+
+  This function converts a string into all upper cased letters.
+
+
+  WRITEXY
+  -------------------------------------------------------------------------
+  Procedure WriteXY (X, Y: Word; Str: String; Attr: Byte);
+
+  This function takes a line of text and prints it onto the local screen
+  at a given X/Y location with a given text attribute.  In Linux, since
+  there is no local console, the remote user will also see any text
+  written with WRITEXY.
+
+  --EOF--
