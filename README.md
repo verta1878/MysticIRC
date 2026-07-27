@@ -2,18 +2,18 @@
 
 > **GitHub:** https://github.com/verta1878/mystic-bbs-irc
 >
-> **Release: 2026-07-25** — All 38 g00r00 1.11 A1-A6 items ported.
+> **Release: 2026-07-25** — All 38 g00r00 1.11 A1-A3 items ported.
 > RIPscrip v1.54 support (42/42 commands, pixel-perfect).
 > Built with **FPC 2.6.4irc r3.1+**. GPLv3.
 
 Based on **Mystic BBS** GPL source by James Coyle (g00r00).
-Maintained by sysop/0 (Antonio Rico), Ecstasy BBS, FTN 1:152/158.
+Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
 
 ## Team
 
 | Handle | Role |
 |--------|------|
-| verta1878 | Project lead, Ecstasy BBS |
+| verta1878 | maintained, Ecstasy BBS |
 | sysop/0 | IRC fork foundation - Free Pascal Compiler 2.6.4irc|
 | evga | IRC fork foundation — RIP engines, MDL, build system  |
 | wrench | ClamAV integration, RIPtermJS, Netmodem2irc |
