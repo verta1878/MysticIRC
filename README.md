@@ -1,4 +1,4 @@
-# Mystic BBS 1.11IRC A7 — Community Fork
+# Mystic BBS 1.11IRC A4 — Community Fork
 
 > **GitHub:** https://github.com/verta1878/mystic-bbs-irc
 >
