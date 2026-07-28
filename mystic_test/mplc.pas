@@ -138,7 +138,7 @@ Begin
   Console  := TOutput.Create(True);
 
   Console.WriteLine (#13#10'Mystic BBS Programming Language Compiler Version ' + mysVersion);
-  Console.WriteLine ('Copyright (C) ' + mysCopyYear + ' By James Coyle.  All Rights Reserved.'#13#10);
+  Console.WriteLine ('Copyright (C) 1997-2013 James Coyle. IRC Fork (C) 2025-2026'#13#10);
 
   If ParamCount = 0 Then Begin
     Console.WriteLine ('MPLC [path/file] : Compile one script [path/file]');

@@ -41,6 +41,7 @@ Uses
   BBS_User,
   BBS_FileBase,
   BBS_Menus,
+  BBS_Hunspell,
   MPL_Execute;
 
 Const
@@ -64,6 +65,7 @@ Type
     FileBase       : TFileBase;
     Menu           : TMenuEngine;
     IO             : TBBSIO;
+    SpellCheck     : THunSpell;
     Pipe           : TPipe;
     EventFile      : File of RecEvent;
     ThemeFile      : File of RecTheme;
@@ -205,11 +207,12 @@ Begin
     TIOSocket(Client).FTelnetServer := True;
   {$ENDIF}
 
-  User     := TBBSUser.Create(Pointer(Self));
-  IO       := TBBSIO.Create(Pointer(Self));
-  Msgs     := TMsgBase.Create(Pointer(Self));
-  FileBase := TFileBase.Create(Pointer(Self));
-  Menu     := TMenuEngine.Create(Pointer(Self));
+  User       := TBBSUser.Create(Pointer(Self));
+  IO         := TBBSIO.Create(Pointer(Self));
+  Msgs       := TMsgBase.Create(Pointer(Self));
+  FileBase   := TFileBase.Create(Pointer(Self));
+  Menu       := TMenuEngine.Create(Pointer(Self));
+  SpellCheck := THunSpell.Create(bbsCfg.DataPath);
 End;
 
 Destructor TBBSCore.Destroy;
@@ -221,6 +224,7 @@ Begin
   Msgs.Free;
   FileBase.Free;
   Menu.Free;
+  SpellCheck.Free;
   User.Free;
   IO.Free;
 

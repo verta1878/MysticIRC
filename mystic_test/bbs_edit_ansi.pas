@@ -1556,7 +1556,7 @@ Var
   End;
 
 Begin
-  Console.GetScreenImage (13, 6, 60, 24, Img);
+  Console.GetScreenImage (1, 1, 80, 25, Img);
 
   Session.io.BufFlush;
 

@@ -1,0 +1,77 @@
+
+                         The following is the list of
+                        "Official Distribution Sites"
+                                    for
+
+                           THD ProScan Version 12.2
+                           ------------------------
+
+    FREQ "THDPRO" [DOS Version] or "THDOS2" [OS/2 Version] (no quotes) from
+any of these sites for Version 12.2.
+
+    Please note that I cannot guarantee that all systems will have the file
+available immediately (or at all). This is a service provided by these sysops
+without any obligation to myself.
+
+    The following two files are expected to become available on the internet 
+shortly following release.
+
+ftp://ftp.coast.net/SimTel/msdos/virus/thd_12_2.zip   [DOS  Version]
+ftp://ftp.coast.net/SimTel/os2/virus/thd212_2.zip     [OS/2 Version] 
+
+    Until such time as those files are made available, I will make available
+on my WWW site the two files thd_12_2.exe and thd212_2.exe which are the
+official distribution archives. These will be replaced with links to the SimTel
+files as soon as they become available.
+My web page is located at (subject to change without prior notice)...
+http://www.naples.net/~nfn03274
+
+  BOARD NAME                     SYSOP             FIDO ADDR    TELEPHONE #
+  ----------                     -----             ---------    -----------
+! The Learning Curve BBS         Paul Laufer       1:102/332    (310) 371-0007
+!@The Saturday Knights           Don Johnson       1:104/531    (303) 420-8839
+@ Moody Blues                    Bernie Schau      1:138/155    (360) 893-3101
+!@My Desk                        Vicki Fletcher    1:138/255    (206) 845-2418
+!@Bandmaster                     Dallas Hinton     1:153/715    (604) 266-1977
+!@Bandmaster Postie              Dallas Hinton     1:153/7715   (604) 266-5271
+!@Lighthouse <ASP>               Michael Yadron    1:230/20     (219) 864-1066
+!@Never Surrender!               Charlie Wardick   1:234/68     (419) 475-8705
+! Digital Wasteland              Art Mason         1:246/53     (519) 972-6828
+! The Tomb of Horrors            Neil Dempster     1:250/346    (416) 255-2164
+!@The Virus Watch BBS            Bryan Sullivan    1:250/503    (416) 654-3814
+!@Realms of Insanity             John Zielinski    1:259/400    (905) 820-4392
+@ The Forbidden Knights          Tim Strike        1:259/423    (905) 820-7273
+!@Tech Support BBS               Scott Ferguson    1:300/603    (520) 797-9785
+! CompUSA BBS                    Matt Shulman      1:333/366    (508) 935-3376
+! The Concession Stand           Eric Staufer      1:374/6568   (407) 569-6568
+!@Barnabas The Caring BBS [OS/2] john barton       2:25/103    +44-1375-850447
+  FrontLine BBS                  Lars Wigrell      2:201/437     +46-8-7391510
+! TrueBlue BBS                   Erik Coolen       2:281/909    +31-70-3470904
+! Nethen Valley BBS              Frederic Fammeree 2:293/2008    +32-10-861522
+! Airtel Remote Access 1         Adrian Pop        2:440/64    +44-1342-717800
+! Airtel Remote Access 2         Adrian Pop        2:440/201   +44-1342-718900
+!@Yukon Ho! [Node 1]             Mark Kerr         2:443/59    +44-1232-768163
+!@Yukon Ho! [Node 2]             Mark Kerr         2:443/60    +44-1232-763639
+!@EasyBoard                      peter janssens    2:512/1      +31-478-510040
+  EasyBoard [ISDN 64kpbs]        peter janssens    2:512/302    +31-478-550003
+  Power BBS                      Roger Dunk        3:711/953    +61-2-858-4114
+  Gallifrey                      Raymond Rosch     3:713/910    +61-2-820-7624
+
+Systems marked with "!" support 28800 modems.
+Systems marked with "@" are running HST Dual Standard modems
+All systems support a minimum of 14400 v32 bis.
+
+Availability on WWIVnet
+-----------------------
+Board Name    : Zenith Nadir
+Software Type : WWIV
+Supports      : 300-28.8 bps
+Operates      : 24 hrs. / 7 days
+Number        : (813) 654-3050 (Seffner, FL)
+SysOp         : Tom Goodson aka P-38
+Contact       :
+                1@2736 (WWIVnet)
+                tgoodson@aol.com
+                sf7o@scfn.thpl.lib.fl.us
+Guest Account on Zenith Nadir for THD ProScan only
+Log on name: GUEST, password: GUEST

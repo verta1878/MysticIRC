@@ -45,6 +45,7 @@ Uses
   m_FileIO,
   m_Strings,
   m_DateTime,
+  Dos,
   m_Output,
   m_Input,
   m_Pipe,
@@ -270,8 +271,9 @@ Procedure CalculateNodeNumber;
 Var
   Count    : Word;
   TChat    : ChatRec;
-  FileAge  : LongInt;
-  FileTime : TDateTime;
+  ChatF    : File;
+  ChatAge  : LongInt;
+  ChatTime : LongInt;
 Begin
   Session.NodeNum := 0;
 
@@ -293,10 +295,15 @@ Begin
       End Else Begin
         { Stale node detection: if chat file is older than 5 minutes
           and still marked Active, the node crashed without cleanup }
-        FileAge := SysUtils.FileAge(bbsCfg.DataPath + 'chat' + strI2S(Count) + '.dat');
-        If FileAge <> -1 Then Begin
-          FileTime := FileDateToDateTime(FileAge);
-          If (Now - FileTime) > (5.0 / 1440.0) Then Begin { 5 minutes }
+        Assign (ChatF, bbsCfg.DataPath + 'chat' + strI2S(Count) + '.dat');
+        {$I-} Reset(ChatF); {$I+}
+        If IOResult = 0 Then Begin
+          GetFTime(ChatF, ChatAge);
+          Close(ChatF);
+          { Compare file timestamp with current DOS time }
+          { If more than 300 seconds (5 min) old, consider stale }
+          ChatTime := CurDateDos - ChatAge;
+          If ChatTime > 300 Then Begin
             FileErase(bbsCfg.DataPath + 'chat' + strI2S(Count) + '.dat');
             Session.NodeNum := Count;
             Break;
@@ -515,9 +522,12 @@ Begin
 End;
 
 Var
-  Count  : Byte;
-  Temp   : String[120];
-  Script : String[120];
+  Count      : Byte;
+  Temp       : String[120];
+  Script     : String[120];
+  ActiveNodes: Word;
+  NodeCheck  : Word;
+  TempChat   : ChatRec;
 Begin
   {$IFDEF DEBUG}
     SetHeapTraceOutput('mystic.mem');
@@ -648,6 +658,26 @@ Begin
     Session.User.ThisUser.Flags := Session.User.ThisUser.Flags XOR UserNoTimeout;
 
     Console.SetWindowTitle ('Mystic Configuration');
+
+    { Check for active users and warn sysop }
+    ActiveNodes := 0;
+    For NodeCheck := 1 to bbsCfg.INetTNNodes Do Begin
+      Assign (Session.ChatFile, bbsCfg.DataPath + 'chat' + strI2S(NodeCheck) + '.dat');
+      If ioReset (Session.ChatFile, SizeOf(ChatRec), fmRWDN) Then Begin
+        ioRead (Session.ChatFile, TempChat);
+        Close  (Session.ChatFile);
+        If TempChat.Active Then Inc(ActiveNodes);
+      End;
+    End;
+
+    If ActiveNodes > 0 Then Begin
+      Console.WriteStr ('WARNING: ' + strI2S(ActiveNodes) +
+        ' user(s) online. Take care when editing configuration.');
+      Console.WriteStr (#13#10);
+      Console.WriteStr ('Press any key to continue...');
+      Console.WriteStr (#13#10);
+      Keyboard.ReadKey;
+    End;
 
     ConfigLog ('Startup successful - entering configuration editor');
 

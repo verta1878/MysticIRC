@@ -98,7 +98,8 @@ Type
 Implementation
 
 Uses
-  BBS_Core;
+  BBS_Core,
+  BBS_Crypt;
 
 Constructor TBBSUser.Create (Var Owner: Pointer);
 Begin
@@ -418,7 +419,7 @@ Begin
   SavedNum := UserNum;
   UserNum  := -1;
 
-  If Not Session.io.GetPW(Session.GetPrompt(274), Session.GetPrompt(293), TempUser.Password) Then Begin
+  If Not Session.io.GetPW(Session.GetPrompt(274), Session.GetPrompt(293), TempUser.PasswordHash) Then Begin
     If bbsCfg.PWInquiry Then
       If Session.io.GetYN(Session.GetPrompt(475), False) Then
         Session.Msgs.PostMessage(True, '/TO:' + strReplace(bbsCfg.FeedbackTo, ' ', '_') + ' /SUBJ:Password_Inquiry');
@@ -913,7 +914,7 @@ Begin
 
     Str1 := Session.io.GetInput(15, 15, 16, '');
 
-    If Str1 <> ThisUser.Password Then Begin
+    If Not CheckPassword(Str1, ThisUser.PasswordHash, ThisUser.Password) Then Begin
       Session.io.OutFullLn (Session.GetPrompt(418));
       Exit;
     End;
@@ -950,7 +951,8 @@ Begin
   Until (Str1 = Str2) or (Edit);
 
   If Str1 = Str2 Then Begin
-    ThisUser.Password     := Str1;
+    ThisUser.PasswordHash := HashPassword(Str1);
+    ThisUser.Password     := strUpper(Str1);  { keep plaintext for backward compat }
     ThisUser.LastPWChange := DateDos2Str(CurDateDos, 1);
   End;
 End;
@@ -1449,10 +1451,19 @@ Begin
 
 //    session.systemlog('DEBUG: pw check: ' + tempuser.handle);
 
-    If strUpper(Session.UserLoginPW) <> TempUser.Password Then Begin
+    If Not CheckPassword(Session.UserLoginPW, TempUser.PasswordHash, TempUser.Password) Then Begin
       UserNum := -1;
 
       Halt;
+    End;
+
+    { Auto-upgrade plaintext password to MD5 hash on successful login }
+    If Not IsHashedPassword(TempUser.PasswordHash) Then Begin
+      TempUser.PasswordHash := HashPassword(Session.UserLoginPW);
+      Reset  (UserFile);
+      Seek   (UserFile, UserNum - 1);
+      Write  (UserFile, TempUser);
+      Close  (UserFile);
     End;
 
     ThisUser := TempUser;
@@ -1500,7 +1511,7 @@ Begin
       A := UserNum;   {If user would drop carrier here itd save their info }
       UserNum := -1;  {which is only User.ThisUser.realname at this time        }
 
-      If Not Session.io.GetPW(Session.GetPrompt(2), Session.GetPrompt(3), TempUser.Password) Then Begin
+      If Not Session.io.GetPW(Session.GetPrompt(2), Session.GetPrompt(3), TempUser.PasswordHash) Then Begin
         If bbsCfg.PWInquiry Then
           If Session.io.GetYN(Session.GetPrompt(475), False) Then
             Session.Msgs.PostMessage(True, '/TO:' + strReplace(bbsCfg.FeedbackTo, ' ', '_') + ' /SUBJ:Password_Inquiry');

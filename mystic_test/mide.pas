@@ -1458,7 +1458,8 @@ Begin
 
   Console.WriteXY (21,  8,  31, strPadC('MIDE', 40, ' '));
   Console.WriteXY (21,  9, 112, strRep('Ä', 40));
-  Console.WriteXY (22, 11, 113, 'Copyright (C) ' + mysCopyYear + ' By James Coyle');
+  Console.WriteXY (14, 11, 113, 'Copyright (C) 1997-2013 James Coyle');
+  Console.WriteXY (14, 12, 113, 'IRC Fork (C) 2025-2026 verta1878, sysop/0, evga, kiddo, wrench');
   Console.WriteXY (31, 12, 113, 'All Rights Reserved');
   Console.WriteXY (21, 14, 113, strPadC('Version ' + mideVersion + ' (MPL v' + mplVer + ')', 40, ' '));
   Console.WriteXY (32, 16, 113, 'www.mysticbbs.com');
@@ -2173,7 +2174,7 @@ Begin
   Console.TextAttr := 7;
   Console.ClearScreen;
   Console.WriteLine('Mystic Integrated Development Environment Version ' + mideVersion);
-  Console.WriteLine('Copyright (C) ' + mysCopyYear + ' By James Coyle.  All Rights Reserved');
+  Console.WriteLine('Copyright (C) 1997-2013 James Coyle. IRC Fork (C) 2025-2026');
 
   Input.Free;
   Console.Free;

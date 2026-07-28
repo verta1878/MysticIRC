@@ -1,0 +1,498 @@
+
+******************************* EDITORIAL NOTE *******************************
+**                                                                          **
+**    It should be noted that use of this utility is recommended against.   **
+** It removes the "control" factor from THDPRO.EXE on which the entire      **
+** security concept is based. With proper use, this utility can be a gift.  **
+** However in the hands of people not "FULLY" aware of the power of the     **
+** various utilities (and all of their quirks) this utility could allow you **
+** to do uncontrollable damage to your system.                              **
+**    Unless you are absolutely certain that you need to use this and know  **
+** absolutely everything about the archiver/scanner you intend to invoke    **
+** using this utility, be aware that the results may not always be as       **
+** "controllable" as you may anticipate.                                    **
+**                                                                          **
+******************************************************************************
+**                                                                          **
+**      Although I will support this utility, I cannot promise to know      **
+**  anything about the various products you may configure for use with it.  **
+**                                                                          **
+******************************************************************************
+
+    THDEXARC.EXE is THD ProScan's External Archive Editor. It's purpose is to 
+allow the user to add external archive and virus scanner support to THD 
+ProScan Version 12.0 and later, by creating a data file with necessary 
+information for THDPRO.EXE to use these external archives and/or virus 
+scanners in it's normal running.
+
+    Definitions found in THDEXARC.DAT (created by this utility) will only be 
+used IF THDEXARC.DAT exists in the same directory as THDPRO.EXE and IF the 
+archive type is not supported internally to THDPRO.EXE. An archive type 
+"normally" supported by THDPRO.EXE which is not defined in THDINSTL will be 
+considered unsupported for this definition and will be checked against the 
+types supported in THDEXARC.DAT. If however they are configured in THDINSTL, 
+the internal routines will be used.
+
+    Conversion "to" external archive types is not supported by THDPRO.EXE, 
+however conversion "from" these types using the normal convert indicators is 
+supported.
+
+    In the case of virus scanners, no comparison to internally configured 
+scanners is made, so you can opt to run the internally supported scanners via 
+this option with different parameters than set internally without a conflict 
+arising with those internal to THDPRO.EXE.
+
+
+KEYWORDS (replaceable strings if you prefer) are as simple as the following...
+
+~~A - use "A"rchiver instead of unarchiver
+~~U - use "U"narchiver instead of archiver
+~~F - "F"ilename for the current process
+~~I - "I"nclude filenames or other relevant information.
+~~D - "D"irectory
+~~L - "L"og file (for scanners only)
+
+If any of the above is entered in lower case they will be translated to upper 
+case prior to saving the record.
+
+    The ~~A and ~~U are special keywords in that they are not actually 
+"replaced" on the command line. Instead they are simply stripped from the 
+command line and the archiver (~~A) or unarchiver (~~U) is used  instead of 
+the default. In order to understand this, you must realize that each of the 
+archive processes has a default executable.
+    In the case of the "test archive" command for instance, THDPRO.EXE will 
+use the "path to unarchiver" by default. If for some reason THDPRO.EXE should 
+be required to use the archiver (instead of the unarchiver) you could put ~~A 
+on the parameter line to tell THDPRO.EXE to use the "path to archiver" instead 
+of the "path to unarchiver". Putting ~~A in a parameter which normally uses 
+the Archiver will have no adverse effects (except to take up a few spaces in 
+your configurable space)
+
+
+    The other codes are replaced at run-time by THDPRO.EXE based on the 
+following. Codes not explained in any given entry are not supported for that 
+entry and have no translation value.
+
+
+IN THE SCANNER CONFIGURATION
+----------------------------
+   Path to Scanner - None
+  Scan a directory - ~~D=name of the Directory to scan (no ending "\")
+                     ~~L=full path and filename of "heurist.Log"
+                         (or more accurately the temporary heuristic Log)
+       Scan a file - ~~F=full path and filename of the File to be
+                         scanned.
+                     ~~L=full path and filename of "heurist.Log"
+                         (or more accurately the temporary heuristic Log)
+
+Success Errorlevel - None
+
+
+IN THE ARCHIVE CONFIGURATION
+----------------------------
+
+      Archive Type - None
+ Archive extension - None
+ Internal/External - None
+  Archive ID (hex) - None
+  Archive ID (chr) - None
+ Archive ID Offset - None
+  Path to Archiver - None
+Path to Unarchiver - None
+         Expansion - ~~F=full path and filename of the archive to be expanded
+                     ~~D=Current temporary directory used by THDPRO.EXE
+                     ~~A=Path to Archiver (use only if you wish the
+                         archiver to be used for this process instead of
+                         the unarchiver. If absent the unarchiver is used).
+                     ** Note that an entry of "N/A" (without the quotes) in
+                         this field will cause THDPRO.EXE to skip all aspects
+                         of processing except the "test" for this file type
+                         (new in THD ProScan Version 12.2)
+       Compression - ~~F=full path and filename of the archive to be created
+                     ~~D=Current temporary directory used by THDPRO.EXE
+                     ~~U=Path to Unarchiver (use only if you wish the
+                         Unarchiver to be used for this process instead of
+                         the archiver. If absent the archiver is used).
+        Add a file - ~~F=full path and filename of the archive being tested
+                     ~~I=full path and filename of the file(s) to be added
+                     ~~U=Path to Unarchiver (use only if you wish the
+                         Unarchiver to be used for this process instead of
+                         the archiver. If absent the archiver is used).
+     Add a comment - ~~F=full path and filename of the archive being tested
+                     ~~I=full path and filename of the comment to be added
+                     ~~U=Path to Unarchiver (use only if you wish the
+                         Unarchiver to be used for this process instead of
+                         the archiver. If absent the archiver is used).
+      Test archive - ~~F=full path and filename of the archive being tested
+                     ~~I=No replacement values (will be left untouched)
+                     ~~A=Path to Archiver (use only if you wish the
+                         archiver to be used for this process instead of
+                         the unarchiver. If absent the unarchiver is used).
+    Delete by list - ~~F=full path and filename of the archive being tested
+                     ~~I=full path and filename of the list to be removed
+                     ~~U=Path to Unarchiver (use only if you wish the
+                         Unarchiver to be used for this process instead of
+                         the archiver. If absent the archiver is used).
+Delete by filename - ~~F=full path and filename of the archive being tested
+                     ~~I=full path and filename of the file(s) to be removed
+                     ~~U=Path to Unarchiver (use only if you wish the
+                         Unarchiver to be used for this process instead of
+                         the archiver. If absent the archiver is used).
+Success Errorlevel - none
+
+
+The Menu Interface
+------------------
+
+    The menu interface is "basic" meaning that it supports the up/down arrow 
+keys as well as the use of the highlighted "Hot Keys". <enter> selects the 
+highlighted option. <esc> is equivalent to the "Quit" option on each menu.
+    To select an option move the highlight by pressing the up and down arrow 
+keys and press the <enter> key when the correct option is highlighted. Or 
+press the highlighted letter of your selection.
+    Except as noted below the home key will move the highlight to the first 
+selection on the menu and the end key will move the highlight to the last 
+selection.
+
+    In the view/edit/add modes the following keys serve a special purpose.
+Right = "N"ext
+Left  = "P"revious
+Home  = "F"irst
+End   = "L"ast
+
+
+    The menu commands will not be broken down in this text. Anyone incapable 
+of understanding the meanings of the various menu options should seriously 
+reconsider before trying to add or manipulate external archives or scanners.
+
+IMPORT - EXPORT
+---------------
+
+    The "Import" option available from the Main Menu allows the user to 
+"import" definitions from a text file. This text file must contain a 
+definition in the precise format created by the "export" function (discussed 
+in the next paragraph) except that it will ignore any leading and/or trailing 
+spaces. This will allow easy importation of other's settings. The text 
+imported "from" can contain as many definitions as you like and may also 
+contain information other than the definitions (THDEXARC will search for the 
+definition portions and offer you the option to import each definition as it 
+is found).
+
+    The "Export" option is available from the "View" menu. If you select the 
+"export" option you will be prompted if you wish to export the currently 
+displayed archiver or scanner or to export "all" records. If you select the 
+"all" option then all scanner AND archive definitions will be exported 
+regardless of which you are viewing. The export file is a simple text file and 
+can be edited without destroying the effectiveness as long as no lines which 
+are "used" are removed completely.
+
+    Both of these options will prompt you to enter a filename with the 
+"default" being THDEXARC.EXP. You may supply another filename and/or a full 
+path and filename at your option. If the file exists on an export attempt you 
+will be asked if you wish to "overwrite" (replace the existing file), "append" 
+(add the new info to the end of the existing file) or "abort" (stop 
+exportation).
+
+THDEXARC.EXP
+------------
+    Included in the distribution archive is THDEXARC.EXP. This is a text file 
+which contains the "Export" of some archivers and scanners (most of which are 
+already supported internally). You can Import the various definitions via the 
+Import function from the main menu. It is distributed in this format to avoid 
+having THDPRO.EXE use THDEXARC.DAT unless it has been specifically configured.
+Note that the various Paths supplied in this file are not likely to exist on 
+your system and will almost certainly need to be corrected. This can be done 
+with a text editor or inside THDEXARC.EXE at the time of importation. Import 
+only those definitions that you wish to use and/or add your own. However 
+please take great care when using this utility. I cannot stress how little 
+control you may have if you're not fully aware of the capabilities of the 
+archivers or scanners that can be configured through it's use.
+
+Configuration Breakdown
+-----------------------
+
+    The breakdown of the configuration section goes like this.
+
+    On first run (or any run where a THDEXARC.DAT does not exist in the 
+current directory), the "first" menu will only show 4 options. They are...
+
+1 Add an Archiver
+2 Add a Virus Scanner
+3 Import
+Q Quit
+
+    After at least a single record exists you will be given the following
+options...
+
+1 View Current Archivers
+2 View Current Scanners
+3 Modify an Archiver
+4 Modify a Virus Scanner
+5 Add an Archiver
+6 Add a Virus Scanner
+7 Remove an Archiver
+8 Remove a Virus Scanner
+9 Import
+Q Quit
+
+    The two "Remove" options when used result in "complete" removal of any
+records chosen to be removed. Records "Removed" cannot be recovered. However,
+all deletion is confirmed prior to any actual action.
+
+                      *********************************
+                      * UNDER "ARCHIVE" CONFIGURATION *
+                      *********************************
+
+These definitions are effective under all "archive" options except the
+"remove" and "quit" selections.
+
+--------------
+Archive Type -
+--------------
+   The Name and version of the Archiver/Unarchiver who's action this entry is
+designed to account for (ie. PKZIP/PKUNZIP version 2.04g).
+
+--------------------
+Archive extension  -
+--------------------
+   The "normal" extension of the archive type (ZIP for Zip, LZH for Lha etc)
+[ capital letters are forced ]
+
+-------------------
+Internal/External -
+-------------------
+   This entry is a toggle. Selecting it toggles support from External (use the 
+info in the THDEXARC file) to Internal (use THDPRO.EXE's internal 
+identification and handling routines).
+
+    IN ALMOST ALL CASES THIS SHOULD BE SET TO EXTERNAL!!!
+
+This will signify that you are defining an archive type not supported by 
+THDPRO.EXE.
+    The setting of INTERNAL is a special case which tells THDPRO.EXE, that the 
+archive type is already support internally but the search for the 
+Identification needs to be adjusted by the number in ID_OFFSET in order for 
+THDPRO.EXE to properly identify the archive type.
+    In order to understand how this might be used, see the "Internal Support" 
+notes at the end of this document.
+
+------------------
+Archive ID (hex) -
+Archive ID (chr) -
+------------------
+   Either of these will allow you to "input" archive identification characters
+in HEXADECIMAL format (00-FF). These can usually be seen in a hex editor or
+other hexadecimal viewer. The "?" is a reserved character and may NOT be used
+in the archive id (hex 3F). The ? is used to indicate that a character in
+"this" position may be any character. PKZIP for instance might be entered as
+50,4B,03,04,??,??,??,??,??,??,??,??,??,??,??. Which is translated into.. Only
+the first four characters are significant and they must be 50,4B,03,04 IN THAT
+ORDER. The "hex" entry is where input is made, the "chr" entry is for display
+purposes only and will show the actual character represented by the hex code
+entered.
+    LHA archives could be identified here as...
+2D,6C,68,??,2D,??,??,??,??,??,??,??,??,??,??
+which would require a match for the first three and fifth character while
+allowing the fourth character to be anything. (The Id offset for this pattern
+in LHA archives is at position "2")
+    In cases where it would be easier to enter the actual character than it's
+"hex" equivalent, you may do this by entering it with a preceding "=". So for
+PKZIP for instance one could alternately enter it as...
+=P,=K,03,04,??,??,??,??,??,??,??,??,??,??,??.
+    The "=" tells the interpreter that the second character is the actual
+character to be entered and it in turn "translates" that character into it's
+appropriate hex code. So entering "=P" would result in "50" showing in the
+space where that was entered (as "50" is the hex equivalent of a capital "P").
+The "P" itself would be displayed on the (chr) line below. This works for all
+"typable" characters.
+
+-------------------
+Archive ID Offset -
+-------------------
+    Number of bytes from the beginning of the archive at which the Archive ID
+is located. The "first" byte of the archive is "0" (not 1). Thus "ZIP"
+archives with the above signature would have an offset of "0".
+
+------------------
+Path to Archiver -
+------------------
+   The full path and filename of the archiver (ie C:\TOOLS\PKZIP.EXE). This
+entry MUST represent a full path and filename (drive preferred but not
+required) [ capital letters are forced ]
+
+--------------------
+Path to Unarchiver -
+--------------------
+   The full path and filename of the UNarchiver (ie C:\TOOLS\PKUNZIP.EXE). 
+This entry MUST represent a full path and filename (drive preferred but not 
+required). An entry of "=" will cause it to match the "Path to Archiver" entry 
+above. [ capital letters are forced ]
+
+-----------
+Expansion -
+-----------
+    The parameters required by the UNARCHIVER to expand an archive of this 
+type for PKZIP for instance, one might enter "-d -o- ~~F" (meaning to recreate 
+directories and never overwrite existing files)
+    To avoid running expansion and compression commands in THDPRO.EXE (v12.2 
+or later) set this field to "N/A" (without the quotes). This will tell 
+THDPRO.EXE that this entry is for "testing only" (like GIFTEST) and there is 
+no appropriate command to expand or compress files using this utility.
+
+-------------
+Compression -
+-------------
+    Although not "currently" supported by THDPRO.EXE, this field should be 
+defined as the parameters necessary for the ARCHIVER to create an archive 
+including all subdirectories which may be under it. . For PKZIP, one might use 
+"-arp ~~F"
+    If this action is not applicable set to "N/A" (see above under Expansion)
+
+------------
+Add a file -
+------------
+    Parameters used to "add a file" to this particular archive. The "archiver"
+is normally used for this purpose. For PKZIP you might use "-a ~~F ~~I".
+
+---------------
+Add a comment -
+---------------
+    The parameters required by the Archiver to add an archive comment. For
+PKZIP one might use "-a ~~F -z > ~~I"
+
+--------------
+Test archive -
+--------------
+    The parameters used by the Unarchiver to "test" the CRC of an archive. For
+PKZIP "-t ~~F".
+
+----------------
+Delete by list -
+----------------
+    The parameters required by the Archiver to delete files via a list where
+~~F will be replaced by the full path and name of the archive and ~~I will be
+replaced by the full path and filename of the "list". For PKZIP "-d ~~F @~~I"
+
+--------------------
+Delete by filename -
+--------------------
+    The parameters required by the Archiver to delete files BY NAME where ~~F
+will be replaced by the full path and name of the archive and ~~I will be
+replaced by the filename(s) of the file(s) to be removed.
+For PKZIP "-d ~~F ~~I"
+
+--------------------
+Success Errorlevel -
+--------------------
+    The errorlevel returned when the various command lines have encountered
+no errors in their execution (usually "0"). Note that THDPRO.EXE evaluates
+this errorlevel in the same way as "DOS". An errorlevel less than or equal
+to the value entered here is considered a "pass".
+
+
+                    *********************************
+                    * UNDER "SCANNER" CONFIGURATION *
+                    *********************************
+
+These definitions are effective under all "scanner" options except the
+"remove" and "quit" selections.
+
+---------
+Scanner -
+---------
+    The Name and Version of the scanner represented by this entry. For example
+"McAfee's VirusScan Version 2.2.5."
+
+-----------------
+Path to Scanner -
+-----------------
+   The full path and filename of the Virus Scanner (ie C:\SCAN\SCAN.EXE). This
+entry MUST represent a full path and filename (drive preferred but not
+required) [ capital letters are forced ]
+
+------------------
+Scan a directory -
+------------------
+    The parameters required to scan all files in a directory and all of it's
+subdirectories. for Mcafee's SCAN you might use "/all /sub /nomem ~~D\*.*".
+
+-------------
+Scan a file -
+-------------
+    The parameters required to scan a single file. for Mcafee's SCAN you might
+use "/all /nomem ~~F".
+
+--------------------
+Success Errorlevel -
+--------------------
+    The errorlevel returned when no viruses are found. (usually "0") Note that
+THDPRO.EXE evaluates this errorlevel in the same way as "DOS". An errorlevel
+less than or equal to the value entered here is considered a "pass".
+
+Notes -
+
+    Prior to saving any records, This program records the CRC of the
+executable file(s) of the record for use by the SECURE mode of THDPRO.EXE. The
+time required to do this will vary depending on the size of the executables.
+
+    If running THDPRO.EXE in secure mode, the CRC's above can be "corrected"
+by "edit"ing the path to any one of the executable files of the record in
+question. This will cause the CRC's to be recalculated for the executables
+in that record. Running THDPRO.EXE /SEC has no effect on the THDEXARC CRC
+records and will not correct the CRC's stored therein. Note however that none
+of these CRC's should change unless you have changed the file that they point
+to. You should be EXTREMELY suspicious if you find yourself needing to
+correct a CRC contained in the THDEXARC.DAT file if you have not changed
+the file(s) affected.
+
+    All archive records are sorted upon exit from the program in reverse order
+based on the archive identification strings. The sorting is required to ensure
+that THDPRO.EXE attempts archive identification in the correct order. No
+"sorting" of scanner entries is necessary.
+
+------------------
+Internal Support -
+------------------
+   In order to understand when one might set the Internal/External toggle on 
+an archive type to "INTERNAL" one needs to understand how THD looks for it's 
+archive identification internally as well as what THD looks for. Under all 
+"normal" circumstances, THD looks for the archive identification at offset "0" 
+in any given archive type ("2" for LHA).
+   When looking at SFX files THD reads the executable header for the "size" of 
+the executable header and changes its starting point by that amount. This 
+works fine for DOS SFX files since the actual archive is simply appended to an 
+executable file. However OS/2 and Windows have a different executable 
+structure and the "size" THD finds can simply be the size the the "dos stub". 
+This stub is then followed by a portion of code specific to OS/2 or Windows. 
+(Some OS/2 SFX types do return the proper size and do not need to be accounted 
+for by this method.)
+   THDPRO.EXE would thus not be able to identify that file as an archive as it 
+would be searching for the ID in the OS/2 or Win executable portion instead of 
+the archive. What is needed is a way to tell THDPRO.EXE to "skip" a specific 
+number of bytes to locate the id header.
+    When setting an archive type to INTERNAL, most fields are ignored. The 
+only "significant" field in the record is the ID_OFFSET. THD will (if it fails 
+to recognize the archive internally) check again beginning with the id_offset 
+as specified in any internal THDEXARC entries. It will restart a new internal 
+search using the offset provided by THDEXARC and defining the archive as 
+whichever internal identification it matches. If it matches none of the 
+internal archive types, it is defined as an unrecognized type.
+   A sample of this type of use is included in THDEXARC.EXP, and I may be 
+happy to help those who may need it for other purposes (although I may require 
+you to send me the archiver or possibly a few sample archives of the type 
+which needs to be defined). I have accounted for the RAR occurrences of this 
+type. The [OS/2] LH and ZIP SFX formats I tested do not need to be accounted 
+for as they both returned the correct size and are recognized by THDPRO.EXE 
+without this consideration.
+    It is important to remember that "internal" means internal to THDPRO.EXE. 
+Those types defined as "internal" will NOT be compared to any other records 
+stored in the THDEXARC.DAT file and therefore will ONLY work if THDINSTL.EXE 
+has been configured to use the particular archiver you intend to support using 
+this method. If the archiver is NOT configured internally, then make the 
+definition an external one and fill in all necessary fields.
+
+    If in doubt, ask. This option (and indeed, this tool) is not for the 
+average user.
+
+    THAT'S ALL FOLKS!!
+Good luck.

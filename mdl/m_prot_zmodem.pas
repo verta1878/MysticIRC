@@ -163,7 +163,7 @@ Type
   ZmodemProtocol = object(AbstractProtocol)
     UseCrc32         : Boolean;         {True when using 32bit CRCs}
     CanCrc32         : Boolean;         {True when Crc32 capable}
-    LastFileOfs      : LongInt;         {File position reported by remote}
+    LastFileOfs      : Int64;           {File position reported by remote}
     AttentionStr     : Array[1..MaxAttentionLen] of Byte;   {Attn string value}
     FileMgmtOpts     : Byte;            {File mgmt opts rqst by sender}
     FileMgmtOverride : Boolean;         {True to override senders file mg opts}
@@ -930,7 +930,7 @@ End;
   var
     Result : Word;
     FileExists : Boolean;
-    FileLen : LongInt;
+    FileLen : Int64;
 //    FileDate : LongInt;
     FileOpt : Byte;
     FileSkip : Boolean;

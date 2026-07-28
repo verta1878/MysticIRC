@@ -1,7 +1,7 @@
 ================================================================
- Mystic BBS 1.10IRC whatsnew
+ Mystic BBS 1.10 A38 - IRC whatsnew
 ================================================================
- This file lists changes made in the 1.10IRC community fork.
+ This file lists changes made in this fork of the 1.10 A38 source.
  Ordered OLDEST FIRST: the initial-port Phase 0 work is at the top;
  the most recent work is at the bottom.  Convention (matching Mystic's
  own whatsnew):
@@ -843,53 +843,202 @@
 [RIP] Added 8 ICN icons (chat door files logo mail quit sysinfo who)
 [RIP] Analyzed 32 RIP scene files — all commands verified implemented
 
---- Alpha 62-63 ---
- Version-bumped to 1.10IRC final. No code changes.
- All A41-A61 items ported and verified.
- 1.10IRC is feature-complete and in alpha testing.
-
- Next version: 1.11IRC starting at A1.
-
 ================================================================
- End of 1.10IRC whatsnew
+ Session 6 — RIPscrip Integration + RIPView (2026-07-25)
 ================================================================
 
++ RIPView v1.0.0: standalone RIPscrip v1.54 viewer — 42/42 commands
+  implemented, 100% pixel-perfect against ans2png reference (819,200
+  pixels, 0 mismatches). Modular: 7 units, 1,656 lines total.
+  CLI mode: -d debug, -b RATE baud emulation, -l directory listing.
+  Free Vision TUI mode: menu bar, file dialog, baud/debug controls.
+  Win32 build included (ripview.exe, 165KB PE32).
+
++ RIP terminal mode: TERM_RIP = 2 added to records.pas alongside
+  TERM_ASCII and TERM_ANSI.  UseRipTerm field in TIOBase tracks
+  active RIP sessions.
+
++ Display file priority for RIP terminals: .mrp (Mystic RIP menu)
+  first, then .rip (RIP art/graphics), then .ans (ANSI fallback).
+  RIP terminals fall back to ANSI gracefully.
+
++ .mrp file extension: Mystic RIP menu files — contain RIPscrip
+  button commands (!|1U) with host command strings for interactive
+  graphical menus.  Separate from .rip (general art/display).
+
++ DefTermMode = 4 (RIP): sysop can force RIP terminal mode in config.
+  Config editor: Terminal toggle now includes RIP option.
+  RIP Version field added (v1.54, currently the only supported version).
+
++ Command line -R flag: forces RIP terminal mode for a node.
+  -A flag forces ANSI mode.  Both bypass detection.
+
++ GetGraphics updated: user can select 0=ASCII, 1=ANSI, 2=RIP
+  at login.  MCI |SE now reports "RIP" for RIP terminals.
+
++ Theme flag ThmAllowRIP ($00000004): when set, RIP logins are
+  allowed.  If not set, RIP users fall back to ANSI with a message.
+
++ chg2rip v2.3: ANSI-to-RIP converter (pixel-perfect, 880 lines)
+  ans2png: ANSI-to-BMP reference renderer (656 lines)
+
++ RIPView modular architecture:
+  Shared units (all versions): ripengine, ripdraw, riptext, ripbmp
+  v1-specific: v1/rip1parse, v1/rip1exec
+  Ready for v2/v3/v4 version subdirectories.
+
++ RIPView drawing engine (ported from RIPtermJS BGI.js):
+  Bresenham line/circle/ellipse, trig arc with angle clipping,
+  pie slice with floodfill, cubic Bezier, scanline polygon fill,
+  stack-based flood fill, VGA 8x16 CP437 font (MSB-first).
+
++ Win32 build: all 11 executables cross-compiled (fpc264irc).
+  mystic.exe, mis.exe, mplc.exe, mide.exe, mutil.exe, fidopoll.exe,
+  marc.exe, install.exe, ripview.exe, chg2rip.exe, ans2png.exe.
+
+! Fixed m_ops.pas: added {$IFDEF WIN64} block for Win64 cross-compile
+  (was missing — only WIN32 was handled).
+
+! Fixed ripview.pas: removed DateUtils/StrUtils dependencies for
+  fpc264irc compatibility (FPC 2.6.4 ppu checksum mismatch).
+
+! Cleaned all stale mystic_ripapi/2/3/4 references across 33 files.
+  Old top-level directories replaced with mystic_rip/v1-v4.
+
+! mystic_test synced with mystic/ — 30 files updated from main source
+  to include all session 1-5 fixes.  Only 3 files differ (RIP changes).
+
+! Fixed: Stale node detection. If a node crashes without cleanup,
+  its chat file stays Active and the node is permanently BUSY.
+  CalculateNodeNumber now checks the chat file age — if older than
+  5 minutes and still Active, considers it a ghost node and reclaims
+  it. No more permanent BUSY from crashed sessions.
+  Future: configurable timeout in System Config.
+
 ================================================================
- Mystic BBS 1.11IRC whatsnew
- This file lists changes made in the 1.11IRC development branch.
+ Mystic BBS 1.11IRC Alpha 1 (2026-07-20)
+ Sessions 1-3: Foundation port, RIPView, MPL
 ================================================================
 
---- 1.11IRC A1 (untested) ---
- + MDL refactor Phase 1: MIS -- replace mdl wrappers with FPC RTL
- + HS/Link Pascal port (clean-room from HDK spec)
- + FTP download prompt wiring (prompts 528-531)
- + HTTP server configuration in mystic.dat (port, max connections)
- + Web download option ([W] in prompt 528/530)
- + Protocol menu strings in language file
- + Print API backport to v3/v2/v1
- + Serial port / UART / FOSSIL configuration screen in Mystic config
- + Wire m_fossil / m_serial / m_fossil_io into MIS for DOS serial support
- + HS/Link standalone program (hslink.exe / hslink DOS)
++ [A1] Version bumped from 1.10 A38irc-A63 to 1.11IRC
++ [A1] FPC 2.6.4irc compiler (GitHub: verta1878/fpc264irc)
++ [A1] 7-target cross-compiler: Linux, Win32, DOS, OS/2, Darwin,
+  FreeBSD, x86_64-Linux. 3,021 PPUs.
++ [A1] chg2rip v2.3: ANSI-to-RIP converter, pixel-perfect
+  (0 diff pixels, ImageMagick verified). 880 lines.
++ [A1] ans2png: ANSI-to-BMP reference renderer. 656 lines.
++ [A1] RIP engines consolidated under mystic_rip/:
+  v1/ (4,041 lines), v2/ (5,304), v3/ (40,788), v4/ (45,991)
++ [A1] MPL: record VAR parameters, record function return,
+  multi-dimensional arrays
++ [A1] MPL: TimerMS (function 562) — millisecond timer
++ [A1] MPL: FormatDate (function 563) — format date with mask
++ [A1] 20 MPL scripts compile (14 stock + 6 test scripts)
++ [A1] mplfunc.txt: 237-function MPL quick reference for MIDE
 
---- 1.11IRC A7 additions (Kiddo) ---
+================================================================
+ Mystic BBS 1.11IRC Alpha 2 (2026-07-22)
+ Session 4: Serial/FOSSIL, MIDE help
+================================================================
 
- + chg2rip v2.3: ANSI to RIPscrip converter (pixel-perfect)
-   44KB output for 62KB ANSI, 31x reduction from v1.0
-   VGA 8x16 font ROM, CGA 171/87 palette, text-based emission
-   RIPtermJS-verified, charsize 2 for 16px text height
- + ans2png: ANSI to BMP renderer (100% pixel-perfect match)
- + vgafont.inc: VGA 8x16 CP437 font ROM (4096 bytes)
- + examples/riptermJS/ added (Carl Gorringe, GPLv3 reference)
- + m_archive.pas: 13-format archive library with internal readers
-   ZIP RAR ARJ LHA ARC PAK SQZ HYP UC2 (pure Pascal, no external tools)
- + aviewarc/sqz/hyp/uc2.pas: internal archive header readers
- + m_io_fossil.pas: TIOFossil TIOBase adapter for DOS serial
-   mystic -COM1 -FOSSIL -B38400 (no MIS needed for dial-up)
- + m_mouse.pas: real implementation replaced placeholder (278 lines)
- + g00r00 1.11 A1-A6: all 38 items fully ported
- + MIDE Help system: Index, Under Cursor, Help on Help
- + MPL: records, multi-dim arrays, TimerMS, FormatDate
- + 20 MPL test scripts, 237-function reference (mplfunc.txt)
- + DOS-DESQVIEW-SETUP.md: full multi-node DOS BBS guide
- + ANSI-TO-RIP-PROGRESS.md: 36KB development log
++ [A2] Serial v1.0: sysop/0's UART 8250/16550 hardware layer
+  (serial.pas, 203 lines). Direct I/O ports, FIFO control,
+  modem signals (CTS/DSR/RI/DCD/DTR/RTS).
++ [A2] serial_irq.pas: kiddo's ISR + 4KB ring buffer (195 lines)
++ [A2] fossil.pas: wrench's FOSSIL dispatch FSC-0015/FSC-0072
+  (394 lines). INT 14h compatible.
++ [A2] netfosdl.pas: wrench's standalone FOSSIL driver (254 lines)
+  CLI: /baud, /irq, /fifo, /nofifo. X00 compatible.
++ [A2] m_serial.pas: OOP wrapper (TModemSerial) with GetDCD,
+  DataAvailable, DetectUART, SetFIFO, EnableIRQ/DisableIRQ.
+  IRQ auto-enabled on DOS Open, auto-disabled on Close.
++ [A2] MIDE help system wired: Help > Index reads mplfunc.txt,
+  Help > Under Cursor context-sensitive lookup.
++ [A2] Door32 library: g00r00's d32.pas added to examples/door32/
 
+================================================================
+ Mystic BBS 1.11IRC Alpha 3 (2026-07-24)
+ Session 5: Win32 cross-compilation, RIP integration
+================================================================
+
++ [A3] Win32 PE32 i386 cross-compilation from Linux via fpc264irc
++ [A3] 18 Win32 binaries: mystic, mis, mplc, mide, mutil,
+  fidopoll, marc, install, mbbsutil, nodespy, qwkpoll, mystpack,
+  maketheme, install_make, 109to110, chg2rip, ans2png, ripview
++ [A3] RIP integration in mystic_test/:
+  TERM_RIP = 2, .mrp/.rip/.ans display priority
+  Config editor RIP fields, -R/-A command line flags
+  MCI |SE reports "RIP" for RIP terminals
+  Theme flag ThmAllowRIP ($00000004)
++ [A3] Searchlight-style lightbar prompt menus (DoLBPromptMenu)
+  Identical to 1.12 — complete implementation.
++ [A3] RecConfig RIP fields carved from Reserved (record size
+  unchanged, old mystic.dat compatible)
+
+================================================================
+ Mystic BBS 1.11IRC Alpha 4 (2026-07-28)
+ Session 6: Runtime testing, crypto, spell check, fixes
+================================================================
+
+! [A4] RecConfig RIP fields moved from mid-record to end.
+  Was corrupting all paths when reading old mystic.dat.
+! [A4] mystic -cfg BUSY: CalculateNodeNumber skipped in config
+  mode. Config doesn't need a node. 1.12 has same bug.
+! [A4] Theme check bypass: mystic -cfg now enters config editor
+  even when theme.dat is missing.
+! [A4] Set_Node_Action crash: added {$I-} protection on
+  ReWrite(ChatFile) in bbs_nodeinfo.pas.
+! [A4] Stale node detection: CalculateNodeNumber checks chat
+  file age via Dos.GetFTime. Nodes idle >5 minutes with
+  Active=True are auto-reclaimed. No SysUtils dependency.
+! [A4] MIS shutdown hang: WaitConnection(0) changed to
+  WaitConnection(1000). Server threads poll with 1-second
+  select() timeout. Clean shutdown within 1 second.
+! [A4] ANSI editor palette disappears: GetScreenImage changed
+  from (13,6,60,24) to (1,1,80,25). Full screen save/restore.
+! [A4] Email to missing user: shows prompt 156 "user not found"
+  instead of silently discarding. Both interactive and /TO: paths.
+! [A4] New user feedback: checks if FeedbackTo user exists before
+  trying to send. Shows error message + logs if missing.
+! [A4] Zmodem >2GB: LongInt changed to Int64 for file position
+  tracking in m_prot_base.pas and m_prot_zmodem.pas.
+  Protocol header casts stay LongInt (32-bit wire format).
++ [A4] maketheme cfgpath: new command to set DataPath directly.
+  Bypasses mystic.dat corruption. Usage: maketheme cfgpath c:\mystic\data\
++ [A4] Active user warning: mystic -cfg scans chat files, warns
+  sysop if users are online before entering config editor.
++ [A4] Password MD5 hashing (bbs_crypt.pas, 65 lines):
+  New PasswordHash field in RecUser (String[40], carved from Reserved).
+  Dual-field: PasswordHash (MD5) + Password (plaintext backup).
+  CheckPassword checks hash first, falls back to plaintext.
+  Auto-upgrade: successful login with old password hashes it.
+  Needed for BINKP CRAM-MD5 authentication.
++ [A4] Hunspell spell check wired (bbs_hunspell.pas, 134 lines):
+  THunSpell in TBBSCore. LoadLibrary pattern, graceful disable
+  if DLL/dictionaries missing. Pre-built libs in attic/.
++ [A4] Spell check in FS editor: 'K' from command menu.
+  Walks all lines, reports misspelled words with suggestions.
++ [A4] Embedded icon: mystic.exe and mis.exe have {$R mystic.res}
+  Mystic icon in taskbar/tray. utrayit loads MAINICON resource.
++ [A4] mkicon.pas: pure Pascal ICO generator (186 lines).
+  DOS and Mystic styles. Replaces Python script.
++ [A4] Install.pas: creates temp1/temp2/temp3 node directories.
++ [A4] Copyright updated across all programs:
+  Copyright (C) 1997-2013 James Coyle
+  IRC Fork (C) 2025-2026 verta1878, sysop/0, evga, kiddo, wrench
++ [A4] mterm v0.1: terminal emulator with RIP/ANSI display,
+  telnet/serial/FOSSIL connections, phonebook, session capture.
+  LoadANSIFile and LoadRIPFile for offline viewing.
++ [A4] OL_Editor.pas: offline mail reply editor with integrated
+  Hunspell spell check (229 lines). Word wrap at column 72.
+  SpellCheckAll, CheckWord, SuggestWord. Skips quoted lines.
++ [A4] OpenOLMS: offline mail system (11 files) — BlueWave, QWK,
+  JAM, Hudson message bases, packer/unpacker, filter.
++ [A4] Serial v1.1: wrench update — /baud:RATE, /irq:N, /fifo:N,
+  /nofifo CLI flags. X00 compatible params.
++ [A4] THD ProScan archive added to examples/thdproscan/
++ [A4] RIPView docs: merged v1.54/v2.0/v3.0 specs into
+  ripjsapi.html (33,863 lines). JS reference code in ripviewer/.
++ [A4] 111dataclean.zip: clean 1.11IRC A3 data files (22 files)
+
+ Recompile MPL scripts: mplc -all

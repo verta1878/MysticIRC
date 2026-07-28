@@ -8,118 +8,738 @@
     going wrong whether it is Mystic or operator error!
 
  2. There is no automatic upgrade process.  The process is to install the full
-    release and then copy over your existing data files and themes.
+    installation to a temporary directory, so that you have access to the
+    latest version of the files.  Then follow the upgrade instructions provided
+    below for your specific version.  Usually this just means replacing new
+    binary files contained in the new alpha.
 
- MYSTIC BBS 1.10IRC UPGRADE NOTES
- ==================================
+ 3. REVIEW THE WHATSNEW.TXT for this alpha.  The WHATSNEW is structured to show
+    what has been added/fixed between alphas, and also provides documentation
+    for new or changed features.
 
- If upgrading from stock Mystic 1.10 A38 or earlier:
+ 4. There is no direct upgrade path for 1.09 without going through the ALPHA
+    upgrades.  This is due to there being no known 1.09 Sysops anymore so time
+    spent maintaining that upgrade would be a waste.
 
- 1. Create a "webroot" directory under your Mystic root:
+ 5. At the end of the upgrade file a list of all new prompts for this version of
+    Mystic will be maintained should you be missing any, or the upgrade calls for
+    new prompts.
 
-      Windows:  C:\mystic\webroot\
-      Linux:    /mystic/webroot/
+ 6. REMEMBER #1 TO BACKUP YOUR BBS DIRECTORY! :)
 
-    The HTTP file server (port 8080) serves static web pages from this
-    directory. Place an index.htm file here for your BBS web page.
-    If the directory does not exist, HTTP requests to / will show
-    a default page with your BBS name.
+ 
+ .---------------------------------------.
+ | UPGRADING FROM ALPHA 38/49 TO ALPHA 40 |-------------------------------
+ `---------------------------------------'
+- Stop all Mystic stuff
+- DELETE EVENT.DAT FROM YOUR DATA FOLDER
+- Replace *ALL executables* (don't forget MIDE and MPLC in scripts folder!)
+- Add new prompt #515 to default.txt (and all other prompt files you might use)
+- Copy ansimidx.ans into your text directory
+- Copy ansimidx.ini into your text directory (note the new template format!)
+- Recompile MPL programs (mplc -all in scripts directory)
+- Note that you may need to update any |DF prompts to use the proper format
+  of |DF<filename>| It is now a requirement to have the trailing pipe
+  character so that we can support filenames with spaces in them.
 
- 2. Protocol configuration (optional):
+Optional stuff:
+- Note the new "strip_seenby" option in mutil.ini you want want to use it.
 
-    If you want internal file transfer protocols instead of external,
-    add these entries in the Protocol Editor:
+ .---------------------------------------,
+ | UPGRADING FROM ALPHA 40 TO ALPHA 60    |-------------------------------
+ `---------------------------------------'
+- Stop all Mystic programs (mystic, mis, mutil)
+- BACKUP your entire BBS directory
+- Replace *ALL* executables with the new A63 build
+- Recompile all MPL programs (mplc -all in scripts directory)
 
-      Key=X  Desc=Xmodem       Batch=No   SendCmd=@XMODEM   RecvCmd=@XMODEM
-      Key=Y  Desc=Ymodem       Batch=Yes  SendCmd=@YMODEM   RecvCmd=@YMODEM
-      Key=G  Desc=Ymodem-G     Batch=Yes  SendCmd=@YMODEMG  RecvCmd=@YMODEMG
-      Key=Z  Desc=Zmodem       Batch=Yes  SendCmd=@ZMODEM   RecvCmd=@ZMODEM
-      Key=8  Desc=Zmodem 8K    Batch=Yes  SendCmd=@ZMODEM8  RecvCmd=@ZMODEM8
-      Key=3  Desc=Zmodem 32K   Batch=Yes  SendCmd=@ZMODEM32 RecvCmd=@ZMODEM32
-      Key=K  Desc=Kermit        Batch=Yes  SendCmd=@KERMIT   RecvCmd=@KERMIT
+New features that may require attention:
+- [A51] Auto-ban IP: configure via mystic -cfg -> Internet Servers
+  New fields: Auto-ban Conns, Auto-ban Secs (0=off)
+- [A51] goodip.txt: create data/goodip.txt to whitelist IPs from
+  all blocking (badip, DNSBL, DNSCC, auto-ban). Same format as badip.txt.
+- [A56] Node chat: new commands /QUIT, /EMOTE, /TELL, /REPLY available
+  Update telehelp.asc in text directory to document them.
+- [A56] Node chat: prompt #181 now supports &2 (node#), &3 (low color),
+  &4 (high color) for per-node color coding.
+- [A60] MPL: new procedure AppendText(FileName, Text: String) available.
+  New variables CfgChatStart, CfgChatEnd available. Both require Uses CFG;
+- [A60] LZH: archive viewer now handles level 0, 1, and 2 LZH files.
 
-    External protocols (DSZ, etc) still work as before.
+No record size changes — mystic.dat and users.dat are compatible.
+No new prompts required beyond what A40 added (#515).
 
- 3. MIS now includes an HTTP file server on port 8080.
+Built with fpc264irc r3.1+ — Win32 Runtime Error 216 crash fixed.
+MIS telnet now uses pure FPC uforkpty (no libutil.a dependency).
 
-    It starts automatically with MIS. It serves:
-      - Static pages from webroot/ (index.htm, CSS, images)
-      - File downloads via FTP Name mapping (/FtpName/filename)
 
-    FTP Name and FTP ACS must be configured per file base in the
-    File Base Editor for files to be accessible via HTTP or FTP.
+UPGRADING FROM ALPHA 36 TO ALPHA 37
+===================================
+- Replace *ALL* executables
+  NOTE the new qwkpoll.exe (qwk mailer for QWK networking)
+- Copy new qwk.mnu into menus dir (or update yours based on whatsnew)
+- Copy new qwknetwork.mnu into menus dir
+- NOTE the new [MergeNodeList] section in MUTIL.INI you can copy the
+  default or use the new MUTIL.INI if you want to use nodelist stuff
+- Recompile ALL MPL programs (not sure if this is really needed or not)
 
- 4. FTP server fixes applied:
+UPGRADING FROM ALPHA 35 TO ALPHA 36
+===================================
+- Replace *ALL* executables (only).
+- Recompile ALL MPL programs
 
-    - SIZE command now returns actual file size (was "not implemented")
-    - REST command added for resume support
-    - PASV endian fix for passive mode connections
+UPGRADING FROM ALPHA 34 TO ALPHA 35
+===================================
+- Replace *ALL* executables (only).
+- Recompile all MPL programs
+- Update prompt #95 (below and in default) [optional]
 
- 5. default.txt (language/prompts):
+UPGRADING FROM ALPHA 33 TO ALPHA 34
+===================================
+- Replace *ALL* executables only.
+- Delete MakeTheme.exe (it is no longer used)
+- Move default.txt from root Mystic directory to DATA directory
+  Do this for all of your theme prompt files if you have more than one theme.
+- Copy mpltest.mps and rumors.mps into your scripts directory.
+- The ANSIQUOT template has changed.  Either copy the new ansiquot.ans into
+  your text directory, or review the whatsnew and update your existing one.
+- Recompile all MPL programs (mplc -all in scripts if just defaults)
+- Matrix login has been updated slightly (specifically the XL login command)
+  so double check that your matrix looks the way you want it to if you use it.
 
-    This release uses prompts 0-515. If you have a custom theme,
-    verify your prompt file has at least 516 entries (prompts 0-515).
-    Prompts above 515 from newer Mystic versions are not used yet.
+UPGRADING FROM ALPHA 32 TO ALPHA 33
+===================================
+- Replace *ALL* executables ONLY (not mystic.dat etc).  Don't forget MPLC/MIDE
+- Update prompt #296 in your prompts (default.txt unless you changed it).
+  You can find it below or the default.txt in the install.
+- Add new prompts #513-514 in your default.txt.  Same as above.
+- Recompile theme prompt files (maketheme compile default.txt, etc)
+- Go into your configuration (mystic -cfg) and:
+    - System Config -> Server Options -> Internet Server Options -> Interface
+    - Make *SURE* you reset this value to exactly "0.0.0.0" (without quotes)
+    - Use CTRL-Y to blank the value and save it.  Then make sure its blank then
+      set it to 0.0.0.0
+- Go to System Config -> Config -> Message Base Settings
+    - Set your Ext Reply ACS to a value you want.  Ext Reply is what allows
+      users to be able to reply to a different message base (added in A32).
+      They MUST meet this ACS or Mystic will no longer prompt them like in A32
+- I do not think I changed MPL but if you get errors do a MPLC -all as usual
 
- 6. MPL scripts may need recompilation if upgrading from an older version.
-    Run your .mps files through the MPL compiler to regenerate .mpx files.
+UPGRADING FROM ALPHA 31 TO ALPHA 32
+======================================
+- Replace all binaries ONLY (not MYSTIC.DAT, etc) - (dont forget MPLC/MIDE!)
+- Recompile all MPL programs (MPLC -all in SCRIPTS if using defaults)
+- Add prompts #509-512 to all themes (aka default.txt, etc)
+- Recompile all themes with MakeTheme - validate success!
 
-================================================================
- Upgrading to Mystic BBS 1.11IRC Alpha 1
-================================================================
+UPGRADING FROM ALPHA 30 TO ALPHA 31
+======================================
+- Replace MYSTIC.EXE binary with new one
+- Replace MUTIL.EXE binary with new one
 
- 1. Replace mystic, mis, mplc, mutil, fidopoll binaries.
+UPGRADING FROM ALPHA 29 TO ALPHA 30
+======================================
+- Replace all binaries
+- Recompile all MPL programs
+- Note new executable FIDOPOLL.EXE if
+  you want to use internal BINKP stuff
+- Reconfigure BBS-events if you used them (sorry)
+- Optionally delete event.dat from DATA it is no
+  longer used.
 
- 2. IMPORTANT: Recompile ALL MPL scripts:
-      mplc -ALL
-    The MPL bytecode format changed for record VAR parameters.
-    Old .mpx files will crash. Run this from your Mystic directory.
+UPGRADING FROM ALPHA 28 TO ALPHA 29
+===================================
+- Replace all binaries
+- Update prompt #490
+- Recompile themes with MakeTheme
+- Recompile all MPL programs
 
- 3. The following record fields were removed from theme data:
-      - UseRipDetect (RecConfig)
-      - ThmAllowRIP constant
-      - TERM_RIP constant
-    RIP support moved to mystic_rip/ for future development.
-    IconPath and FontPath remain for ANSI icons and theme fonts.
+UPGRADING FROM ALPHA 27 TO ALPHA 28
+===================================
+- Replace all binaries
+- Replace prompt #490 with new one
+- Add prompts #504 through #508
+- Recompile themes with MakeTheme
+- Recompile all MPL programs (mplc -all in scripts directory, etc)
 
- 4. The -R command line flag (RIP terminal mode) was removed.
-    DefTermMode max is now 3 (ANSI). RIP option (4) removed.
+UPGRADING FROM ALPHA 26 TO ALPHA 27
+===================================
+- Replace all binaries
+- Copy your raw nodelist to nodelist.txt in the DATA directory (if you
+  have one) for the new nodelist browser.
+- Copy nodesearch.asc from the default install's TEXT directory into your
+  text directory.
+- Add new prompts #496 - #503 (see end of file)
+- Recompile prompts using MakeTheme.  Verify that it was successful.
 
- 5. Configuration RIP Editor menu option removed.
-    RIP requires graphical mode, not text 80x25.
+UPGRADING FROM ALPHA 25 TO ALPHA 26
+===================================
+- Replace all binaries
+- For each theme replace prompts #66,67 with the prompts below.  If you
+  are not sure, that means replacing them inside of default.txt.
+- For each theme add new prompts #494,495 found below.
+- Recompile all theme prompt files using MakeTheme.
+- If you want to see demos of the LightBar/Prompt menus look for
+  testlbprompt.mnu in the new default install menu directory.
 
- 6. Protocol Editor: HS/Link can be added as external protocol.
-    Compile hslink.pas from examples/hslink-src/ for your platform.
-    Protocol Editor setup:
-      Key=H  Desc=HS/Link  Batch=No
-      Send: hslink -P%%1 -B%%2 %%3
-      Recv: hslink -P%%1 -B%%2 -U%%3
+UPGRADING FROM ALPHA 24 TO ALPHA 25
+===================================
+Replace all binaries
 
- 7. New MPL feature: Records can be passed by VAR reference.
-    Example: Procedure MyProc (Var T: MyRecord);
-    See scripts/testrec.mps for usage.
+UPGRADING FROM ALPHA 23 TO ALPHA 24
+===================================
+Copy nodespy.ini into the directory where you have NodeSpy.
 
- 8. Messages containing ANSI escape codes are now displayed
-    with embedded colors. ANSI art can be uploaded in the
-    full screen editor and auto-converted to pipe codes.
+If you are still using A22 you can follow the instructions
+below to upgrade directly from A22 to A24.
 
- 9. install program now creates icon/ and font/ directories
-    under the text path (previously rip/ and icons/).
+UPGRADING FROM ALPHA 22 to ALPHA 23
+===================================
+Install to a temp directory
+Copy over all binaries (dont forget mide/mplc!)
+Recompile all MPL programs
+Copy ansiviewer.ans into your TEXT directories
+Copy ansigalv.ans into your TEXT directories
+Copy new blackjack.mps over your old one
+*IMPORTANT* Execute "mbbsutil -fixindex" in your root mystic dir
 
-================================================================
- Upgrading to Mystic BBS 1.11IRC Alpha 3
-================================================================
+UPGRADING FROM ALPHA 21 TO ALPHA 22
+===================================
+Copy over all binaries
 
- 1. Replace mystic, mis, mplc, mutil, fidopoll binaries.
+UPGRADING FROM ALPHA 20 TO ALPHA 21
+===================================
+Copy over all binaries
+Delete MYSTPACK
+(mUTIL now can pack message bases)
 
- 2. Recompile ALL MPL scripts: mplc -ALL
-    New function: TimerMS (function 562)
+UPGRADING FROM ALPHA 19 TO ALPHA 20
+===================================
+Copy over all binaries.
+Recompile MPL programs
+Review new MUTIL configuration additions
 
- 3. New MCI codes available in prompt files:
-      |-Y  Force next Yes/No prompt to default Yes
-      |-N  Force next Yes/No prompt to default No
+UPGRADING FROM ALPHA 18 TO ALPHA 19
+===================================
+Copy over all binaries.
+Recompile MPL programs (you might need to fix includes see whatsnew)
+Newer version of USAGE.MPS too
 
- 4. DateDos2Str and DateJulian2Str now support formats 4-6
-    for 4-digit year display (4=MM/DD/YYYY, 5=DD/MM/YYYY,
-    6=YYYY/MM/DD). Existing formats 1-3 unchanged.
+UPGRADING FROM ALPHA 17 TO ALPHA 18
+===================================
 
+Copy over all binaries
+Recompile your MPL programs using MPLC -all or whatever
+
+New program called NODESPY is now included
+Updated some MPL (to-prompt, usage, etc)
+
+UPGRADING FROM 1.10 ALPHA 15/16 to 1.10 ALPHA 17
+=============================================
+
+This should be a simply binary replacement.  Simply perform the
+installation to a temporary directory and then copy over the
+newer binaries (don't forget MPLC and MIDE in the scripts directory).
+
+Also, MIDE now has a configuration file (mide.ini) that you may wish
+to copy from the new install.
+
+Recompile your MPL programs just to be safe.  I can't remember if
+that needs to happen for this version or not.
+
+Note that this version has internal Zmodem, but it still has some
+problems with certain clients.  It may be best to stick with SEXYZ
+or some other protocol driver for now.
+
+If you are using something PRIOR to alpha 15, you need to find the
+correct section to get to that level.
+
+
+UPGRADING FROM 1.10 ALPHA 11 - 14 TO 1.10 ALPHA 17
+==================================================
+
+If you are upgrading from 1.10 ALPHA 11-14 then you need to replace
+all of the binaries, recompile all MPL programs (mplc -all), and
+add/recompile new prompts.
+
+*IN ADDITION* THIS IS VERY IMPORTANT
+
+You will need to copy CvtMenus to your menus directory and run it only once
+so that your menu files are converted to the format used in ALPHA 15+.  Once
+this is done you can delete this program.
+
+Also, there are new versions of BlackJack.mpl and Usage.mpl and also TO-PRMPT
+is now included in the Mystic distribution.
+
+
+UPGRADING FROM 1.09 TO 1.10 ALPHA 17
+====================================
+
+The following instructions are for upgrading your current *1.09* release of
+Mystic BBS.
+
+!!! THIS IS A SIGNIFICANT UPGRADE YOU WILL NEED TO MAKE A FULL BACKUP OF YOUR
+!!! CURRENT SYSTEM IN CASE THERE ARE PROBLEMS.
+
+In addition, the MPL language has significantly changed in this release.  If
+you are using a lot of MPL modules, they will need to be upgraded to new
+versions.  The MPL syntax has been standardized to be consistant with Pascal
+compilers, so the syntax will not be changing every couple of releases as it
+has in the past.  It is a bunch of work now, but it means we won't be doing
+this again in the future!
+
+1. Install Mystic 1.10 into a temporary directory.
+
+2. Copy the following files from the temporary install directory to your
+   BBS directory (replacing old executables where needed):
+
+      MYSTIC.EXE
+      MAKETHEME.EXE
+      MBBSUTIL.EXE
+      MUTIL.EXE
+      MUTIL.CFG
+      109TO110.EXE
+      MYSTPACK.EXE
+      MIS.EXE
+
+3. Copy the following files from your temporary install SCRIPTS directory
+   into your BBS scripts directory (replacing old stuff).
+
+      MPLC.EXE
+      MIDE.EXE
+      BBSLIST.MPS
+      BULLETIN.MPS
+      MPLDEMO.MPS
+      MPLTEST.MPS
+      BLACKJACK.MPS
+      BLACKJACK.ANS
+      RUMORS.MPS
+      USAGE.MPS
+
+4. Run MPLC -ALL in your BBS scripts directory to recompile all of your
+   MPL programs.  If you use custom MPL programs some may not compile and
+   will need to be upgraded.
+
+5. Copy CFGROOT.ANS from your temporary install DATA directory into your
+   BBS data directory.
+
+6. For each "language" you have installed (usually just default.txt) you
+   will need add new prompts listed at the end of this file.  default.txt
+   is found in your root BBS directory.
+
+7. For each "language" you have installed (usually just default) you will
+   need to recompile the prompts using MAKETHEME.  Do *NOT* use the old
+   MAKELANG as it no longer is used with Mystic BBS.
+
+     MakeTheme compile default.txt
+
+8. Copy ANSIGALH.ANS and ANSIGAL.ANS from the temporary install's TEXT
+   directory into your BBS TEXT directory.
+
+9. In your main BBS directory execute 109to110.EXE *MAKE SURE IF YOU ARE
+   RUNNING AN OPERATING SYSTEM THAT USES FILE SECURITY THAT YOU HAVE FULL
+   ACCESS TO ALL FILES IN YOUR BBS DIRECTORIES.  IF YOU DO NOT THE UPGRADE
+   WILL FAIL AND YOU WILL HAVE TO RESTORE AND START OVER*
+
+10. Delete 109to110.exe
+
+11. Copy CvtMenus program into your menus directory and run it ONE TIME ONLY
+    so that it will convert your menu files.
+
+12. Delete CvtMenus.exe
+
+13. Notes: The install program will attempt to delete the following unused
+    programs and files: wfcscrn.* from DATA, makelang.exe, mcfg.exe,
+    *.lng from DATA, node*.dat from DATA.  If these files still exists for
+    some reason they should be deleted.  *MCFG AND MAKELANG ARE NO LONGER
+    USED WITH MYSTIC*
+
+
+
+
+VERSION PRIOR TO 1.09
+=====================
+
+If you are using 1.07 you must upgrade to 1.08, and then 1.09 using those
+upgrade packages.  And then you can follow the instructions for 1.09 to
+the latest alphas above.
+
+IF you are using 1.08 ALPHAs you must FIRST upgrade to 1.08 full release,
+and then to 1.09 before following the instructions above.
+
+
+
+
+; ==== [ REPLACED PROMPTS 1.10 ] ==========================================
+
+; Disconnect after download?
+066 |CR|12Disconnect after file transfer? |11
+
+; Disconneting in 10 seconds, press a key to abort
+067 |CR|09Disconnecting in 10 seconds: Press a key to abort.
+
+; Editing message display
+296 |16|CL|09|17   |15Message Editing |$X79 |16|CR|CR|09(|11A|09)      |03To: |11|&1|CR|09(|11B|09) |03Subject: |11|&2|CR|09(|11C|09)    |03Sent: |11|&3|CR|CR|09Edit option (|11!|09) Edit text, (|11Q|09)uit? |11
+
+; Message base new and qwk scan toggle prompt:
+095 Toggle: |09[|11#-#,#|09], Select [|11A|09]dd All, [|11R|09]emove All, [|11?|09/|11List|09]: |XX
+
+
+; ==== [ NEW PROMPTS 1.10 ] ===============================================
+
+; ansi gallery: Ansi is required to use this prompt
+466 |CRSorry, this gallery requires ANSI graphics|CR|CR|PA
+
+; ansi gallery: Deselected file in list (bar OFF)
+; &1=filename     &2=filesize  &3=filedate  &4=sauce author  &5=sauce title
+; &6=sauce group  &7=filetime
+467 |[X02|07|16 |$R49|&1 |$R12|&6 |$R12|&4 |XX
+
+; ansi gallery: Selected file in list (bar ON)
+; &1=filename     &2=filesize  &3=filedate  &4=sauce author  &5=sauce title
+; &6=sauce group  &7=filetime
+468 |[X02|15|17 |$R49|&1 |$R12|&6 |$R12|&4 |XX
+
+; ansi gallery: Deselected DIRECTORY in list (bar OFF)
+; &1=filename     &2=filesize  &3=filedate  &4=sauce author  &5=sauce title
+; &6=sauce group  &7=filetime
+469 |[X02|07|16 |$R49|&1 |12<DIRECTORY>|$D15 |XX
+
+; ansi gallery: Selected DIRECTORY in list (bar ON)
+; &1=filename     &2=filesize  &3=filedate  &4=sauce author  &5=sauce title
+; &6=sauce group  &7=filetime
+470 |[X02|15|17 |$R49|&1 |12<DIRECTORY>|$D15 |XX
+
+; ansi gallery: Current path update prompt (when switching directories)
+; set to blank to not display a path (automatically excludes the root)
+; &1 = current path   &2 = # of files in path
+471 |[X08|[Y05|15|16|$R70|&1
+
+; ansi gallery: Percent bar update (when redrawing page)
+; Set to blank to not display a bar.  Bar config is in MCFG lang settings
+; &1 = Percentage bar   &2 = Percentage (0-100)
+472 |[X52|[Y23|15|16|$L03|&2|07% |&1
+
+; ansi gallery: Default sauce values for no sauce record.  3 words separated
+; by semi-colons: Title;Author;Group  IE: Unknown;Unknown;Unknown
+473 Unknown;Unknown;Unknown
+
+; ansi gallery: Command prompt for ! (only download for now)
+474 |CR|12Download |&1? |XX
+
+; Password inquiry prompt
+475 |CR|12Send a password inquiry message to the SysOp? |XX
+
+; Displayed when account expired down to a security level > 0
+476 |CR|14Your account has expired.  Downgrading security to |XS.
+
+; Displayed when account expired down to level 0 (delete)
+477 |CR|12Your account has expired and is now marked for deletion.
+
+; User required password change
+478 |CR|14This BBS requires a password change every |PW days.
+
+; User2User chat page which node?
+479 |CR|09Enter node to chat with |01[|10?|01/|10List|01]|09: |XX
+
+; User2User node/user is unavailable
+480 |CR|15That user is marked unavailable.|CR|CR|PA
+
+; User2User force user into chat?
+481 |CR|12Force user into chat? |XX
+
+; User2User sending chat request &1=User &2=Node
+482 |CR|15Sending chat request to |&1...|DE|DE|CR
+
+; User2User chat mode starting
+483 |CL|09|17   |15Chat mode engaged.|$X70 ESC/Quit |16|CR
+
+; User2User chat mode ended
+484 |CL|09|17   |15Chat mode end.|$X79 |16|DE|DE
+
+; User2User accept chat page request? &1=user &2=Node
+485 |CL|15|&1 is requesting private user chat.  Accept? |11
+
+; MsgBase quickscan header prompt
+486 |CR|12Starting Quick Scan|CR
+
+; MsgBase quickscan Scanning prompt
+; &1=basename  &2=current base#  &3=total bases#
+487 Scanning |&1 [|&2 of |&3]...
+
+; MsgBase quickscan base list prompt
+; &4=msgs in base    &5=new messages  &6=your messages  &7=global total msg
+; &8=global new msgs &9=global your msgs
+488 |03Base: |14|$R40|&1 |03Total: |09|$L04|&4|03 New: |11|$L04|&5 |03Yours: |12|$L03|&6
+
+; MsgBase quickscan footer prompt
+; &7=global total msg   &8=global new msgs   &9=global your msgs
+489 |CRQuick Scan complete. |CR|CR|PA
+
+; Msg header flags text one word each separated by a space
+; 1=Local 2=Echo 3=Private 4=Sent 5=Delete 6=Received
+490 Local,Echo,Priv,Sent,Del,Rcvd
+
+; File base filesize flags one word separated by a space
+; 1=offline  2=failed  3=unvalidated  4=GB  5=MB  6=KB  7=B
+491 OFFLINE FAILED UNVALID GB MB KB B
+
+; Forward msg: which base
+492 |CR|09Forward message to which base (?/List): |XX
+
+; Sysop password prompt
+493 |CR|09Sysop Password: |XX
+
+; Normal msg reader: Remove from newscan? (after I command)
+494 |CR|12Remove |15|MB |12from message newscan? |XX
+
+; Lightbar msg reader: Remove from newscan (after I command)
+495 |CR|12Remove |15|MB |12from message newscan? |XX
+
+; Netmail send address prompt with active nodelist searching
+496 |CR|09Enter netmail address or search criteria (|10?|09/|10Help|09): |11
+
+; Nodelist browser prompt
+497 |CR|09Enter nodelist search criteria (|10?|09/|10Help|09): |11
+
+; Nodelist search results header
+498 |CR|15Node         System Name                Location           SysOp               |CR|09============ ========================== ================== ====================
+
+; Node list search results
+; &1=addr  &2=bbsname  &3=location  &4=sysop  &5=phone  &6=internet
+499 |10|$R12|&1 |15|$R26|&2 |11|$R18|&3 |09|$R20|&4
+
+; Node list single result
+500 |CR|03    Address: |14|&1|CR|03System Name: |11|&2|CR|03   Location: |11|&3|CR|03   Operator: |11|&4|CR|03      Phone: |11|&5|CR|03   Internet: |11|&6
+
+; Node list search  "found X matches"  &1=# of matches
+501 |CR|03Found |11|&1 |03matches.
+
+; Netmail send confirmation
+; &1=addr  &2=bbsname  &3=location  &4=sysop  &5=phone  &6=internet  &7=to
+502 |CR|12Send netmail to |15|&7|07 at |15|&1|12? |11
+
+; QWK .REP complete/results prompt
+; &1=msgs imported  &2=msgs failed  &3=bases added to scan  &4=bases removed
+503 |10SUCCESS|01.|CR|CR|11- |03Posted |11|&1 |03new messages (|11|&2 |03failed)|CR|11- |03Added |11|&3 |03bases to new scan (|11|&4 |03removed).|CR|CR|PA
+
+; Standard message reader: Lastread pointer set &1 = msg number
+504 |CR|11Last read pointer has been set to message number |&1.|CR|CR|PA
+
+; Lightbar reader: Lastread pointer set &1 = msg number
+505 |CR|11Last read pointer has been set to message number |&1.|CR|CR|PA
+
+; QuickScan message list header    &2=basename
+506 |15From            Base                 Subject|CR|09=============== ==================== ==========================================
+
+; QuickScan message list middle
+; &1=msg#  &2=basename  &3=from  &4=to  &5=subject  &6=date
+507 |10|$R15|&3 |09|$R20|&2 |11|$R42|&5
+
+; QuickScan message list footer
+508 |09|$D79=|CR
+
+; Message reply options (standard)
+; &1=base name  &2=reply to name   &3=msg subject
+509 |16|CL|09|17   |15Message Reply |$X79 |16|CR|CR|03    Area: |11|&1|CR      |03To: |11|&2|CR|03 Subject: |11|$R65|&3|CR|CR|09Reply area (|11ENTER|09) Current, |09(|11B|09)ase, |09(|11E|09)mail, |09(|11Q|09)uit? |14
+
+; Message reply options (lightbar)
+; &1=base name  &2=reply to name   &3=msg subject
+510 |16|CL|09|17   |15Message Reply |$X79 |16|CR|CR|03    Area: |11|&1|CR      |03To: |11|&2|CR|03 Subject: |11|$R65|&3|CR|CR|09Reply area (|11ENTER|09) Current, |09(|11B|09)ase, |09(|11E|09)mail, |09(|11Q|09)uit? |14
+
+; Message reply select base prompt
+511 |CR|09Select message base for reply [|10?|09/|10List|09]: |11
+
+; Message "replying to X base" prompt   &1=base name
+512 |CR|03Posting reply message to base |11|&1|03.
+
+; Message post: "post msg as private" in pub/priv type base
+513 |CR|12Post this as a private message? |11
+
+; Message reply: "post msg as private" in pub/priv type base
+514 |CR|12Post this as a private message? |11
+
+; Msg Editor: No permission to upload message text
+515 |CR|12You do not have access to upload message text.|CR|CR|PA
+
+; Terminal emulation for TE mci code
+; word1=ASCII   word2=ANSI
+516 ASCII ANSI
+
+; UB results (File list type)
+; word1=Normal  word2=Lightbar
+517 Normal Lightbar
+
+; UE results (message editor type)
+; word1=line,   word2=full   word3=ask
+518 Line Full Ask
+
+; UG results (gender/sex)
+; word1=female   word2=male   word3=unknown
+519 Female Male Unknown
+
+; UJ results (message reader type)
+; word1=Normal   word2=Lightbar
+520 Normal Lightbar
+
+; UQ results (lightbar quote style)
+; word1=standard   word2=windowed
+521 Standard Windowed
+
+; Yes and No text used in various places
+; Word1=no   word2=Yes
+522 No Yes
+    
+; Off and On text used in various places
+; Word1=Off   word2=On
+523 Off On
+
+; New scan toggle yes/no (on/off) toggle text
+; Word1=no   word2=Yes
+524 No Yes
+
+; Editing auto signature message subject
+525 Signature Editor
+
+; Months of the year (short name) one word per, Jan-Dec separated by a space
+526 Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+
+; Months of the year (long name) one word per, Jan-Dec separated by a space
+527 January February March April May June July August September October November December
+
+ .---------------------------------------,
+
+ .---------------------------------------,
+ | UPGRADING 1.11IRC A3 TO A4             |-------------------------------
+ `---------------------------------------'
+- Stop all Mystic programs (mystic, mis, mutil)
+- BACKUP your entire BBS directory
+- Replace *ALL* executables with the new A4 build
+- Recompile all MPL programs (mplc -all in scripts directory)
+
+New in A4:
+- Password hashing: existing plaintext passwords auto-upgrade to
+  MD5 on next successful login. No manual action needed.
+- Spell check: drop libhunspell32.dll + dictionary.aff + dictionary.dic
+  in your data directory. See mystic_spell/SETUP.md for details.
+- Stale node detection: crashed nodes auto-reclaim after 5 minutes.
+- MIS shutdown: now exits cleanly within 1 second.
+- ANSI editor: color palette no longer corrupts the screen.
+- Install: now creates temp1-temp3 node directories.
+
+No record size changes — mystic.dat and users.dat are compatible.
+New PasswordHash field carved from RecUser Reserved space.
+
+ | UPGRADING TO RIP BUILD                 |-------------------------------
+ `---------------------------------------'
+
+ IMPORTANT: This build adds RIPscrip v1.54 support. The system
+ configuration record (RecConfig) has new fields. You MUST run
+ the upgrade steps below or mystic.dat will be corrupted.
+
+ STEP 1: BACKUP
+   - Stop all Mystic programs (mystic, mis, mutil)
+   - BACKUP your entire BBS directory (especially mystic.dat)
+
+ STEP 2: REPLACE EXECUTABLES
+   - Extract mystic-win32-upd.zip over your BBS directory
+   - This replaces all 18 executables
+
+ STEP 3: UPGRADE DATA FILES
+   - Run: mystic -cfg
+   - Go to System Config
+   - The new RIP fields will initialize to defaults:
+       Terminal:    unchanged (your current setting)
+       RIP Version: v1.54
+       RIP Width:   640
+       RIP Height:  350
+   - Save and exit
+
+ STEP 4: RECOMPILE MPL SCRIPTS
+   - cd scripts
+   - mplc -all
+   - This recompiles all .mps scripts to .mpx
+
+ STEP 5: VERIFY
+   - Start mystic and log in
+   - Check |SE MCI code shows correct terminal type
+   - RIP users should see .mrp files if present
+
+ NEW EXECUTABLES IN THIS BUILD:
+   mystic.exe       BBS server (RIP terminal support)
+   mis.exe          Internet server
+   mplc.exe         MPL compiler
+   mide.exe         MPL IDE editor
+   mutil.exe        Maintenance utility
+   fidopoll.exe     FidoNet BINKP poller
+   marc.exe         ZIP archiver + MP3/MP4 metadata
+   install.exe      Installation setup
+   mbbsutil.exe     BBS utility
+   nodespy.exe      Node spy
+   qwkpoll.exe      QWK poller
+   mystpack.exe     Data packer
+   maketheme.exe    Theme maker
+   install_make.exe Install builder
+   109to110.exe     1.09 to 1.10 upgrade
+   ripview.exe      RIPscrip v1.54 viewer (42/42 commands)
+   chg2rip.exe      ANSI-to-RIP converter
+   ans2png.exe      ANSI-to-BMP reference renderer
+
+ NEW CONFIGURATION OPTIONS:
+   System Config -> Terminal: new "RIP" option (mode 4)
+   System Config -> RIP Version: v1.54
+   System Config -> RIP Width: 640 (default)
+   System Config -> RIP Height: 350 (default)
+   System Config -> RIP Fallback: Yes (fall back to ANSI)
+
+ NEW DISPLAY FILE EXTENSIONS:
+   .mrp = Mystic RIP menu (buttons + host commands)
+   .rip = RIP art/graphics
+   Display priority for RIP terminals: .mrp -> .rip -> .ans
+
+ NEW COMMAND LINE FLAGS:
+   mystic -R    Force RIP terminal mode for this node
+   mystic -A    Force ANSI terminal mode for this node
+
+ NEW RECORD FIELDS (RecConfig):
+   RipScreenW   : Word     (default 640)
+   RipScreenH   : Word     (default 350)
+   RipFallback  : Boolean  (default True)
+   RipVersion   : Byte     (default 0 = v1.54)
+
+ NEW RECORD FIELDS (TIOBase):
+   UseRipTerm   : Boolean  (runtime, not saved to disk)
+
+ NEW CONSTANTS:
+   TERM_RIP     = 2
+   ThmAllowRIP  = $00000004
+
+ COMPATIBILITY:
+   - users.dat: no changes, fully compatible
+   - mystic.dat: new fields appended to RecConfig
+     First run of mystic -cfg will initialize defaults
+   - Menus (.mnu): no changes, fully compatible
+   - Themes: ThmAllowRIP flag defaults to 0 (RIP allowed)
+   - MPL scripts: must recompile (mplc -all)
+
+ Built with FPC 2.6.4irc r3.1 — PE32 i386 Win32.
+ GPLv3 — The Crew: verta1878, sysop/0, evga, kiddo, wrench
+
+ MANUAL STEP:
+   - Copy mplfunc.txt to your BBS docs directory
+     (e.g. copy mplfunc.txt c:\mystic\docs\)
+   - MIDE Help > Index reads mplfunc.txt from the BBS root
+     or docs directory
+
+ STALE NODE DETECTION:
+   If mystic.exe crashes or is killed, the node's chat file
+   (chatN.dat in Data path) may be left with Active=True.
+   This previously caused permanent BUSY for that node.
+
+   Now: nodes idle for 5+ minutes with Active=True are
+   automatically reclaimed. No manual intervention needed.
+
+   To manually clear a stuck node immediately:
+     del c:\mystic\data\chatN.dat  (where N = node number)
+
+   Future: configurable ghost timeout in System Config.

@@ -1,0 +1,32 @@
+
+     This note is for users of OS/2 Warp who find that use of SCAN.EXE causes 
+the THDPRO.EXE (or other) window to close without any apparent reason.
+
+    My "first" solution is to use the OS/2 native version of THD ProScan 
+(version 12 or later) and the native OS/2 version of McAfee's VirusScan.
+
+    However if for some reason you MUST use the dos version, try this...
+
+     After much investigation, I must admit I am unable to figure out "why" 
+SCAN 2.?.? closes an OS/2 session.
+     However, I have found, that for some unknown reason, I am able to stop it 
+from doing so if I run "SCAN *.*". After running this in an OS/2 window, 
+SCAN.EXE thereafter seems to work fine. In turn THDPRO.EXE has no difficulty 
+running it without the window closing.
+
+     If the window (or session) is closed and then opened again, you will need 
+to run scan.exe in the newly opened window (session) in order prevent SCAN.EXE 
+from closing it.
+
+     This has proven to be the case on my system for both a VDM and a dos 
+session. I cannot however guarantee it will work for everyone else.
+
+    Other's have reported "some" success by changing their DOS=HIGH statement 
+in their config.sys file (some loading dos high and others not, some using the 
+UMB some not). There seems to be no pattern to this and there are also no 
+guarantees. The most common sucessful setting is DOS=HIGH,UMB.
+    At least ome user has suggested that the problem was fixed by applying the 
+IBM FIXPACK #10 to his copy of WARP. I have not been able to verify this.
+
+    The alternate solution is to use the OS/2 native version of THD ProScan 
+(version 12 or later) and the native OS/2 version of McAfee's VirusScan.

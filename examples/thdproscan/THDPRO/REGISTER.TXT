@@ -1,0 +1,28 @@
+
+                                 DO IT NOW
+                                 ---------
+
+    I'm pleased to announce that I'm no longer programming THD ProScan on an 
+XT. And I'm further pleased to say that it is due largely to the few VERY 
+generous donations I have recieved to date.
+
+    However, with each release I ponder the possibility of "requiring" a 
+registration. And with each release I go back and look at the list of donators 
+and am reminded that are some generous people out there who don't "need" to be 
+"required" to register a product to show their appreciation. And in the same 
+thought I wonder how many more registrations I would get if I "required" it.
+
+    And after it's all said and done, another FreeWare version of THD Proscan 
+is released. This one was an irritatingly close decision. This version 
+"almost" became shareware. The introduction of THDEXARC made this one a 
+difficult decision. THD is now at the point where it has introduced enough 
+features that it will be useful well into the future without requiring a 
+registration.
+
+    So my request is that if you use this product and you have any 
+appreciation for the effort that went into it, then please let me know. If you 
+can afford a few dollars, great. If not, drop me a letter or a netmail and 
+just say thanks. Addresses are available on the first screen of THDINSTL.EXE. 
+And above all, before you forget, reread the first line...
+
+Dave...

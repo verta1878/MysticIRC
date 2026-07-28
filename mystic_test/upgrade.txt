@@ -608,6 +608,28 @@ and then to 1.09 before following the instructions above.
 527 January February March April May June July August September October November December
 
  .---------------------------------------,
+
+ .---------------------------------------,
+ | UPGRADING 1.11IRC A3 TO A4             |-------------------------------
+ `---------------------------------------'
+- Stop all Mystic programs (mystic, mis, mutil)
+- BACKUP your entire BBS directory
+- Replace *ALL* executables with the new A4 build
+- Recompile all MPL programs (mplc -all in scripts directory)
+
+New in A4:
+- Password hashing: existing plaintext passwords auto-upgrade to
+  MD5 on next successful login. No manual action needed.
+- Spell check: drop libhunspell32.dll + dictionary.aff + dictionary.dic
+  in your data directory. See mystic_spell/SETUP.md for details.
+- Stale node detection: crashed nodes auto-reclaim after 5 minutes.
+- MIS shutdown: now exits cleanly within 1 second.
+- ANSI editor: color palette no longer corrupts the screen.
+- Install: now creates temp1-temp3 node directories.
+
+No record size changes — mystic.dat and users.dat are compatible.
+New PasswordHash field carved from RecUser Reserved space.
+
  | UPGRADING TO RIP BUILD                 |-------------------------------
  `---------------------------------------'
 

@@ -42,10 +42,10 @@
 
 Const
   mysSoftwareID  = 'Mystic BBS';
-  mysCopyYear    = '1997-2013';
-  mysVersion     = '1.11IRC A7';
+  mysCopyYear    = '1997-2026';
+  mysVersion     = '1.11IRC A3';
   mysDataChanged = '1.10 A11';
-  mysCopyNotice  = 'Copyright (C) ' + mysCopyYear + ' By James Coyle';
+  mysCopyNotice  = 'Copyright (C) 1997-2013 By James Coyle. IRC Fork (C) 2025-2026';
 
   {$IFDEF WIN32}
     PathChar = '\';
@@ -509,7 +509,8 @@ Type
     CodePage     : Byte;                  // 0 = CP437, 1 = UTF8
     QwkExtended  : Boolean;
     QwkNetwork   : LongInt;
-    Reserved     : Array[1..383] of Byte;
+    PasswordHash : String[40];             // MD5 hash: prefix + 32 hex, carved from Reserved
+    Reserved     : Array[1..342] of Byte;  // was 383, minus 41 for PasswordHash
   End;
 
   RecEvent = Record

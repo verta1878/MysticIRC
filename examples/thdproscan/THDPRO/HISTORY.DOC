@@ -1,0 +1,896 @@
+                             THD ProScan History
+                             -------------------
+
+Aug 20, 1992 - Ver 1.00 - First official release
+                 - a command.com compatible counterpart to
+                   the THDscan series of upload testers.
+
+Sept 28, 1992 - Ver 2.00 -
+        
+        Bugfix - Insert current directory for some "found" utilities 
+                 during install.
+        Bugfix - Fixed error when extensions not supplied during 
+                 installation.
+        Bugfix - Added conditional delay to the program, to allow the
+                 ansi screen to complete on fast systems.
+        Bugfix - Stopped upper imbedded indicator from flashing during 
+                 the entire embedded archive testing process.
+        Bugfix - Fixed some errors in the "move" routines which could
+                 cause runtime errors.
+        Bugfix - Redirected Scan.exe's output as it seems to find gateway
+                 if it is installed.
+        Bugfix - The tester now requires a drive and path before it will 
+                 begin operation.
+        Added  - Errorlevel 5 to retain compatibility with BBS programs which
+                 use this as an indicator that a file is to be resumed.
+        Added  - Support for NON-ansi users.
+        Added  - Removed any attempt to send user output when a fossil is 
+                 not found.
+        Added  - Internal archive identification by ID codes rather than 
+                 the previous use of extension . (also allows testing of 
+                 self-extracting archives)
+        Added  - The ability to preserve the AV in protected ZIP files.
+        Added  - The ability to fail files based on date.
+        Added  - Reporting of the BBS-name through the user-side ansi.
+
+Oct 27, 1992 - Ver 3.0 -No additions (Streamlined code and bugfixes)
+        
+        Bugfix - Internal archives which were not configured for, caused
+                 the system to choke with a runtime error. Fixed.
+        Bugfix - A runtime error #6 was reported by a limited number of
+                 systems (using Share.exe). Repaired.
+        Bugfix - A file failing the scan operation was still being
+                 reported as having failed scanning by "VER 1" (whoops).
+        Bugfix - Some optimizing of code resulting in a smaller exe file.
+
+Nov 15, 1992 - Ver 4.0 - Emergency release to fix a problem with Scan
+
+        Bugfix - The redirection of SCAN.EXE's output introduced in Version 
+                 2 was removed due to problems with detection errorlevels
+                 not being returned to the tester correctly under MS-DOS's
+                 command.com.
+
+        Bugfix - The ansi screen now correctly identifies the version.
+                 Version 3 reported version 2 on the ansi screen.
+
+Feb 1, 1993 - Ver 5.0 - Standard update
+
+        Added  - Installation can now read settings from the previous
+                 version of THDPRO.EXE and incorporate them into the present
+                 version. (only version 4 is supported for this feature)
+
+        Added  - Support for the new PKZIP 204e self extracting files.
+                 As a result Version 5 absolutely requires PKZIP version
+                 204e for the testing of "ZIP" archives.
+
+        Added  - A hack list can now be used (such as the "HACK REPORT")
+                 to avoid testing files with filenames that you do not want
+                 sent to your system. (files will fail but be saved)
+
+        Added  - The ability to supply a comport from the command line to
+                 override the default when being used on a multi-node system.
+
+        Added  - The use of comport "0" to suppress remote output.
+
+        Added  - THD ProScan now displays the name of the file being tested
+                 before testing begins as well as informing the sysop when
+                 testing has been completed.
+
+        Bugfix - Internal delays were lengthened for those systems with fast
+                 computers and slow communications.
+
+        Bugfix - Previous versions would choke on illegal filenames (fixed).
+
+Feb 12, 1993 - Ver 5.1 - Upgrade
+
+               - Issued an upgrade which repaired an incorrect version
+                 number for version 5 as well as restoring the "syntax
+                 report".
+
+               - Included THD ProScan's Terminal Assistant Version 2.
+                 Upgraded to avoid choking on directories and read only
+                 files.
+
+May 2, 1993 - Ver 6.0 - Standard update
+
+        Bugfix - An old problem for RA sysops has been found and removed.
+                 In some very odd circumstances, RA users had a problem with
+                 THD ProScan deleting the wrong directory. Due to the rarity
+                 of the occurrence and the inability to reproduce the
+                 effect, it was assumed to be a strange conflict between the
+                 tester and RA. I did however manage to find a way to
+                 duplicate the occurrence and have removed the problem code.
+
+        Bugfix - A change was made to allow simultaneous operation on two
+                 or more nodes. Previously this would cause problems with
+                 the testing and the logs.
+
+        Bugfix - A problem with previous versions, whereby certain directory
+                 structures could cause a runtime error 5 while testing
+                 archives has been repaired.
+
+        Bugfix - A user reported a Runtime error 103 when running THDPRO.EXE
+                 It was found that this error was caused by his deleting
+                 the directory in which THD expected to create his log
+                 files. When THD could not find the directory, it choked. It
+                 now tests for this condition and exits if unable to
+                 initialize the log file.
+
+        Bugfix - Reportedly, Version 5 failed "Gif-lited" files during the
+                 GIFTEST run. Unconfirmed, but version 6 properly recognizes
+                 an errorlevel 10 exit from Giftest.
+
+        Bugfix - Previous versions would fail valid archives if they did not
+                 have a proper file extension. Fixed.
+
+        Added  - Memory swapping while running the more "intense" tasks.
+                 Memory overhead will be reduced by about 48k during SQZ
+                 functions and SCAN functions. Memory reductions are
+                 compliments of TurboPower Software's EXECSWAP program.
+
+        Added  - Improved internal error checking to detect changes from
+                 original configuration.
+
+        Added  - Heuristic testing for viruses through the use of TBSCAN.EXE
+                 or F-PROT.EXE.
+
+        Added  - Installation can read settings from the previous
+                 version of THDPRO.EXE and incorporate them into the present
+                 version. (only versions 4 and 5 are supported for this
+                 feature). All future versions will support this feature for
+                 the two versions prior to itself.
+
+        Added  - Support for the new PKZIP 204g self extracting files.
+                 As a result Version 6 absolutely requires PKZIP version
+                 204g for the testing of "ZIP" archives. (All versions
+                 between 1.10 and 2.04g are supported)
+
+        Added  - Support for the SQZ archive type.
+
+        Added  - "Move/Rename" suppression for those BBS programs that
+                 choke when files are renamed or moved.
+
+        Added  - The ability to substitute a non-zero comport for the local 
+                 comport. Sysops who use a local logon to test files can now
+                 do so by telling THDPRO.EXE to substitute "0" when testing 
+                 on a different comport, thereby avoiding remote output during 
+                 logons to a specific node.
+        
+        Upgrade- Major code optimization and the introduction of encryption
+                 into the tester code resulting in a significantly smaller
+                 executable file.
+        
+        Change - The method used to identify the archives has been improved
+                 to increase the speed.
+
+        Change - Previously, it was recommended to compress the executable 
+                 file after installation. Due to the introduction of 
+                 encryption into this release, that recommendation no longer 
+                 holds. The tester will not work if the file is changed.
+
+        Change - Included THD ProScan's Terminal Assistant Version 3
+                 in the archive. Contains a fix for a problem when source
+                 and destination directories were the same as well as the
+                 ability to test directories other than the source
+                 configured internally. See THDTERM.DOC for details.
+
+May 9, 1993 - Ver 6.1 (Patch)
+
+        Bugfix - The release of TBSCAN version 6 meant that the parameters
+                 needed to interact with it would need to be revised. This
+                 upgrade changed the parameters so that TBSCAN would not
+                 exit with an error on every run.
+
+Jun 9, 1993  - Ver 7.0 - Standard Update
+
+        Bugfix - "GIF" and "TD0" files found internally to a valid archive type
+                 could cause version 6 to run forever. (fixed)
+
+        Bugfix - PkZip 204 "AV" codes are now properly recognized.
+
+        Bugfix - In some odd circumstances, version 6 could inadvertently
+                 remove the "current" directory instead of the temporary
+                 directory. (fixed)
+
+        Change - PkZip's "AV" protection is no longer optional.
+
+        Change - The parameters for TBSCAN version 6+ have been optimized.
+                 Support for earlier versions is no longer available.
+
+        Added  - The ability to supply a "list" of files to be removed from
+                 the archives.
+
+        Added  - Preservation of the Archive's original date and time.
+
+        Change - MAJOR coding changes have resulted in reduced memory usage,
+                 increased speed, and the ability to search much farther
+                 than previous versions.
+
+        Change - The order of drives selected for use can now be reversed
+                 or "rotated". (During the installation)
+
+        Change - A change in the way TurboSoft's EXECSWAP program was
+                 utilized has resulted in the release of all but about 5 k
+                 of THDPRO.EXE's memory when running external tasks. All
+                 calls to external programs are now done through EXECSWAP.
+                 The Program itself uses about 75k of memory.
+
+Jun 12, 1993 - Patch to version 7.1
+               Released both an upgrade (patch) and a full release.
+
+        Bugfix - Version 7 deleted all "GIF" and "TD0" files. fixed.
+
+        Bugfix - Previous version would not run if they were made
+                 "read only". Fixed.
+
+Jul 1, 1993 - Ver 8.0 - standard update
+
+        Bugfix - The ability to remove files from a "list" was rendered
+                 inoperable for "ZIP" and "ARJ" files. Fixed.
+
+        Bugfix - Version 7 could leave orphaned log entries under some
+                 normal circumstances. This has been repaired.
+
+        Bugfix - Some of the newer ARJ SFX files were not properly
+                 recognized. Fixed.
+
+        Bugfix - Version 7 could, under some circumstances, become unable
+                 to remove it's temporary directory. Fixed.
+
+        Bugfix - The add option of SQZ was including the paths to the added
+                 file. Fixed. SQZ files are now "updated" rather than
+                 "added" to avoid duplicates. Also the SQZ comment is now
+                 stripped before processing.
+
+        Added  - Version 8.0 now supports the HACKLIST "IDX" files directly
+                 as a list to be used for "hack checking". The "COL" file is
+                 still supported, as is the method described in the
+                 "THDPRO.DOC".
+
+        Added  - THD ProScan now supports the self extracting form of "HYP"
+                 files. Previously all Self extract data starting codes were
+                 hard coded into the EXE file. I have since found out how to
+                 read the executable header and now get the appropriate
+                 address from there.
+
+        Change - TBSCAN command line parameters needed to be changed again
+                 to remain compatible with TBSCAN version 6.03.
+
+        Change - The ARJ strip comment line was modified for compatibility
+                 with ARJ241.
+
+        Change - The PKZIP "add" line has been modified to use maximum
+                 compression when adding loaders to archives.
+
+        Change - Testing of SQZ archives will now be done on the same drive
+                 as the original archive whenever possible, due to SQZ.EXE
+                 experiencing difficulty when running across drives.
+
+        Change - Memory swapping has been fully optimized. THD ProScan
+                 Version 8 leaves barely over 2k in memory when performing
+                 external tasks.
+
+Nov 1, 1993 - Ver 9.0 - standard update
+
+        Bugfix - A rare error caused a few systems to hang (and/or report
+                 unwarranted errors) when testing some very specific files.
+                 Fixed.
+
+        Bugfix - The name of the main archive was not included in the
+                 heuristic log if one of its imbedded archives contained
+                 suspicious code. Fixed.
+
+        Bugfix - An error in the command line sent to TDCHECK caused valid
+                 TD0 files to fail the CRC test. Fixed.
+
+        Added  - Major addition of file conversions. 5 levels of conversions
+                 to choose from, as well as on-the-fly conversion for RG, TG
+                 and RA. (possibly the most complete file convertor
+                 available in ANY utility - dedicated or otherwise).
+
+        Added  - Description files can be imported into RemoteAccess 2.00,
+                 Telegard 2.7 File Data Bases directly by THDPRO.EXE
+                 (FILE_ID.DIZ, DESC.SDI, and DESC.SDN). In the case of viral
+                 detection, if this option is selected a message regarding
+                 the failure will be inserted instead (RA only).
+
+        Added  - Online help during installation.
+
+        Added  - Dos shell from installation.
+
+        Added  - Ability to put random and/or area-specific comments in
+                 archives as selected from a list.
+
+        Added  - Ability to put current date and/or time in user supplied
+                 file comments.
+
+        Added  - Ability for the sysop to customize the remote output
+                 through the use of ansi files (THDPRO.AN? and
+                 PAINSOFT.AN?). Providing an entire array of 21 possible
+                 output screens to be chosen from at random.
+
+        Added  - The ability to FORCE a single ansi output (PAINSOFT.ANS).
+
+        Added  - The ability to remove files from archives based on their
+                 CRC value.
+
+        Added  - The sysop may select to not automatically test files over a
+                 given size. If asked to test a file over the supplied size
+                 THDPRO will prompt the sysop for 5 seconds to press a key.
+                 If no key is pressed the file is not tested. Files skipped
+                 by this process will return the same errorlevel as a
+                 successful test.
+
+        Change - SHARE is now detected and files opened in shared mode if
+                 found. If access to a file is denied, THDPRO.EXE will wait
+                 for up to 30 seconds for the other process to release the
+                 file before aborting.
+
+        Change - THD ProScan will now finish in the same directory in which
+                 it started.
+
+        Change - SCAN.EXE is no longer mandatory.
+
+        Change - Heuristic failures can be considered virus infected.
+                 (optional if SCAN.EXE is used, mandatory if not)
+
+        Change - Option to use any or all of the supported virus scanners.
+
+        Change - Files original timestamp is optional (It can be kept or
+                 updated).
+
+        Change - Output during virus scanning with F-Prot or TBScan now
+                 shows the remote what tester is being used.
+
+        Change - Temporary directories are now chosen in a way which
+                 prohibits use of a directory that already exists.
+
+        Change - Orphaned temp directories will be removed on the
+                 second day following their creation.
+
+        Change - THDTERM4 is released with added support for users of
+                 FileDoor.
+
+        Change - THDDEMO.COM has been modified to support testing of the
+                 sysop supplied ansi screens/interfaces.
+
+Dec 14, 1993 - Ver 9.1 - Bugfix release
+
+        Bugfix - THD ProScan 9.0 had trouble with indexing some RemoteAccess
+                 2.00 and 2.01 FDB's. Fixed. THD should now update the FDB
+                 correctly.
+
+        Bugfix - Version 9.0 refused to add comments on "some" bbs setups.
+                 The problem was eventually traced to Share.exe and
+                 repaired.
+
+        Bugfix - Version 9.0 would lock some systems when attempting to
+                 strip the comments from PAK and/or ARC packets. Fixed.
+
+        Bugfix - A similar problem to that above was encountered by some
+                 systems with ARJ archives. This too has been fixed.
+
+        Bugfix - THDPRO.EXE from version 9.0 ignored the AV when removing
+                 files by CRC value in ZIP files. Fixed.
+
+        Bugfix - During the installation THDINSTL had severe difficulty
+                 dealing with "SCAN.EXE" when it was not in the dos path.
+                 Fixed.
+
+        Bugfix - During installation, if the sysop were to use the new dos
+                 shell and change directories and/or drives, THDINSTL would
+                 experience a runtime error #2. Fixed.
+
+        Bugfix - The settings as stated in the documents did not actually
+                 default to failing of heuristic tests when SCAN.EXE was not
+                 used. Fixed.
+
+        Bugfix - Persons running Share.exe experienced a runtime error when
+                 attempting to use CRC mode. Fixed.
+
+        Added  - The /KO parameter which will cause THDPRO.EXE to not delete
+                 the original file in conversion mode.
+
+        Added  - Support for FILE_ID.DIZ importation into TG via an external
+                 file called THDPRO.DIZ. (See TG-RG.TXT for details)
+
+        Added  - The THDOPT environment variable which allows "some" minor
+                 aspects of the tester to be modified. (See newin9-1.txt)
+
+        Added  - "/C" option to THDDEMO. Use of this option when testing
+                 PAINSOFT.AN? files will allow you to scroll through the
+                 various colour schemes available for the header. (See
+                 THDFILES.TXT)
+
+        Change - The colour of the identification lines (header) used during
+                 the display of PAINSOFT.AN? files are now configurable. See
+                 THDFILES.TXT for an explanation.
+
+        Change - The identification line used during the display of
+                 PAINSOFT.AN? files now reads "CUSTOM ANSI INTERFACE"
+                 instead of "USER SUPPLIED ANSI INTERFACE".
+
+        Change - Numerous minor changes have been made to the program in an
+                 effort to ease the potential problems running THD under a
+                 network environment.
+
+        Change - The detection process for ARC and PAK has been modified to
+                 lessen the false detections.
+
+        Change - The F-PROT command line has been modified for compatibility
+                 with F-PROT version 2.10.
+
+        Change - TBSCAN uses the TBSCAN.LNG and TBSCAN.SIG files from it's
+                 current directory (if they are present). THD now changes
+                 directories before running TBSCAN. (TBAV609 fixed this)
+
+        Change - TBSCAN version 6.08 also introduced a date checking
+                 procedure. If the files are older than 6 months, TBSCAN
+                 will prompt the sysop to press a key. Version 9.1 supplies
+                 the necessary switch to avoid this prompt.
+
+        Change - Running "THDDOC.EXE X" will cause THDDOC to extract the
+                 document to a text file called THDDOC.TXT (overwriting any
+                 file by the same name) in the current directory. (For those
+                 of you who prefer text files to the executable supplied.)
+
+Apr 21, 1994 - Ver 10m beta - Public Beta (Interim release to tide the
+                              usership over until 10.0 can be released).
+
+        Bugfix - The planned add-on support did not function correctly.
+                 (No add-ons were ever released.)
+
+        Bugfix - Rejections of files by "date" has been corrected from
+                 version 9.1.
+
+        Bugfix - Adding of archive comments has been repaired to add on
+                 every run. 9.1 experienced problem in some very specific
+                 circumstances.
+
+        Added  - Additional self checking to help ensure the integrity
+                 of the program.
+
+        Added  - Support for McAfee's VirusScan version 2.?.? via the
+                 THDOPT environment variable.
+
+        Added  - Best guess and newest file date options.
+
+        Added  - Three user definable conversion levels.
+
+        Added  - "Default" command line options. The ability to have
+                 THDPRO.EXE always process as if certain options had
+                 been supplied on the command line.
+
+        Change - The internal configuration format was overhauled in the
+                 interest of speed.
+
+        Change - The search routines were re-written to avoid detection of
+                 the volume label on systems running the OS/2 service pack.
+
+        Change - The filemodes used by THD were changed so that THDPRO.EXE
+                 would run under RAMGR (which leaves file open when it
+                 shells out).
+
+        Change - After loss of carrier, THDPRO.EXE now stops sending remote
+                 output.
+
+        Change - A major overhaul of LHA handling. "Cloning" to be
+                 used in special circumstances.
+
+        Change - THDTERM 5a beta. Avoids duplicate testing inherent with
+                 older versions and introduced the option to supply a
+                 comport other than "0".
+
+Aug 20, 1994 - Ver 10.0 - Major Upgrade (from 9.1)
+
+        ***
+           Note that changes made from the 10m beta are not listed here.
+           All changes in that beta are considered to be part of 10.0
+        ***
+
+        Added  - Secure Mode - A mode in which THDPRO.EXE attempts to
+                 verify that changes to utilities it uses do not go
+                 unnoticed. A "breach" during secure mode will abort
+                 the test without attempting to use the modified file.
+
+        Added  - Support for UC2 and RAR archive formats. Conversions to
+                 these formats are also supported.
+
+        Added  - Third party programmer support through the use of
+                 TESTINFO.DAT, a new data file containing much
+                 information about the file tested.
+
+        Added  - Comment keywords for descriptions, newest/oldest file,
+                 newest/oldest date and author/product information.
+
+        Added  - The "/LA" (Log All) switch to THDPRO.EXE.
+
+        Change - Major change to the testing/converting process. When
+                 space is available, all files will be expanded prior to
+                 virus scanning and conversions will take place without
+                 re-expanding all files. If this method fails, then
+                 THDPRO.EXE will revert to the old (one at a time) method
+                 at the cost of speed.
+
+        Change - The SCAN.EXE command line is now compatible with the SCAN
+                 2.x.x series. To use the 1.x.x series you must set the
+                 environment variable THDOPT=SC1.
+
+        Change - BBS updates are no longer done by THDPRO.EXE. They are done
+                 by a new utility called THDPLUS.EXE.
+
+        Change - The log directory "requirement". If THDPRO.EXE cannot
+                 locate the configured log directory, it will create its
+                 log in another directory (which is dependant on the users
+                 configuration).
+
+        Change - Fossil routines have been optimized to avoid overrun with
+                 faster systems.
+
+        Change - Ansi detection to not be "fooled" by "AVATAR" systems.
+
+        Change - File descriptions have been modified to reflect reasons
+                 for failure in cases where THDPRO.EXE fails a file.
+
+        Change - CRC failures are now subject to "Failed File Moving" if
+                 this option is set to normal. (previously these were left
+                 untouched.)
+
+        Change - The "Waiting" message will now only be displayed as a
+                 result of a "share" related violation. Also the name of
+                 the file in conflict will be reported by this message.
+
+        Change - Zip comments are now stripped internally by THDPRO.EXE.
+
+        Change - The option to limit by date or age now ignores the dates
+                 of directories and uses only actual file dates.
+
+        Change - Imbedded scanning is no longer reported due to its speed.
+                 The space it had previously occupied is replaced by
+                 Re-Archiving.
+
+        Change - The method of drive detection in THDINSTL has been modified
+                 to be faster and avoid some access problems with some CD-ROM
+                 changers.
+
+        Change - THDINSTL.EXE can be renamed to simplify installation on a
+                 network (or run THDINSTL.EXE /NET). See THDDOC for details.
+
+Mar 7, 1995 - Ver 11.0 - Emergency Release / bugfix
+
+        Bugfix - The file failing by age and/or date was rendered inoperable
+                 in version 10.0. Fixed.
+
+        Bugfix - Version 10.0 would initialize the comport if a fossil was
+                 detected (even if running in local mode). Fixed
+
+        Bugfix - Files were not properly added during conversions.
+
+        Bugfix - Conversion had difficulty with some files due to their names.
+                 This version now looks for these files and does not convert
+                 them.
+
+        Bugfix - Conversion will fall back to the old method when
+                 non-convertible internal archives are found.
+
+        Bugfix - The removal by list feature has been completely reworked for
+                 better performance.
+
+        Bugfix - The /NFL (/NOFLOPPY) switch has been repaired and should
+                 now operate correctly.
+
+        Bugfix - Logging of failed scans of non archive types has been
+                 corrected.
+
+        Bugfix - Remote delays have been shortened. This should fix the
+                 output on many faster systems which previously may have
+                 "appeared" to be sending at 1200 BPS.
+
+        Bugfix - THDPLUS has been completely reworked in reference to
+                 FILES.BBS.
+
+        Bugfix - THDINSTL /NET (or NETINSTL) was adding "C:\" to all paths
+                 without drive letters. Fixed.
+
+        Bugfix - The names of THDPRO.EXE's temporary subdirectories have
+                 been changed to avoid problems for those who utilize a
+                 country code other than 437.
+
+        Bugfix - Removed the error I've come to know as
+                 THD ERROR=59. File not found.
+
+        Bugfix - Fixed a share error which could occur when a file's size
+                 was over your maximum test size.
+
+        Change - The program has been modified to avoid the "allfiles" warning
+                 given by TBSCAN.EXE version 6.32+. These newer versions will
+                 not work with THDPRO.EXE prior to version 11.0.
+
+        Change - The ARJ security envelope is no longer allowed to verify
+                 itself except during the "CRC test" portion of testing.
+
+        Change - Added the "/NOEMS" switch to the SCAN.EXE parameters for
+                 the 2 series of SCAN. This will was necessary to avoid window
+                 closures in Windows dos sessions.
+
+        Added  - CHGINFO.EXE which can change the path information in
+                 TESTINFO.DAT records to match the file's current location.
+                 Use is very specific, please see the documentation for
+                 details.
+
+        Added  - THDPRO.EXE and THDINSTL.EXE now reports the absence of
+                 SCAN's *.DAT files.
+
+        Added  - Support for RAR "AV"ed archives. THD now recognizes them
+                 and has the ability to create them via THDRAR=TRUE.
+
+        Added  - THDPLUS can now also extract the description for a file
+                 to an external text file. (THDPLUS /EXTRACT) As well,
+                 initial support has been added for T.A.G. 2.7, Telegard
+                 version 3.0 (working name) and for RemoteAccess version 2.5+
+                 and for PCBoard 15+. many of the features in this version of
+                 THDPLUS are untested. It should be treated as a BETA for
+                 other than previously supported features.
+
+Nov 25, 1995 - Ver 12.0 -
+        Standard upgrade / Introduction of the OS/2 native version.
+
+        Bugfix - THDPLUS.EXE was modified to properly account for T.A.G.
+                 multinode setups.
+
+        Bugfix - Fixed an error in the fossil routines which could cause
+                 some systems to lock up if carrier was dropped during
+                 the test process.
+
+        Bugfix - Fixed the "adding" of files to AV'ed zip files during
+                 conversion. (Version 11.0 would corrupt the newly AV'ed
+                 archive.)
+
+        Bugfix - GIF files could fail a virus scan due to an error in the
+                 SCAN.EXE command line. Valid GIF's are no longer scanned.
+
+        Bugfix - CHGINFO could "miss" some directories when looking for
+                 FILES.BBS (Fixed).
+
+        Bugfix - The four file dating options were inoperable in version 11.0
+                 (fixed).
+
+        Bugfix - The THD ERROR CODE = 58 which occurred on OS/2 systems
+                 "should" be repaired. If this is not the case, try the new
+                 OS/2 native version.
+
+        Bugfix - Fixed the problem with Telegard 3.0 (2.99 Gamma) which
+                 resulted in duplicate entries when the "add" option was not
+                 specifically invoked. Entries may still be added to the TG3
+                 FDB by using /ADD on the THDPRO.EXE command line or by
+                 SET THDOPT=ADD, however without one of these switches,
+                 THDPRO.EXE will only update existing entries.
+
+        Change - Dropped internal support for SCAN version 1.?.?
+
+        Change - The Hacklist feature will now recognize the BADFILES.CTL
+                 format.
+
+        Change - Further improvements to the LHA cloning.
+
+        Change - Archive diagnosis is more complete which allows for avoiding
+                 problems with multivolume archives as well as avoiding the
+                 password prompt on protected RAR archives. This change allow
+                 for some other minor improvements as well.
+
+        Change - Files on drive "A" or drive "B" will always be treated as
+                 "read-only" allowing no changes to files resident on those
+                 drives. (This was in fact active in version 11.0 but not
+                 documented.)
+
+        Change - "add" Gifspecs to the description. [RA only]
+
+        Added  - THDEXARC, which allows for addition of virus scanners and
+                 archive types not supported internally by THDPRO.EXE. This
+                 feature adds considerable functionality to the program.
+
+        Added  - Secure mode is now reported in the log and on the screen.
+
+        Added  - The ability to "envelope" non supported file types in an
+                 archive (convert specific non-archives to one of the
+                 supported archive types).
+
+        Added  - The ability to hit "P" during a dos process to cause that
+                 process to pause before returning to THDPRO.EXE (to view dos
+                 output before it disappears). When "P" is used to pause the
+                 screen, press any key to return control to THDPRO.EXE.
+
+        Added  - "/RO" to treat the test file as "read-only" (no changes
+                 what-so-ever to the original file).
+
+        Added  - "Deep" removal. (removal of files from subdirs and
+                 imbedded archives). This feature is available ONLY during
+                 conversion, and ONLY for those archive types which will
+                 actually be converted.
+
+        Added  - Support for UNP. If configured UNP will be run on every file.
+                 UNP expands compressed executable files to improve the
+                 chances of viral detection. This feature is NOT active during
+                 conversion since it will change the original files.
+
+        Added  - The ability for the user to limit the amount of disk space
+                 used during a test. Two such options exist. The ability to
+                 configure a minimum amount of free space or a maximum amount
+                 of space to be used for expansion. (See "Limits" note)
+
+        Added  - The ability for the user to limit the amount of time allowed
+                 for expansion of files. (See "Limits" note)
+
+        Added  - "/OV" switch to over-ride the new time and space limits.
+
+      * Limits - The new limits are checked "only" after expansion of the
+                 archives and may not have any effect on archives which
+                 contain no imbedded archives. Space limits during testing of
+                 specific archive types (RAR - ARJ - LHA - ZIP) may be
+                 "calculated" prior to any expansion resulting in no expansion
+                 taking place if limits are "expected" to be exceeded.
+                 These limits can be ignored by us the the new "/OV" switch on
+                 the command line for manual testing.
+
+Dec 25, 1995 - Ver 12.1 - BugFix
+
+        Bugfix - During conversion, version 12.0 would rename all imbedded
+                 archives back to their original name after conversion. This
+                 version correctly only renames those files with non-standard
+                 extensions.
+
+        Bugfix - The expected errorlevel (EXIT_LEVEL) in the TESTINFO.DAT was
+                 not always recorded correctly. This cause programs which
+                 attempted to use this information to pass files which failed
+                 testing. Corrected.
+
+        Bugfix - Corrected a typo in THDINSTL on the final screen where option
+                 "J" reported 'press "K" to modify'.
+
+        Bugfix - On occasion, selecting one option from the final screens,
+                 upon completion of configuration of that option THDINSTL
+                 would automatically prompt for input in regard to another
+                 option (Fixed).
+
+        Bugfix - THDPLUS when recording the "old" description from RA's FDB
+                 would sometimes record multiple descriptions (or portions of
+                 multiple descriptions) in addition to the correct
+                 description. Fixed.
+
+        Bugfix - ZIP idenification has been modified again to avoid the long
+                 delays identifying corrupted ZIP archives.
+
+        Bugfix - The OS/2 comport initialization was not working in all
+                 instances. The THDPORT=??? options did not "apparently" work
+                 where passing the file handle on the command line did.
+                 Corrected
+
+        Bugfix - The T.A.G. structures did not "convert" well to the OS/2
+                 version which resulted in a runtime error 100. The source of
+                 the problem has been found and corrected.
+
+        Change - Ansi detection is now disabled if ANSI is forced via the
+                 THDOPT environment variable.
+
+        Change - Formatting of the description for FILES.BBS is now only done
+                 if the description does NOT quailify as a valid FILE_ID.DIZ
+                 in respect to it's line length.
+
+        Change - THDEXARC has been changed slightly so as to disallow changes
+                 to the parameter and path fields when dealing with "INTERNAL"
+                 archive types.
+
+        Change - THDDEMO.EXE has been modified to more correctly display the
+                 ansi's on some ansi drivers (notably the one included with
+                 MS-DOS version 6.2x) which fail to properly translate the
+                 <esc>K sequence.
+
+        Change - THDPLUS will not mark TESTINFO records processed when the
+                 TELEGARD v3 (2.99) BBS type is used unless THDPRO.EXE has
+                 processed the record twice or Telegard has marked the record
+                 as processed. This will allow TG sysops to keep THDPLUS in
+                 the same directory as THDPRO.EXE without TG being unable to
+                 find it.
+
+        Change - The coding which surrounds the area known as THD ERROR = 58
+                 has been completely reworked "again" in the hope of solving
+                 this problem for OS/2 users of the DOS version.
+
+        Change - When creating archives from non-archives, THDPRO.EXE will now
+                 also "add" any files to the newly created archive which you
+                 have configured for adding to archives.
+
+        Added  - Added a BBS definition to support FILES.BBS type using the
+                 "|" (pipe) code to indicate extended description use.
+
+        Added  - A new option for THDOPT. SET THDOPT=ADDSPACE## will allow the
+                 addition of extra spaces to the front of the extended
+                 descriptions during FILES.BBS updates (## is the number of
+                 spaces to add).
+
+        Added  - In the OS/2 VERSION ONLY, the ability to set the priority
+                 level used by THDPRO.EXE during operation. Four switches
+                 /PR1, /PR2, /PR3 and /PR4. /PR1 is low priority and /PR4
+                 is high priority.
+
+        Added  - A section of documentation regarding UNP usage was
+                 inadvertently missed. It is included as UNP.TXT.
+
+        Added  - Dupe Checking. Select to create a DUPE LIST in THDINTSL.EXE
+                 and thereafter use the /DC switch to check for files which
+                 have already been processed. (Records kept are via CRC/SIZE,
+                 so modified files of the same name which are not identical to
+                 previously tested files will not be considered dupes.
+
+Feb 28, 1996 - Ver 12.2 - BugFix (no additions or changes)
+
+       Bugfix - An Error in THDPLUS messed (and sometimes missed) the FDB
+                updating with the T.A.G. BBS type. Fixed
+
+       Bugfix - An error in THDPLUS could cause problems when updating
+                descriptions of files other than the last file in an RA FDB.
+                Fixed.
+
+       Bugfix - The File Date "Use File's upload date and time" was not
+                functioning. Fixed.
+
+       Bugfix - The docs refer to two options in regard to Failed File Moving.
+                They incorrectly state the options as Active and Inactive.
+                THDINSTL.EXE has been modified to match this wording.
+
+       Bugfix - I finally managed to reproduce the "THD ERROR = 58" error and
+                I "believe" I have solved it. (This one should get a prize for
+                being the most elusive bug to date)
+
+       Bugfix - A change in the handling of Zip files caused the "AV" flag to
+                be reset in THDPRO.EXE during Convert-Only mode. This
+                effectively resulted in THDPRO.EXE ignoring the "AV" when the
+                /CO switch was used. Fixed.
+
+       Bugfix - An error on the command line causes ZIP.EXE to not include
+                subdirectories when rearchiving files. Fixed.
+
+       Bugfix - THDINSTL.EXE incorrectly stated that removal of files by list
+                supported wildcards within this list. THDPRO.EXE has been
+                modified to allow wildcards in that list.
+
+       Bugfix - Imbedded SFX archives were not being converted back to SFX
+                archives. Instead they were being left in their native archive
+                format. Fixed.
+
+       Bugfix - THDEXARC.EXE's EXPORT function was inserting an "EXTERNAL"
+                declaration when exporting virus scanners. This caused
+                subsequent imports to fail. Fixed.
+
+       Bugfix - An error in the switches used with RAR.EXE caused it to add
+                the full path to any files it added to an archive. This has
+                been corrected.
+
+       Change - THDPRO.EXE has been modified slightly to handle THDEXARC
+                records slightyl differently if the expansion and compression
+                fields contain "N/A" (without the quotes). This will cause
+                THDPRO.EXE to treat the "archiver" as a TEST-ONLY file
+                (similar to GIFTEST) which in effect avoids attempts to expand
+                or otherwise manipulate the file. (useful for tools like
+                GFXCheck).
+
+Mar 20, 1996 - Ver 12.3 - BugFix (no additions or changes)
+
+       Bugfix - An error in the wildcard expansion could cause THDPRO.EXE to
+                expand a blank entry to the equivalent of "*.*". Fixed.
+
+       Bugfix - An error in THDPLUS which could cause GIFSPEC addition to
+                muddle the indexes in the RA FDB. Fixed.
+
+       Bugfix - An error in THDPLUS could cause it to choke for RA if it
+                resides on a drive other than the BBS drive if the RA
+                configuration did not supply drive letters. Fixed.
+
+       Bugfix - THDPRO.EXE now makes a conscious effort to avoid INFO-ZIP's
+                need to "ask" for a password. Password protected files which
+                are to be tested by UNZIP.EXE are deemed to have failed the
+                CRC test. Previously UNZIP.EXE would prompt the user for a
+                password.
+
+       Bugfix - Fixed the file removal by list when using INFO-ZIP's ZIP.EXE
+                under OS/2.

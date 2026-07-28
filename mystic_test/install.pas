@@ -378,6 +378,11 @@ Begin
   MakeDir (Config.OutBoundPath);
   MakeDir (Lang.TextPath + 'icon' + PathChar);     { icon files }
   MakeDir (Lang.TextPath + 'font' + PathChar);     { font files }
+
+  { Create temp directories for nodes — at least temp1 for local mode }
+  MakeDir (Config.SystemPath + 'temp1' + PathChar);
+  MakeDir (Config.SystemPath + 'temp2' + PathChar);
+  MakeDir (Config.SystemPath + 'temp3' + PathChar);
 End;
 
 Procedure ExtractFile (Y : Byte; Desc, FN, EID, DestPath : String);

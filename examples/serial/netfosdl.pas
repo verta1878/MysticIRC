@@ -24,10 +24,21 @@ program netfosdl;
   no NMServer, no virtual comport. Links ppcross8086 + msdos RTL only.
 
   Drop-in replacement for X00, BNU, ADF, NetFoss.
+  Based on Dedrick Allen's original NetModem/32 FOSSIL specification
+  and the X00 command-line interface.
 
   Usage:
-    netfosdl [/port:N]    load on COM port N (1-4, default 1)
-    netfosdl /u           unload from memory
+    netfosdl                  load on COM1 (default)
+    netfosdl /port:N          load on COM port N (1-4)
+    netfosdl /baud:RATE       set initial baud rate (default 9600)
+    netfosdl /irq:N           override IRQ (default: COM1/3=4, COM2/4=3)
+    netfosdl /fifo:N          FIFO trigger level (1, 4, 8, 14; default 14)
+    netfosdl /nofifo          disable 16550 FIFO (force 8250 polled mode)
+    netfosdl /u               unload from memory
+
+  X00-compatible parameters (recognized for compatibility):
+    netfosdl /B:N             same as /baud:N
+    netfosdl /P:N             same as /port:N
 
   Architecture:
     BBS ──INT 14h──> Int14Handler ──> FossilDispatch ──> serial.pas ──> real UART
@@ -45,7 +56,7 @@ program netfosdl;
 {$MODE OBJFPC}
 
 uses
-  Dos, fossil, serial;
+  Dos, SysUtils, fossil, serial;
 
 const
   VERSION = 'netfosdl 0.1 — FTSC FOSSIL driver (GPLv3)';
@@ -54,6 +65,10 @@ var
   OldInt14: Pointer;
   PortNum: Integer;
   Unloading: Boolean;
+  InitBaud: LongInt;
+  InitFIFO: Integer;
+  UseFIFO: Boolean;
+  OverrideIRQ: Integer;
 
 { ===========================================================================
   INT 14h handler — the entry point the BBS calls.
@@ -126,7 +141,7 @@ procedure Install;
 begin
   WriteLn(VERSION);
   WriteLn('Installing on COM', PortNum, ' (base $',
-          HexStr(COM_BASE[PortNum - 1], 3), ')...');
+          HexStr(COM_BASE[PortNum - 1], 3), ', baud ', InitBaud, ')...');
 
   { Verify the UART exists before going resident }
   if SerDetectUART(PortNum - 1) = 'none' then
@@ -207,35 +222,89 @@ end;
 procedure ParseArgs;
 var
   i: Integer;
-  arg: String;
+  arg, val: String;
+  p: Integer;
+
+  function ArgVal(const prefix: String): String;
+  begin
+    if Copy(UpCase(arg), 1, Length(prefix)) = UpCase(prefix) then
+      Result := Copy(arg, Length(prefix) + 1, Length(arg))
+    else
+      Result := '';
+  end;
+
 begin
   PortNum := 1;
+  InitBaud := 9600;
+  InitFIFO := 14;
+  UseFIFO := True;
+  OverrideIRQ := -1;
   Unloading := False;
 
   for i := 1 to ParamCount do
   begin
     arg := ParamStr(i);
+
     if (arg = '/u') or (arg = '/U') or (arg = '-u') then
       Unloading := True
-    else if (Copy(arg, 1, 6) = '/port:') or (Copy(arg, 1, 6) = '/PORT:') then
+
+    { /port:N or X00-compatible /P:N }
+    else if (ArgVal('/port:') <> '') or (ArgVal('/P:') <> '') then
     begin
-      PortNum := Ord(arg[7]) - Ord('0');
+      val := ArgVal('/port:');
+      if val = '' then val := ArgVal('/P:');
+      PortNum := Ord(val[1]) - Ord('0');
       if (PortNum < 1) or (PortNum > 4) then
       begin
-        WriteLn('ERROR: port must be 1-4. Got: ', arg[7]);
+        WriteLn('ERROR: port must be 1-4. Got: ', val);
         Halt(1);
       end;
     end
+
+    { /baud:RATE or X00-compatible /B:N }
+    else if (ArgVal('/baud:') <> '') or (ArgVal('/B:') <> '') then
+    begin
+      val := ArgVal('/baud:');
+      if val = '' then val := ArgVal('/B:');
+      InitBaud := StrToIntDef(val, 9600);
+      if InitBaud < 300 then InitBaud := 300;
+    end
+
+    { /irq:N }
+    else if ArgVal('/irq:') <> '' then
+    begin
+      val := ArgVal('/irq:');
+      OverrideIRQ := Ord(val[1]) - Ord('0');
+    end
+
+    { /fifo:N }
+    else if ArgVal('/fifo:') <> '' then
+    begin
+      val := ArgVal('/fifo:');
+      InitFIFO := StrToIntDef(val, 14);
+      if not (InitFIFO in [1, 4, 8, 14]) then InitFIFO := 14;
+    end
+
+    { /nofifo }
+    else if (arg = '/nofifo') or (arg = '/NOFIFO') then
+      UseFIFO := False
+
     else if (arg = '/?') or (arg = '-h') or (arg = '--help') then
     begin
       WriteLn(VERSION);
       WriteLn;
       WriteLn('Usage:');
-      WriteLn('  netfosdl              load on COM1 (default)');
-      WriteLn('  netfosdl /port:N      load on COM port N (1-4)');
-      WriteLn('  netfosdl /u           unload from memory');
+      WriteLn('  netfosdl                  load on COM1 (default)');
+      WriteLn('  netfosdl /port:N          COM port 1-4');
+      WriteLn('  netfosdl /baud:RATE       initial baud rate (default 9600)');
+      WriteLn('  netfosdl /irq:N           override IRQ');
+      WriteLn('  netfosdl /fifo:N          FIFO trigger (1/4/8/14, default 14)');
+      WriteLn('  netfosdl /nofifo          disable 16550 FIFO');
+      WriteLn('  netfosdl /u               unload from memory');
       WriteLn;
-      WriteLn('Drop-in replacement for X00, BNU, ADF, NetFoss.');
+      WriteLn('X00-compatible: /B:N = /baud:N, /P:N = /port:N');
+      WriteLn;
+      WriteLn('Based on Dedrick Allen''s NetModem/32 + X00 specification.');
       WriteLn('FTSC FSC-0015 rev 5 + FSC-0072. Real UART, no network.');
       Halt(0);
     end;

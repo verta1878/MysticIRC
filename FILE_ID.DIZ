@@ -1,18 +1,17 @@
 Mystic BBS 1.11IRC A7
 GPLv3 Community Fork (IRC)
-Ecstasy BBS — FTN 1:152/158
+FTN 1:152/158
 Linux, Win32, DOS, OS/2
 
 RIPscrip v1.54 (42/42 commands)
 RIPView + Free Vision TUI
 chg2rip/ans2png pixel-perfect
-BINKP FTS-1026 FidoNet AreaFix
-MARC ZIP + MP3/MP4 metadata
-MIS Telnet FTP HTTP SMTP POP3
-NNTP BINKP + system tray icon
+Password MD5 + Hunspell
+Serial v1.1 UART/FOSSIL/IRQ
+MIS tray icon + clean shutdown
 20 MPL scripts, 237 functions
-MIDE help system (mplfunc.txt)
-FOSSIL serial for DOS dial-up
+Zmodem >2GB (Int64 fix)
+mterm terminal + OpenOLMS
 
 Built with FPC 2.6.4irc r3.1
 18 PE32 i386 Win32 binaries

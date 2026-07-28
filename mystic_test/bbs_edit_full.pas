@@ -741,6 +741,71 @@ Begin
   If (CurLine < mysMaxMsgLines) And Added Then Inc(CurLine);
 End;
 
+Procedure SpellCheckMessage;
+Var
+  Line     : Integer;
+  Col      : Integer;
+  Word     : String;
+  Suggest  : String;
+  InWord   : Boolean;
+  WStart   : Integer;
+  Checked  : Integer;
+  Errors   : Integer;
+  Ch       : Char;
+Begin
+  If Not TBBSCore(Session).SpellCheck.Loaded Then Begin
+    Session.io.OutFullLn('|12Spell check not available (dictionary not found).|07');
+    Exit;
+  End;
+
+  Checked := 0;
+  Errors  := 0;
+
+  Session.io.OutFullLn('|14Spell checking...|07');
+
+  For Line := 1 to CurLine Do Begin
+    Col := 1;
+
+    While Col <= Length(TextData[Line]) Do Begin
+      { Skip non-alpha characters }
+      While (Col <= Length(TextData[Line])) And Not (TextData[Line][Col] in ['A'..'Z', 'a'..'z', '''']) Do
+        Inc(Col);
+
+      If Col > Length(TextData[Line]) Then Break;
+
+      { Collect word }
+      WStart := Col;
+      Word := '';
+
+      While (Col <= Length(TextData[Line])) And (TextData[Line][Col] in ['A'..'Z', 'a'..'z', '''', '-']) Do Begin
+        Word := Word + TextData[Line][Col];
+        Inc(Col);
+      End;
+
+      If Length(Word) < 2 Then Continue;
+
+      Inc(Checked);
+
+      If Not TBBSCore(Session).SpellCheck.CheckWord(Word) Then Begin
+        Inc(Errors);
+        Suggest := TBBSCore(Session).SpellCheck.Suggest(Word);
+
+        Session.io.OutFull('|12Line ' + strI2S(Line) + ': |14"' + Word + '"');
+
+        If Suggest <> '' Then
+          Session.io.OutFull(' |07→ |10' + Suggest);
+
+        Session.io.OutFullLn('|07');
+      End;
+    End;
+  End;
+
+  Session.io.OutFullLn('|07Checked |15' + strI2S(Checked) + '|07 words, |15' + strI2S(Errors) + '|07 misspelled.');
+
+  If Errors = 0 Then
+    Session.io.OutFullLn('|10No spelling errors found.|07');
+End;
+
 Procedure Commands;
 Var
   Ch  : Char;
@@ -752,7 +817,7 @@ Begin
   Repeat
     Session.io.OutFull (Session.GetPrompt(354));
 
-    Ch := Session.io.OneKey ('?ACDHQRSTU', True);
+    Ch := Session.io.OneKey ('?ACDHKQRSTU', True);
 
     Case Ch of
       '?' : Session.io.OutFullLn (Session.GetPrompt(355));
@@ -772,6 +837,11 @@ Begin
             End;
       'H' : Begin
               Session.io.OutFile ('fshelp', True, 0);
+              Exit;
+            End;
+      'K' : Begin
+              { Spell check entire message }
+              SpellCheckMessage;
               Exit;
             End;
       'Q' : Begin

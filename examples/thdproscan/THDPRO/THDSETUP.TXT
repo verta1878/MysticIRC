@@ -1,0 +1,470 @@
+
+     Due to the number of requests from sysop's on "how" to set up
+THD ProScan to work with their BBS programs, I am including this explanation
+for setup in RA 2.?? (2.00, 2.01 and 2.5?), WWIV, Renegade 07-17 (and 100%
+compatible ONLY), Telegard (2.7 and 3.??) , PCBoard (15.?), Maximus, EzyCom, 
+Wildcat and T.A.G. 2.7?.
+     Although it works equally well with other BBS programs, These are the
+only programs which I can supply any assistance with. Most of these setup 
+suggestions have been supplied by users of THD ProScan.
+     But first a multi-purpose batch file for those wishing to test numerous 
+files in a single directory. 
+
+         **********************************************************
+         ** IT IS IMPORTANT THAT ANY BBS RUNNING THDPRO.EXE SWAP **
+         ** OUT IT'S  MEMORY SO THAT THDPRO.EXE  CAN EFFECTIVELY **
+         ** RUN THE VARIOUS ARCHIVE UTILITIES AND VIRUS SCANNERS **
+         **********************************************************
+
+     Needless to say... BE SURE TO SELECT THE PROPER BBS TYPE IN THDINSTL
+
+* - * - * - * - * - *
+
+                           GENERAL PURPOSE BATCH FILE
+                           --------------------------
+                           (See THDTERM.EXE as well)
+DIRTEST.BAT
+-----------
+@ECHO OFF
+CTTY CON
+FOR %%F IN (%1\*.*) DO C:\THDPRO\THDPRO.EXE %%F
+
+
+This will cause all files in the supplied directory to be tested. However, 
+be warned that only the errorlevel from the last file tested will be 
+returned to the calling program.
+Syntax for this batch file would be C:\THDPRO\DIRTEST.BAT C:\TEST
+where DIRTEST.BAT is located in "C:\THDPRO" and "C:\TEST" is the directory 
+containing the files to be tested.
+
+(Some command processors may require that the "%%F" above be replaced by "%F" 
+when run from the command line.)
+
+* - * - * - * - * - *
+
+                           TELEGARD 3.0 (2.99 Gamma 4)
+                           -------------------------
+Configure THDPRO.EXE with your desired settings, taking special care to select 
+TG 3.0 as your BBS type. Supply the path to your main TG directory when asked 
+and answer "yes" to update file data bases.
+
+Load Telegard
+From the WFC press "S" (System config)
+Select "F" (File system)
+Make sure option "D" is set to "Yes"
+Make sure option "U" is set to "Upload Processor"
+Select "7" (Upload processor)
+enter "C:\THDPRO\THRPO.EXE ~AF ~CP"
+      (substitute the correct path to THDPRO.EXE)
+enter "0" (for passed errorlevel)
+select "8"
+enter "yes" to use TESTINFO.DAT
+enter "C:\THDPRO\"
+      (substitute with your THDPRO directory)
+Quit back to the WFC
+
+    Some users have reported that using THD causes duplicate file entries. 
+This is almost certainly caused by changes made by THDPLUS.EXE to the TG file 
+data base(s). To avoid this problem either rename or delete THDPLUS.EXE from 
+the THDPRO directory. TG will use the TESTINFO.DAT file created by THDPRO.EXE 
+to update it's file bases and THDPLUS is therefore unnecessary with this 
+configuration.
+    THDPRO.EXE runs THDPLUS automatically if it exists in the same directory. 
+Renaming is recommended to avoid this while it still allows you the 
+opportunity to run it manually if you should ever require it. Deleting 
+accomplishes the same result but does not afford the ability to run it 
+manually.
+
+* - * - * - * - * - *
+
+                                  TELEGARD 2.7
+                                  ------------
+     Lets start from scratch..
+make a dir called C:\THDPRO
+change to that directory.
+unarchive the THD Proscan archive into that directory.
+run THDINSTL.EXE
+answer all the questions and double check the settings on the final
+   screens as if your life depended on it's being correct.
+change to your BBS directory.
+type TELEGARD -K
+press "P"
+press "F"
+look at option "L".. make note of the path here
+shell to dos.
+go to the directory just seen in option "L".
+copy THDPRO.EXE and THDPLUS.EXE from C:\THDPRO\ to this directory.
+return to TG (exit shell).
+press "A"
+press "M"
+press "1" (which I assume will correspond to the "ZIP" archive type)
+check the first option to be sure it is marked "ACTIVE" (if not mark it
+     active).
+change line "#6" to read "THDPRO.EXE @F"
+Press "Q" until you are back at the "WFC" screen and from their do a local
+     logon.
+Once logged on.. Go to the file section and list the files long enough to
+     find the name of a single valid "zip" file.
+now type at the menu prompt "//\\AT"
+enter the name of the "zip" filename you just found using "list"
+answer no to delete files question.. and No to search all dirs question.
+watch the output on your side to see if the file is being scanned.
+
+     The ONLY reason that this process (if followed EXACTLY) would not 
+work.. is because you have no directory listed under option "L" (as above). 
+IF you do not have a directory specified there, then change the "line #6" 
+mentioned above to include the full path "C:\THDPRO\THDPRO.EXE @F".. DO NOT 
+enter this if there is a path in option "L" or the archive tester will not 
+be found.
+     Also.. you might wish to test it from the command line as follows to be 
+sure that it works.
+type
+C:\THDPRO\THDPRO.EXE C:\COMMAND.COM
+     This will show you the scanner at work and if you do not see this type
+of screen when run from TG.. then you have failed in configuring TG NOT the 
+fault of the scanner.
+     This is FAR more detailed than I had ever hoped to have to get. Any TG 
+sysop should be able to accomplish this without such detail.. BUT given that
+you may never have had to do this before.. Follow the instructions 
+EXACTLY!!!!
+
+* - * - * - * - * - *
+                  
+                           Renegade v07-17 Beta
+                           --------------------
+
+1. Make a directory for THD ProScan.  We'll assume for now that you've
+   called it "C:\THDPRO".  Change to that directory.  Unarchive
+   the THD ProScan distribution archive into that directory.
+2. Run THDINSTL.EXE.  Answer all the questions, and double check that the
+   settings are correct on the final screens.
+3. Change to your main BBS directory, and type "RENEGADE.EXE -L".
+   Press "S" to enter the system configuration menu.  Press "A" to enter 
+   the main BBS configuration menu.  Look at option "9", your archivers 
+   path, and make a note of the path here.
+4. Shell to DOS.  Change to the directory you just saw in option "9".  If it
+   doesn't exist, create it.  Copy THDPRO.EXE from C:\THDPRO to
+   this directory. Return to Renegade (type "EXIT").
+5. Press "Q" to leave the main BBS configuration menu.  Press "L" to
+   enter the archivers configuration menu.  Press "M" to modify an 
+   archiver.  Press the number of any archiver that has a "+" in front 
+   of it (in other words, any active archiver) and hit ENTER.  Change 
+   option number 6 ("File testing cmdline") to read "THDPRO.EXE %F".  
+   If you are running more than one node, you should change this to read
+   "THDPRO.EXE %F %P".  (You can also do this if you only run one node 
+   if you like, but it's not necessary.)  Repeat step number 5 until 
+   you've setup THD ProScan in option number 6 for every active 
+   archiver.
+
+If you followed this process exactly, the only reason it wouldn't work is 
+if you hadn't defined your archivers directory.  (Option "9" from "MAIN 
+BBS CONFIGURATION".)  If you have NOT specified an archivers directory, then 
+you can change the commandline in each of your archivers to read
+"C:\THDPRO\THDPRO.EXE %F".  Use the full path ONLY if you haven't already 
+specified a path in your archivers setup.
+Most sysops should be able to figure this out.  If THD ProScan DOESN'T work, 
+then try going through this process once more, and make sure you
+follow the instructions EXACTLY.
+
+     Note that not mentioned above is the need to have RG swap out prior to 
+running THDPRO.EXE. Failure to swap RG could result in failed scan sessions 
+or other memory shortages.
+
+     Renegade Setup text was supplied by Lars Hellsten.
+
+* - * - * - * - * - *
+                               T.A.G. 2.7
+                               ----------
+
+     T.A.G. users should simply run THDPRO.EXE from POSTUL.BAT which will 
+process the description by running THDPLUS at that time. In this case you 
+would not need a FILETEST.BAT and make POSTUL.BAT look like this... This 
+method has been recommended to me as the method of choice.
+
+POSTUL.BAT
+------------
+C:\THDPRO\THDPRO.EXE %4%5 %2
+
+* - * - * - * - * - *
+
+                                 PCBOARD
+                                 -------
+
+User of the OS/2 NATIVE version and the THD OS/2 version should not the 
+following exceptions. 
+
+1) In PCBSETUP, under options 1 :
+      Verify files uploaded is set to "Yes".
+
+2) Edit the PCBTEST.BAT file in the PCBoard directory, and make it look similar
+to the following:
+
+     For proper use with PCBOARD, the following is recommended
+
+If running the DOS version of THD ProScan
+
+PCBTEST.BAT
+--------
+@echo off
+echo * %1 Failed testing by THD ProScan > PCBFAIL.TXT
+if %2 == UPLOAD SET THDPCB=%3
+C:\THDPRO\THDPRO.EXE %1
+if errorlevel == 1 goto END
+DEL pcbfail.txt
+:end
+-----------
+
+If running the OS/2 Version of THD ProScan under the OS/2 version of PCBoard.
+
+PCBTEST.CMD
+--------
+@echo off
+SET THDPORT=PCBHANDLE
+echo * %1 Failed testing by THD ProScan > PCBFAIL.TXT
+if %2 == UPLOAD SET THDPCB=%3
+C:\THDPRO\THDPRO.EXE %1
+if errorlevel == 1 goto END
+DEL pcbfail.txt
+:end
+-----------
+
+The "if %2 == UPLOAD SET THDPCB=%3" line is ABSOLUTELY required for proper
+functioning with PCBoard IF you wish THD to update the description and/or
+filename and filesize.
+
+THDPRO.EXE will exit with an errorlevel of 1 or higher if the file fails the
+test. It will then exit without changing the PCBFAIL.TXT. However, if the
+test is successful, it will delete the "PCBFAIL.TXT" file.
+
+     ** Original text supplied by Mike Thomson **
+     **   Text has been modified to reflect    **
+     **  changes for THD ProScan Version 11.0  **
+
+* - * - * - * - * - *
+
+                                  WWIV
+                                 ------
+                      ( As supplied by Tom Goodson )
+
+    The following assumes that upload security is the primary purpose for
+installing an upload virus scanning event in the first place, therefore
+I recommend that all uploads in this particular setup be directed to the
+SYSOP directory after scanning for sysop/co-sysop inspection prior to
+being moved to the appropriate file subdirectories.  However, if the
+sysop intends to let his/her callers upload directly to the various file
+subdirectories (which I do not advise), the command line below will
+accommodate this as well.
+
+    To Install THD ProScan on your WWIV BBS:
+
+Configure THDPRO.EXE with THDINSTL.EXE (Select "none" as your BBS type).
+Run WWIV's INIT program and select 'More System Info' and set
+    'All UL to Sysop' to YES. (This step is not mandatory, but it is highly
+    recommended for maximum security.  After you examine the uploaded file,
+    you will have to manually move it to its appropriate subdirectory
+    yourself).
+Select 'External Programs' and for 'Upload Event,' enter the following
+    command line:
+C:\THDPRO\THDPRO.EXE %2%3 %4
+
+    *** Of course the above command line assumes that you have installed ***
+    ***   THD ProScan on your C: drive in a subdirectory named THDPRO.   ***
+
+Bring up the BBS and enter directory edit (//DIREDIT).  Set UPLOADS in the
+    SYSOP file subdirectory to ALLOWED.  Set all other subirectories to
+    DISALLOWED (this will disallow any unauthorized uploads directly to the
+    other subdirectories).
+
+Tom Goodson a.k.a. P-38, SysOp, Zenith Nadir, @2736 WWIVnet
+
+My thanks goes to David Muir, the wise fellow who wrote THD ProScan for
+    allowing me to distribute this excellent program, and to JAFO who provided
+    insight on the command line.
+
+                                  WWIV
+                                 ------
+                    ( As supplied by Rob Giannini )
+
+Configure THDPRO.EXE with THDINSTL.EXE. (Select "none" as your BBS type)
+
+Run the WWIV's INIT program and select external programs.
+Go down to the upload event and enter...
+
+C:\THDPRO\THDPRO.EXE C:\WWIV\%2%3
+                   |       |  | |
+Path to THDPRO.EXE--       |  | |
+                           |  | |
+BBS Directory---------------  | |
+                              | |
+File directory----------------- |
+                                |
+File to test---------------------
+
+* - * - * - * - * - *
+
+                      REMOTEACCESS 2.0? and 2.5?
+                      --------------------------
+Unarchive The THD ProScan distribution archive in it's own directory.
+Run "THDINSTL.EXE"
+     During THDINSTL, if you run RA 2.?? and would like THDPRO.EXE to
+automatically insert FILE_ID.DIZ comments into RA's File data bases, Be sure
+to tell the install that you use RA. And then select the version which is
+100% compatible to the version you are running (available from the final
+screen). DO NOT enable this option if you are running a "FILES.BBS" oriented
+system.
+    It is important to note that THD treats RA 2.0? and 2.5? differently and 
+you must select the correct BBS type in THDINSTL.EXE.
+
+                            ** IMPORTANT **
+     From the final screen of THDINSTL, one of the options is "Failed file
+Moving". Be sure to set this to "Inactive". If you do not, it may confuse
+RemoteAccess when it is unable to find the file.
+
+    Setting up Raconfig:
+
+Run raconfig and select the following menu options:
+
+1/  Options
+2/  Files
+
+
+The following is an example of how to fill in the upload scanning section...
+
+Scan online  Yes
+Failed scan  /unavailable/move to 998
+Scan utility C:\THDPRO\THDPRO.EXE @ *P *M
+
+Scan Online is set to yes to allow the user to see straight away
+if there are any problems with his upload.
+
+Failed scan action is set to mark the file as unavailable and move it
+to file area 998 (an area previously decided to be a badfiles area).
+
+Scan utility runs C:\THDPRO\THDPRO.EXE with following parameters:
+
+@  path and filename of file to be tested
+*P com port in use
+*M swap RA out of memory to give THD ProScan as much room as possible.
+
+     This general outline was supplied by Mark Kerr.
+     Mark can be reached VIA Fidonet at 2:443/59 for further support in
+regards to RemoteAccess.
+
+* - * - * - * - * -*
+
+                                EZYCOM (1.10)
+                                -------------
+
+     The following is a batch file supplied for use with EZYCOM v1.10. It is
+intended to be used as both UPCONV.BAT and/or DOCNV.BAT.
+
+-!- Start Text ---     Upconv.bat, Doconv.bat
+@echo off
+rem
+rem This batchfile requires an environment SET TASK=1 setting,
+rem 1=Task 1, 2=Task 2, 3=Task 3  etc.   0 is for a Local Logon....
+rem This should be done in your main BBS Batch file for every
+rem node that you have.
+rem
+rem %1 1                         node number
+rem %2 D:\EZY\SECUPLD\           where uploaded
+rem %3 D:\EZY\TEMP\CONV01        where it does it
+rem %4 D:                        drive it is on
+rem %5 LIST                      file name no ext
+rem %6 ZIP                       ext to
+rem %7 ARJ                       ext from (could be NULL)
+
+rem If TASK variable not set then assume local logon, thus no output
+rem to the user....
+
+
+IF "%1"=="1" THDPRO %2%5.%7 2 TO%6
+IF "%1"=="2" THDPRO %2%5.%7 3 TO%6
+
+rem                         ^
+rem                         )
+rem        -----------------
+rem       (
+rem      Com Port which is equivalent to the TASK Number
+:ENDIT
+-!- End Text ---
+
+     ----- This portion modified from information originally -----
+     -----    supplied by John Pallister for version 1.02    -----
+
+* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - *
+
+                               MAXIMUS V3.xx
+                               -------------
+
+DOS -
+     Create a batch file called VIRCHECK.BAT as follows...
+
+@echo off
+C:\THDPRO\THDPRO.EXE %1%2%3
+
+     Thereafter, edit the MAX.CTL file in the following way
+
+     % Max will call this batch file once for each file uploaded.    For
+     % more information on this keyword, please see MAX_REF.PRN.
+
+     Upload Check Virus           Vircheck.bat
+
+OS/2 -
+     Create a batch file called VIRCHECK.CMD as follows...
+
+@echo off
+C:\THDPRO\THDPRO.EXE %1%2%3 %6
+
+     Thereafter, edit the MAX.CTL file in the following way
+
+     % Max will call this batch file once for each file uploaded.    For
+     % more information on this keyword, please see MAX_REF.PRN.
+
+     Upload Check Virus           Vircheck.cmd %P
+
+This text supplied by : Michel van der Heijden
+    * - OS/2 text modified based on Michel's suggested dos settings.
+
+* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - *
+    
+                                 WILDCAT
+                                 -------
+
+How to Install ThdPro ver 11.0 in Wildcat BBS. (Wc3.x, 4.x)
+
+Add a line to your autoexec.bat file as follows:
+SET THDPRO=C:\WC30\THDPRO
+
+Then add a line in your config.sys if not already there:
+INSTALL=C:\DOS\SHARE.EXE
+
+Put ThdPro into a subdirectory on WC30 and do the configuration
+using THDINSTL.EXE in the THDPRO directory you created.
+
+then edit the scanfile.bat in Wc30 as follows...
+Scanfile.bat to run THDPro in Wildcat 3.0
+--------------------------------------------
+REM The following line changes to the node work directory for the
+REM node executing this batch file.
+CD \WC30\WCWORK\NODE%WCNODEID%
+REM The next line runs the THDPro ver 11.0 program
+REM scan the uploaded files for virii.
+C:\WC30\THDPRO\THDPRO.EXE %1
+REM See THDPro docs for complete information. The %1 is the
+REM filename uploaded that is to be scanned.
+REM No additional commands are required to return to WILDCAT! since
+REM this batch assumes you are using shell rather than terminate.
+REM Create a directory called FAILSCAN or whatever and direct files
+REM to that directory that fail the scan in your thdpro configuration
+REM For example c:\failscan
+------------------------------------------------------------------
+
+    Text supplied by Bill Lozza (calvin@cris.com)
+
+* - * - * - * - * - * - * - * - * - * - * - * - * - * -
+
+     Keep in mind that this information is general and version specific and 
+may not work for you as is. No person or group accepts responsibility for 
+the accuracy of this text as it is supplied only as "assistance".
+

@@ -364,7 +364,7 @@ End;
 Begin
   WriteLn;
   WriteLn ('MAKETHEME : Mystic BBS Theme Compiler Version ' + mysVersion);
-  WriteLn ('Copyright (C) ' + mysCopyYear + ' By James Coyle.  All Rights Reserved');
+  WriteLn ('Copyright (C) 1997-2013 James Coyle. IRC Fork (C) 2025-2026');
   WriteLn;
 
   If ParamCount < 1 Then Begin

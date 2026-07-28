@@ -122,7 +122,7 @@ type
     ProtocolStatus : Word;
 
     APort            : TIOBase;
-    SrcFileLen       : LongInt;           {Size of file (in bytes)}
+    SrcFileLen       : Int64;             {Size of file (in bytes)}
     SrcFileDate      : LongInt;           {File date/time stamp (A39)}
     UserStatus       : ShowStatusProc;    {Hook for user display}
     BlockCheck       : LongInt;           {Block check value}
@@ -134,7 +134,7 @@ type
     apFlags          : Word;              {AbstractProtocol options}
     TransTimeout     : Word;              {Tics to wait for trans freespace}
     GotOneFile       : Boolean;           {True if we've received one file}
-    InitFilePos      : LongInt;           {Initial file pos during resumes}
+    InitFilePos      : Int64;             {Initial file pos during resumes}
 
     {For getting the next file to transmit}
     PathName         : PathStr;           {Complete path name of current file}
@@ -168,8 +168,8 @@ type
     FileBuffer       : ^FileBufferArray;  {For reading/writing files}
     StartOfs         : LongInt;           {Holds starting offset of file}
     EndOfs           : LongInt;           {Holds ending offset of file}
-    LastOfs          : LongInt;           {FileOfs of last Get/Put}
-    FileOfs          : LongInt;           {Current file offset}
+    LastOfs          : Int64;             {FileOfs of last Get/Put}
+    FileOfs          : Int64;             {Current file offset}
     EndOfDataOfs     : LongInt;           {Ofs of buffer of end-of-file}
     EndPending       : Boolean;           {True when end-of-file is in buffer}
     WriteFailOpt     : WriteFailOptions;  {Rules for overwriting files}

@@ -150,6 +150,7 @@ Implementation
 Uses
   DOS,
   BBS_Core,
+  BBS_Crypt,
   BBS_DataBase,
   BBS_Common,
   bbs_General,
@@ -1950,7 +1951,7 @@ Begin
 
     Temp := GetInput(15, 15, 16, '');
 
-    If Temp = PW Then
+    If CheckPassword(Temp, PW, PW) Then
       Exit
     Else Begin
       OutFullLn(BadStr);

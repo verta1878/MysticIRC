@@ -1,104 +1,106 @@
-# Mystic BBS 1.11IRC — Community Fork
+# Mystic BBS 1.11IRC A7 — Community Fork
 
 > **GitHub:** https://github.com/verta1878/mystic-bbs-irc
 >
-> **Release: 2026-07-25** — All 38 g00r00 1.11 A1-A3 items ported.
+> **Release: 2026-07-28** — Version 1.11IRC A7.
 > RIPscrip v1.54 support (42/42 commands, pixel-perfect).
 > Built with **FPC 2.6.4irc r3.1+**. GPLv3.
 
 Based on **Mystic BBS** GPL source by James Coyle (g00r00).
-Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
+Maintained by verta1878, FTN 1:152/158.
 
 ## Team
 
 | Handle | Role |
 |--------|------|
-| verta1878 | maintained, Ecstasy BBS |
-| sysop/0 | IRC fork foundation - Free Pascal Compiler 2.6.4irc|
-| evga | IRC fork foundation — RIP engines, MDL, build system  |
-| wrench | ClamAV integration, RIPtermJS, Netmodem2irc |
-| Kiddo | 1.11IRC porting, MPL compiler, FOSSIL, chg2rip converter |
+| verta1878 | Project lead, FTN 1:152/158 |
+| sysop/0 | serial.pas UART layer, architecture |
+| evga | Free Pascal Compiler 2.6.4irc, RIP engines, MDL |
+| kiddo | serial_irq.pas ISR, text rendering, MPL, chg2rip |
+| wrench | fossil.pas, netfosdl.pas FOSSIL driver, netmodem2irc |
 
 ## Directory Structure
 
 ```
-mystic/                  BBS core (mystic, mis, mplc, mide, mutil, fidopoll)
-mdl/                     Mystic Development Library (52 units)
+mystic/                  BBS core (clean, no RIP)
+mystic_test/             BBS core + RIP integration (testing)
+mdl/                     Mystic Development Library (52+ units)
 mystic_rip/              RIPscrip — ALL RIP code lives here
-  v1/                      RIPscrip v1.54 engine (ripscr.pas, 4,041 lines)
-  v2/                      RIPscrip v2.0 engine (rip2api.pas, 5,304 lines)
-  v3/                      RIPscrip v3.0 engine (rip3api.pas, 40,788 lines)
-  v4/                      RIPscrip v4.0 engine (rip4api.pas, 45,991 lines)
+  v1/                      RIPscrip v1.54 engine
+  v2/                      RIPscrip v2.0 engine
+  v3/                      RIPscrip v3.0 engine
+  v4/                      RIPscrip v4.0 engine
   chg2rip.pas              ANSI→RIP converter (pixel-perfect, v2.3)
   ans2png.pas              ANSI→BMP renderer (pixel-perfect)
   ripviewer/               RIPView v1.0.0 — 42/42 cmds, CLI + FV TUI
-  vgafont.inc              VGA 8x16 CP437 font ROM (4,096 bytes)
-mystic_sdl/              SDL2 graphical terminal
+    source/                  Pascal source (7 units, 1,656 lines)
+    docs/                    ripjsapi.html (merged v1.54/v2.0/v3.0 specs)
+    fonts/                   18 BGI + bitmap fonts
+    icons/                   219 ICN/MSK/HIC files
+    rips/                    259 test RIP files
+    js-reference/            RIPtermJS source (read-only reference)
+mystic_spell/            Hunspell spell check binding
 mystic_crypt/            CryptLib SSH/TLS
-mystic_spell/            Hunspell spell check
+mystic_sdl/              SDL2 graphical terminal
 mystic_modem/            Modem/FOSSIL front-end
 mystic_mailer/           BINKP/FidoNet mailer
-mystic_misdos/           DOS MIS
 examples/
-  ripterm154/              RIPterm 1.54 DOS binary (Carl Gorringe archive)
+  mterm/                   mterm terminal + OpenOLMS (28 files, 9,548 lines)
+  serial/                  Serial v1.1 + FOSSIL driver (1,119 lines)
+  door32/                  g00r00's Door32 library (d32.pas)
+  thdproscan/              THD ProScan archive
   riptermJS/               RIPtermJS JavaScript viewer (Carl Gorringe, GPLv3)
-  hslink-src/              HS/Link protocol (clean-room Pascal port)
-  ansilove-src/            Ansilove (VGA font source)
-  marc/                    MARC — built-in ZIP archiver + MP3/MP4 metadata (MediaTag)
-docs/                    Documentation (17 files)
-  ANSI-TO-RIP-PROGRESS.md   chg2rip development log (39KB)
-out-linux/               Linux build output
-out-win32/               Win32 build output
-out-dos/                 DOS build output
-out-os2/                 OS/2 build output
-out_darwin/              macOS build output
-attic/                   Retired code
+  mkicon.pas               Pure Pascal ICO generator (186 lines)
+  marc/                    MARC ZIP archiver + MP3/MP4 metadata
+docs/                    Documentation
 ```
 
-## RIPscrip Engines
-
-All under `mystic_rip/`:
-
-| Engine | Path | Lines | Status |
-|--------|------|-------|--------|
-| v1 ripscr.pas | v1/ | 4,041 | ✅ Compiles |
-| v2 rip2api.pas | v2/ (+img, pasjpeg) | 5,304 | ✅ Compiles |
-| v3 rip3api.pas | v3/ (+img, prg, wav, pasjpeg) | 40,788 | ✅ Compiles |
-| v4 rip4api.pas | v4/ (+img, prg, wav, pasjpeg, prt) | 45,991 | ✅ Compiles |
-| ripviewer | ripviewer/source/ | 1,602 | ✅ 42/42 cmds, 100% pixel match |
-| chg2rip | ./ | 880 | ✅ 100% pixel-perfect |
-| ans2png | ./ | 340 | ✅ 100% pixel-perfect |
-
-## ANSI to RIP Converter (chg2rip v2.3)
-
-- **100% pixel-perfect** — 0 diff pixels (ImageMagick verified)
-- **44KB output** for 62KB ANSI (31x smaller than v1.0 pixel bars)
-- **3 minutes at 2400 baud** (vs 97 minutes for v1.0)
-- `-pd` flag for PabloDraw compatibility
-- RIPtermJS-verified: charsize 2 for 16px text height
-- Full dev log: `docs/ANSI-TO-RIP-PROGRESS.md`
-
-## BBS Binaries
+## BBS Binaries (18 Win32 PE32 i386)
 
 | Binary | Status |
 |--------|--------|
-| mystic | ✅ Compiles |
-| mis | ✅ Compiles |
-| mplc | ✅ Compiles |
-| mide | ✅ Compiles |
-| mutil | ✅ Compiles |
-| fidopoll | ✅ Compiles |
+| mystic | ✅ |
+| mis | ✅ |
+| mplc | ✅ |
+| mide | ✅ |
+| mutil | ✅ |
+| fidopoll | ✅ |
+| marc | ✅ |
+| maketheme | ✅ |
+| mbbsutil | ✅ |
+| install | ✅ |
+| install_make | ✅ |
+| nodespy | ✅ |
+| qwkpoll | ✅ |
+| mystpack | ✅ |
+| 109to110 | ✅ |
+| chg2rip | ✅ |
+| ans2png | ✅ |
+| ripview | ✅ |
 | 20 MPL scripts | ✅ All compile |
 
-## Key Features (1.11IRC)
+## Key Features (1.11IRC A7)
 
-- g00r00 1.11 A1-A6 fully ported (38 items)
+- g00r00 1.11 A1-A3 base fully ported
+- RIPscrip v1.54 (42/42 commands, pixel-perfect)
+- RIPView CLI + Free Vision TUI viewer
+- chg2rip/ans2png pixel-perfect converters
+- Password MD5 hashing (auto-upgrade from plaintext)
+- Hunspell spell check binding (runtime loaded)
+- Serial v1.1: UART 16550, IRQ ring buffer, FOSSIL driver
+- Zmodem >2GB file transfer (Int64 fix)
+- MIS system tray icon (embedded resource)
+- MIS clean shutdown (select-based polling)
+- Stale node detection (5-min auto-reclaim)
+- Active user warning in config mode
+- maketheme cfgpath command
+- MIDE help system (237 functions, mplfunc.txt)
+- Searchlight-style lightbar menus (identical to 1.12)
 - MPL: record VAR params, record function return, multi-dim arrays
-- FOSSIL/serial: TIOFossil for DOS dial-up (`-COM1 -FOSSIL`)
-- MIDE: help system (Index, Under Cursor, Help on Help)
-- Archive library: ZIP, RAR, ARJ, LHA, ARC, PAK, SQZ, HYP, UC2
-- Print API: ESC/P, PCL, PostScript, BMP (v1-v4)
-- DESQview DOS multi-node setup documented
+- FOSSIL/serial: TIOFossil for DOS dial-up
+- mterm terminal emulator + OpenOLMS offline reader
+- mkicon pure Pascal ICO generator
+- Door32 library (g00r00's d32.pas)
 
 ## Build
 
@@ -113,8 +115,6 @@ git clone https://github.com/verta1878/fpc264irc
 ./build-win32.sh
 ```
 
-See `docs/BUILDING.md` for full instructions.
-
 ## Platforms
 
 | Platform | Status |
@@ -122,15 +122,17 @@ See `docs/BUILDING.md` for full instructions.
 | x86_64-linux | ✅ Native |
 | i386-win32 | ✅ Cross-compiled |
 | i386-go32v2 (DOS) | ✅ Cross-compiled |
-| i386-os2 | ✅ Working (slow compile via fpc264irc EMX) |
+| i386-os2 | ✅ Working |
 | i386-darwin | ✅ Needs clang + SDK |
 
 ## License
 
 GNU General Public License v3. See `LICENSE`.
 
+Copyright (C) 1997-2013 By James Coyle
+Copyright (C) 2025-2026 IRC Fork: verta1878, sysop/0, evga, kiddo, wrench
+
 ## Links
 
 - Compiler: https://github.com/verta1878/fpc264irc
 - RIPtermJS: https://github.com/cgorringe/RIPtermJS
-- RIPterm 1.54: https://github.com/cgorringe/RIPterm154

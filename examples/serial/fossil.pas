@@ -23,6 +23,10 @@ unit fossil;
   STANDALONE. No NM_* units, no engine, no netmodem. This is a drop-in
   replacement for X00, BNU, ADF, NetFoss.
 
+  Based on Dedrick Allen's original NetModem/32 FOSSIL specification
+  and the X00 reference. See driver/src/NETMODEM.ASM for the original
+  implementation. See docs/DRIVER_INTERFACE.md for the reconstructed spec.
+
   Sits on top of serial.pas (sysop/0's real UART unit). Every FOSSIL
   function maps to a serial.pas call against real hardware.
 

@@ -1,0 +1,143 @@
+================================================================
+ g00r00's Mystic BBS 1.11 Official Alpha Releases
+ Source: http://wiki.mysticbbs.com/doku.php?id=whats_new_111
+ Retrieved: 2026-07-28
+ 
+ STATUS: NEEDS VERIFICATION against our 1.11IRC codebase.
+ Check each item: is it in our code? Which file? Working?
+================================================================
+
+--- 1.11 A1 (Oct 16, 2015) ---
+
++ MPL: Records passed by VAR reference
+  STATUS: ✅ In our code (mpl_execute.pas, mpl_compile.pas)
+
++ ANSI abort waits for current sequence to complete (10+ chars)
+  STATUS: ? VERIFY in bbs_io.pas
+
++ ANSI abort based on time (checked every half second)
+  STATUS: ? VERIFY
+
++ Reworked file buffering in file listings (performance)
+  STATUS: ? VERIFY in bbs_filebase.pas
+
+! Msg base editor menu command shown incorrectly in command list
+  STATUS: ? VERIFY
+
+! /topic in node chat caused lockup
+  STATUS: ? VERIFY in bbs_nodechat.pas
+
+! /topic reset to blank
+  STATUS: ? VERIFY
+
++ F2/ESC selectable with arrow keys in install
+  STATUS: ? VERIFY in install.pas
+
++ ENTER on send node message aborts
+  STATUS: ? VERIFY
+
++ Embedded ANSI in message base reading
+  STATUS: ? VERIFY in bbs_msgbase.pas
+
++ FS editor: upload ANSI/Pipe files into editor
+  STATUS: ? VERIFY in bbs_edit_full.pas
+
++ ANSI art auto-converts to 79-char BBS-friendly ANSI
+  STATUS: ? VERIFY
+
++ FTP: 502 error for unknown commands (Filezilla)
+  STATUS: ? VERIFY in mis_client_ftp.pas
+
++ FIDOPOLL: skip blank hostnames
+  STATUS: ? VERIFY in fidopoll.pas
+
+--- 1.11 A2 (Oct 17, 2015) ---
+
++ TZUTC kludges for echomail
+  STATUS: ? VERIFY in echomail tosser
+
+! Quoting broken for ANSI embedded messages
+  STATUS: ? VERIFY
+
+! Editor kludge fixes from A1
+  STATUS: ? VERIFY
+
+--- 1.11 A3 (Oct 24, 2015) ---
+
++ MPL: Records as function return types
+  STATUS: ✅ In our code (mpl_execute.pas)
+
++ MPL: TimerMS : LongInt (millisecond timer)
+  STATUS: ✅ In our code (function 562)
+
++ MPL: formatDate(dosDate, mask) : String
+  STATUS: ✅ In our code (function 563)
+
++ MCI: |−Y force Yes default, |−N force No default
+  STATUS: ? VERIFY in bbs_io.pas
+
++ Searchlight-style prompt menus revamped
+  STATUS: ✅ In our code (bbs_menus.pas, identical to 1.12)
+
++ Zmodem inactivity timeout reset after transfer
+  STATUS: ? VERIFY
+
++ MUTIL mass upload: better logs, temp dir purge
+  STATUS: ? VERIFY in mutil.pas
+
++ MPL: dateDos2Str/dateJulian2Str formats 4,5,6 (4-digit year)
+  STATUS: ? VERIFY in m_datetime.pas
+
+! File description editing disabled — fixed
+  STATUS: ? VERIFY
+
+! MsgEditor MPL function disabled — fixed
+  STATUS: ? VERIFY
+
+--- 1.11 A4 (Nov 5, 2015) ---
+
++ MUTIL echomail export tracks last exported message
+  STATUS: ? VERIFY in mutil.pas
+
+! TIC toss false duplicate with REPLACES keyword
+  STATUS: ? VERIFY in mutil_filetoss.pas
+
++ Strip tear/origin/kludge from editor, regenerate on save
+  STATUS: ? VERIFY in bbs_edit_full.pas
+
+! Quoting >10,000 lines crash
+  STATUS: ? VERIFY
+
+--- 1.11 A5 (Nov 5, 2015) ---
+
++ Message forward strips/recalculates network info
+  STATUS: ? VERIFY in bbs_msgbase.pas
+
+! MPL: multi-dim arrays in records fix
+  STATUS: ✅ In our code (mpl_execute.pas)
+
+--- 1.11 A6 — STABLE (Nov 6, 2015) ---
+
++ ANSI draw mode cleanup: ESC menu for color/glyph/exit
+  STATUS: ? VERIFY in bbs_edit_ansi.pas — may relate to our
+  palette disappearing bug
+
+! Amiga font switching fixed on Linux
+  STATUS: ? VERIFY in bbs_io.pas Linux path
+
+================================================================
+ VERIFICATION PLAN
+================================================================
+
+For each ? VERIFY item:
+1. Find the code in our mystic_test/ source
+2. Check if it matches g00r00's description
+3. Mark as ✅ (present), ❌ (missing), or 🔧 (partial)
+4. If missing, check if it's in 1.12 source and can be ported
+
+Items marked ✅ are confirmed in our code from sessions 1-6.
+Items marked ❌ need porting from 1.11 or 1.12.
+Items marked 🔧 are partially implemented.
+
+Our 1.11IRC numbering is INDEPENDENT of g00r00's 1.11.
+Our A1 != his A1. Overlap exists but is coincidental.

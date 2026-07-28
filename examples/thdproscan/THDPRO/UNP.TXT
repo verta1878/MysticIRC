@@ -1,0 +1,62 @@
+
+    NOTES about the use of UNP. (UNP411.ZIP)
+
+- UNP is NOT designed as an automated program. You must be aware that
+  there are two possible side effects from it's use (possibly more).
+
+- First, UNP cannot be made to NOT prompt for input. Therefore it may
+  prompt for input and THD cannot supply the necessary keypress.
+
+- Second, THD uses a switch which instructs it to remove all levels of
+  imbedded compression. It is possible under some circumstances for this
+  usage to throw UNP into a permanent loop trying to expand some files.
+
+- ONLY UNP version 4.11 is supported. Other versions may or may not work.
+
+- UNP is ONLY used when no conversions are being done (it modifies the
+  original files and these files would be unacceptable for rearchiving)
+
+- UNP is not used on the "original" file. That is
+  "THDPRO.EXE C:\TEST\TEST.EXE"
+  would not cause UNP to run on TEST.EXE itself, but if TEST.EXE were an SFX,
+  then it would be run on all of the files expanded from this file. (For the
+  same reason as above, we can't arbitrarily change the original file)
+
+*********************************************
+*** Should you or should you not use UNP? ***
+*********************************************
+
+    On the plus side, it increases the odds of detecting a virus considerably, 
+and runs reasonably fast.
+    On the minus side, it "may" freeze your board awaiting input. As well as 
+if you intend to use it you cannot do single step conversions (conversions 
+would have to be done separately). Again I have not yet seen this happen but 
+have had reports of it happening.
+
+*************************
+*** Would "I" use it? ***
+*************************
+
+    Yes.. But "I" don't run a BBS. No-one is counting on my board being "up" 
+at all times. I will almost always be there to "press a key" if need be (and 
+it's no big deal if I'm not). I always have an extra three seconds to make 
+sure the file is virus free.
+
+****************************
+*** Should "you" use it? ***
+****************************
+
+    For supervised testing... without a doubt. The added security could well 
+be worth it.
+    For unsupervised testing... It's tough to say, I would say that "if" the 
+loss of single-step conversions is something you don't mind, then try it. If 
+it locks up your system, stop using it during the automatic testing process.
+
+    As a general rule of thumb, I recommend using it until such time as you 
+find it hampers your system. The increased chance of viral detection is well 
+worth it if all you loose is the few seconds to expand the files to their 
+uncompressed format.
+
+UNP is Cardware. If you use it, please drop the author a Post Card.
+
+David Muir... Author THD ProScan.
