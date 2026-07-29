@@ -397,9 +397,10 @@ Begin
             BoxOpen      (48, 4, 79, 21);
             CoolBoxOpen  (54, 'Other');
 
-            Form.AddNone ('A', ' A ANSI Editor',              50,  5, 50,  5, 28, 'Launch ANSI art editor');
-            Form.AddNone ('T', ' T Text Editor',              50,  6, 50,  6, 28, 'Edit text files');
-            Form.AddNone ('L', ' L View Log Files',           50,  7, 50,  7, 28, 'View system log files');
+            // A4: editors disabled — use standalone binaries
+            // Form.AddNone ('A', ' A ANSI Editor',              50,  5, 50,  5, 28, 'Launch ANSI art editor');
+            // Form.AddNone ('T', ' T Text Editor',              50,  6, 50,  6, 28, 'Edit text files');
+            Form.AddNone ('L', ' L View Log Files',           50,  5, 50,  5, 28, 'View system log files');
             // RIP Editor removed — requires graphical mode
             Form.AddNone ('-', ' --------------------------', 50,  9, 50,  9, 28, '');
             Form.AddNone ('N', ' N Edit Bad User Names',      50, 10, 50, 10, 28, 'Edit banned user names');
@@ -428,8 +429,9 @@ Begin
               End;
             End Else
               Case Res of
-                'A' : Configuration_AnsiEditor;
-                'T' : Configuration_EditFile('');
+                // A4: editors disabled — use standalone binaries
+                // 'A' : Configuration_AnsiEditor;
+                // 'T' : Configuration_EditFile('');
                 'L' : Configuration_ViewLogs;
                 // 'R' : RIP Editor removed
                 'N' : Configuration_EditFile(bbsCfg.DataPath + 'badnames.txt');

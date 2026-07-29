@@ -36,7 +36,7 @@ Uses
   m_Crypt,
   m_Strings;
 
-{ Hash a plaintext password -> '{MD5}hexdigest' (37 chars) }
+// Hash a plaintext password to MD5 prefix + hex digest (37 chars)
 Function HashPassword (const PlainText: String) : String;
 Begin
   Result := PW_MD5_PREFIX + Digest2String(MD5(strUpper(PlainText)));

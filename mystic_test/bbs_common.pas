@@ -265,6 +265,9 @@ End;
 
 Procedure ProcessSysopCommand (Cmd: Char);
 Begin
+  { A4: No sysop commands in config mode — no user is connected }
+  If Session.ConfigMode Then Exit;
+
   If Not Console.Active And (Cmd <> #47) Then Exit;
 
   Case Cmd of

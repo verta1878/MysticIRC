@@ -1,15 +1,7 @@
 Unit bbs_hunspell;
 
-// ====================================================================
 // Mystic BBS — Hunspell Spell Check Integration
-// ====================================================================
-//
 // Dynamically loads libhunspell at runtime.
-// If DLL/SO not found, spell check is silently disabled.
-//
-// g00r00 pattern: same as Python — LoadLibrary + GetProcAddress.
-// Requires: dictionary.dic + dictionary.aff in DataPath.
-//
 // GPLv3.
 
 {$I M_OPS.PAS}
@@ -18,28 +10,31 @@ Interface
 
 Uses
   {$IFDEF WINDOWS} Windows, {$ENDIF}
-  {$IFDEF UNIX} DynLibs, {$ENDIF}
-  SysUtils;
+  DynLibs;
 
 Type
   THunHandle = Pointer;
+  PPChar = ^PChar;
+
+  THunCreateFunc  = Function(AffPath, DicPath: PChar): THunHandle; cdecl;
+  THunDestroyProc = Procedure(H: THunHandle); cdecl;
+  THunSpellFunc   = Function(H: THunHandle; Word: PChar): Integer; cdecl;
+  THunSuggestFunc = Function(H: THunHandle; Var SList: PPChar; Word: PChar): Integer; cdecl;
+  THunFreeProc    = Procedure(H: THunHandle; SList: PPChar; N: Integer); cdecl;
 
   THunSpell = Class
   Private
     FLib       : TLibHandle;
     FHandle    : THunHandle;
     FLoaded    : Boolean;
-    FDictPath  : String;
-    { Function pointers }
-    FCreate    : Function(AffPath, DicPath: PChar): THunHandle; cdecl;
-    FDestroy   : Procedure(H: THunHandle); cdecl;
-    FSpell     : Function(H: THunHandle; Word: PChar): Integer; cdecl;
-    FSuggest   : Function(H: THunHandle; Var SList: PPChar; Word: PChar): Integer; cdecl;
-    FFreeSug   : Procedure(H: THunHandle; SList: PPChar; N: Integer); cdecl;
+    FCreate    : THunCreateFunc;
+    FDestroy   : THunDestroyProc;
+    FSpell     : THunSpellFunc;
+    FSuggest   : THunSuggestFunc;
+    FFreeSug   : THunFreeProc;
   Public
     Constructor Create(Const ADataPath: String);
     Destructor Destroy; Override;
-    Function  IsLoaded: Boolean;
     Function  CheckWord(Const AWord: String): Boolean;
     Function  Suggest(Const AWord: String): String;
     Property  Loaded: Boolean Read FLoaded;
@@ -50,34 +45,36 @@ Implementation
 Constructor THunSpell.Create(Const ADataPath: String);
 Var
   AffFile, DicFile: String;
+  AffPChar, DicPChar: PChar;
 Begin
   Inherited Create;
-  FLoaded := False;
-  FDictPath := ADataPath;
 
-  { Try loading hunspell library }
+  FLoaded  := False;
+  FLib     := NilHandle;
+  FHandle  := Nil;
+
+  { Try loading library }
   {$IFDEF WINDOWS}
   FLib := LoadLibrary('libhunspell32.dll');
-  If FLib = 0 Then FLib := LoadLibrary('libhunspell64.dll');
-  If FLib = 0 Then FLib := LoadLibrary('hunspell.dll');
+  If FLib = NilHandle Then FLib := LoadLibrary('hunspell.dll');
   {$ENDIF}
-  {$IFDEF LINUX}
+  {$IFDEF UNIX}
   FLib := LoadLibrary('libhunspell.so');
-  If FLib = 0 Then FLib := LoadLibrary('libhunspell-1.7.so.0');
-  If FLib = 0 Then FLib := LoadLibrary('libhunspell-1.6.so.0');
+  If FLib = NilHandle Then FLib := LoadLibrary('libhunspell-1.7.so.0');
+  If FLib = NilHandle Then FLib := LoadLibrary('libhunspell-1.6.so.0');
   {$ENDIF}
   {$IFDEF DARWIN}
   FLib := LoadLibrary('libhunspell.dylib');
   {$ENDIF}
 
-  If FLib = 0 Then Exit;
+  If FLib = NilHandle Then Exit;
 
   { Load function pointers }
-  Pointer(FCreate)  := GetProcAddress(FLib, 'Hunspell_create');
-  Pointer(FDestroy) := GetProcAddress(FLib, 'Hunspell_destroy');
-  Pointer(FSpell)   := GetProcAddress(FLib, 'Hunspell_spell');
-  Pointer(FSuggest) := GetProcAddress(FLib, 'Hunspell_suggest');
-  Pointer(FFreeSug) := GetProcAddress(FLib, 'Hunspell_free_list');
+  @FCreate  := GetProcAddress(FLib, 'Hunspell_create');
+  @FDestroy := GetProcAddress(FLib, 'Hunspell_destroy');
+  @FSpell   := GetProcAddress(FLib, 'Hunspell_spell');
+  @FSuggest := GetProcAddress(FLib, 'Hunspell_suggest');
+  @FFreeSug := GetProcAddress(FLib, 'Hunspell_free_list');
 
   If Not Assigned(FCreate) Then Exit;
   If Not Assigned(FSpell)  Then Exit;
@@ -86,44 +83,47 @@ Begin
   AffFile := ADataPath + 'dictionary.aff';
   DicFile := ADataPath + 'dictionary.dic';
 
-  If Not FileExists(AffFile) Or Not FileExists(DicFile) Then Exit;
+  AffPChar := @AffFile[1];
+  DicPChar := @DicFile[1];
 
-  FHandle := FCreate(PChar(AffFile), PChar(DicFile));
-  If FHandle = Nil Then Exit;
+  FHandle := FCreate(AffPChar, DicPChar);
 
-  FLoaded := True;
+  If FHandle <> Nil Then
+    FLoaded := True;
 End;
 
 Destructor THunSpell.Destroy;
 Begin
-  If FLoaded And Assigned(FDestroy) Then
+  If (FHandle <> Nil) And Assigned(FDestroy) Then
     FDestroy(FHandle);
-  If FLib <> 0 Then
-    FreeLibrary(FLib);
-  Inherited;
-End;
 
-Function THunSpell.IsLoaded: Boolean;
-Begin
-  Result := FLoaded;
+  If FLib <> NilHandle Then
+    FreeLibrary(FLib);
+
+  Inherited Destroy;
 End;
 
 Function THunSpell.CheckWord(Const AWord: String): Boolean;
+Var
+  P: PChar;
 Begin
   If Not FLoaded Then Begin Result := True; Exit; End;
-  Result := FSpell(FHandle, PChar(AWord)) <> 0;
+  P := @AWord[1];
+  Result := FSpell(FHandle, P) <> 0;
 End;
 
 Function THunSpell.Suggest(Const AWord: String): String;
 Var
   SList: PPChar;
   N: Integer;
+  P: PChar;
 Begin
   Result := '';
   If Not FLoaded Then Exit;
   If Not Assigned(FSuggest) Then Exit;
 
-  N := FSuggest(FHandle, SList, PChar(AWord));
+  P := @AWord[1];
+  N := FSuggest(FHandle, SList, P);
   If N > 0 Then Begin
     Result := StrPas(SList^);
     If Assigned(FFreeSug) Then

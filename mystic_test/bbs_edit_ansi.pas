@@ -1693,12 +1693,7 @@ Begin
   Box.Free;
   Session.io.RemoteRestore (Img);
   Session.io.BufFlush;
-
-  { Update ATTR display on status bar }
-  WriteXY (16, 1, CurAttr, 'ATTR');
-
-  DrawPage (1, WinSize, False);
-  LocateCursor;
+  ReDrawTemplate (False);
 End;
 
 Procedure TEditorANSI.MessageUpload;
@@ -1966,7 +1961,7 @@ Begin
                  DoEnter;
                  DoChar(Ch);
                End Else
-                 If (CurX = 1) and (Ch = '/') and (Not DrawMode) Then Begin
+                 If (CurX = 1) and (Ch = '/') and (Not DrawMode) and (Not FileMode) Then Begin
                    EditorCommands;
 
                    If (Not Save) and (Not Done) Then ReDrawTemplate(False);
@@ -2104,10 +2099,10 @@ Begin
     Form.ExitOnFirst := True;
 
     Form.AddNone ('C', ' C Continue',            26,  9, 26,  9, 24, '');
-    Form.AddNone ('?', ' ? Help',                26, 10, 26, 10, 24, '');
-    Form.AddNone ('\', ' \ Jump to first line',  26, 11, 26, 11, 24, '');
-    Form.AddNone ('/', ' / Jump to last line',   26, 12, 26, 12, 24, '');
-    Form.AddNone ('Q', ' Q Quit',               26, 13, 26, 13, 24, '');
+    Form.AddNone ('Q', ' Q Quit',               26, 10, 26, 10, 24, '');
+    Form.AddNone ('?', ' ? Help',                26, 11, 26, 11, 24, '');
+    Form.AddNone ('\', ' \ Home (first line)',   26, 12, 26, 12, 24, '');
+    Form.AddNone ('/', ' / End (last line)',     26, 13, 26, 13, 24, '');
 
     Res := Form.Execute;
     Form.Free;
@@ -2132,14 +2127,14 @@ Begin
     Form := TAnsiMenuForm.Create;
     Form.ExitOnFirst := True;
 
-    Form.AddNone ('C', ' C Continue',            26,  7, 26,  7, 24, '');
-    Form.AddNone ('?', ' ? Help',                26,  8, 26,  8, 24, '');
-    Form.AddNone ('\', ' \ Jump to first line',  26,  9, 26,  9, 24, '');
-    Form.AddNone ('/', ' / Jump to last line',   26, 10, 26, 10, 24, '');
+    Form.AddNone ('O', ' O Open...',             26,  7, 26,  7, 24, '');
+    Form.AddNone ('A', ' A Save As...',          26,  8, 26,  8, 24, '');
+    Form.AddNone ('S', ' S Save',               26,  9, 26,  9, 24, '');
+    Form.AddNone ('C', ' C Continue',            26, 10, 26, 10, 24, '');
     Form.AddNone ('Q', ' Q Quit',               26, 11, 26, 11, 24, '');
-    Form.AddNone ('S', ' S Save',               26, 12, 26, 12, 24, '');
-    Form.AddNone ('A', ' A Save As...',          26, 13, 26, 13, 24, '');
-    Form.AddNone ('O', ' O Open...',             26, 14, 26, 14, 24, '');
+    Form.AddNone ('?', ' ? Help',                26, 12, 26, 12, 24, '');
+    Form.AddNone ('\', ' \ Home (first line)',   26, 13, 26, 13, 24, '');
+    Form.AddNone ('/', ' / End (last line)',     26, 14, 26, 14, 24, '');
 
     Res := Form.Execute;
     Form.Free;

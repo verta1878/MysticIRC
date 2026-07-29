@@ -353,6 +353,10 @@ Begin
     If Not TBBSCore(Core).LocalMode Then
       TBBSCore(Core).Client.WriteBuf(OutBuffer, OutBufPos);
 
+    { A4: In local mode, flush to console directly }
+    If TBBSCore(Core).LocalMode Then
+      Console.BufFlush;
+
     If Session.Pipe.Connected Then
       Session.Pipe.SendToPipe(OutBuffer, OutBufPos);
 

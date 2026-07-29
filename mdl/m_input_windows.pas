@@ -155,6 +155,15 @@ Begin
       If InputRec.Event.KeyEvent.bKeyDown then begin
         If not(InputRec.Event.KeyEvent.wVirtualKeyCode in [VK_SHIFT, VK_MENU, VK_CONTROL, VK_CAPITAL, VK_NUMLOCK, VK_SCROLL]) then begin
 
+          { A4: If AsciiChar is printable (>= 32) and no ALT pressed,
+            use it directly. ENHANCED_KEY flag on some Win32 consoles
+            falsely routes regular keys through the extended path. }
+          If (Ord(InputRec.Event.KeyEvent.AsciiChar) >= 32) and
+             (InputRec.Event.KeyEvent.dwControlKeyState and (LEFT_ALT_PRESSED or RIGHT_ALT_PRESSED) = 0) Then Begin
+            addBuffer(Chr(Ord(InputRec.Event.KeyEvent.AsciiChar)));
+            Result := True;
+            Exit;
+          End Else
           If (Ord(InputRec.Event.KeyEvent.AsciiChar) = 0) or (InputRec.Event.KeyEvent.dwControlKeyState and (LEFT_ALT_PRESSED or ENHANCED_KEY or RIGHT_ALT_PRESSED) > 0) Then Begin
             If (Ord(InputRec.Event.KeyEvent.AsciiChar) = 13) and (InputRec.Event.KeyEvent.wVirtualKeyCode = VK_RETURN) Then Begin
               addBuffer(#13);
