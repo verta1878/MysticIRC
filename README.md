@@ -13,11 +13,12 @@ Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
 
 | Handle | Role |
 |--------|------|
-| verta1878 | Project lead, Ecstasy BBS FTN 1:152/158 |
-| sysop/0 | serial.pas UART layer, architecture |
-| evga | Free Pascal Compiler 2.6.4irc, RIP engines, MDL |
-| kiddo | serial_irq.pas ISR, text rendering, MPL, chg2rip |
-| wrench | fossil.pas, netfosdl.pas FOSSIL driver, netmodem2irc |
+| verta1878   | Project lead, Ecstasy BBS FTN 1:152/158 |
+| sysop/0     | serial.pas UART layer, architecture |
+| evga        | Free Pascal Compiler 2.6.4irc, RIP engines, MDL |
+| kiddo       | serial_irq.pas ISR, text rendering, MPL, chg2rip |
+| wrench      | fossil.pas, netfosdl.pas FOSSIL driver, netmodem2irc |
+| hexadecimal	| PCBoard 15.4 — resurrection                |
 
 ## Directory Structure
 
