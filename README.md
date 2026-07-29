@@ -24,6 +24,8 @@ Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
 
 ```
 mystic/                  BBS core (clean, no RIP)
+mystic_ansieditor        110-111 Test ansieditor
+mystic_ansieditor2       111-112 Test ansieditor 2
 mystic_test/             BBS core + RIP integration + A4 fixes
 mdl/                     Mystic Development Library (52+ units)
 mystic_rip/              RIPscrip — ALL RIP code lives here
