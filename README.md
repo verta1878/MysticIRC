@@ -1,19 +1,19 @@
-# Mystic BBS 1.11IRC A7 — Community Fork
+# Mystic BBS 1.11IRC — Community Fork
 
 > **GitHub:** https://github.com/verta1878/mystic-bbs-irc
 >
-> **Release: 2026-07-28** — Version 1.11IRC A7.
+> **Release: 2026-07-28** — Version 1.11IRC A4.
 > RIPscrip v1.54 support (42/42 commands, pixel-perfect).
 > Built with **FPC 2.6.4irc r3.1+**. GPLv3.
 
 Based on **Mystic BBS** GPL source by James Coyle (g00r00).
-Maintained by verta1878, FTN 1:152/158.
+Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
 
 ## Team
 
 | Handle | Role |
 |--------|------|
-| verta1878 | Project lead, FTN 1:152/158 |
+| verta1878 | Project lead, Ecstasy BBS FTN 1:152/158 |
 | sysop/0 | serial.pas UART layer, architecture |
 | evga | Free Pascal Compiler 2.6.4irc, RIP engines, MDL |
 | kiddo | serial_irq.pas ISR, text rendering, MPL, chg2rip |
@@ -23,7 +23,7 @@ Maintained by verta1878, FTN 1:152/158.
 
 ```
 mystic/                  BBS core (clean, no RIP)
-mystic_test/             BBS core + RIP integration (testing)
+mystic_test/             BBS core + RIP integration + A4 fixes
 mdl/                     Mystic Development Library (52+ units)
 mystic_rip/              RIPscrip — ALL RIP code lives here
   v1/                      RIPscrip v1.54 engine
@@ -40,19 +40,28 @@ mystic_rip/              RIPscrip — ALL RIP code lives here
     rips/                    259 test RIP files
     js-reference/            RIPtermJS source (read-only reference)
 mystic_spell/            Hunspell spell check binding
-mystic_crypt/            CryptLib SSH/TLS
+mystic_crypt/            CryptLib SSH/TLS example
 mystic_sdl/              SDL2 graphical terminal
 mystic_modem/            Modem/FOSSIL front-end
 mystic_mailer/           BINKP/FidoNet mailer
+mystic_misdos/           DOS MIS
 examples/
-  mterm/                   mterm terminal + OpenOLMS (28 files, 9,548 lines)
-  serial/                  Serial v1.1 + FOSSIL driver (1,119 lines)
+  mterm/                   mterm terminal + OpenOLMS (38 files, 11,721 lines)
+  serial/                  Serial v1.1 + FOSSIL driver (4 files, 1,119 lines)
   door32/                  g00r00's Door32 library (d32.pas)
+  utrayit/                 Console tray unit + mkicon ICO generator
   thdproscan/              THD ProScan archive
   riptermJS/               RIPtermJS JavaScript viewer (Carl Gorringe, GPLv3)
-  mkicon.pas               Pure Pascal ICO generator (186 lines)
   marc/                    MARC ZIP archiver + MP3/MP4 metadata
+  hslink-src/              HS/Link protocol (clean-room Pascal port)
+  ansilove-src/            Ansilove (VGA font source)
 docs/                    Documentation
+attic/                   Retired code
+out-linux/               Linux build output
+out-win32/               Win32 build output
+out-dos/                 DOS build output
+out-os2/                 OS/2 build output
+out_darwin/              macOS build output
 ```
 
 ## BBS Binaries (18 Win32 PE32 i386)
@@ -66,41 +75,31 @@ docs/                    Documentation
 | mutil | ✅ |
 | fidopoll | ✅ |
 | marc | ✅ |
-| maketheme | ✅ |
-| mbbsutil | ✅ |
 | install | ✅ |
-| install_make | ✅ |
+| mbbsutil | ✅ |
 | nodespy | ✅ |
 | qwkpoll | ✅ |
 | mystpack | ✅ |
+| maketheme | ✅ |
+| install_make | ✅ |
 | 109to110 | ✅ |
+| ripview | ✅ |
 | chg2rip | ✅ |
 | ans2png | ✅ |
-| ripview | ✅ |
-| 20 MPL scripts | ✅ All compile |
 
-## Key Features (1.11IRC A7)
+## Key Features (1.11IRC A4)
 
-- g00r00 1.11 A1-A3 base fully ported
-- RIPscrip v1.54 (42/42 commands, pixel-perfect)
-- RIPView CLI + Free Vision TUI viewer
-- chg2rip/ans2png pixel-perfect converters
-- Password MD5 hashing (auto-upgrade from plaintext)
-- Hunspell spell check binding (runtime loaded)
-- Serial v1.1: UART 16550, IRQ ring buffer, FOSSIL driver
-- Zmodem >2GB file transfer (Int64 fix)
-- MIS system tray icon (embedded resource)
-- MIS clean shutdown (select-based polling)
-- Stale node detection (5-min auto-reclaim)
-- Active user warning in config mode
-- maketheme cfgpath command
-- MIDE help system (237 functions, mplfunc.txt)
-- Searchlight-style lightbar menus (identical to 1.12)
-- MPL: record VAR params, record function return, multi-dim arrays
-- FOSSIL/serial: TIOFossil for DOS dial-up
-- mterm terminal emulator + OpenOLMS offline reader
-- mkicon pure Pascal ICO generator
-- Door32 library (g00r00's d32.pas)
+- g00r00 1.10 A38 base with A39-A63 features ported
+- g00r00 1.11 A1-A3 items: VAR records, TimerMS, FormatDate, Searchlight menus
+- RIPscrip v1.54: RIPView 42/42 commands pixel-perfect
+- Password MD5 hashing with auto-upgrade (bbs_crypt.pas)
+- Hunspell spell check in FS editor
+- Serial v1.1 + FOSSIL driver + IRQ ring buffer
+- mterm terminal + OpenOLMS offline mail reader
+- Stale node detection, MIS shutdown fix, ANSI editor fix
+- Zmodem >2GB file transfers (Int64)
+- Embedded taskbar/tray icon (utrayit + mkicon)
+- 20 MPL scripts, 237 functions documented
 
 ## Build
 
@@ -122,15 +121,12 @@ git clone https://github.com/verta1878/fpc264irc
 | x86_64-linux | ✅ Native |
 | i386-win32 | ✅ Cross-compiled |
 | i386-go32v2 (DOS) | ✅ Cross-compiled |
-| i386-os2 | ✅ Working |
+| i386-os2 | ✅ EMX |
 | i386-darwin | ✅ Needs clang + SDK |
 
 ## License
 
 GNU General Public License v3. See `LICENSE`.
-
-Copyright (C) 1997-2013 By James Coyle
-Copyright (C) 2025-2026 IRC Fork: verta1878, sysop/0, evga, kiddo, wrench
 
 ## Links
 
