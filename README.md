@@ -18,13 +18,15 @@ Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
 | evga | Free Pascal Compiler 2.6.4irc, RIP engines, MDL |
 | kiddo | serial_irq.pas ISR, text rendering, MPL, chg2rip |
 | wrench | fossil.pas, netfosdl.pas FOSSIL driver, netmodem2irc |
+| hexadecimal | PCBoard 15.4 Revival |
 
 ## Directory Structure
 
 ```
 mystic/                  BBS core (clean, no RIP)
 mystic_test/             BBS core + RIP integration + A4 fixes
-mdl/                     Mystic Development Library (52+ units)
+  mdl/                     Local copy of MDL (self-contained build)
+mdl/                     Mystic Development Library (67 units)
 mystic_rip/              RIPscrip — ALL RIP code lives here
   v1/                      RIPscrip v1.54 engine
   v2/                      RIPscrip v2.0 engine
@@ -39,7 +41,7 @@ mystic_rip/              RIPscrip — ALL RIP code lives here
     icons/                   219 ICN/MSK/HIC files
     rips/                    259 test RIP files
     js-reference/            RIPtermJS source (read-only reference)
-mystic_spell/            Hunspell spell check binding
+mystic_spell/            Hunspell spell check binding + SETUP.md
 mystic_crypt/            CryptLib SSH/TLS example
 mystic_sdl/              SDL2 graphical terminal
 mystic_modem/            Modem/FOSSIL front-end
@@ -51,12 +53,18 @@ examples/
   door32/                  g00r00's Door32 library (d32.pas)
   utrayit/                 Console tray unit + mkicon ICO generator
   thdproscan/              THD ProScan archive
+  trapgate/                TrapGate FTN Mailer (43 Pascal, ZLib128, 4 releases)
+  naplps/                  NAPLPS specs (NAP.txt, FIPS121 PDF)
   riptermJS/               RIPtermJS JavaScript viewer (Carl Gorringe, GPLv3)
+  ripterm154/              RIPterm 1.54 DOS binary (Carl Gorringe archive)
   marc/                    MARC ZIP archiver + MP3/MP4 metadata
   hslink-src/              HS/Link protocol (clean-room Pascal port)
   ansilove-src/            Ansilove (VGA font source)
+  rip/                     RIP test files
+  rez2ans-next/            REZ to ANSI converter
+  ciadraw/                 CIA Draw ANSI tool
 docs/                    Documentation
-attic/                   Retired code
+attic/                   Retired code (rip2, retired-libs)
 out-linux/               Linux build output
 out-win32/               Win32 build output
 out-dos/                 DOS build output
