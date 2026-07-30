@@ -47,6 +47,9 @@ mystic_sdl/              SDL2 graphical terminal
 mystic_modem/            Modem/FOSSIL front-end
 mystic_mailer/           BINKP/FidoNet mailer
 mystic_misdos/           DOS MIS
+mystic_ansieditor/       ANSI editor standalone
+mystic_ansieditor2/      ANSI editor v2
+mystic_texteditor/       Text editor standalone
 examples/
   mterm/                   mterm terminal + OpenOLMS (38 files, 11,721 lines)
   serial/                  Serial v1.1 + FOSSIL driver (4 files, 1,119 lines)

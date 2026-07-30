@@ -119,3 +119,20 @@ Or does it just have the code path without using it on XP?
 - Does it fall back to IPv4 on XP?
 
 **Phase 6 item.** Do not add IPv6 until verified against 1.12.
+
+## RIP v1 Video Driver Integration
+
+**Goal:** mystic_test loads video drivers for RIPscrip v1.54 16-color support.
+**Requires:** evga's display layer (mystic_sdl or direct framebuffer).
+**Context:** RIPView renders to a 640x350 EGA canvas with 16 colors.
+The BBS needs to display this canvas to the user — either via
+SDL2 (graphical terminal), direct VGA framebuffer (DOS), or
+converted to ANSI escape sequences (telnet).
+
+**Approach:**
+- DOS: Direct VGA mode 10h (640x350x16) via m_output.pas
+- Win32/Linux: SDL2 window via mystic_sdl/ or pixel-to-ANSI conversion
+- Telnet: RIP commands sent raw to RIP-capable terminal (RIPterm, mterm)
+
+**Status:** Deferred. Needs evga for display layer architecture.
+**Depends on:** RIPView pixel-perfect (done), mystic_test RIP integration (done)
