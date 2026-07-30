@@ -1,0 +1,62 @@
+UPGRADE INFORMATION:
+====================
+If you currently are using an FMail version between 1.02 and 1.49,
+do the following:
+- Backup you config files and your executables.
+- Copy the new executables over the old ones.
+- Start FSetup and go into the Area Manager and the Node
+  Manager. Save changes when exiting.
+
+IMPORTANT: Some programs that access the FMail config files may
+not be able to do so any more after the upgrade. With the AutoExport
+feature, you can export FMail config files in the old 1.02 format
+to another directory thus enabling other programs to keep working
+properly.
+
+
+NEW FEATURES IN 1.60
+====================
+- The maximum number of nodes has been increased to 8000 for 32 bit and
+  DOS-DPMI versions.
+- FTOOLS ADDNEW function has been added. If you run this command after new
+  areas have been received (FMail Toss), these areas will be added to
+  FMAIL.AR (using the defaults you set on the AreaMgr defaults page in
+  FSetup). After that, you can run FMAIL TOSS /B to retoss the bad messages.
+  You can detect the arrival of new areas by testing from your batch file
+  whether or not FMAIL.BDE exists in the FMail directory.
+  If you add the switch /A, the files that are normally updated by FSetup's
+  AutoUpdate feature, will also be updated by FTools AddNew.
+- NT compressed directories are now supported.
+- The product code list has been updated to FTSCPROD.005.
+- It's now possible to have netmail messages sent by you be moved to the
+  Personal Mail directory (extra Yes/No toggle).
+- It's now possible to do JAM base maintenance for selected areas.
+- EleBBS support added.
+- SMTP now can handle multiple filenames when sending netmail messages
+  with more than one file attached.
+- FTools Addnew now also can create the AutoUpdate files if you add /A.
+
+FIXED IN 1.60
+=============
+- Fixed display of amount of disk space being freed after JAM maintenance.
+  The JAM base is now always packed (/P has no function for JAM anymore).
+- Fixed import of FastEcho node file: group membership flags were swapped
+  accidently.
+- Long filenames support for JAM bases has been fixed.
+- A problem that caused FMail to be slow when the MT aware switch was
+  enabled has been fixed.
+- The bug where FMAIL TOSS /B could corrupt the Hudson message base if at
+  the time of execution the message base was almost full has been fixed.
+- Extra checks on the Hudson message base size have been added to prevent
+  message base problems.
+- Fixed statistics in SUMMARY.LOG file.
+- Fixed sort problem of the export addresses in the Area Manager.
+- Global update of the Comment field in the Area Manager has been fixed.
+- Rescan via '=' command in AreaFix messages has been fixed.
+- Update of the QuickBBS info has been fixed.
+- Some time zone related problems have been fixed.
+- A small Y2K problem ('100' in Toss Summary log file) has been fixed.
+- Not all memory was released after using the 'List members' in FSetup.
+  This has been fixed.
+- Problem with wrong destination of 'Passive' notify message has been fixed.
+

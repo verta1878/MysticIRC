@@ -1,0 +1,1166 @@
+3:3/0|"sysgod.org",BND,CM
+3:54/0|"quinnspost.dyndns.org",BND,CM
+3:640/384|"quinnspost.dyndns.org",BND,CM
+3:640/954|"bbs.ricta.net",BND,CM "bbs.ricta.net"_60177,TEL,CM "bbs.ricta.net",IFC,CM
+3:640/1674|"cassowary.buzzard.homedns.org",BND,CM
+3:712/0|"sysgod.org",BND,CM
+3:712/101|"oglaroon.servebeer.com",BND,CM
+3:712/550|"fido.yukla.net",BND,CM
+3:712/620|"dungeon.barnabasmusic.com",BND,CM
+3:712/848|"sysgod.org",BND,CM
+3:633/0|"bbs.vk3heg.net",BND,CM
+3:633/260|"fido.tardis.net",BND,CM "fido.tardis.net"_60177,TEL,CM "fido.tardis.net",IFC,CM
+3:633/267|"blizzard.ozzmosis.com",BND,CM "blizzard.ozzmosis.com"_60177,TEL,CM "blizzard.ozzmosis.com",IFC,CM
+3:633/280|"bbs.vk3heg.net",BND,CM
+3:633/400|"theshackbbs.pepe.net.au",BND,CM "theshackbbs.pepe.net.au",TEL,CM "theshackbbs.pepe.net.au",IFC,CM
+3:800/0|"xaragmata.dyndns-web.com",BND,CM
+3:800/7|"xaragmata.dyndns-web.com",BND,CM
+3:800/214|"fruitscandy.org",BND,CM
+3:800/432|"xaragmata.dyndns-web.com",BND,CM
+3:800/896|"ddomain.bbs.us",BND,CM
+3:772/10|"maxie.tzo.com",BND,CM
+3:772/1|"maxie.tzo.com",BND,CM
+3:772/210|"bbs.the.gen.nz",BND,CM
+1:1/0|"filegate.net",BND,CM "filegate.net"_24555,BND,CM "filegate.net",TEL,CM
+1:1/1|"vintagebbsing.com",BND,CM "vintagebbsing.com",TEL,CM "vintagebbsing.com",IFC,CM
+1:1/20|"the-estar.com",BND,CM
+1:1/21|"cmech.dynip.com",BND,CM
+1:1/120|"wpusa.dynip.com",BND,CM,U,TEW "wpusa.dynip.com",TEL,CM,U,TEW
+1:1/130|"bbs.darkrealms.ca",BND,CM
+1:10/0|"realitycheckbbs.org",BND,CM
+1:10/1|"realitycheckbbs.org",BND,CM
+1:10/3|"binkd.region15.net",BND,CM
+1:102/0|"mysteria.com",BND,CM
+1:102/401|"techware.dynip.com",BND,CM
+1:102/943|"mysteria.com",BND,CM
+1:103/0|"realitycheckbbs.org",BND,CM
+1:103/13|"wd1cks.org"_24554,BND
+1:103/17|"nix.synchro.net",BND "nix.synchro.net",TEL
+1:103/705|"vert.synchro.net",BND,CM
+1:143/0|"realitycheckbbs.org",BND,CM
+1:143/1|"realitycheckbbs.org",BND,CM
+1:143/600|"shodan.synchro.net",BND,CM
+1:143/700|"night.synchro.net",BND,CM
+1:202/0|"realitycheckbbs.org",BND,CM
+1:202/315|"we6jbo.mine.nu",BND,CM
+1:202/1333|"sleepyhollow.darktech.org",BND,CM
+1:207/0|"realitycheckbbs.org",BND,CM
+1:207/210|"theboard.synchro.net",BND,CM
+1:213/0|"net213.rail-city.net",BND,CM
+1:213/720|"binkp.rail-city.net",BND,CM
+1:214/0|"bbs.quinnnet.org",BND,CM
+1:214/1|"bbs.quinnnet.org",BND,CM
+1:214/22|"bbs.quinnnet.org",BND,CM
+1:218/0|"realitycheckbbs.org",BND,CM
+1:218/1|"realitycheckbbs.org",BND,CM
+1:218/150|"midxpres.no-ip.org",BND,CM
+1:218/213|"binkp.rail-city.net",BND,CM
+1:218/601|"wastelands-bbs.net",BND,CM
+1:218/700|"realitycheckbbs.org",BND,CM
+1:218/701|"realitycheckbbs.org",BND,CM
+1:218/903|"net218.strangeGizmo.com",BND,CM
+1:11/0|"ftn.rocasa.net",BND,CM "ftn.rocasa.net"_60177,TEL,CM "ftn.rocasa.net",IFC,CM
+1:11/11|"ftn.rocasa.net",BND,CM "ftn.rocasa.net"_60177,TEL,CM "ftn.rocasa.net",IFC,CM
+1:11/331|"ftn.emergencyscene.net",BND,CM
+1:11/340|"echo-base-bbs.com",BND,CM
+1:120/0|"ftn.rocasa.net",BND,CM "ftn.rocasa.net"_60177,TEL,CM
+1:120/229|"xblade.mooo.com",BND,CM
+1:120/301|"bbs.legionhq.net",BND,CM "bbs.legionhq.net"_60178,BND,CM "bbs.legionhq.net"_60177,TEL,CM "bbs.legionhq.net",IFC,CM
+1:120/331|"ftn.emergencyscene.net",BND,CM
+1:120/481|"rockford.yi.org",BND,CM "rockford.yi.org",TEL,CM
+1:120/544|"ftn.rocasa.net",BND,CM "ftn.rocasa.net"_60177,TEL,CM "ftn.rocasa.net",IFC,CM
+1:120/546|"rocasa.biz",BND
+1:120/601|"osbbs.dtdns.net",BND,CM
+1:120/602|"landoftheloungelizards.com",BND,CM
+1:154/0|"bbs.pharcyde.org",BND,CM
+1:154/10|"bbs.pharcyde.org",BND,CM
+1:154/20|"roi.synchro.net",BND,CM
+1:220/0|"thedragonscove.us",BND,CM
+1:220/10|"thedragonscove.us",BND,CM "thedragonscove.us",TEL,CM
+1:220/14|"mpcug.com",BND,CM
+1:220/20|"becksbbs.synchro.net",TEL,CM
+1:226/50|"bbs.nitemarecafe.com",BND,CM "bbs.nitemarecafe.com"_60177,TEL,CM
+1:226/150|"bbs.glorb.com",BND,CM
+1:226/160|"filebuck.synchro.net",BND
+1:226/200|"flownet.org",BND
+1:226/250|"Thecause.synchro.net",BND,CM
+1:226/301|"cozmos.thruhere.net",BND,CM "cozmos.thruhere.net",TEL,CM
+1:226/410|"tek1systems.com",TEL,CM
+1:227/201|"ewbbs.synchro.net",BND,CM
+1:227/300|"flamingstar.no-ip.info",BND,CM "flamingstar.no-ip.info",TEL,CM
+1:227/350|"bwrbbs.dynddns.org",BND,CM "bwrbbs.dynddns.org",TEL,CM
+1:2215/0|"fidonet.wabusa.com",BND,CM
+1:2215/1|"fidonet.wabusa.com",BND,CM
+1:2215/10|"ftn.wabusa.com"_24555,BND,CM "ftn.wabusa.com"_3141,TEL,CM "ftn.wabusa.com",IFC,CM
+1:2215/15|"fidonet.wabusa.com",BND,CM
+1:2215/111|"fido.sinnershaven.com",BND,CM
+1:2215/300|"nnl.darktech.org",BND,CM
+1:2215/1701|"bbs.sfhqbbs.org",TEL,CM
+1:2320/0|"DERBYCITYBBS.COM",BND,CM "DERBYCITYBBS.COM"_24554,BND,CM "DERBYCITYBBS.COM",TEL,CM
+1:2320/109|24.95.249.246,BND,CM
+1:2320/112|067.142.045.122,TEL
+1:2320/200|63.165.1.205,BND,CM
+1:2320/304|"Manic-modem.com",TEL,CM,U,TCP,TEL "Manic-modem.com",IFC,CM,U,TCP,TEL
+1:12/0|"lionsden.darktech.org",BND,CM
+1:12/1|"bbs.diskshop.ca",BND,CM
+1:12/2|"bbs.darkrealms.ca",BND,CM
+1:229/0|"bbs.darkrealms.ca",BND,CM,CM
+1:229/200|"bbs.electronicchicken.com",BND,CM
+1:229/426|"bbs.darkrealms.ca",BND,CM,CM
+1:229/452|"tinysbbs.com",BND,CM,CM
+1:229/619|"bbsorillia.com",BND,CM,CM
+1:229/713|"philster.org",BND,CM
+1:249/0|"lionsden.darktech.org",BND,CM
+1:249/133|"ca.animeshare.com",BND,CM
+1:249/134|"canada.synchro.net",BND,CM
+1:249/177|"bbs.ed209.org",BND
+1:249/179|"mail.thecubebbs.com",BND
+1:249/202|"bbs.micronick.com",BND,CM
+1:249/205|"brainscan.servebbs.com",BND,CM
+1:249/300|"lionsden.darktech.org",BND,CM
+1:249/303|"lionsden.darktech.org",BND,CM
+1:250/468|"mysticrealms.myddns.com",BND,CM
+1:255/0|"bbs.node2001.org",BND,CM "bbs.node2001.org"_60177,TEL,CM "bbs.node2001.org",IFC,CM
+1:255/28|"bbs.node2001.org",BND,CM "bbs.node2001.org"_60177,TEL,CM "bbs.node2001.org",IFC,CM
+1:255/36|"theville.vintagecomputing.net",BND,CM
+1:13/0|"cfbbs.dtdns.net",BND,CM "cfbbs.dtdns.net",TEL,CM
+1:13/1|"ssalpha.dyndns.org",BND,CM
+1:13/2|"robertwolfe.org",BND,CM
+1:109/0|"bbsdoors.com",BND,CM
+1:109/201|"bbs.cyberchatnet.com",BND,CM "bbs.cyberchatnet.com",IFC,CM
+1:109/567|"bbsdoors.com",BND,CM
+1:129/0|"cfbbs.dtdns.net",BND,CM "cfbbs.dtdns.net",TEL,CM
+1:129/102|"convolution.us",BND,CM
+1:129/150|98.239.130.130,TEL
+1:129/165|"battlestarbbs.dyndns.org",BND,CM "battlestarbbs.dyndns.org"_51,TEL,CM
+1:129/215|"mysticbbs.pwnz.org",BND,CM
+1:129/305|"ttb.slyip.com",BND,CM
+1:261/0|"bbs.weather-station.org"_24555,BND,CM
+1:261/1|"bbs.weather-station.org"_24555,BND,CM
+1:261/20|"robertwolfe.org",BND,CM
+1:261/38|"filegate.net",BND,CM
+1:261/100|"filegate.net"_24555,BND,CM "filegate.net",TEL,CM
+1:261/220|"blues.zapto.org",BND,CM
+1:261/1304|"bbs.weather-station.org",BND,CM
+1:261/1352|76.160.123.50,BND,CM
+1:261/1381|"holodeckbbs.homeip.net",BND,CM
+1:261/1406|"amachat.zapto.org",BND,CM
+1:261/1550|76.160.123.50,BND,CM
+1:261/3000|76.160.123.50,BND,CM
+1:266/0|"cfbbs.dtdns.net",BND,CM "cfbbs.dtdns.net",TEL,CM
+1:266/10|"thelooniebin.net",BND
+1:266/32|"eldritch.darktech.org",BND,CM
+1:266/75|"bbs.theyird.com",TEL,CM
+1:266/185|"tazbbs.dtdns.net",BND,CM
+1:266/404|"tequilamockingbirdonline.net",BND
+1:266/420|"ssalpha.dyndns.org",BND,CM
+1:266/512|"cfbbs.dtdns.net",BND,CM "cfbbs.dtdns.net",TEL,CM
+1:266/1413|"bbs.haz-matiii.com",BND,CM
+1:267/0|"net267.ns1.twlightparadox.com",BND,CM
+1:267/1|"yurykalinin.servemp3.com",BND,CM "yurykalinin.servemp3.com",TEL,CM "yurykalinin.servemp3.com",IFC,CM
+1:267/69|"bbs.doilidov.com",BND,CM
+1:267/150|"csbbs.twilightparadox.com",BND,CM
+1:267/151|"oceanbbs.dyndns.org",BND,CM
+1:267/152|"xtcbox.org",BND,CM
+1:267/153|"amachat.org"_24556,BND,CM "amachat.org"_30,TEL,CM
+1:267/155|"hpbbs.dyndns.org",TEL,CM
+1:267/206|"theblack.net",BND
+1:267/250|"ruscubbi.dyndns.org",BND,CM "ruscubbi.dyndns.org",IFC,CM
+1:267/310|"siliconu.synchro.net",BND,CM
+1:267/375|"warriorbbs.dyndns.org",BND,CM
+1:275/0|"shenks.synchro.net",BND,CM
+1:275/1|"thedarksword.darktech.org",BND,CM
+1:275/89|"bbs.dmine.net",BND,CM "bbs.dmine.net",TEL,CM
+1:275/91|"fluph.darktech.org",BND,CM
+1:275/92|"fluph.darktech.org"_2313,BND,CM
+1:275/100|"shenks.dyndns.org",BND,CM
+1:275/215|"thedarksword.darktech.org",BND,CM
+1:14/0|"vintagebbsing.com",BND,CM "vintagebbsing.com",TEL,CM "vintagebbsing.com",IFC,CM
+1:282/0|"vintagebbsing.com",BND,CM "vintagebbsing.com",TEL,CM "vintagebbsing.com",IFC,CM
+1:282/1050|"dkbbs.shensey.com",BND,CM "dkbbs.shensey.com"_60177,TEL,CM
+1:282/1055|"melon.rlaprise.net",BND,CM "melon.rlaprise.net"_60177,TEL,CM
+1:282/1056|"crystalp.synchro.net",BND,CM "crystalp.synchro.net",BND,CM "crystalp.synchro.net",IFC,CM
+1:282/1057|"bismaninfo.hopto.org",BND,CM "bismaninfo.hopto.org",BND,CM "bismaninfo.hopto.org",IFC,CM
+1:289/0|"vintagebbsing.com",BND,CM "vintagebbsing.com",TEL,CM "vintagebbsing.com",IFC,CM
+1:289/51|"hzbbs.synchro.net",BND,CM
+1:289/52|"starbase.myvnc.com",BND,CM "starbase.myvnc.com",TEL,CM "starbase.myvnc.com",IFC,CM
+1:298/0|"vintagebbsing.com",BND,CM "vintagebbsing.com",TEL,CM "vintagebbsing.com",IFC,CM
+1:298/5|"vintagebbsing.com",BND,CM "vintagebbsing.com",TEL,CM "vintagebbsing.com",IFC,CM
+1:298/6|"vintagebbsing.com",BND,CM
+1:300/0|"vintagebbsing.com",BND,CM "vintagebbsing.com",TEL,CM "vintagebbsing.com",IFC,CM
+1:300/4|"b-o-g.net",BND,CM "b-o-g.net",TEL,CM "b-o-g.net",IFC,CM
+1:2905/0|"vintagebbsing.com",BND,CM "vintagebbsing.com",TEL,CM "vintagebbsing.com",IFC,CM
+1:2905/2|"web.backalley.net",BND,CM
+1:288/0|"curmudge.hopto.org",BND,CM
+1:288/34|"curmudge.hopto.org",BND,CM
+1:15/0|"bayhaus.org",BND,CM "bayhaus.org"_60177,TEL,CM "bayhaus.org",IFC,CM
+1:15/1|"lightningbbs.com",BND,CM "lightningbbs.com",TEL,CM
+1:15/3|"binkd.region15.net",BND,CM
+1:15/350|"bbs.kingdomsend.net",BND,CM
+1:114/0|"bayhaus.org",BND,CM "bayhaus.org"_60177,TEL,CM "bayhaus.org",IFC,CM
+1:114/201|"babblebbs.no-ip.org",BND,CM "babblebbs.no-ip.org",TEL,CM
+1:114/271|"bbs.dbackbbs.com",BND,CM "bbs.dbackbbs.com",TEL,CM
+1:114/365|"kellys.synchro.net",BND,CM
+1:114/464|"torchwood-3.dyndns.org",BND,CM "torchwood-3.dyndns.org",TEL,CM
+1:114/480|"theechozone.com",BND
+1:114/485|"bbs.trod.org",BND,CM "bbs.trod.org"_60177,TEL,CM "bbs.trod.org",IFC,CM
+1:114/487|"novabbs.org",BND,CM
+1:114/501|"acme-anvil.darktech.org",TEL,CM
+1:114/625|"therealmbbs.com",BND,CM "therealmbbs.com",TEL,CM
+1:114/701|"ss-bbs.dns2go.com"_51,TEL,CM
+1:128/0|"cscnet1.net",BND,CM
+1:128/1|"cscnet1.net",BND,CM
+1:128/2|"bayhaus.org",BND,CM "bayhaus.org"_60177,TEL,CM "bayhaus.org",IFC,CM
+1:128/3|"asgard-bbs.net",BND,CM
+1:128/187|"cscnet1.net",BND,CM
+1:311/0|"lightningbbs.com",BND,CM "lightningbbs.com",TEL,CM
+1:311/1|"lightningbbs.com",BND,CM "lightningbbs.com",TEL,CM
+1:311/2|"lightningbbs.com",BND,CM "lightningbbs.com",TEL,CM
+1:311/4|"cpugod.synchro.net"_3141,BND,CM
+1:305/0|"hermes.coherent-logic.com",BND,CM
+1:305/1|"hermes.coherent-logic.com",BND,CM
+1:305/2|"deadbeatz.org",BND,CM
+1:16/0|"bnbbbs.net",BND,CM "bnbbbs.net",TEL,CM
+1:132/0|"asok.dtdns.net",BND,CM
+1:132/174|"asok.dtdns.net",BND,CM
+1:142/0|"bnbbbs.dyndns.org",BND,CM "bnbbbs.dyndns.org",TEL,CM
+1:142/926|"n1api.ham-radio-op.net",BND,CM
+1:320/0|"bnbbbs.net",BND,CM "bnbbbs.net",TEL,CM
+1:320/101|"mobiusbbs.dyndns.org",BND,CM
+1:320/111|"matrixreturns.dyndns.org",BND,CM
+1:320/119|"bnbbbs.net",BND,CM "bnbbbs.net",TEL,CM
+1:320/219|"bnbbbs.net"_24555,BND,CM "bnbbbs.net"_60177,TEL,CM "bnbbbs.net",IFC,CM
+1:322/0|"cascadesbbs2.com",BND,CM
+1:322/320|"lostcryp.synchro.net",BND,CM
+1:322/753|"necrobbs.strangled.net",BND,CM
+1:322/754|"sbbs.cascadesbbs2.com"_24556,BND,CM
+1:322/755|69.85.85.61,BND 69.85.85.61,BND 69.85.85.61,TEL
+1:322/756|"va.cascadesbbs2.com"_24555,BND,CM
+1:322/757|"majicka.at2k.org",BND,CM
+1:322/758|"bbs.spendydays.com",BND,CM
+1:322/759|"cascadesbbs2.com",BND
+1:322/761|"bbs.oddbit.com",BND
+1:323/120|"chowdanet.com",TEL,CM
+1:323/981|"tunemanbbs.mine.nu",BND,CM
+1:17/0|"nwstar.tzo.com",BND,CM
+1:138/0|"lookglas.tzo.com",BND,CM
+1:138/142|"bbs.retroarchive.org",BND,CM "bbs.retroarchive.org",TEL,CM
+1:138/146|"lookglas.tzo.com",BND,CM
+1:138/391|12.150.66.87,BND,CM
+1:138/393|"bbs.ezvsn.com",BND,CM
+1:140/0|"nwstar.tzo.com",BND,CM
+1:140/1|"nwstar.tzo.com",BND,CM
+1:153/7715|"bandmaster.tzo.com",BND,CM
+1:153/802|70.77.23.245_66,BND
+1:340/0|"time.synchro.net",BND,CM
+1:340/7|"digdist.bbsindex.com",BND,CM "digdist.bbsindex.com",TEL,CM "digdist.bbsindex.com",IFC,CM
+1:340/10|"x-bit.org",BND,CM
+1:340/100|"bbs.echto.net",BND,CM
+1:340/400|"time.synchro.net",BND,CM
+1:340/700|"bbs.chernobylnetworks.ru",BND,CM
+1:342/9|"wolf-lair.dyndns.org",IFC,CM
+1:342/16|"jandro1000.no-ip.biz",BND,CM
+1:342/41|"pcgames.synchro.net",BND,CM
+1:342/77|"binkp.gypsybbs.net",BND,CM
+1:342/806|"xanadubbs.ca",BND,CM "xanadubbs.ca",TEL,CM "xanadubbs.ca",IFC,CM
+1:18/0|"the-estar.com",BND,CM
+1:18/1|"wpusa.dynip.com",BND,CM "wpusa.dynip.com",TEL,CM
+1:18/200|"bbs.outpostbbs.net",BND,CM
+1:116/0|"bbs.lmbh.org",BND,CM "bbs.lmbh.org",TEL,CM
+1:116/12|"stormerlabs.homelinux.net",TEL
+1:116/18|"robertwolfe.org",BND,CM
+1:116/19|"eastsidebbs.com"_51,TEL,CM
+1:116/22|"www.thebutt.net",BND "www.thebutt.net",TEL
+1:116/28|"magnum.synchro.net",BND,CM "magnum.synchro.net",TEL,CM
+1:116/60|"opendoor.synchro.net",BND,CM
+1:116/80|"bbs.at2k.org",BND,CM
+1:116/110|"fido.club-friday.net",BND,CM
+1:116/116|"bbs.lmbh.org",BND,CM "bbs.lmbh.org",TEL,CM
+1:116/739|"am1620.servebbs.net",BND,CM "am1620.servebbs.net",TEL,CM
+1:116/4148|"kj4tkv.org",BND,CM "kj4tkv.org",TEL,CM
+1:123/0|"the-estar.com",BND,CM
+1:123/10|"ssl.archaicbinary.net",BND,CM
+1:123/22|"sq1bbs.com",BND
+1:123/24|"qlbbs.mooo.com",BND,CM "qlbbs.mooo.com",TEL,CM "qlbbs.mooo.com",IFC,CM
+1:123/52|"kia.zapto.org",BND,CM "kia.zapto.org",TEL,CM
+1:123/57|"eoth.dyndns.org",BND,CM "eoth.dyndns.org",TEL,CM
+1:123/100|"armed.gamilitia.us",BND "armed.gamilitia.us",TEL
+1:123/130|"afterhours-bbs.com",BND
+1:123/140|"docsplace.tzo.com",BND
+1:123/160|"english.office-on-the.net",BND,CM
+1:123/170|"bbs.techinvasion.net",BND,CM "bbs.techinvasion.net",TEL,CM
+1:123/205|"tffbbs.com",BND "tffbbs.com",TEL
+1:123/256|"bbs.furmen.org",BND,CM "bbs.furmen.org",TEL,CM "bbs.furmen.org",IFC,CM
+1:123/300|"montereybbs.ath.cx",BND,CM "montereybbs.ath.cx",TEL,CM
+1:123/500|"the-estar.com",BND,CM
+1:123/518|"flashback-bbs.zapto.org",BND,CM
+1:123/880|"fjbbs.gotdns.com",BND,CM "fjbbs.gotdns.com",TEL,CM
+1:123/1025|"pinebelt.servebbs.net",BND,CM
+1:123/2000|"playmate.selfip.com",BND,CM "playmate.selfip.com"_60177,TEL,CM "playmate.selfip.com",IFC,CM
+1:123/6502|71.41.126.198,BND,CM
+1:135/0|"bbs.ds69bbs.com",BND,CM "bbs.ds69bbs.com",TEL,CM
+1:135/3|"core.barvinok.net",BND,CM
+1:135/364|"bbs.ds69bbs.com",BND,CM "bbs.ds69bbs.com",TEL,CM
+1:135/365|"gac.no-ip.com",BND,CM
+1:135/366|"localyocalbbs.com",BND,CM "localyocalbbs.com",TEL,CM
+1:135/368|"eoth2.dyndns.org",BND,CM "eoth2.dyndns.org",TEL,CM
+1:135/369|"piranha.acid.org",BND,CM "piranha.acid.org",TEL,CM
+1:135/370|"bbs.flutterbyesbbs.com",BND,CM "bbs.flutterbyesbbs.com",TEL,CM
+1:137/0|"abnormal.zapto.org",BND,CM "abnormal.zapto.org",TEL,CM
+1:137/10|"abnormal.zapto.org",BND,CM "abnormal.zapto.org",TEL,CM
+1:3634/0|"ftn.wpusa.dynip.com",BND,CM "ftn.wpusa.dynip.com",TEL,CM
+1:3634/1|"ftn.wpusa.dynip.com",BND,CM "ftn.wpusa.dynip.com",TEL,CM
+1:3634/12|"ftn.wpusa.dynip.com",BND,CM "ftn.wpusa.dynip.com",TEL,CM
+1:3634/15|"fidonet.wabusa.com",BND,CM
+1:3634/22|"sq1bbs.com",BND,CM
+1:3634/24|"bbs.shadowscope.com",BND,CM "bbs.shadowscope.com",TEL,CM
+1:3634/25|"digital52.com",BND,CM
+1:3634/1000|"ftn.wpusa.dynip.com",BND,CM "ftn.wpusa.dynip.com",TEL,CM
+1:3634/3000|"ftn.wpusa.dynip.com",BND,CM "ftn.wpusa.dynip.com",TEL,CM
+1:19/0|"sursum-corda.com",BND,CM "sursum-corda.com",TEL,CM
+1:106/0|"bbs.theflowers.tv",BND,CM "bbs.theflowers.tv",TEL,CM
+1:106/9788|"bbs.theflowers.tv",BND,CM "bbs.theflowers.tv",TEL,CM
+1:106/324|"cyberia.darktech.org",BND,CM
+1:124/0|"omgwtfbbs.org",BND,CM "omgwtfbbs.org",TEL,CM
+1:124/25|"omgwtfbbs.org",BND,CM "omgwtfbbs.org",TEL,CM
+1:124/5009|"FMLYNET.DYNDNS.ORG"_24556,BND "FMLYNET.DYNDNS.ORG",TEL
+1:124/5013|"rdfig.net",BND,CM
+1:170/0|"onguardbbs.com",TEL,CM
+1:170/201|"onguardbbs.com",TEL,CM
+1:170/500|"onguardbbs.com",TEL,CM
+1:387/0|"lone-star.dyndns.org",BND,CM
+1:387/1|"lone-star.dyndns.org",BND,CM
+1:387/6|"lone-star.dyndns.org",BND,CM
+1:387/10|"z28krazy.dyndns.org"_24555,BND,CM
+1:387/20|"bbs.kristyandrick.com",BND,CM "bbs.kristyandrick.com",TEL,CM
+1:387/22|"lone-star.dyndns.org",BND,CM
+1:393/0|"cmech.dynip.com",BND,CM
+1:393/31|"setxbbs.synchro.net",BND,CM
+1:393/68|"cmech.dynip.com",BND,CM
+1:396/0|"sursum-corda.com",BND,CM "sursum-corda.com",TEL,CM
+1:396/3|"sursum-corda.com",BND,CM "sursum-corda.com",TEL,CM
+1:396/4|"sursum-corda.com",BND,CM "sursum-corda.com",TEL,CM
+1:396/18|"costakis.org",TEL
+1:396/40|"reu.org",TEL,CM
+1:396/45|"sursum-corda.com",BND,CM "sursum-corda.com",TEL,CM
+1:396/60|"kingcoder.net",BND,CM "kingcoder.net",TEL,CM
+1:3828/0|108.223.123.25,BND,CM
+1:3828/1|108.223.123.25,BND,CM
+1:3828/6|108.223.123.25,BND,CM
+1:3828/7|108.223.123.25,BND,CM
+1:3828/99|108.223.123.25,BND,CM
+2:2/2|"felten.yi.org",BND,CM
+2:2/20|"admin.ftsc.org",BND,CM,U,TCc
+2:2/33|"s.mascanc.net",BND,CM,U,TXH
+2:2/1003|"AMBROSIA60.dtdns.net",BND,CM
+2:20/0|"felten.yi.org",BND,CM
+2:201/0|"bejo.dyndns.org",BND,CM
+2:201/111|"bejo.dyndns.org",BND,CM
+2:201/148|"www.fidoreader.com",BND,CM
+2:201/329|"pippin.webbplatsen.se",TEL
+2:201/330|"pippin.webbplatsen.se",TEL
+2:201/499|"murphys.se"_200,BND,CM "murphys.se",TEL,CM "murphys.se"_24,TEL,CM "murphys.se"_199,IFC,CM
+2:201/605|"medin.dynip.com",BND,CM "medin.dynip.com",TEL,CM
+2:203/0|"felten.yi.org",BND,CM
+2:203/2|"felten.yi.org",BND,CM
+2:203/3|"thecurio.servebbs.com",BND,CM "thecurio.servebbs.com",TEL,CM
+2:203/6|"felten.yi.org",BND,CM
+2:203/124|"pepzi.eu",TEL,CM
+2:203/412|"Jamten-TCL.m.nu",BND,CM
+2:21/999|"copbbs.dyndns.org",BND,CM
+2:211/1|"copbbs.dyndns.org",BND,CM
+2:211/37|"copbbs.dyndns.org",BND,CM
+2:22/0|"rbb.ath.cx",BND,CM
+2:22/999|"rbb.homeip.net"_24567,BND,CM
+2:221/0|"rbb.ath.cx",BND,CM "rbb.ath.cx"_24567,BND,CM
+2:221/1|"rbb.homeip.net",BND,CM
+2:221/360|"rbb.bbs.fi",BND,CM "rbb.bbs.fi"_32,TEL,CM
+2:221/361|"rbb.bbs.fi",BND,CM
+2:222/42|"bbbs.net"_200,BND,CM "bbbs.net",TEL,CM
+2:23/0|"duggi.junc.org",BND,CM "duggi.junc.org",TEL,CM "duggi.junc.org",IFC,CM
+2:230/0|"duggi.junc.org",BND,CM "duggi.junc.org",TEL,CM "duggi.junc.org",IFC,CM
+2:230/35|"fido.ddibbsystem.dk",BND "fido.ddibbsystem.dk",TEL
+2:230/38|"duggi.junc.org",BND,CM "duggi.junc.org",TEL,CM "duggi.junc.org",IFC,CM
+2:230/53|"duggi.junc.org",BND,CM "duggi.junc.org",TEL,CM "duggi.junc.org",IFC,CM
+2:230/100|"bbs.geekworld.dk",BND,CM "bbs.geekworld.dk",TEL,CM "bbs.geekworld.dk",IFC,CM
+2:230/150|"binkp.kofobbs.dk",BND,CM "binkp.kofobbs.dk",IFC,CM
+2:230/151|"fido3.kofobbs.dk",BND,CM "fido3.kofobbs.dk",IFC,CM
+2:230/152|"fido2.kofobbs.net",BND,CM "fido2.kofobbs.net",TEL,CM
+2:230/153|"fido.kofobbs.dk",BND,CM "fido.kofobbs.dk",TEL,CM "fido.kofobbs.dk",IFC,CM
+2:24/2|"pbbs.darktech.org",BND,CM
+2:240/1|"datenbahn.dd-dns.de",BND,CM
+2:240/6298|"fido.crashmail.de",BND,CM
+2:240/2189|"binkd.kruemel.org",BND,CM
+2:240/2198|"outpost.kruemel.org",BND,CM
+2:240/4014|"bagge.dyndns.org",BND,CM
+2:240/4099|"olav.homelinux.com",BND,CM
+2:240/5834|"datenbahn.dd-dns.de",BND,CM
+2:2410/300|"quadriga-berlin.dyndns.org",BND,CM
+2:2410/301|"quadriga-berlin.dyndns.org",BND,CM
+2:2410/399|"quadriga-berlin.dyndns.org",BND,CM
+2:2410/202|"strickeranderl.org",BND,CM
+2:2411/0|"Host2411.dyndns.org",BND,CM
+2:2411/1|"NC.n2411.de",BND,CM "NC.n2411.de",IFC,CM
+2:2411/3|"PLK.n2411.de",BND,CM "PLK.n2411.de",IFC,CM
+2:2411/12|"stts.no-ip.org",BND
+2:2411/413|"nomans.n2411.de",BND,CM
+2:2411/500|"CHARON-BBS.dyndns.org",BND,CM
+2:2411/506|"CHARON-BBS.n2411.de",BND,CM
+2:2411/525|"525.n2411.de",BND,CM "525.n2411.de",IFC,CM
+2:244/0|"AMBROSIA60.dtdns.net",BND,CM
+2:244/1200|"AMBROSIA60.dtdns.net",BND,CM
+2:244/1120|"AMBROSIA60.dtdns.net",BND,CM
+2:244/1661|"fido.theca-tabellaria.de",BND,CM
+2:244/77|"monobox.dtdns.net",BND,CM
+2:244/1353|"binkd.wombaz.de",BND,CM
+2:244/1512|"The.Geek2-Grotto.de",BND,CM "The.Geek2-Grotto.de"_60177,TEL,CM "The.Geek2-Grotto.de",IFC,CM
+2:246/0|"binkd.kleinmann-haigerloch.de",BND,CM "binkd.kleinmann-haigerloch.de"_60177,TEL,CM "binkd.kleinmann-haigerloch.de",IFC,CM
+2:246/2000|"binkd.kleinmann-haigerloch.de",BND,CM "binkd.kleinmann-haigerloch.de"_60177,TEL,CM "binkd.kleinmann-haigerloch.de",IFC,CM
+2:246/1020|"joschi.dyndns.org",BND,CM
+2:246/1305|"wieslauf.dyndns.org",BND,CM "wieslauf.dyndns.org",IFC,CM
+2:246/2027|"binkd.kleinmann-haigerloch.de",BND,CM "binkd.kleinmann-haigerloch.de"_60177,TEL,CM "binkd.kleinmann-haigerloch.de",IFC,CM
+2:249/0|"monisbox.dyndns.org",BND,CM
+2:249/3000|"monisbox.dyndns.org",BND,CM
+2:249/592|"robo-bbs.dyndns.org",BND,CM "robo-bbs.dyndns.org",IFC,CM
+2:249/3110|"monisbox.dyndns.org",BND,CM
+2:249/3111|"monisbox.dyndns.org",BND,CM
+2:249/3112|"bbsdd.de",BND
+2:249/3114|"monisbox.dyndns.org",BND,CM
+2:249/3120|"bbs-planb.no-ip.org",BND,CM
+2:2426/2191|"bernibox-ol.dyndns.org",BND,CM
+2:2432/217|"carsten.darktech.org",BND,CM
+2:2432/223|"donnerhain.dyndns.org",BND,CM
+2:2432/260|"oal-fido.no-ip.org",BND,CM
+2:2432/280|"michamhx.ath.cx",BND
+2:2432/299|"pbbs.darktech.org",BND,CM
+2:2432/333|"salze.dyns.cx",BND
+2:2432/344|"graybeast.dyndns.org"_24555,BND,CM "graybeast.dyndns.org",TEL,CM "graybeast.dyndns.org",IFC,CM
+2:2432/348|"graybeast.dyndns.org"_24555,BND,CM "graybeast.dyndns.org",TEL,CM "graybeast.dyndns.org",IFC,CM
+2:2432/349|"graybeast.dyns.cx",BND,CM
+2:2432/363|"dance-system.dyndns.org",BND,CM
+2:2432/394|"ftn.owlserver.de",TEL,CM
+2:2432/395|"binkd.owlserver.de",BND,CM
+2:2432/920|"binkd.darkwhole.de",BND,CM
+2:2433/404|"wing-willich.dyndns.org",BND,CM
+2:2433/405|"henter.homeip.net",BND,CM
+2:2437/0|"travelbit.servebeer.com",BND,CM
+2:2437/1|"travelbit.dyndns.org",BND,CM
+2:2437/10|"trikone.han.de",BND,CM
+2:2437/33|"Fido.DE",BND,CM
+2:2437/34|"defiant.home.kafke.net",BND,CM "defiant.home.kafke.net",IFC,CM
+2:2437/200|"travelbit.dyndns.org",BND,CM
+2:2437/224|"travelbit.servebeer.com",BND,CM
+2:2443/0|"bgl-net.astrath.net",BND,CM "bgl-net.astrath.net"_60177,TEL,CM "bgl-net.astrath.net",IFC,CM
+2:2443/3|"plk-bgl-net.astrath.net",BND,CM "plk-bgl-net.astrath.net"_60177,TEL,CM "plk-bgl-net.astrath.net",IFC,CM
+2:2443/1021|"srv1.nrw1de.ksit.de",BND,CM
+2:2443/1183|"roedeldns.dyndns.org",BND,CM
+2:2443/1311|"comlink.astrath.net",BND,CM
+2:2443/1313|"funboard.astrath.net",BND,CM "funboard.astrath.net"_60177,TEL,CM "funboard.astrath.net",IFC,CM
+2:2448/0|"schnickschnack.darktech.org",BND,CM
+2:2448/1|"abel.dnsalias.net",BND,CM
+2:2448/222|"geros-castle.homeip.net",BND
+2:2448/600|"schnickschnack.darktech.org",BND,CM
+2:2448/614|"schnickschnack.darktech.org",BND,CM
+2:2448/615|"schnickschnack.darktech.org",BND,CM
+2:2448/656|"canmin.duenn.ruhr.de",BND,CM
+2:2448/3000|"fido.second.de",BND,CM "fido.second.de",TEL,CM "fido.second.de",IFC,CM
+2:2448/305|"fido.second.de",BND "fido.second.de",TEL "fido.second.de",IFC
+2:2448/44|"abel.dnsalias.net",BND,CM
+2:2448/401|"fido.softeq.org",BND,CM "fido.softeq.org"_60177,TEL,CM "fido.softeq.org",IFC,CM
+2:2449/7|"ideefix.dyndns.org",BND,CM
+2:2449/170|"sbbs.cjb.net",BND,CM
+2:2449/175|"sbbs.dyndns.org",BND,CM
+2:2449/179|"sbbs.darktech.org",BND "sbbs.darktech.org",TEL
+2:2449/185|"bb2.rattenholl.com",BND "bb2.rattenholl.com",TEL
+2:2449/402|"hst.dyndns.dk",BND,CM
+2:2449/434|"rr1.dnsart.com",BND,CM
+2:2452/0|"host2452.doene.de",BND,CM
+2:2452/250|"ftn.doene.de",BND,CM
+2:2452/280|"schauf.homeip.net",BND
+2:2452/290|"wueppel.doene.de"_24555,BND,CM
+2:2454/919|"binkd.prometheus-home.de",BND,CM
+2:2476/159|"flyerbbs.dyndns.org",BND,CM
+2:2476/480|"finest.dyndns.org",BND,CM
+2:2476/493|"aroundos2.dyndns.org",BND,CM
+2:2490/1052|"binkd.gloeckner.cx",BND,CM
+2:2490/3046|"cyberia.dnsalias.com",BND,CM
+2:2490/3050|"srv1.nrw1de.ksit.de",BND,CM
+2:2490/4049|"pbh.dyndns.org",BND,CM
+2:25/0|"applewoodbbs.mine.nu",BND,CM,U,TCE
+2:250/0|"applewood.mine.nu",BND,CM,U,TCE
+2:250/1|"applewoodbbs.mine.nu",BND,CM "applewoodbbs.mine.nu",TEL,CM
+2:250/2|"bbs.zeusdev.co.uk",BND
+2:250/7|"b4bbs.sampsa.com",BND,CM
+2:250/9|"stormie.synchro.net",BND,CM
+2:250/10|"sbbs.ath.cx",BND,CM
+2:250/11|"b4hermes.sampsa.com",BND,CM
+2:250/13|"norbertbbs.org",BND,CM
+2:250/25|"fido.pavelreich.org",BND,CM
+2:250/88|"b4bbs.sampsa.com",BND,CM
+2:28/0|"fido.vlist.eu",BND,CM,U,TCc
+2:280/0|"fido.ddutch.nl",BND,CM "fido.ddutch.nl"_60177,TEL,CM "fido.ddutch.nl",IFC,CM
+2:280/19|"binkp.dreamlandbbs.com",BND,CM "binkp.dreamlandbbs.com"_60177,TEL,CM "binkp.dreamlandbbs.com",IFC,CM
+2:280/1027|"binkp.dreamlandbbs.com",BND,CM "binkp.dreamlandbbs.com"_60177,TEL,CM "binkp.dreamlandbbs.com",IFC,CM
+2:280/1041|"fido.bier028.nl"_60117,TEL,CM
+2:280/1043|"bbs.falconbbs.nl",BND,CM
+2:280/53|"fido.ddutch.nl",BND,CM "fido.ddutch.nl"_60177,TEL,CM "fido.ddutch.nl",IFC,CM
+2:280/464|"fido.vlzn.nl",BND,CM
+2:280/1016|"bbs.bredenbeek.net",BND,CM "bbs.bredenbeek.net",TEL,CM "bbs.bredenbeek.net",IFC,CM
+2:280/1049|"thecoast.servebbs.org",BND,CM
+2:280/1141|"fido.hneut.nl",BND,CM
+2:280/1203|"randstad.aconet.org",BND,CM
+2:280/2802|"fido.mbse.eu",BND,CM "fido.mbse.eu"_60177,TEL,CM "fido.mbse.eu",IFC,CM
+2:280/5003|"fido.ddutch.nl",BND,CM "fido.ddutch.nl"_60177,TEL,CM "fido.ddutch.nl",IFC,CM
+2:280/5268|"fido.cisbbs.nl",BND,CM "fido.cisbbs.nl",IFC,CM
+2:280/5555|"fido.vlist.eu",BND,CM,U,TCc
+2:292/0|"skynetbbs.dyndns.org",BND,CM
+2:292/624|"skynetbbs.dyndns.org",BND,CM
+2:292/789|"fido.joncheere.be",BND,CM
+2:292/854|"many-glacier.mine.nu",BND,CM,U,TXH
+2:292/907|"bbs.tsoh.be",BND,CM
+2:292/908|"cl.tsoh.be",BND,CM
+2:30/0|"fido.baboon.ch",BND,CM
+2:30/999|"fido.baboon.ch",BND,CM
+2:301/0|"fido.baboon.ch",BND,CM
+2:301/111|"fido.sisyphus.ch",BND,CM
+2:301/107|"zvl-bbs.net",BND,CM
+2:301/221|"3lands.dyndns.org",BND,CM
+2:301/520|"fido.baboon.ch",BND,CM
+2:301/812|"fifi.woody.ch",BND,CM
+2:31/2|"donhelmi.homeip.net",BND,CM
+2:313/41|"donhelmi.homeip.net",BND,CM
+2:316/151|"fido.insecurity.at",BND
+2:331/51|"bbs.bofh.it",BND,CM "bbs.bofh.it"_60177,TEL,CM "bbs.bofh.it",IFC,CM
+2:34/0|"bbs.zruspas.org",BND,CM "bbs.zruspas.org",TEL,CM
+2:34/888|"bbs.zruspas.org",BND,CM "bbs.zruspas.org",TEL,CM
+2:34/999|"bbs.zruspas.org",BND,CM "bbs.zruspas.org",TEL,CM
+2:340/0|"bbs.zruspas.org",BND,CM "bbs.zruspas.org",TEL,CM
+2:340/101|"raydeejay.homeip.net",BND,CM
+2:341/0|"bbs.zruspas.org",BND,CM "bbs.zruspas.org",TEL,CM
+2:341/66|"bbs.zruspas.org",BND,CM "bbs.zruspas.org",TEL,CM
+2:343/107|"fido.beholderbbs.org",BND,CM "fido.beholderbbs.org",TEL,CM "fido.beholderbbs.org",IFC,CM
+2:345/432|"nervionbbs.dyndns.org",BND,CM "nervionbbs.dyndns.org",TEL,CM "nervionbbs.dyndns.org",IFC,CM
+2:348/105|"ficbbs.org",BND,CM "ficbbs.org",IFC,CM
+2:348/107|"dotcom.ficbbs.org",BND,CM
+2:348/204|"bbs.lucus.org",BND,CM
+2:348/609|"parolas.thebbs.org",BND,CM "parolas.thebbs.org",TEL,CM "parolas.thebbs.org",IFC,CM
+2:400/333|"wasilij.dyndns.org",BND,CM
+2:400/520|"the-gate.dnsalias.org",BND,CM
+2:400/189|"semkd.dyndns.org",BND,CM
+2:400/814|"gurman814.homeip.net",BND,CM
+2:42/0|"fido.m19.cz",BND,CM "fido.m19.cz",IFC,CM
+2:421/0|"fido.m19.cz",BND,CM "fido.m19.cz",IFC,CM
+2:421/79|"fido.m19.cz",BND,CM "fido.m19.cz",IFC,CM
+2:421/790|"fido.m19.cz",BND,CM "fido.m19.cz",IFC,CM
+2:421/83|"bbs.lan255.net",BND,CM "bbs.lan255.net"_60177,TEL,CM "bbs.lan255.net",IFC,CM
+2:423/81|"fido.bajer.cz",BND,CM "fido.bajer.cz",TEL,CM "fido.bajer.cz",IFC,CM
+2:423/120|"alecoexp.dyndns.org",BND,CM "alecoexp.dyndns.org",IFC,CM
+2:4500/1|"fido.mgts.by",BND,CM "fido.mgts.by",IFC,CM
+2:452/123|"f123.n452.com",BND,CM
+2:46/0|"fido.omp.dp.ua",BND
+2:46/50|195.24.140.205,BND,CM
+2:46/128|"fido.happy.kiev.ua",BND,CM
+2:46/999|"f999.n46.z2.binkp.net",BND,CM "f999.n46.z2.binkp.net",IFC,CM
+2:4600/0|"fidonet.glotych.com",BND,CM
+2:4600/140|"fidonet.glotych.com",BND,CM
+2:461/0|"f0.n461.z2.binkp.net",BND,CM
+2:461/79|"leemon.no-ip.org",BND,CM "leemon.no-ip.org",IFC,CM
+2:461/106|83.117.241.231,BND,CM
+2:461/1024|"f1024.n461.z2.binkp.net",BND,CM
+2:461/169|"home.macloue.com",BND
+2:461/48|"f48.n461.z2.binkp.net",BND,CM,U,TUF "f48.n461.z2.binkp.net",IFC,CM,U,TUF
+2:461/145|"Uni.Com.UA",BND,CM "Uni.Com.UA",IFC,CM
+2:461/7|"minya.mine.nu",IFC,U,TSe
+2:461/112|"sodin.homeip.net",BND,CM
+2:461/144|"Alex44.Uni.Com.UA",BND,CM "Alex44.Uni.Com.UA",IFC,CM
+2:461/444|"f444.n461.z2.binkp.net",BND,CM "f444.n461.z2.binkp.net",IFC,CM
+2:461/69|"juzy.no-ip.org",BND,CM
+2:461/155|"avkorop.dyndns.org"_443,BND,CM
+2:461/28|"altor.sytes.net",BND,CM
+2:4614/0|"f0.n4614.z2.binkp.net",BND,CM "f0.n4614.z2.binkp.net",IFC,CM
+2:4614/20|"cservice.dyndns.org",BND,CM "cservice.dyndns.org",IFC,CM
+2:4614/12|77.120.199.195,BND,CM
+2:4615/74|"f74.n4615.z2.binkp.net",BND,CM "f74.n4615.z2.binkp.net",IFC,CM
+2:462/43|195.5.56.250,BND 195.5.56.250,IFC
+2:462/177|"f177.n462.z2.binkp.net",BND,U,TVF
+2:4623/0|"fido.if.net.ua",BND,CM
+2:4623/178|"fido.if.net.ua",BND,CM
+2:4625/0|"fido.sytes.net",BND,CM
+2:4625/46|"fido.sytes.net",BND,CM
+2:4625/1|"fido.sytes.net",BND,CM
+2:4625/2|"dobrovanov.no-ip.com",BND,CM
+2:4625/9|"fido.vstu.vinnica.ua",BND,CM "fido.vstu.vinnica.ua",IFC,CM
+2:4625/12|"bonsalut.com",BND,CM
+2:463/117|"finto.no-ip.org",BND,CM
+2:463/68|"fido.happy.kiev.ua",BND,CM
+2:463/59|"fido.ipms.kiev.ua",BND
+2:463/62|"f62.n463.z2.binkp.net",BND,CM "f62.n463.z2.binkp.net",IFC,CM
+2:463/365|195.160.221.160,BND,CM
+2:463/407|"f407.n463.z2.binkp.net",BND,CM
+2:463/648|213.133.161.46,BND,CM
+2:463/1963|"boss.materials.kiev.ua",BND
+2:463/94|"fido.babitch.com",BND,CM "fido.babitch.com",IFC,CM
+2:463/532|212.26.144.6,BND,CM 212.26.144.6,IFC,CM
+2:463/822|"fido822.pplira.kiev.ua",BND,CM "fido822.pplira.kiev.ua",IFC,CM
+2:463/877|"neon2.mine.nu",BND,U,Tsd "neon2.mine.nu",TEL,U,Tsd "neon2.mine.nu",IFC,U,Tsd
+2:463/2223|"f2223.n463.z2.binkp.net",BND,U,TWd
+2:4635/0|"f0.n4635.z2.binkp.net",BND,CM "f0.n4635.z2.binkp.net",IFC,CM
+2:4635/8|"f8.n4635.z2.binkp.net",BND
+2:4635/1024|"f1024.n4635.z2.binkp.net",BND,CM "f1024.n4635.z2.binkp.net",IFC,CM
+2:4635/4|"fidovicpryl.dyndns.org",BND,U,TdG
+2:4635/32|"f32.homedns.org",BND
+2:4635/52|"f52.n4635.z2.binkp.net",BND,U,TXE
+2:4635/69|"f69.n4635.z2.binkp.net",BND,U,TVE "f69.n4635.z2.binkp.net",IFC,U,TVE
+2:4635/77|"f77.n4635.z2.binkp.net",BND,U,TXE
+2:4635/78|"darkstranger.dyndns.org",BND,U,TCD
+2:464/0|"fido.omp.dp.ua",BND,CM
+2:464/5555|"fido.omp.dp.ua",BND
+2:464/89|"fido.omp.dp.ua",BND,CM
+2:464/95|"fido.isd.dp.ua",BND,CM
+2:464/400|"fido.omp.dp.ua",BND,CM
+2:464/999|"kbps.polsl.pl",BND,CM
+2:464/4077|"railways.dp.ua",BND,CM
+2:464/84|"kbps.polsl.pl",BND,CM
+2:4641/0|"f0.n4641.z2.binkp.net",BND,CM
+2:4641/444|"f444.n4641.z2.binkp.net",BND,CM
+2:4641/103|"f103.n4641.z2.binkp.net",BND,CM,U,TUe "f103.n4641.z2.binkp.net",IFC,CM,U,TUe
+2:4641/222|"karimovru.mine.nu",BND,CM
+2:4641/666|"fido.bashirov.info",BND,CM
+2:4642/0|"f0.n4642.z2.binkp.net",BND,U,TVe
+2:4642/7|213.227.223.148,BND,U,TKC
+2:4642/8|"f8.n4642.z2.binkp.net",BND,CM
+2:4642/48|"f48.n4642.z2.binkp.net",BND,CM
+2:4642/49|"f49.n4642.z2.binkp.net",BND,U,TVe
+2:4646/1|"f1.n4646.z2.binkp.net",BND,CM
+2:465/0|89.105.243.80,BND,CM
+2:465/50|213.133.161.46,BND,CM
+2:465/103|"f103.n465.z2.binkp.net",IFC,CM
+2:465/204|"fido.os.org.ua",BND,CM
+2:465/235|"f235.n465.z2.binkp.net",BND
+2:465/259|"fidolinux.com.ua",BND "fidolinux.com.ua",IFC
+2:465/216|"f216.n465.z2.binkp.net",IFC
+2:465/321|195.184.210.31,BND,CM
+2:4651/0|"f0.n4651.z2.binkp.net",BND,CM "f0.n4651.z2.binkp.net",IFC,CM
+2:4651/42|"f42.n4651.z2.binkp.net",BND,CM "f42.n4651.z2.binkp.net",IFC,CM
+2:466/0|"fido.mksat.net",BND,CM,U,TSG
+2:466/50|"fido.mksat.net",BND,CM,U,TSG
+2:466/5|"pegas.kcic.com.ua",BND,CM
+2:466/7|213.227.246.246,BND,CM
+2:466/32|"mscan.dyndns.info",BND,U,Ttu
+2:466/55|"f55n466z2.dyndns.org",BND,U,TUV
+2:466/58|217.77.223.79,BND,U,TUV
+2:466/65|"procsys.dyndns.org",BND,CM
+2:466/81|"fqc.mk.ua",BND,CM
+2:466/466|"fidonet-online.org",BND,CM
+2:467/70|"f70n467.dyndns.org",BND,CM "f70n467.dyndns.org",IFC,CM
+2:467/24|"f24.n467.z2.binkp.net",BND,CM "f24.n467.z2.binkp.net",IFC,CM
+2:467/31|"f31.n467.z2.binkp.net",BND,U,TRH
+2:467/61|"f61.n467.z2.binkp.net",IFC,CM
+2:467/72|"f72.n467.z2.binkp.net",BND,CM "f72.n467.z2.binkp.net",IFC,CM
+2:467/555|"www.dreams-in-space.net",BND,CM
+2:467/648|213.133.161.46,BND,CM
+2:467/1313|"f1313n467.no-ip.org",BND,CM
+2:468/0|"f0.n468.z2.binkp.net",BND,U,TRF
+2:468/10|"f10.n468.z2.binkp.net",BND,CM "f10.n468.z2.binkp.net",IFC,CM
+2:468/42|"f42.n468.z2.binkp.net",BND,CM "f42.n468.z2.binkp.net",IFC,CM
+2:468/57|"f57.n468.z2.binkp.net",BND,CM
+2:468/60|195.38.17.135,BND
+2:468/74|"f74.n468.z2.binkp.net",BND,CM "f74.n468.z2.binkp.net",IFC,CM
+2:468/166|91.205.65.44,BND,CM
+2:469/0|"dimmy.dynalias.net",BND,U,TVd "dimmy.dynalias.net",IFC,U,TVd
+2:469/150|"fido.mdl.net",BND,CM "fido.mdl.net",IFC,CM
+2:469/15|"dimmy.dynalias.net",BND,U,TVd
+2:469/83|"f83.n469.z2.binkp.net",IFC,CM
+2:469/799|212.56.195.22,BND 212.56.195.22,IFC
+2:469/200|"f200.n469.z2.binkp.net",BND,CM "f200.n469.z2.binkp.net"_60177,TEL,CM
+2:469/142|"f142.n469.z2.binkp.net",BND,CM "f142.n469.z2.binkp.net",IFC,CM
+2:469/418|"fido.causeni.com",BND
+2:48/0|"bbs.micha.waw.pl",BND,CM "bbs.micha.waw.pl",TEL,CM "bbs.micha.waw.pl",IFC,CM
+2:48/48|"bbs.micha.waw.pl",BND,CM "bbs.micha.waw.pl",TEL,CM "bbs.micha.waw.pl",IFC,CM
+2:48/997|"bbs.micha.waw.pl",BND,CM "bbs.micha.waw.pl",TEL,CM "bbs.micha.waw.pl",IFC,CM
+2:48/998|"bbs.micha.waw.pl",BND,CM "bbs.micha.waw.pl",TEL,CM "bbs.micha.waw.pl",IFC,CM
+2:48/999|"hub.webadm.eu",BND,CM
+2:480/0|"bbs.micha.waw.pl",BND,CM "bbs.micha.waw.pl",TEL,CM "bbs.micha.waw.pl",IFC,CM
+2:480/124|"uucp.freebsd.lublin.pl",IFC,CM
+2:480/127|"bbs.micha.waw.pl",BND,CM "bbs.micha.waw.pl",TEL,CM "bbs.micha.waw.pl",IFC,CM
+2:480/138|"bbs.avenger.apcoh.org",TEL,CM "bbs.avenger.apcoh.org",IFC,CM
+2:480/140|"hub.webadm.eu",BND,CM
+2:480/7000|"bbs.micha.waw.pl",BND,CM "bbs.micha.waw.pl",TEL,CM "bbs.micha.waw.pl",IFC,CM
+2:50/0|"dvb.marvelm.ru",BND,CM
+2:50/1|"newworld715.dyndns.org",BND,CM
+2:50/2|"1200.metal.ru",BND,CM
+2:50/4|"wayfarer.no-ip.info",BND,CM,U,TVd
+2:50/13|"kocharin.pp.ru",BND,CM
+2:5000/1|"f1.n5000.z2.binkp.net",BND,CM "f1.n5000.z2.binkp.net",IFC,CM
+2:5000/2|"andy.gcom.ru",BND,CM "andy.gcom.ru",IFC,CM
+2:5000/7|"f7.n5000.z2.binkp.net",BND,CM
+2:5000/8|"f8.n5000.z2.binkp.net",BND,CM
+2:5000/10|"f10.n5000.z2.binkp.net",BND,CM
+2:5000/13|"f13.n5000.z2.binkp.net",BND,CM
+2:5000/14|"f14.n5000.z2.binkp.net",BND,CM
+2:5000/20|"f20.n5000.z2.binkp.net",BND,CM
+2:5000/21|"f21.n5000.z2.binkp.net",BND,CM
+2:5000/22|"f22.n5000.z2.binkp.net",BND,CM
+2:5000/26|"fido.gcom.ru",BND,CM "fido.gcom.ru",IFC,CM
+2:5000/27|"f27.n5000.z2.binkp.net",BND,CM
+2:5000/28|"f28.dxsoft.com",BND,CM
+2:5000/44|"f44.n5000.z2.binkp.net",BND,CM
+2:5000/54|"fido.olmisoft.com",BND,CM
+2:5000/61|"f61.n5000.z2.binkp.net",BND,CM
+2:5000/67|"fido.garsib.ru",BND,CM "fido.garsib.ru",IFC,CM
+2:5000/81|"shark.nnet.ru",BND,CM "shark.nnet.ru",IFC,CM
+2:5000/83|"f83.n5000.z2.binkp.net",BND,CM
+2:5000/91|"f91.n5000.z2.binkp.net",BND,CM
+2:5000/94|"ianohin.no-ip.org",BND,CM
+2:5000/95|"f95.n5000.z2.binkp.net",BND,CM
+2:5000/99|"fido.jester.ru",BND,CM
+2:5000/104|"sib.r-style.ru",BND,CM
+2:5000/111|"byte.nsk.su",BND,CM "byte.nsk.su",IFC,CM
+2:5000/114|"f114.n5000.z2.binkp.net",BND,CM
+2:5000/117|"f117.n5000.z2.binkp.net",BND,CM
+2:5000/124|"f124.n5000.z2.binkp.net",BND,CM
+2:5000/170|"f170.n5000.z2.binkp.net",BND,CM
+2:5000/177|"f177.n5000.z2.binkp.net",BND,CM
+2:5000/197|"f197.n5000.z2.binkp.net",BND,CM
+2:5000/222|"f222.n5000.z2.binkp.net",BND,CM
+2:5000/256|"f256.n5000.z2.binkp.net",BND,CM
+2:5000/280|"f280.n5000.z2.binkp.net",BND,CM
+2:5000/292|"fido.river-net.org",BND,CM,U,TSX
+2:5000/363|"fido.anistratenko.net",BND,CM
+2:5000/444|"f444.n5000.z2.homelabs.org"_24555,BND,CM,U,TRM "f444.n5000.z2.homelabs.org",IFC,CM,U,TRM
+2:5000/5000|"fido.anistratenko.net",BND,CM
+2:5001/27|"f27.n5001.z2.binkp.net",BND,CM
+2:5001/90|"fido.serje.net",BND,CM
+2:5001/5001|"fido.kuzstu.ru",BND,CM
+2:5004/32|"gatetostaff.aeroomsk.ru",BND,CM
+2:5004/58|"f58.n5004.z2.binkp.net",BND,CM
+2:5004/67|"cats-pleasure.stabilis.ru",BND,CM "cats-pleasure.stabilis.ru",IFC,CM
+2:5005/0|"f0.n5005.z2.binkp.net",BND,CM
+2:5006/0|"f0.n5006.z2.binkp.net",BND,CM "f0.n5006.z2.binkp.net",IFC,CM
+2:5006/1|"f1.n5006.z2.binkp.net",BND,CM "f1.n5006.z2.binkp.net",IFC,CM
+2:5006/9|"f9.n5006.z2.binkp.net",BND,CM "f9.n5006.z2.binkp.net",IFC,CM
+2:5007/0|"f0.n5007.z2.binkp.net",BND,CM
+2:5007/1|"f1.n5007.z2.binkp.net",BND,CM
+2:5007/10|"f10.n5007.z2.binkp.net",BND,CM
+2:5007/11|"fido.jroshin.ru",BND,CM
+2:5007/18|"shal.ru",BND,CM
+2:5007/20|"sure.comlink.khakassia.ru",BND,CM
+2:5007/913|"f913.n5007.z2.binkp.net",BND,CM
+2:5010/0|"f352.sage.su",BND,CM
+2:5010/352|"f352.sage.su",BND,CM
+2:5010/224|"xeon224.homeip.net",IFC,CM
+2:5012/0|"fido-kgn.ru",BND,CM
+2:5012/200|"fido-kgn.ru",BND,CM
+2:5015/35|"f35n5015z2.dyndns.org",BND
+2:5015/44|"ns.sintez.nnov.ru",BND,CM
+2:5015/120|"hashev.dyndns.org",BND,CM
+2:5015/167|"vetka.homeip.net",BND
+2:5015/221|"sstd.homeip.net",BND,CM
+2:5015/227|"fido.aleks-k.ru",BND,CM
+2:5015/228|"fido.lvov.in",BND,CM
+2:5019/0|"fido.ganjanetwork.ru",BND,CM "fido.ganjanetwork.ru",IFC,CM
+2:5019/40|"fido.ganjanetwork.ru",BND,CM "fido.ganjanetwork.ru",IFC,CM
+2:5019/30|"ice-station.ru",BND,CM
+2:5019/42|"fido.sivakoff.org",BND,CM
+2:5019/400|"fido.g0x.ru",BND,CM
+2:5020/0|"commserv.rpb.ru",BND,CM
+2:5020/274|"274.no-ip.com",BND,CM "274.no-ip.com"_60177,TEL,CM "274.no-ip.com",IFC,CM
+2:5020/830|"830.ru",BND,CM "830.ru",IFC,CM
+2:5020/1200|"f1200.metal.ru",BND,CM
+2:5020/1906|"binkp.nauchi.ru",BND,CM
+2:5020/2158|"fidonode.dyndns.org",BND,U,Tcd "fidonode.dyndns.org",IFC,U,Tcd
+2:5020/2613|"nozdr.ru",BND,CM
+2:5020/11200|"f11200.metal.ru",BND,CM
+2:5020/545|"fido.gremlin.ru",BND,CM
+2:5020/526|"noda.tarkin.ru",BND,CM
+2:5020/843|"fido.fuzzypigs.com",BND,CM
+2:5020/5545|"fidonet.org.ru"_25545,BND,CM
+2:5020/715|"fido.hubahuba.su",BND,CM
+2:5020/101|94.79.47.242,BND,CM 94.79.47.242,TEL,CM 94.79.47.242,IFC,CM
+2:5020/290|"ftn.avalon-island.ru",BND,CM "ftn.avalon-island.ru",IFC,CM
+2:5020/400|"ddt.demos.su",BND,CM "ddt.demos.su",IFC,CM
+2:5020/540|"binkd.piafi.ru",BND,CM
+2:5020/556|"fido.lushnikov.net",BND,CM
+2:5020/570|"altynclub.ru",BND,CM
+2:5020/837|"nightbbs.ru",BND,CM
+2:5020/921|"fido.nln.ru",BND,CM
+2:5020/961|"fido.cemehob.ru",BND,CM
+2:5020/982|194.67.66.4,BND,CM
+2:5020/1313|"fido.stabilis.ru",BND,CM,U,TUd
+2:5020/1519|"vds.lushnikov.net",BND,CM
+2:5020/2024|"chernokozov.com",BND,CM
+2:5020/2142|"fido.axi.ru",BND,CM
+2:5020/2395|"tsr-ftn.dtdns.net",BND,CM
+2:5020/2992|"dvb.marvelm.ru",BND,CM
+2:5020/3636|"korpus1.ru",BND,CM
+2:5020/3904|"fido.rayst.ru",BND,CM
+2:5020/4096|"fido.pochek.net",BND,CM
+2:5020/5452|"fido.hubahuba.su"_24555,BND,CM
+2:5020/8080|"teabbs.ru",BND,CM
+2:5020/758|"commserv.rpb.ru",BND,CM
+2:5020/8|"luft.t-systems.ru",BND,CM
+2:5020/104|"fido.masterbank.ru",BND,CM
+2:5020/214|193.109.114.5,BND,CM
+2:5020/348|"ozr.dyndns.org",BND,CM
+2:5020/829|"829.dlabs.ru",BND,CM,U,TVd "829.dlabs.ru",IFC,CM,U,TVd
+2:5020/902|"902.paradigma.ru",BND,CM
+2:5020/1452|"drybody.dyndns.org",BND,U,TTF
+2:5020/4441|"fido.ym-com.net",BND,CM
+2:5020/5480|"fido.impgl.ru",BND,CM
+2:5020/8086|"f8086.no-ip.org",BND,CM,U,TUd
+2:5020/1042|"f1042.ru",BND,CM
+2:5020/35|"2-5020-35-fidonet.dtdns.net",BND,CM
+2:5020/785|"f785.25u.com",BND,CM
+2:5020/814|"f814.dyndns.org",BND,U,TVd
+2:5020/828|"temnenkov.dyndns.org",BND,CM
+2:5020/2140|"vp.propush.ru",BND,CM
+2:5020/2141|"vp.propush.ru"_24555,BND,CM
+2:5020/3274|"fido.teppa.ru",BND,CM "fido.teppa.ru"_60177,TEL,CM "fido.teppa.ru",IFC,CM
+2:5020/128|"fido.corbina.ru",BND
+2:5020/960|"bbs.lfabbs.ru",BND,CM,U,TTE "bbs.lfabbs.ru",IFC,CM,U,TTE
+2:5020/2038|"2038.no-ip.org",IFC,CM
+2:5020/2192|"vault13.no-ip.org",BND,U,TST
+2:5020/9696|"gelf.no-ip.org",BND,CM
+2:5020/10192|"f10192.hopto.org",BND,CM
+2:5020/5020|"fido.hubahuba.su",BND,CM
+2:5020/194|217.65.15.140,BND,CM
+2:5020/12000|"fluid.fidoman.ru",BND,U,TVF "fluid.fidoman.ru",IFC,U,TVF
+2:5020/77|"fido.rn3aig.ru",BND,CM
+2:5020/730|"xepb.ru",BND,CM
+2:5020/848|"fidonode.in",BND,CM
+2:5020/849|"r.fidonode.in",BND,CM
+2:5020/850|"dartfox.ru",BND,CM
+2:5020/1453|80.240.218.178,BND,CM,U,TUd
+2:5020/1721|"fido.tdto.ru",BND,CM
+2:5020/1754|"fido1754.no-ip.org",BND,CM
+2:5020/1955|"voznikevich.me",BND,U,Ttd "voznikevich.me",IFC,U,Ttd
+2:5020/2065|"f2065.no-ip.org",BND,CM "f2065.no-ip.org",IFC,CM
+2:5021/4|"ns.comp.tver.ru",BND,CM
+2:5021/29|"fido.tver.ru",BND,CM
+2:5021/2|"fido.rtelekom.ru",BND,CM
+2:5021/44|"f44.n5021.z2.binkp.net",BND,CM
+2:5022/0|"f0.n5022.z2.binkp.net",BND,U,Tse
+2:5022/2|"f2.n5022.z2.binkp.net",BND,CM
+2:5022/5|"f5.n5022.z2.binkp.net",BND,CM
+2:5022/63|"f63.n5022.z2.binkp.net",BND,CM
+2:5022/163|"f163.n5022.z2.binkp.net",BND,U,TUd
+2:5022/68|"f68.n5022.z2.binkp.net",BND,U,TUd
+2:5022/128|"f128.n5022.z2.binkp.net",BND,CM
+2:5023/0|"elecs.kaluga.com",BND,CM
+2:5023/11|"elecs.kaluga.com",BND,CM
+2:5023/12|62.148.155.86,BND,CM
+2:5023/52|"home.krivospitsky.ru",BND,CM
+2:5023/54|109.225.40.194,BND,CM
+2:5023/112|62.148.155.86,BND,CM
+2:5024/0|"n3.net5024.ru",BND,CM
+2:5024/3|"n3.net5024.ru",BND,CM
+2:5025/0|"fido.lordmb.ru",BND,CM,U,TTF
+2:5025/9595|"talk.vrn.ru",BND,CM
+2:5025/75|"fido.lordmb.ru",BND,CM,U,TTF
+2:5025/14|"f14.n5025.z2.binkp.net",BND,CM
+2:5025/5025|"f5025.n5025.z2.binkp.net",BND,CM
+2:5025/2|"f2.n5025.z2.binkp.net",BND,CM
+2:5025/17|213.129.119.162,BND,CM
+2:5025/3|"f3.n5025.z2.binkp.net",BND,CM
+2:5025/128|"f128.n5025.z2.binkp.net",BND,CM
+2:5025/121|"fido.icelan.ru",BND,CM "fido.icelan.ru",IFC,CM
+2:5025/69|80.82.69.168,BND,CM
+2:5025/18|"f18.n5025.z2.binkp.net",BND,CM
+2:5025/12|"12.fidosoft.ru",BND,CM "12.fidosoft.ru",IFC,CM
+2:5025/150|"150.fidosoft.ru",BND,CM,U,TWh "150.fidosoft.ru",IFC,CM,U,TWh
+2:5026/0|"riat-group.ru",BND,CM
+2:5026/1|"riat.indi.ru",BND,CM
+2:5026/10|"riat-group.ru",BND,CM
+2:5026/6|"deep-purple.ru",BND,CM
+2:5026/16|"fido.gov.ivanovo.ru",BND,CM
+2:5026/15|109.60.151.138,BND,CM 109.60.151.138,IFC,CM
+2:5026/49|"www.ispu.ru",BND,CM
+2:5028/0|"63.5028.net.ru",BND
+2:5028/67|"yardis.ru",BND,CM
+2:5029/0|"ftn.avblabs.ru",BND,CM
+2:5029/9|"ftn.astcrg.ru",BND,CM
+2:5029/10|"rapsp.ru",BND,CM,U,TUD
+2:5029/25|"ipnode.servebbs.com",BND,CM
+2:5029/32|"ftn.avblabs.ru",BND,CM
+2:5029/34|"gorgaz.ryazan.ru",BND,CM
+2:5030/0|"fido.stpeteclub.ru",BND,CM
+2:5030/231|"binkd.hts-spb.com",BND,CM
+2:5030/500|"f500.zxy.spb.ru",BND,CM
+2:5030/1202|"lich.phys.spbu.ru",BND,U,TPG "lich.phys.spbu.ru",IFC,U,TPG
+2:5030/87|"nvm2.spb.ru",BND,CM "nvm2.spb.ru",IFC,CM
+2:5030/153|"ddg.spb.ru",BND,CM
+2:5030/706|89.179.122.17,BND,CM
+2:5030/1520|"avanpost.net.ru",BND,CM,U,Tvd
+2:5030/1522|95.31.133.240,BND
+2:5030/115|"f115.spb.ru",BND,CM "f115.spb.ru",IFC,CM
+2:5030/731|"s0t.ru",BND,CM
+2:5030/920|"fido.mariinsky.ru",BND,CM "fido.mariinsky.ru",TEL,CM "fido.mariinsky.ru",IFC,CM
+2:5030/84|"fido.enlight.ru",BND,CM
+2:5030/427|"fido.andrianov.ru",BND,CM
+2:5030/907|"fidonet.equuleus.ru",BND,CM
+2:5030/1559|"fido.probapribor.spb.ru",BND,CM "fido.probapribor.spb.ru",IFC,CM
+2:5030/1997|"fido.bsrealm.net",BND,CM
+2:5030/1115|"f1115.spb.ru",BND,CM "f1115.spb.ru",IFC,CM
+2:5030/25|77.239.235.48,BND,CM
+2:5030/51|"home.diogen.spb.ru",BND,CM
+2:5030/73|"fido.vrad.spb.ru",BND,CM
+2:5030/257|"f257.edv.ragtime.ru",BND,CM
+2:5030/279|"sysman.deltatelecom.ru",BND,CM
+2:5030/379|"fido.garmiza.spb.ru",BND,CM
+2:5030/519|"dmk.0x6e6d6b.com",BND,CM
+2:5030/786|"elvete.com",BND,CM
+2:5030/830|"fido.fiona.spb.ru",BND,CM
+2:5030/999|77.239.253.138,BND,CM
+2:5030/1048|"stanley.winlink.ru",BND,CM
+2:5030/1237|"home.glk.spb.ru",BND,CM "home.glk.spb.ru",IFC,CM
+2:5030/1249|178.162.51.212,BND,CM
+2:5030/1340|"kot.spb.ru",BND,CM
+2:5030/1374|"meganet.kentos.ru",BND,CM
+2:5030/1499|"f1499.spb.ru",IFC,CM
+2:5030/2237|"glk.spb.ru",BND,CM
+2:5030/4441|"artpaint.spb.ru",BND,CM
+2:5030/1900|"ftn.kawai.spb.ru",BND,CM
+2:5030/1475|93.170.2.230,BND,CM
+2:5030/1492|"1492.spb.ru",BND,CM,U,TVF
+2:5030/1957|"fido.stpeteclub.ru",BND,CM
+2:5030/74|"cats-shadow.spb.ru",BND,CM "cats-shadow.spb.ru",IFC,CM
+2:5030/282|"picon.spb.ru",BND,CM
+2:5030/709|"ftn.spbmed.com",BND,CM,U,TWF
+2:5030/777|"fido.parmasoft.spb.ru",BND,CM
+2:5030/957|"node-957.spb.ru",BND,CM
+2:5030/1111|"bbs.tochlab.net",BND,CM
+2:5030/1488|"maymak.homeip.net",BND,CM
+2:5030/1554|"elfy.dyndns.org",BND,CM
+2:5030/2404|"ziv.dyndns.org",BND,CM
+2:5031/50|"robot.e-cons.ru",BND,CM
+2:5031/7|"shwamp.dyndns.org",BND,CM
+2:5031/25|"bbbbs.mooo.com",BND,CM
+2:5032/0|"f1.n5300.z13.felis.ru",BND,CM
+2:5032/23|"f1.n5300.z13.felis.ru",BND,CM
+2:5033/4|"mts.pskov.ru",BND,CM
+2:5033/33|62.33.13.73,BND,CM
+2:5033/35|"mts.pskov.ru",BND,CM
+2:5033/39|"allpskov.ru",BND,CM
+2:5033/51|62.33.24.81,BND,CM
+2:5034/0|"fido.netfast.ru",BND,CM
+2:5034/13|"fido.netfast.ru",BND,CM
+2:5034/10|85.113.221.175,BND,CM
+2:5034/16|"fido.lexs.blasux.ru",BND,CM
+2:5035/100|"f100.n5035.z2.binkp.net",BND,CM
+2:5037/0|"fido.heleas.net",BND,CM
+2:5037/28|"fido.heleas.net",BND,CM
+2:5037/7|"wayfarer.no-ip.info",BND,CM,U,TVd
+2:5037/1|"work.heleas.net",BND,CM
+2:5038/10|82.140.98.42,BND,CM
+2:5040/6|"f6.n5040.z2.binkp.net",BND,CM
+2:5040/41|"stim.leased.redcom.ru",BND,CM
+2:5045/0|"kvk555.ru",BND,CM
+2:5045/17|"mail.ussuriisk.ru",BND,CM
+2:5045/64|"fido.wom.ru",BND,CM
+2:5045/37|"fido.vstn.marine.su",BND,CM "fido.vstn.marine.su",TEL,CM "fido.vstn.marine.su",IFC,CM
+2:5045/58|"kraft777.dyndns.org",BND,CM
+2:5045/41|"kvk555.ru",BND,CM
+2:5045/200|"fido200.kvk555.ru",BND,CM
+2:5045/666|82.162.154.82,BND
+2:5045/57|82.194.165.235,BND,CM
+2:5047/0|82.194.178.65,BND,CM 82.194.178.65,IFC,CM
+2:5047/8|212.14.208.193,BND,CM
+2:5047/47|82.194.178.65,BND,CM 82.194.178.65,IFC,CM
+2:5047/27|"f27.n5047.z2.binkp.net",BND,CM
+2:5049/0|"fido164.suvorkov.ru",BND,CM
+2:5049/97|"fido.suvorkov.ru",BND,CM "fido.suvorkov.ru",TEL,CM "fido.suvorkov.ru",IFC,CM
+2:5049/36|"f36.n5049.z2.binkp.net",BND
+2:5049/37|"f37.n5049.z2.binkp.net",BND
+2:5049/165|"f165.n5049.z2.binkp.net",BND
+2:5049/164|"fido164.suvorkov.ru",BND,CM
+2:5049/33|"f33.n5049.z2.binkp.net",BND
+2:5049/50|"ftn.any.com.ru",BND,CM
+2:5049/162|"fido.iakupov.ru",BND,CM
+2:5049/166|"fido.jn0.ru",BND,CM
+2:5050/0|"fido.italks.ru",BND,CM
+2:5050/9|"fido.italks.ru",BND,CM,U,TTD
+2:5050/13|"fido.ua4wk.ru",BND,CM
+2:5050/57|"n505057.dyndns.org",BND,CM
+2:5050/55|"say.webhop.net",BND,CM
+2:5050/127|88.82.85.38,BND,CM
+2:5051/0|"mechanic.podzone.org",BND,U,TVD
+2:5051/40|89.239.142.37,BND,U,TVD
+2:5051/41|"mechanic.podzone.org",BND,U,TVD
+2:5051/42|95.104.192.34,BND,U,TVD
+2:5051/43|46.8.122.230,BND,U,TVD
+2:5052/5052|"info.martelcom.ru",BND,CM "info.martelcom.ru",IFC,CM
+2:5052/4|"info.martelcom.ru",BND,CM "info.martelcom.ru",IFC,CM
+2:5052/12|"f12.n5052.z2.binkp.net",BND,CM
+2:5053/0|"n5053c.dyndns.org",BND,U,TUE
+2:5053/7|"necrojohnson.dyndns.org",BND,CM
+2:5053/54|"ftpserver.org.ru",BND,CM
+2:5053/56|"lone-star-station.dyndns.org",BND,U,TPF "lone-star-station.dyndns.org",IFC,U,TPF
+2:5053/400|217.23.80.3,BND,CM
+2:5053/42|"alien.renet.ru",BND,U,TPG
+2:5053/45|213.147.208.164,BND,CM
+2:5053/55|"n5053c.dyndns.org",BND,U,TUE
+2:5053/15|"timaru.dyndns.tv",BND,CM
+2:5053/44|213.80.249.14,BND,CM
+2:5053/57|89.179.70.208,BND,CM
+2:5054/75|"f75.n5054.z2.binkp.net",BND,CM
+2:5054/84|"f84.n5054.z2.binkp.net",BND,U,TOC
+2:5054/89|"keu.pstu.ru",BND,CM
+2:5054/37|"f37.n5054.z2.binkp.net",BND,CM
+2:5055/0|"node73.daemony.ru",BND,CM
+2:5055/88|"f88.n5055.z2.binkp.net",BND,CM
+2:5055/73|"node73.daemony.ru",BND,CM
+2:5055/158|"f158.n5055.z2.binkp.net",BND,CM
+2:5055/122|"f122.n5055.z2.binkp.net",BND,CM
+2:5055/177|"f177.n5055.z2.binkp.net",BND,CM "f177.n5055.z2.binkp.net",TEL,CM "f177.n5055.z2.binkp.net",IFC,CM
+2:5055/85|"f85.n5055.z2.binkp.net",BND,CM
+2:5055/92|"f92.n5055.z2.binkp.net",BND,CM
+2:5055/176|"f176.n5055.z2.binkp.net",BND,CM "f176.n5055.z2.binkp.net"_60177,TEL,CM "f176.n5055.z2.binkp.net",IFC,CM
+2:5055/182|"sergey.ortoped.org.ru",BND,CM
+2:5055/200|"f200.n5055.z2.binkp.net",BND,CM "f200.n5055.z2.binkp.net"_60177,TEL,CM "f200.n5055.z2.binkp.net",IFC,CM
+2:5057/0|"fido.fligel.org",BND,CM
+2:5057/19|"fido.fligel.org",BND,CM
+2:5057/34|212.32.219.35,BND,CM 212.32.219.35,IFC,CM
+2:5057/53|"fido.roswellsite.ru",BND,CM
+2:5057/70|85.113.39.205,BND,CM
+2:5057/77|"f77.n5057.z2.binkp.net",BND,CM
+2:5059/37|"ftn.stlk.name",BND,CM
+2:5060/7|"ws.init.ru",BND
+2:5060/88|"fido.init.ru",BND,CM
+2:5060/900|"fido.siriusnet.ru",BND,CM "fido.siriusnet.ru",IFC,CM
+2:5061/0|"fido.rostov.ru",BND,CM,U,Tcd
+2:5061/7|"samael.chimfak.rsu.ru",BND,CM
+2:5061/15|"fido.rostov.ru",BND,CM
+2:5061/58|"rfniias.ru",BND,CM
+2:5061/112|"fido.philos.rsu.ru",BND,CM "fido.philos.rsu.ru",IFC,CM
+2:5062/0|"kap18.dyndns.org",BND,U,TKX
+2:5062/18|"kap18.dyndns.org",BND,U,TKX
+2:5062/1|"f1.n5062.z2.binkp.net",BND,CM
+2:5062/2|"f2.n5062.z2.binkp.net",BND,CM
+2:5062/66|"f66.n5062.z2.binkp.net",BND
+2:5062/10|"f10.n5062.z2.binkp.net",BND,CM "f10.n5062.z2.binkp.net",TEL,CM "f10.n5062.z2.binkp.net",IFC,CM
+2:5062/128|"f128.n5062.z2.binkp.net",BND,CM "f128.n5062.z2.binkp.net",TEL,CM "f128.n5062.z2.binkp.net",IFC,CM
+2:5063/88|"Fidonet.Mithgol.Ru"_1978,BND,U,TSU
+2:5063/89|"dsd-station.servebbs.net",BND,CM
+2:5064/0|"wit.hopto.org",BND,CM,U,TUD
+2:5064/54|"wit.hopto.org",BND,CM,U,TUD
+2:5064/56|"gribmax.sytes.net",BND,CM,U,TUF "gribmax.sytes.net",IFC,CM,U,TUF
+2:5066/0|89.151.142.207,BND,CM
+2:5066/18|"fido.cbx.ru",BND,CM
+2:5066/20|89.151.183.12,BND,CM
+2:5066/75|"www.symov.dyndns.org",BND,CM,U,TTd
+2:5066/109|89.151.142.207,BND,CM
+2:5066/198|"METEOVIKTOR.PP.RU",BND,CM
+2:5066/298|85.234.0.67,BND,CM
+2:5066/71|"www.megaputer.net",BND,CM,U,TSG
+2:5066/2|"fido.cap.ru",BND,CM
+2:5066/45|"torz.net.ru",BND,CM
+2:5068/0|"f58.n5068.net",BND,CM
+2:5068/45|178.64.190.8,BND,CM
+2:5068/58|"f58.n5068.net",BND,CM
+2:5075/0|"fido.subbotin.org",BND,CM "fido.subbotin.org",IFC,CM
+2:5075/35|"fido.subbotin.org",BND,CM "fido.subbotin.org",IFC,CM
+2:5076/0|"207.grumbler.org",BND,CM,U,TqB
+2:5076/207|"207.grumbler.org",BND,CM,U,TqB
+2:5080/0|"fido.imp.uran.ru",BND,CM
+2:5080/68|"fido.imp.uran.ru",BND,CM
+2:5080/17|195.64.192.72,BND
+2:5080/31|"sentosa.e-burg.su",BND
+2:5080/147|"fido.lotsman.ru",BND
+2:5080/201|"25080201.no-ip.info",BND
+2:5080/102|"binkd.node.grumbler.org",BND "binkd.node.grumbler.org"_443,BND
+2:5080/172|213.242.204.161,BND
+2:5080/207|"25080207.no-ip.org",BND
+2:5080/245|"unyuu.homelinux.org",BND
+2:5083/0|"f444.n5083.z2.homelabs.org",BND,CM
+2:5083/1|"n5083.no-ip.org",BND,U,TSC
+2:5083/74|"nolemozzi.no-ip.biz",BND,U,TWB
+2:5083/86|"dflab.net",BND,CM
+2:5083/88|78.109.156.94,BND,U,TUI
+2:5083/89|"vsa1987.no-ip.info",BND
+2:5083/90|"n5083.ufo777.net",BND,U,TSC
+2:5083/444|"f444.n5083.z2.homelabs.org",BND,CM
+2:5085/45|"f45.n5085.z2.binkp.net",BND,CM
+2:5085/109|"f109.n5085.z2.binkp.net",BND,CM
+2:5088/0|"gengen.homelinux.net",BND,CM
+2:5088/13|"gengen.homelinux.net",BND,CM
+2:5088/50|"fido.g-net.kz",BND,CM
+2:5090/22|"f22.n5090.z2.binkp.net",BND,CM
+2:5090/29|"f29.n5090.z2.binkp.net",BND,CM
+2:5090/33|"f33.n5090.z2.binkp.net",BND,CM
+2:5090/54|"f54.n5090.z2.binkp.net",BND,CM
+2:5090/65|"f65.n5090.z2.binkp.net",BND,CM
+2:5090/69|"f69.n5090.z2.binkp.net",BND,CM
+2:5090/73|"f73.n5090.z2.binkp.net",BND,CM
+2:5090/97|"f97.n5090.z2.binkp.net",BND,CM
+2:5090/99|"f99.n5090.z2.binkp.net",BND,CM
+2:5090/135|"f135.n5090.z2.binkp.net",BND,CM
+2:5090/1029|"f1029.n5090.z2.binkp.net",BND
+2:5090/1102|"f1102.n5090.z2.binkp.net",BND,CM
+2:5095/0|"n5095.podolsk.ru",BND,CM
+2:5095/1|"f1.n5095.podolsk.ru",BND,CM "f1.n5095.podolsk.ru",IFC,CM
+2:5095/20|"fido.stabilis.ru",BND,CM "fido.stabilis.ru",IFC,CM
+2:5095/95|"tsr-ftn.dtdns.net",BND,CM
+2:5097/0|"marazma.net",BND,CM
+2:5097/303|"marazma.net",BND,CM
+2:5097/24|"dk24.no-ip.org",BND
+2:5097/31|"nightflame.info",BND,CM
+2:6001/7|"node7.fido.bryansk.su",BND,CM
+2:6001/9|"node9.fido.bryansk.su"_443,BND,U,TUc "node9.fido.bryansk.su"_8080,BND,U,TUc
+2:6001/10|"node10.fido.bryansk.su",BND,CM
+2:6004/0|"f0.n6004.z2.binkp.net",BND
+2:6004/1|"rfqa.mine.nu",BND,CM
+2:6004/3|"n6004.mine.nu",BND,CM
+2:6004/4|"node4.ath.cx",BND,U,TNO
+2:6035/0|"f0.n6035.z2.binkp.net",BND,CM,U,TUd
+2:6035/1|"f1.n6035.z2.binkp.net",BND,CM,U,TUd
+2:6035/5|"f5.n6035.z2.binkp.net",BND,CM
+2:6055/73|"73.mlcom.ru",BND,CM
+2:6056/0|"1.fido6056.int.ru",BND
+2:6056/1|"1.fido6056.int.ru",BND
+2:6056/8|"8.fido6056.int.ru",BND
+2:6056/32|"f32.n6056.z2.binkp.net",BND
+2:6056/51|"51.fido6056.int.ru",BND
+2:6056/99|"f99.n6056.z2.binkp.net",BND
+2:6056/207|"f207.n6056.z2.binkp.net",BND
+2:6070/0|"tortuga.podzone.net",BND,U,ToW
+2:6070/35|"alexkim.dyndns.org",BND,CM
+2:6070/109|"tortuga.podzone.net",BND,U,ToW
+2:6078/0|78.36.196.48,BND,CM,U,TVF 78.36.196.48,TEL,CM,U,TVF 78.36.196.48,IFC,CM,U,TVF
+2:6078/1|78.36.196.48,BND,CM,U,TVF 78.36.196.48,TEL,CM,U,TVF 78.36.196.48,IFC,CM,U,TVF
+2:6078/2|"fidonet.dyndns.info",IFC
+2:6078/5|"ua2fga.homelinux.com",BND
+2:6078/6|"andreyf1.homelinux.org",BND
+2:6078/80|"cheslav.no-ip.info",BND,CM
+2:6090/0|"fido.mic6090.pp.ru",BND,CM "fido.mic6090.pp.ru",IFC,CM
+2:6090/1|"fido.mic6090.pp.ru",BND,CM "fido.mic6090.pp.ru",IFC,CM
+2:56/0|"AMBROSIA60.dtdns.net",BND,CM
+2:362/0|"msmacbbs.com",BND,CM
+2:362/6|"msmacbbs.com",BND,CM
+2:411/0|"canada.synchro.net",BND,CM
+2:411/134|"canada.synchro.net",BND,CM
+4:4/0|"adorni.no-ip.org",BND,CM
+4:4/1|"adorni.no-ip.org",BND,CM
+4:4/2|"adorni.no-ip.org",BND,CM
+4:4/3|"adorni.no-ip.org",BND,CM
+4:4/5|"adorni.no-ip.org",BND,CM
+4:80/0|"bsbbs.com.br",BND,CM
+4:801/0|"bsbbs.com.br",BND,CM
+4:801/189|"bsbbs.com.br",BND,CM
+4:88/0|"fidocl.no-ip.org",BND,CM
+4:88/1|"fidocl.no-ip.org"_24555,BND,CM
+4:880/0|"fidocl880.no-ip.org"_24556,BND,CM
+4:880/100|"fidocl880.no-ip.org"_24557,BND,CM
+4:880/17|"fidocl.no-ip.org"_24558,BND,CM
+4:90/0|"adorni.no-ip.info",BND,CM
+4:90/1|"adorni.no-ip.info",BND,CM
+4:900/0|"ice.ath.cx",BND,CM
+4:900/100|"ice.ath.cx",BND,CM
+4:900/101|"ice.ath.cx",BND
+4:902/0|"adorni.no-ip.info",BND,CM
+4:902/100|"adorni.no-ip.info",BND,CM
+4:902/26|"bbs.docksud.com.ar",BND,CM
+4:902/27|"adorni.no-ip.info",BND,CM
+4:904/0|"osionline.com.ar",BND,CM
+4:904/1|"osionline.com.ar",BND,CM
+4:904/10|"dabcanada.no-ip.biz",BND,CM
+4:904/13|"osionline.com.ar",BND,CM

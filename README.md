@@ -1,4 +1,4 @@
-# Mystic BBS 1.11IRC A3 — Community Fork
+# Mystic BBS 1.11IRC — Community Fork
 
 > **GitHub:** https://github.com/verta1878/mystic-bbs-irc
 >
@@ -13,21 +13,17 @@ Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
 
 | Handle | Role |
 |--------|------|
-| verta1878   | Project lead, Ecstasy BBS FTN 1:152/158 |
-| sysop/0     | serial.pas UART layer, architecture |
-| evga        | Free Pascal Compiler 2.6.4irc, RIP engines, MDL |
-| kiddo       | serial_irq.pas ISR, text rendering, MPL, chg2rip |
-| wrench      | fossil.pas, netfosdl.pas FOSSIL driver, netmodem2irc |
-| hexadecimal	| PCBoard 15.4 — resurrection                |
+| verta1878 | Project lead, Ecstasy BBS FTN 1:152/158 |
+| sysop/0 | serial.pas UART layer, architecture |
+| evga | Free Pascal Compiler 2.6.4irc, RIP engines, MDL |
+| kiddo | serial_irq.pas ISR, text rendering, MPL, chg2rip |
+| wrench | fossil.pas, netfosdl.pas FOSSIL driver, netmodem2irc |
 
 ## Directory Structure
 
 ```
 mystic/                  BBS core (clean, no RIP)
-mystic_ansieditor        110-111 Test ansieditor
-mystic_ansieditor2       111-112 Test ansieditor 2
 mystic_test/             BBS core + RIP integration + A4 fixes
-mystic_texteditor        110-112 texteditor
 mdl/                     Mystic Development Library (52+ units)
 mystic_rip/              RIPscrip — ALL RIP code lives here
   v1/                      RIPscrip v1.54 engine
