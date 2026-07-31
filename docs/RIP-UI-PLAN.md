@@ -525,6 +525,12 @@ Three fixes applied:
   6. Run against full 118 RIPs once big issues fixed.
   7. test_phase3.pas needs rip_compat fixes baked in (sysop/0 patched
      each run - merge upstream)
+  8. Phase 4: wire {$IFDEF EXPERIMENTAL_RIP} into mystic_test
+  9. openwatcomirc compiler fork for pcbirc (hexadecimal)
+  5. Both engines BUTTONS - shared RIPtermJS port bug. Text positioning.
+  6. Run against full 118 RIPs once big issues fixed.
+  7. test_phase3.pas needs rip_compat fixes baked in (sysop/0 patched
+     each run - merge upstream)
 
 #### Merge Path (sysop/0 direction)
 

@@ -1,0 +1,282 @@
+
+  .-----------------------.
+  | ABOUT THE D32 LIBRARY |------------------------------------------------
+  `-----------------------'
+
+   The D32 library is a Pascal programming library for making cross
+   platform BBS door games.  The goal of D32 is to allow door authors to
+   easily support newer door standards and multiple operating systems while
+   keeping the support for older DOS standards.  The D32 library keeps an
+   interface familure to existing door authors and other door libraries and
+   is 100% configurable even without modifying the D32 source code!
+
+   The best part of it all is that once your door works under one platform,
+   it can be compiled for any other operating system with no changes to the
+   source code!
+
+  .-----------------------------.
+  | FEATURES OF THE D32 LIBRARY |------------------------------------------
+  `-----------------------------'
+
+   + Library is completely free
+
+   + Contains 100% of the source code for the ultimate in flexibility
+
+   + 100% of everything is configurable without modifying the D32 source
+     code.  All events for shelling to DOS, chatting, carrier loss, and
+     more are all definable as functions by your door.
+
+   + Support for compiling native doors under DOS, Window, OS/2, and Linux
+     without changing any source code.
+
+   + Uses FOSSIL communications in DOS for compatibility with all ranges of
+     hardware and software, including virtual modem drivers such as COM/IP,
+     NetModem, VIO, and more.
+
+   + Supports 4 major door drop files: CHAIN.TXT, DORINFO#.DEF, DOOR.SYS and
+     DOOR32.SYS depending on the operating system your door is compiled
+     for.
+
+   + Uses the Door32 standard in all 32-bit environments to allow doors to
+     work over dialup and telnet servers for all BBS software supporting
+     Door32.
+
+   + And MORE...
+
+     (*) Doors will not require any source code changes as long as no
+         operating system specific code is used.  For almost any door,
+         there is no need for OS specific code.
+
+  .----------------------------.
+  | INSTALLING THE D32 LIBRARY |------------------------------------------
+  `----------------------------'
+
+   When you UNZIP the D32 distribution archive, it should have created
+   several subdirectories (if you used the -d option or its equivalent),
+   one of them being a directory called SOURCE.  This is the directory
+   which contains the source code to the D32 library.
+
+   There are two ways to install the D32 library:
+
+      1) Copying the D32 source code (found in the SOURCE directory) into
+         the same directory as the door's source code.
+
+      2) Copying the D32 source code to the common library directory of
+         each compiler that you're using.
+
+   For all of my door development, I just copy the D32 source into the
+   door's directory.  Seems easier that way to me, since I use three
+   different Pascal compilers.
+
+  .------------------------------------------------.
+  | COMPILING DOORS FOR MULTIPLE OPERATING SYSTEMS |----------------------
+  `------------------------------------------------'
+
+   The D32 library can compile native doors for several different operating
+   systems - all from the same source code.  Here's a list of tested
+   compilers and their associated target operating systems:
+
+   Compiler        Version  Target       Drop Files
+   -----------------------------------------------------------------------
+   Turbo Pascal    7.x      DOS          DORINFOX.DEF, DOOR.SYS, CHAIN.TXT
+   Virtual Pascal  2.x      Win, OS/2    DOOR32.SYS
+   Free Pascal     1.x      Linux        (ALL ABOVE TYPES)
+   -----------------------------------------------------------------------
+
+   Between these three compilers, you can compile native doors for DOS,
+   Windows, OS/2, and Linux.  Support for different compilers under
+   different operating systems will be added in the future, but for now
+   one of those are required.
+
+   When porting an older DOS door over to newer operating systems, it is
+   possible that some lower level functions could use operating specific
+   code and will not compile.  In almost all cases, there are VERY easy
+   replacements.  I was able to port PimpWars over to D32 within minutes.
+   In many cases no changes at all will be needed.
+
+   Also, some compilers (such as Virtual Pascal) will expect LongInt
+   instead of Word variables for certain functions.  The D32 library
+   creates a new variable type called "LongWord" which will automatically
+   use the correct type based on what compiler is being used.
+
+   An example of problematic code under Virtual Pascal:
+
+     Function TimerMin : Integer;
+     Var
+       Hour, Min, Sec, Sec100 : Word;
+     Begin
+       GetTime (Hour, Min, Sec, Sec100);
+       TimerMin := (Hour * 60) + Min;
+     End;
+
+   The GetTime procedure in Virtual Pascal will expect a LongInt value
+   for the variables Hour, Min, Sec, and Sec100.  Under Turbo Pascal, it
+   will expect a Word value.  The solution to this would be to use D32's
+   new LongWord type and it will compile for both, as shown below:
+
+     Function TimerMin : Integer;
+     Var
+       Hour, Min, Sec, Sec100 : LongWord;
+     Begin
+       GetTime (Hour, Min, Sec, Sec100);
+       TimerMin := (Hour * 60) + Min;
+     End;
+
+   More common issues when porting doors will be addressed as they are
+   known.
+
+  .----------------------.
+  | PREDEFINED VARIABLES |------------------------------------------------
+  `----------------------'
+
+   The D32 library has a collection of predefined variables which are
+   assigned values during the OpenDoor procedure.  These variables are
+   available in any program that has Door32 included in it's USES
+   statement.  Note that some variables are not available with certain
+   drop file types.  Variables marked with a (*) are available with all
+   drop file types.
+
+   USER RELATED VARIABLES:
+
+     User_Record   - Contains the user's record position in the BBS database
+    *User_Name     - Contains the user's real name
+    *User_Handle   - Contains the user's handle/alias
+    *User_Security - Contains the user's security level
+    *User_Time     - Contains the user's time left
+    *User_Term     - Contains the user's terminal type
+     User_Screen   - Contains the user's screen length
+
+   CONNECTION RELATED VARIABLES:
+
+     Comm_BBSID  - Contains the BBS_ID field from DOOR32.SYS
+     Comm_Type   - Comm Type (0=Local, 1=Dialup, 2=Telnet)
+    *Comm_Handle - Comm Handle in DOOR32.SYS or Comm port otherwise
+    *Comm_Baud   - Baud Rate
+    *Comm_Local  - TRUE if current user is a local connection
+
+   GENERAL VARIABLES:
+
+     AllowArrow   - If TRUE, arrow key input will be allowed.
+     IsLocalKey   - If TRUE, the last key entered was from the local console
+     IsArrowKey   - If TRUE, the last key entered was an arrow key
+     IsNoFile     - If TRUE, the last file sent with SendFile wasn't found
+     PauseLinePos - Contains the current pause counter for the screen pause
+
+   All of the general variables are explained in more detail within the
+   function reference.
+
+  .----------------------------------.
+  | FUNCTION AND PROCEDURE REFERENCE |------------------------------------
+  `----------------------------------'
+
+   This section not completed.  See the FUNCREF.DOC file included with the
+   distribution.  It has a reference of all the older 0.1 library
+   functions which are mostly still the same.
+
+  .-----------------------------.
+  | REDEFINING EVENT PROCEDURES |-----------------------------------------
+  `-----------------------------'
+
+   D32 encapsulates all of its major events and puts them into redefinable
+   procedures.  The library by default will automatically handle all these
+   events, but they can be overridden by your door.
+
+   DEFINABLE EVENT PROCEDURES:
+
+   dOnNoCarrier    - Called when a loss of carrier (hangup) is detected
+   dOnTimeOut      - Called when a user is inactive for 180 seconds
+   dOnStatusUpdate - Called when the status line needs to be updated
+   dOnChatMode     - Called when SysOp chat mode is started
+   dOnLowTime      - Called when the user has only 2 minutes time left
+   dOnNoTime       - Called when the user has ran out of time
+   dOnFilePause    - Called when a display file is paused
+   dOnKickUser     - Called when the SysOp kick user command is selected
+   dOnOsShell      - Called when the SysOp shell command is selected
+
+   When creating your own redefined procedure, it is always easier to copy
+   the D32 source code for the procedure and paste it into your code.  Then
+   all you have to do is rename it and make whatever modifications you
+   would like.  All redefined procedures must be enclosed in the {$F+} and
+   {$F-} compiler directives.  The example below is the "ProcTimeOut"
+   procedure, copied and modified from the original D32 code:
+
+      {$F+}
+      Procedure MyNewTimeOutProc;
+      Begin
+        SendLn ('Call back when your ready to press some keys!');
+        CloseDOOR;
+        Halt(0);
+      End;
+      {$F-}
+
+   Now that you have written the procedure itself, you must assign it to
+   one of the event names listed in the beginning of this section.  You
+   should do this in the very beginning of your program, even before
+   OpenDoor is called:
+
+     dOnTimeOut := MyNewTimeOutProc;
+
+   I hope this helps explain the event procedures.  I'm not the best at
+   explaining these things!
+
+  .-----------------------.
+  | CONTACTING THE AUTHOR |-----------------------------------------------
+  `-----------------------'
+
+   At the time of this writing, I can be contacted in any one of the
+   following ways:
+
+     E-mail : g00r00@ptd.net
+        Web : www.mysticbbs.com/door32
+    FidoNet : MYSTIC and DOORGAMES echos
+        IRC : #mysticbbs on EfNet as nickname "_g00r00_"
+
+   If you have any bug reports or feature requests, feel free to contact
+   me via any one of those methods.
+
+  .--------------------------------.
+  | BBS SOFTWARE SUPPORTING DOOR32 |--------------------------------------
+  `--------------------------------'
+
+   The following BBS software packages are known to support Door32 32-bit
+   doors, or have announced plans to do so in an upcoming release:
+
+      EleBBS     : www.elebbs.com    : Currently supports Door32
+      Mystic BBS : www.mysticbbs.com : Currently supports Door32
+      Synchronet : www.synchro.net   : Currently supports Door32
+      WWIV       : wss.wwiv.com      : Will support Door32 in 5.0
+      Wildcat!   : www.santronics.com: Currently supprots Door32
+      Fusion/GS  : Unknown           : Door32 status unknown
+      LoraBBS    : Unknown           : Door32 status unknown
+
+   If you know of a package that plans to or does already support Door32
+   please e-mail me so I can keep this list updated.  See the section on
+   contacting the author for information on contacting me.
+
+  .-------------.
+  | D32 CREDITS |---------------------------------------------------------
+  `-------------'
+
+   Maarten Berkers - Maarten is the "co-creater" of the Door32 standard.
+                     He donated his EleBBS communications engine to the
+                     project which was eventually released as the freeware
+                     EleCOM library.  Maarten has always had a positive
+                     attitude towards Door32 and the BBS scene in general.
+                     Thanks once again for your good attitude and help!
+
+   James Coyle     - This is me, the other "co-creater" of the Door32
+                     standard.  I've done the majority of the library
+                     programming for the D32 library, and since its
+                     initial creation, I am in charge of keeping it
+                     updated and bug free.
+
+   Programmers     - This is a thanks to any programmer that has decided
+                     to support the Door32 project.  In order to help keep
+                     the BBS scene alive, we must develop new standards
+                     and mold our software around newer technology.  This
+                     cannot happen if programmers are not willing to
+                     implement and support these new standards.  We urge
+                     you ALL to please support this project with your BBS
+                     software and doors!
+
+   -----------------------------------------------------------------------

@@ -1,0 +1,32 @@
+
+8/24/92
+
+This archive contains some preliminary parts of the forthcoming HS/LINK
+DEVELOPER KIT (hereafter "HDK"), which will allow developers to
+incorporate the HS/Link file transfer protocol into their applications.
+
+The file HDK.H defines the public functions, data types and variables
+provided by the developer kit library.
+
+The file HDKSTUB.H specifies the application specific functions that are
+required by the developer kit library at runtime.
+
+To use the HDK you need to write implementations for the various
+functions in HDKSTUB.H which work in conjunction with your application.
+Your application can then call on the top level functions provided by
+HDK.H to configure the protocol and to perform file transfers.
+
+HDKDEMO.C is a sample of how the top level hslink functions can be
+called using normal command line parameters to set options and
+filenames.  Edit this file as needed for your application.
+
+As this is a preliminary edition of the HDK, please feel free to review
+what has been provided and to make suggestions for ways to simplify the
+interface requirements.  I can be reached during normal business hours,
+tuesday through saturday at (818) 891-4228.
+
+Regards,
+
+Samuel Smith
+
+

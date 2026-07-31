@@ -1,0 +1,46 @@
+Publics by module
+
+HSBUF   	size = 2175
+	_bclose                           _bclose_set
+	_bcreate                          _beof
+	_bflush                           _bgetline
+	_bopen                            _bprepare
+	_bread                            _bseek
+	_bseekeof                         _btell
+	_bwrite                         
+
+HSCRC   	size = 1136
+	_calculate_CRC                    _crc_32_tab
+
+HSMISC  	size = 2742
+	_ahtoi                            _calculate_cps
+	_duplicate_file                   _isadir
+	_limit_errors                     _name_only
+	_path_name                        _path_only
+	_sectomin                         _timer_ticks
+	_update_status_log              
+
+HSOPT   	size = 3890
+	_bad_option                       _load_config_file
+	_load_default_config              _process_command_option
+	_process_filespecs                _process_options
+	_queue_transmit                   _set_defaults
+
+HSRECV  	size = 13682
+	__service_receive                 _close_active_file
+	_receive_dle_block                _send_chat_block
+	_send_ready                       _service_receive
+	_write_valid_data_block         
+
+HSTOP   	size = 1556
+	_current_hsws                     _finish_receive
+	_hdk_compdate                     _hdk_copyright
+	_hdk_license                      _hdk_target
+	_proper_CRC                       _sender_name
+	_set_cancel_link                  _terminate_link
+	_text_CRC                         _top_init
+	_wait_for_ready                 
+
+HSTRANS 	size = 9591
+	_transmit_dle_block               _transmit_dle_char
+	_transmit_file                    _transmit_message

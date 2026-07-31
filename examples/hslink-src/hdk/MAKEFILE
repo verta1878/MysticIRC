@@ -1,0 +1,81 @@
+
+#
+# TC++ 1.0 Makefile for "HS/Link Developer Kit"
+# Samuel H. Smith, 10/14/91
+#
+# usage:
+#   make -DCOMP=compiler -DMODEL=model -DCPU=cpu [-DSTATIC] -DTARGET=targetlib
+#
+
+.AUTODEPEND
+
+# default compiler, memory model, CPU type, storage allocation and target file
+
+!if $d(COMP)
+!else
+COMP=TCC
+!endif
+
+!if $d(MODEL)
+!else
+MODEL=s
+!endif
+
+!if $d(CPU)
+CPUOPT=-$(CPU)
+!else
+CPUOPT=
+!endif
+
+!if $d(STATIC)
+STATIC=-DSWS
+!else
+STATIC=
+!endif
+
+!if $d(TARGET)
+!else
+TARGET=HDK
+!endif
+
+# default compilation rules
+
+.C.OBJ:
+        $(COMP) -c -f- -k- -v -y -d -O2 $(CPUOPT) -m$(MODEL) $(STATIC) {$< }
+
+!if $d(ASM)
+.C.ASM:
+        $(COMP) -c -f- -k- -v -y -d -O2 $(CPUOPT) -m$(MODEL) $(STATIC) -S {$< }
+!endif
+
+.C.I:
+        CPP -c -f- -k- -v -y -d -O2 $(CPUOPT) -m$(MODEL) $(STATIC) {$< }
+
+# nested include files
+
+HDK=INCLUDE\hdk.h INCLUDE\hslink.h INCLUDE\hsdisp.h INCLUDE\hscomm.h INCLUDE\hstrans.h INCLUDE\hsrecv.h INCLUDE\hsopt.h
+HSPRIV=hspriv.h hsbuf.h hdktext.h
+
+# build library files
+
+HDK: \HDK\HSCRC.OBJ \HDK\HSRECV.OBJ \HDK\HSTRANS.OBJ \HDK\HSMISC.OBJ \HDK\HSBUF.OBJ \HDK\HSOPT.OBJ \HDK\HSOPT2.OBJ \HDK\HSTOP.OBJ
+        TLIB $(TARGET) +-HSCRC.OBJ +-HSRECV.OBJ +-HSTRANS.OBJ +-HSMISC.OBJ +-HSBUF.OBJ +-HSOPT.OBJ +-HSOPT2.OBJ +-HSTOP.OBJ,$(TARGET)
+
+# compile each source file
+
+\HDK\HSTOP.OBJ: \HDK\HSTOP.C $(HDK) $(HSPRIV) DEBUG.H HSMISC.H INCLUDE\HSUID.H INCLUDE\HSTOP.H HSCRC.H
+
+\HDK\HSCRC.OBJ: \HDK\HSCRC.C $(HDK) $(HSPRIV) INCLUDE\HSUID.H HSCRC.H
+
+\HDK\HSMISC.OBJ: \HDK\HSMISC.C $(HDK) $(HSPRIV) HSMISC.H
+
+\HDK\HSBUF.OBJ: \HDK\HSBUF.C $(HDK) $(HSPRIV) HSMISC.H DEBUG.H
+
+\HDK\HSOPT.OBJ: \HDK\HSOPT.C $(HDK) $(HSPRIV) HSMISC.H INCLUDE\HSUID.H
+
+\HDK\HSOPT2.OBJ: \HDK\HSOPT2.C $(HDK) $(HSPRIV) HSMISC.H INCLUDE\HSUID.H
+
+\HDK\HSRECV.OBJ: \HDK\HSRECV.C $(HDK) $(HSPRIV) HSMISC.H INCLUDE\HSUID.H DEBUG.H
+
+\HDK\HSTRANS.OBJ: \HDK\HSTRANS.C $(HDK) $(HSPRIV) HSMISC.H DEBUG.H
+

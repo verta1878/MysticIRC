@@ -1,0 +1,20 @@
+--- misc/os_detect.h.orig	2026-07-09 01:08:38.843400670 +0000
++++ misc/os_detect.h	2026-07-09 01:08:38.884659018 +0000
+@@ -727,12 +727,12 @@
+ 	  #define BYTE_ORDER		BIG_ENDIAN
+ 	#endif /* !BYTE_ORDER */
+   #endif /* Sun-specific endianness defines */
++#elif defined( __WINDOWS__ )
++  /* MinGW defines __GNUC__ but is Windows and has no <endian.h>; Windows is
++     always little-endian on the platforms cryptlib targets.  (Fork patch to
++     allow mingw cross-compilation - see docs/DECISIONS.md 2026-07-09.) */
++  #define DATA_LITTLEENDIAN
+ #elif defined( __GNUC__ )
+-  /* Using __GNUC__ is a bit risky because a few other compilers want to 
+-     pretend really hard to be gcc while not being gcc, which means that
+-	 __GNUC__ is defined but the gcc include files aren't present.  The
+-	 above checks catch the most common cases, if there are other pretend-
+-	 gcc's then they'll need to be special-cased before this one */
+   #include <endian.h>
+ #endif /* System-specific endian.h includes */
+ 

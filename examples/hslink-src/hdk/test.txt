@@ -1,0 +1,232 @@
+MAKE  Version 3.0  Copyright (c) 1987, 1990 Borland International
+
+Available memory 473834 bytes
+
+        TCC -c -f- -k- -v -y -d -O2  -ms  hscrc.c hsrecv.c hstrans.c hsmisc.c hsbuf.c hsopt.c hsopt2.c \hdk\hstop.c 
+Turbo C++  Version 1.00 Copyright (c) 1990 Borland International
+hscrc.c:
+Error hspriv.h 27: Unable to open include file 'hdktypes.h'
+Error \hdk\hsbuf.h 24: Declaration missing ;
+Error \hdk\hsbuf.h 28: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 28: Declaration missing ;
+Error \hdk\hsbuf.h 29: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 29: Declaration missing ;
+Error \hdk\hsbuf.h 65: ) expected
+Error \hdk\hsbuf.h 68: ) expected
+Error hspriv.h 159: Declaration missing ;
+Error hspriv.h 203: Declaration missing ;
+Error hspriv.h 242: Declaration missing ;
+Error hspriv.h 252: Declaration missing ;
+Error hspriv.h 253: Multiple declaration for 'uchar'
+Error hspriv.h 253: Declaration missing ;
+Error hspriv.h 254: Multiple declaration for 'uchar'
+Error hspriv.h 254: Declaration missing ;
+Error hspriv.h 255: Multiple declaration for 'uchar'
+Error hspriv.h 255: Declaration missing ;
+Error hspriv.h 256: Multiple declaration for 'uchar'
+Error hspriv.h 256: Declaration missing ;
+Error hspriv.h 268: Declaration missing ;
+Error hspriv.h 291: Declaration missing ;
+Error hspriv.h 292: Multiple declaration for 'uchar'
+Error hspriv.h 292: Declaration missing ;
+Error hspriv.h 306: Declaration missing ;
+Error hspriv.h 306: Too many error or warning messages
+*** 26 errors in Compile ***
+hsrecv.c:
+Error hdktext.h 9: Unable to open include file '\hdk\language.h'
+Error hspriv.h 27: Unable to open include file 'hdktypes.h'
+Error \hdk\hsbuf.h 24: Declaration missing ;
+Error \hdk\hsbuf.h 28: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 28: Declaration missing ;
+Error \hdk\hsbuf.h 29: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 29: Declaration missing ;
+Error \hdk\hsbuf.h 65: ) expected
+Error \hdk\hsbuf.h 68: ) expected
+Error hspriv.h 159: Declaration missing ;
+Error hspriv.h 203: Declaration missing ;
+Error hspriv.h 242: Declaration missing ;
+Error hspriv.h 252: Declaration missing ;
+Error hspriv.h 253: Multiple declaration for 'uchar'
+Error hspriv.h 253: Declaration missing ;
+Error hspriv.h 254: Multiple declaration for 'uchar'
+Error hspriv.h 254: Declaration missing ;
+Error hspriv.h 255: Multiple declaration for 'uchar'
+Error hspriv.h 255: Declaration missing ;
+Error hspriv.h 256: Multiple declaration for 'uchar'
+Error hspriv.h 256: Declaration missing ;
+Error hspriv.h 268: Declaration missing ;
+Error hspriv.h 291: Declaration missing ;
+Error hspriv.h 292: Multiple declaration for 'uchar'
+Error hspriv.h 292: Declaration missing ;
+Error hspriv.h 292: Too many error or warning messages
+*** 26 errors in Compile ***
+hstrans.c:
+Error hdktext.h 9: Unable to open include file '\hdk\language.h'
+Error hspriv.h 27: Unable to open include file 'hdktypes.h'
+Error \hdk\hsbuf.h 24: Declaration missing ;
+Error \hdk\hsbuf.h 28: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 28: Declaration missing ;
+Error \hdk\hsbuf.h 29: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 29: Declaration missing ;
+Error \hdk\hsbuf.h 65: ) expected
+Error \hdk\hsbuf.h 68: ) expected
+Error hspriv.h 159: Declaration missing ;
+Error hspriv.h 203: Declaration missing ;
+Error hspriv.h 242: Declaration missing ;
+Error hspriv.h 252: Declaration missing ;
+Error hspriv.h 253: Multiple declaration for 'uchar'
+Error hspriv.h 253: Declaration missing ;
+Error hspriv.h 254: Multiple declaration for 'uchar'
+Error hspriv.h 254: Declaration missing ;
+Error hspriv.h 255: Multiple declaration for 'uchar'
+Error hspriv.h 255: Declaration missing ;
+Error hspriv.h 256: Multiple declaration for 'uchar'
+Error hspriv.h 256: Declaration missing ;
+Error hspriv.h 268: Declaration missing ;
+Error hspriv.h 291: Declaration missing ;
+Error hspriv.h 292: Multiple declaration for 'uchar'
+Error hspriv.h 292: Declaration missing ;
+Error hspriv.h 292: Too many error or warning messages
+*** 26 errors in Compile ***
+hsmisc.c:
+Error hdktext.h 9: Unable to open include file '\hdk\language.h'
+Error hspriv.h 27: Unable to open include file 'hdktypes.h'
+Error \hdk\hsbuf.h 24: Declaration missing ;
+Error \hdk\hsbuf.h 28: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 28: Declaration missing ;
+Error \hdk\hsbuf.h 29: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 29: Declaration missing ;
+Error \hdk\hsbuf.h 65: ) expected
+Error \hdk\hsbuf.h 68: ) expected
+Error hspriv.h 159: Declaration missing ;
+Error hspriv.h 203: Declaration missing ;
+Error hspriv.h 242: Declaration missing ;
+Error hspriv.h 252: Declaration missing ;
+Error hspriv.h 253: Multiple declaration for 'uchar'
+Error hspriv.h 253: Declaration missing ;
+Error hspriv.h 254: Multiple declaration for 'uchar'
+Error hspriv.h 254: Declaration missing ;
+Error hspriv.h 255: Multiple declaration for 'uchar'
+Error hspriv.h 255: Declaration missing ;
+Error hspriv.h 256: Multiple declaration for 'uchar'
+Error hspriv.h 256: Declaration missing ;
+Error hspriv.h 268: Declaration missing ;
+Error hspriv.h 291: Declaration missing ;
+Error hspriv.h 292: Multiple declaration for 'uchar'
+Error hspriv.h 292: Declaration missing ;
+Error hspriv.h 292: Too many error or warning messages
+*** 26 errors in Compile ***
+hsbuf.c:
+Error hspriv.h 27: Unable to open include file 'hdktypes.h'
+Error \hdk\hsbuf.h 24: Declaration missing ;
+Error \hdk\hsbuf.h 28: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 28: Declaration missing ;
+Error \hdk\hsbuf.h 29: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 29: Declaration missing ;
+Error \hdk\hsbuf.h 65: ) expected
+Error \hdk\hsbuf.h 68: ) expected
+Error hspriv.h 159: Declaration missing ;
+Error hspriv.h 203: Declaration missing ;
+Error hspriv.h 242: Declaration missing ;
+Error hspriv.h 252: Declaration missing ;
+Error hspriv.h 253: Multiple declaration for 'uchar'
+Error hspriv.h 253: Declaration missing ;
+Error hspriv.h 254: Multiple declaration for 'uchar'
+Error hspriv.h 254: Declaration missing ;
+Error hspriv.h 255: Multiple declaration for 'uchar'
+Error hspriv.h 255: Declaration missing ;
+Error hspriv.h 256: Multiple declaration for 'uchar'
+Error hspriv.h 256: Declaration missing ;
+Error hspriv.h 268: Declaration missing ;
+Error hspriv.h 291: Declaration missing ;
+Error hspriv.h 292: Multiple declaration for 'uchar'
+Error hspriv.h 292: Declaration missing ;
+Error hspriv.h 306: Declaration missing ;
+Error hspriv.h 306: Too many error or warning messages
+*** 26 errors in Compile ***
+hsopt.c:
+Error hdktext.h 9: Unable to open include file '\hdk\language.h'
+Error hspriv.h 27: Unable to open include file 'hdktypes.h'
+Error \hdk\hsbuf.h 24: Declaration missing ;
+Error \hdk\hsbuf.h 28: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 28: Declaration missing ;
+Error \hdk\hsbuf.h 29: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 29: Declaration missing ;
+Error \hdk\hsbuf.h 65: ) expected
+Error \hdk\hsbuf.h 68: ) expected
+Error hspriv.h 159: Declaration missing ;
+Error hspriv.h 203: Declaration missing ;
+Error hspriv.h 242: Declaration missing ;
+Error hspriv.h 252: Declaration missing ;
+Error hspriv.h 253: Multiple declaration for 'uchar'
+Error hspriv.h 253: Declaration missing ;
+Error hspriv.h 254: Multiple declaration for 'uchar'
+Error hspriv.h 254: Declaration missing ;
+Error hspriv.h 255: Multiple declaration for 'uchar'
+Error hspriv.h 255: Declaration missing ;
+Error hspriv.h 256: Multiple declaration for 'uchar'
+Error hspriv.h 256: Declaration missing ;
+Error hspriv.h 268: Declaration missing ;
+Error hspriv.h 291: Declaration missing ;
+Error hspriv.h 292: Multiple declaration for 'uchar'
+Error hspriv.h 292: Declaration missing ;
+Error hspriv.h 292: Too many error or warning messages
+*** 26 errors in Compile ***
+hsopt2.c:
+Error hdktext.h 9: Unable to open include file '\hdk\language.h'
+Error hspriv.h 27: Unable to open include file 'hdktypes.h'
+Error \hdk\hsbuf.h 24: Declaration missing ;
+Error \hdk\hsbuf.h 28: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 28: Declaration missing ;
+Error \hdk\hsbuf.h 29: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 29: Declaration missing ;
+Error \hdk\hsbuf.h 65: ) expected
+Error \hdk\hsbuf.h 68: ) expected
+Error hspriv.h 159: Declaration missing ;
+Error hspriv.h 203: Declaration missing ;
+Error hspriv.h 242: Declaration missing ;
+Error hspriv.h 252: Declaration missing ;
+Error hspriv.h 253: Multiple declaration for 'uchar'
+Error hspriv.h 253: Declaration missing ;
+Error hspriv.h 254: Multiple declaration for 'uchar'
+Error hspriv.h 254: Declaration missing ;
+Error hspriv.h 255: Multiple declaration for 'uchar'
+Error hspriv.h 255: Declaration missing ;
+Error hspriv.h 256: Multiple declaration for 'uchar'
+Error hspriv.h 256: Declaration missing ;
+Error hspriv.h 268: Declaration missing ;
+Error hspriv.h 291: Declaration missing ;
+Error hspriv.h 292: Multiple declaration for 'uchar'
+Error hspriv.h 292: Declaration missing ;
+Error hspriv.h 292: Too many error or warning messages
+*** 26 errors in Compile ***
+\hdk\hstop.c:
+Error hdktext.h 9: Unable to open include file '\hdk\language.h'
+Error hspriv.h 27: Unable to open include file 'hdktypes.h'
+Error \hdk\hsbuf.h 24: Declaration missing ;
+Error \hdk\hsbuf.h 28: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 28: Declaration missing ;
+Error \hdk\hsbuf.h 29: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 29: Declaration missing ;
+Error \hdk\hsbuf.h 65: ) expected
+Error \hdk\hsbuf.h 68: ) expected
+Error hspriv.h 159: Declaration missing ;
+Error hspriv.h 203: Declaration missing ;
+Error hspriv.h 242: Declaration missing ;
+Error hspriv.h 252: Declaration missing ;
+Error hspriv.h 253: Multiple declaration for 'uchar'
+Error hspriv.h 253: Declaration missing ;
+Error hspriv.h 254: Multiple declaration for 'uchar'
+Error hspriv.h 254: Declaration missing ;
+Error hspriv.h 255: Multiple declaration for 'uchar'
+Error hspriv.h 255: Declaration missing ;
+Error hspriv.h 256: Multiple declaration for 'uchar'
+Error hspriv.h 256: Declaration missing ;
+Error hspriv.h 268: Declaration missing ;
+Error hspriv.h 291: Declaration missing ;
+Error hspriv.h 292: Multiple declaration for 'uchar'
+Error hspriv.h 292: Declaration missing ;
+Error hspriv.h 292: Too many error or warning messages
+*** 26 errors in Compile ***
+
+        Available memory 179456

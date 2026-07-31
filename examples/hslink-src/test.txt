@@ -1,0 +1,38 @@
+MAKE  Version 3.0  Copyright (c) 1987, 1990 Borland International
+
+Available memory 471300 bytes
+
+        tcc -DSWS -c @COMP.OPT   -ms  HSLINK.C
+Turbo C++  Version 1.00 Copyright (c) 1990 Borland International
+hslink.c:
+Error \hdk\hspriv.h 27: Unable to open include file 'hdktypes.h'
+Error \hdk\hsbuf.h 24: Declaration missing ;
+Error \hdk\hsbuf.h 28: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 28: Declaration missing ;
+Error \hdk\hsbuf.h 29: Multiple declaration for 'uchar'
+Error \hdk\hsbuf.h 29: Declaration missing ;
+Error \hdk\hsbuf.h 65: ) expected
+Error \hdk\hsbuf.h 68: ) expected
+Error \hdk\hspriv.h 159: Declaration missing ;
+Error \hdk\hspriv.h 203: Declaration missing ;
+Error \hdk\hspriv.h 242: Declaration missing ;
+Error \hdk\hspriv.h 252: Declaration missing ;
+Error \hdk\hspriv.h 253: Multiple declaration for 'uchar'
+Error \hdk\hspriv.h 253: Declaration missing ;
+Error \hdk\hspriv.h 254: Multiple declaration for 'uchar'
+Error \hdk\hspriv.h 254: Declaration missing ;
+Error \hdk\hspriv.h 255: Multiple declaration for 'uchar'
+Error \hdk\hspriv.h 255: Declaration missing ;
+Error \hdk\hspriv.h 256: Multiple declaration for 'uchar'
+Error \hdk\hspriv.h 256: Declaration missing ;
+Error \hdk\hspriv.h 268: Declaration missing ;
+Error \hdk\hspriv.h 291: Declaration missing ;
+Error \hdk\hspriv.h 292: Multiple declaration for 'uchar'
+Error \hdk\hspriv.h 292: Declaration missing ;
+Error \hdk\hspriv.h 306: Declaration missing ;
+Error \hdk\hspriv.h 306: Too many error or warning messages
+*** 26 errors in Compile ***
+
+        Available memory 199872
+
+** error 1 ** deleting hslink.obj

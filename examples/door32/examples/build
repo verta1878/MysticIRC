@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# If no filename was provided as argument
+if [ -z "$1" ]; then
+    # Prompt user for the file to compile
+    echo -n "Enter the file to compile: "
+    read filename
+else
+    filename="$1"
+fi
+
+# Run the compiler with the specified file
+fpc -vq -g -gl -gw2 -Mtp -TLinux "$filename" -Fu../source -Fu*

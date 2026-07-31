@@ -1,0 +1,10 @@
+EXPFIX
+======
+
+This program fixes a problem that sometimes occurs when installing the
+current version of FMail (1.48). The export addresses in the Area Manager
+then seem to have disappeared. If you then run EXPFIX once, the export
+addresses should be back (running it again will make the addresses
+disappear again).
+
+

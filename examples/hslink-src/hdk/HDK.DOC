@@ -1,0 +1,260 @@
+
+
+
+
+
+
+
+
+                                   User's Guide to
+
+                                        H D K
+
+                                HS/LINK DEVELOPER KIT
+
+
+
+
+
+                                    A product of:
+
+                                    The Tool Shop
+                                   Samuel H. Smith
+                                    P.O. Box 4808
+                             Panorama City, CA 91412-4808
+
+                            (818) 891-4228 (voice and FAX)
+                            (818) 891-6780 (Tool Shop BBS)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          Copyright (c) 1992-1993 Samuel H. Smith
+
+          All  rights reserved.    No  part  of  this  publication  may  be
+          reproduced, stored  in a retrieval system, or  transmitted in any
+          form  or by any means, without prior written permission of Samuel
+          H. Smith.  Use,  duplication, or disclosure by the  Government is
+          subject to restructions as set forth in subparagraph c)(1)(ii) of
+          the  Rights in  Technical  Data and  Computer Software  clause at
+          252.227-7013.
+
+
+                                       CONTENTS
+
+
+               INTRODUCTION
+
+               LIBRARY FILES
+
+               HEADER FILES
+
+               APPLICATION STUBS
+
+               SAMPLE APPLICATION
+
+               SERIAL NUMBERING AND TAMPER DETECTION
+
+               LICENSE AGREEMENT
+
+               APPLICATION NOTES
+
+
+
+
+                                     INTRODUCTION
+
+
+          The HS/LINK  DEVELOPER  KIT, or  "HDK"  for short,  is a  set  of
+          software modules designed to allow COMM application developers to
+          incorporate  the HS/Link  file  transfer  protocol directly  into
+          their applications.
+
+          The HDK consists  of a set of header files and a group of library
+          files.
+
+          To use the HDK you must implement a set of "stub" functions which
+          are  called  upon by  the HDK  at  runtime.   The  file HDKSTUB.C
+          contains sample stub definitions.
+
+          A  sample main  program  is given  to  demonstrate the  preferred
+          sequence of calls to perform a file transfer.
+
+
+                                    LIBRARY FILES
+
+
+          Library files are provided for various memory models and compiler
+          environments.   At  this time  the  following library  files  are
+          available:
+
+          HDKS.LIB
+               Small model for Borland Turbo C++
+
+          HDKSB.LIB
+               Small model for Borland C++ 3.1
+
+          HDKH2.LIB
+               Huge model protected mode for Borland C++ 3.1
+
+          HDKP286.LIB
+               Phar Lap 286 DOS EXTENDER and Borland C++ 3.1
+
+          HDKDL.LIB
+               Compact model for Borland C++ 3.1 for MS Windows DLLs
+
+
+
+                                     HEADER FILES
+
+
+          The primary header file is HDK.H.  This header should be included
+          in all application  modules which will refer  to HDK identifiers.
+          HDK.H automatically includes the following header files:
+
+          HSLINK.H
+               This defines  various external variables used  by HS/Link as
+               well as various needed data types and structures.
+
+          HSOPT.H
+               This  defines   the  various   user  option   settings  (and
+               associated defaults) recognized by HS/Link.  It also defines
+               functions  designed  to process  user command  line options,
+               configuration files,  and outgoing file specifications.
+
+          HSTOP.H
+               This defines the procedures provided  for the "top level" of
+               the protocol which are used directly by your application.
+
+          HSTRANS.H
+               This defines the procedure used to drive the "transmit side"
+               of an HS/Link transfer.
+
+          HSRECV.H
+               This defines the procedures used to drive the "receive side"
+               of an HD/Link transfer.
+
+          HSCOMM.H
+               This  defines   the  COMM  services  required   by  the  HDK
+               libraries.  These   procedures  must  be  provided   by  the
+               application    developer.    See   HDKSTUB.C    for   sample
+               implementations and implementation notes.
+
+          HSDISP.H
+               This defines the display management services required by the
+               HDK  libraries. These  procedures  must be  provided by  the
+               application    developer.    See   HDKSTUB.C    for   sample
+               implementations and implementation notes.
+
+          HSUID.H
+               This defines  the  user registration  and  tamper  detection
+               services  required by  the HDK  libraries. These  procedures
+               must be provided by the application developer. See HDKSTUB.C
+               for sample implementations and implementation notes.
+
+          HSMEM.H
+               This defines the memory  management services required by the
+               HDK libraries.   These  procedures must  be provided  by the
+               application   developer.      See   HDKSTUB.C   for   sample
+               implementations and implementation notes.
+
+          HSCLOCK.H
+               This defines  the time measurement services  required by the
+               HDK  libraries.  These  procedures must  be provided  by the
+               application   developer.      See   HDKSTUB.C   for   sample
+               implementations and implementation notes.
+
+
+                                  APPLICATION STUBS
+
+
+          To use the HDK you must implement a set of "stub" functions which
+          are called upon  by the HDK  at runtime.  The  required functions
+          are  defined  in HSCOMM.H  and  HSDISP.H.    The  file  HDKSTUB.C
+          contains sample stub definitions.
+
+          Application provided functions fall into the following groups:
+
+          COMM services
+               ComOpen, ComClose,  ComSetHandshake, ComGetSpeed, ComGetCts,
+               ComCarrierLost,  ComReadPending, ComReadChar,  ComWriteChar,
+               ComWriteStr,   ComWritePending,   ComCancelXoff,   ComFlush,
+               ComIoStart,   ComIoEnd,   ComReportErrors,  ComReportStatus,
+               ComIdle
+
+          Display management services
+               prepare_display, select_(option,recv,send,version), newline,
+               close_display,        display_chatin,       display_chatout,
+               display_settings,                    display_incoming_files,
+               display_outgoing_files,  display_file_banner, file_bargraph,
+               report_combined,      report_rx_error,      report_tx_error,
+               display_warning, usage
+
+          User registration and tamper detection
+               blocked_userid, local_userid
+
+          Memory management services
+               mem_avail, mem_alloc, mem_free, mem_clear
+
+          Time measurement services
+               bios_clock
+
+
+                                  SAMPLE APPLICATION
+
+
+          To perform an HS/Link file transfer in your application, you must
+
+               (1) initialize HS/Link,
+               (2) initiate a link with the remote user,
+               (3) transfer outgoing and incoming files,
+               (4) shut down the link, and finally
+               (5) deinit HS/Link.
+
+          Functions are provided  to perform  these steps.   A sample  main
+          program is given to demonstrate the preferred sequence of calls.
+
+          Please  refer to MKDEMO*.BAT for specific examples of how to link
+          the HDK libraries and how to compile the sample programs.
+
+
+                        SERIAL NUMBERING AND TAMPER DETECTION
+
+
+          TBW
+
+
+                                  LICENSE AGREEMENT
+
+
+          The HS/LINK DEVELOPER KIT is distributed only under conditions of
+          a signed  license agreement.   Your  license agreement  gives you
+          certain rights  and responsibilities and limits your distribution
+          rights.   In  particular, none  of the  source files,  library or
+          object files or documentation files provided under this agreement
+          may  be made public  or disclosed to any  third party without the
+          written consent of Samuel  H. Smith.  The above  mentioned source
+          files,  library or object  files and  documentation files  may be
+          used only in development of an application program which you will
+          distribute only  in machine executable form.  Please consult your
+          license agreement for further details.
+
+
+
+                                  APPLICATION NOTES
+
+          TBW
+

@@ -1,0 +1,29 @@
+*-------------------------------*
+| CHANGES SINCE THE 0.4 RELEASE |
+*-------------------------------*
+ + Modernized by Ferret @ Alcatraz to bring library upto Free Pascal 3.2.2
+ ! May no longer compile under other compilers 
+
+.-------------------------------.
+| CHANGES SINCE THE 0.3 RELEASE |
+`-------------------------------'
+
+ + Changed the DOOR32.PAS file name and DOOR32 unit name to D32.  In the
+   uses part of your program, you will need to change Uses DOOR32 to
+   Uses D32;
+
+ ! Fixed the drop carrier problem under Windows NT/2K/XP.  All D32 doors
+   should now run flawlessly under all Windows platforms.
+
+ + Removed the CloseDoor procedure, and added it automatically to the exit
+   stack of the compiled executables.  No longer does CloseDoor need to
+   be called - remove it from your code.
+
+ + D32 now sends the proper ANSI clear screen codes if the user has ANSI
+   graphics.  In the past it would send the ascii #12 character which was
+   ignored by some obscure terminals.
+
+ + Rewrote the screen saving functions, and the Win32 WriteXY function.
+
+ + D32 will now save the current directory when the door is first executed,
+   and will then switch back into that directory when the door is finished.

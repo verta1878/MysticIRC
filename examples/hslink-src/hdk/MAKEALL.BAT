@@ -1,0 +1,14 @@
+call cleanup
+call makeh2
+call cleanup
+call makep286
+call cleanup
+call makes
+call cleanup
+call makesb
+call cleanup
+call makess
+call cleanup
+call makessb
+call cleanup
+call upd

@@ -1,0 +1,21 @@
+  HS/Link File Transfer Protocol
+  ======================================
+  Clean-room Pascal implementation
+  Mystic BBS IRC Fork — GPLv3
+
+  Bidirectional send+receive
+  24-bit CRC error detection
+  Sliding window flow control
+  Crash recovery / resume
+  Ready packet negotiation
+  Chat during transfer
+  16 packet types, all handled
+
+  1,067 lines | Pure Pascal
+  Compiles: Linux, Win32, DOS, FreeBSD
+
+  From HDK spec — no C code copied
+  Original protocol: Samuel H. Smith
+
+  m_protocol_hslink.pas
+  July 2026

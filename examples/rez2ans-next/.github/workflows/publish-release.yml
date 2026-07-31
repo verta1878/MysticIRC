@@ -1,0 +1,24 @@
+name: Publish release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish tagged artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: releases/${{ github.ref_name }}/RELEASE_NOTES.md
+          fail_on_unmatched_files: true
+          files: |
+            releases/${{ github.ref_name }}/rez2ans-next_*.deb
+            releases/${{ github.ref_name }}/Rez2ANS-Next-*-Windows-x64-Setup.exe
+            releases/${{ github.ref_name }}/SHA256SUMS

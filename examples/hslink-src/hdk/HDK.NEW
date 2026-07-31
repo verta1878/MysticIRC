@@ -1,0 +1,103 @@
+
+HS/Link Developer Kit Revision History (in reverse order)
+---------------------------------------------------------
+
+04-May-93
+   Added logic to set_cancel function to automatically disable CTS
+   handshake when the transfer appears to have failed.  This can prevent
+   a hang following CTS lockup.
+
+27-Apr-93
+   Added the function
+        void pascal filter_rx_block( char *fname, long offset,
+                                     unsigned size, char *data );
+   to allow applications to process receive blocks prior to hs/link
+   writing them to disk.  This can be used to add a GIF viewer, for
+   instance.
+
+01-Apr-93
+   Changed fixed timeouts from 5 seconds to 11 seconds when waiting for
+   the first character in a packet to arrive.  Once a packet begins to
+   arrive, the next timeout still occurs after 22 seconds of idle time.
+
+   Internal changes to generate the windows/dll version of hdk libraries
+   built with Borland C++ 3.1 using HDKDL.PRJ.
+
+15-Feb-93
+   Added decoding for -CP# (Option.DispPos) which is used to control the
+   status display position relative to the screen.  -CP2 is the default,
+   leaving 2 lines free at the top of screen.  A setting of -CP0 will
+   move the display up, leaving the bottom lines free.
+
+11-Feb-93
+   Added decoding for -NE# (Option.MaxError) which is used to control
+   the number of consecutive identical errors that will cancel a link.
+
+19-Nov-92
+   Changed/added the following HSCOMM.H definition:
+        unsigned ComReadStr(uchar *dest, unsigned bufsiz);
+        void ComWriteStr(uchar *src, unsigned count);
+   to allow the application Com driver to perform multiple character
+   reads and writes.
+
+13-Nov-92
+   Added the functions
+        void disp_message(char *fmt, ...);
+        void disp_error(char *fmt, ...);
+   to application-provided the HSDISP module.  These functions take the
+   place of calls to 'cprintf' in the HDK and make it possible for
+   applications to capture and log error messages.  The disp_error
+   function is called only to display messages that are potentially
+   error, warning or informative conditions.  The disp_message function
+   is called for other display management and block-by-block status
+   displays.  See HSSTUB.C for an example of how to translate these
+   calls back into cprintf calls.
+
+09-Nov-92
+   Added option decoder for -NA to set Option.AlternateDle to 0.  The
+   default for this option is now 1, which should provide quicker and
+   more reliable handshakes with post 1.12 versions.  The option is
+   provided for compatibility with releases 1.12 and earlier.
+
+04-Oct-92
+   Added new application function ComWriteMax() which is used to determine
+   the maximum number of ComWritePending bytes before a call to ComWrite
+   will block on a queue-full condition.  
+
+01-Oct-92
+   Added decoding for -FTn (WS.Option.FifoThresh) which can be used
+   to set NS116550 buffering threshold levels.
+   Added decoding for -N! options, which will undo a previous -! option.
+
+23-Sep-92
+   Added deciding for -NG (WS.Option.DisableCtlG) which can be used by
+   the application to disable the BELL character ^G during chat mode.
+
+10-Sep-92
+   Added new HSCLOCK.H and sample stubs to allow application to
+   define its own way of returning the system bios clock tick counter.
+
+   Removed identify_user, echo_command_line, display_comport from the
+   list of standard application stubs- these are no longer called
+   by the HDK.
+
+09-Sep-92
+   Added new HSMEM.H to define application-provided memory management
+   services.  This allows the application to intercept the HSLINK
+   engine's memory size checks, memory allocation and memory
+   de-allocation.  Made corresponding changes in sample HDKSTUB.C and
+   HSDEMO*.C files.
+
+27-Aug-92
+   Wrote a preliminary version of HDK.DOC.  The HDK object files are now
+   distributed in .LIB format with one LIB file for each memory model
+   supported.  Currently only the small model (HDKS.LIB) and huge
+   protected models (HDKH2.LIB) are provided.
+
+25-Aug-92
+   Rewrote transmit_file and functions in hstop to interface via
+   repeated calls, allowing idle time to be handled at the top level.
+
+   Removed HSTEXT, STRPREP and associated logic.  These text messages
+   are now coded directly in hsdisp, removing them from the developer
+   kit object files and generally simplifying things.

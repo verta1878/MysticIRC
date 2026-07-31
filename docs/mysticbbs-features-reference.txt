@@ -1,0 +1,128 @@
+Mystic BBS Official Features List (from mysticbbs.com/features.html)
+Retrieved: 2026-07-26
+Reference for 1.11IRC upgrade path planning.
+
+:: INTERNET/NETWORK INTEGRATION
+- TELNET, RLOGIN, SSH servers (up to 250 simultaneous users)
+- FTP server (file bases + QWK networking)
+- NNTP server (message base mirror for newsreaders)
+- POP3/SMTP server (BBS email via email clients)
+- BINKP FidoNet mailer with 5D BSO echomail tossing
+- HTTP server (web hosting, file queue downloads)
+- Encrypted Netmail (AES256) and Secure Echomail (BINKP SSL)
+- QWK/QWKE networking with FTP transmission
+- Blacklist DNS and Country blocking for all servers
+- TIC processing and file tossing (node or hub)
+- IPV4 and IPV6 dual stack
+- Multiple server instances on different ports/NICs
+- Outbound TELNET, RLOGIN, SSH gateways
+
+:: MENU SYSTEM
+- Unlimited menus with event-driven system
+- Hot key and extended input options
+- Random and security-level specific menus
+- Lightbar support (Lightbar, Grid, SearchLight style)
+- Timed events work alongside all features
+- Scrolling text "Marquee" system
+- One menu option fires multiple events
+- ACS-based security restrictions
+- Long file names and descriptions
+- Extended hotkey support (arrows, home, end, page)
+- Menu GOSUB and RETURN
+- Online editing and simulation
+- Per-user menu set assignment
+
+:: THEME/LANGUAGE SYSTEM
+- Definable themes with unique prompts/files/menus/scripts
+- All prompts configurable per theme (multiple languages)
+- Theme inheritance from default
+- MCI code system (user data, ANSI functions, formatting)
+- Input field toggle and size limits per prompt
+- Yes/No lightbars, percentage bars, color system
+- 40-column theme support
+- Online editing of themes and prompts
+
+:: MESSAGE BASE SYSTEM
+- JAM message base format
+- QWK/QWKE offline mail
+- Multiple echomail/netmail networks
+- Built-in BINKP mailer and 5D BSO tosser
+- Built-in AreaFix
+- Full screen message editor (quote, cut/paste, spell check)
+- ANSI art in messages
+- Draft message system
+- Message export/download
+- Lightbar message reading and listings
+- Unlimited groups, threaded reading
+- Auto-create bases for new echomail
+- Top XX generators
+
+:: FILE BASE SYSTEM
+- Long file names
+- Internal Xmodem, Ymodem, Ymodem-G, Zmodem, Zmodem/8K
+- Internal archive viewing (ZIP, RAR, LHA, LZH)
+- Navigate inside archives with arrows
+- Download via protocol, FTP, or web browser
+- View files within archives
+- Blind upload system
+- Lightbar file listings
+- FILE_ID.DIZ importing (up to 99 lines)
+- Slow media support (CD/USB copy before download)
+- File queue and auto-logoff after download
+- New/all files listings (online and offline)
+- File validation and integrity checking
+- FILES.BBS and FIDOBONE.NA importers
+- TIC processing with import and tossing
+- Built-in FileFix
+
+:: MULTINODE SYSTEM
+- Up to 255 simultaneous users
+- Inter-node messaging
+- IRC-like chat with multiple rooms and scrollback
+- Private paging and chat
+- Node monitor (snoop, chat, kick)
+- Virtual console screen save/restore
+
+:: DOOR/GAME SYSTEM
+- Unlimited doors
+- DORINFOx.DEF, DOOR.SYS, CHAIN.TXT support
+- DOOR32.SYS (Mystic-created standard)
+- DOS FOSSIL redirection and CP437-to-UTF8 translation
+- Auto account creation via RLOGIN/SSH (door services)
+- Outbound TELNET/SSH/RLOGIN for door services
+
+:: PROGRAMMING (MPL AND PYTHON)
+- MPL: Built-in language, Pascal/Iniquity/C syntax
+- Compiled, distributable without source
+- Source editor with syntax highlighting
+- Access to internal BBS functions
+- Remote screen access, mouse support
+- Python: Embedded Python 2.x/3.x support
+
+:: SECURITY SYSTEM
+- 512-bit SHA/PBKDF2 password storage
+- Email validation with security upgrades
+- Self-service password reset
+- AES256 encrypted netmail, BINKP SSL
+- 255 security profiles
+- ACS system (age, time, date, flags, gender, etc.)
+- Account expiration
+- IP/hostname logging, country blocking
+- DNS blacklist support
+- User blacklisting with post removal
+
+:: OTHER FEATURES
+- CP437 and UTF8 translation
+- Terminal sizes 40x24 to 160x60
+- NodeSpy (monitor, chat, snoop, telnet client)
+- ANSI gallery
+- HTML-like help system
+- Full screen ANSI viewer
+- Display file baud rate emulation
+- Random display files
+- Event system (scheduled, interval, semaphore)
+- QOTD, onliners, voting, time bank, BBS list
+- Statistics tracking (daily, hourly, monthly graphs)
+- Log management and rolling
+- Full scrollable input fields with recall
+- ALL config editors available remotely via telnet
