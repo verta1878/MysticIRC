@@ -1,0 +1,11 @@
+riptermIRC — Browser RIP Viewer
+Based on RIPtermJS by Carl Gorringe (GPLv3)
+Mystic BBS IRC Fork
+
+Standalone browser-based RIP viewer.
+Open viewer.html, drag and drop .rip files.
+Handles CP437 bytes 128-255 correctly.
+Works with chg2rip v2.3 output.
+
+verta1878, sysop/0, evga, kiddo, wrench
+July 2026

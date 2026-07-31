@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>RIPview — Kiddo Edition</title>
+<meta charset="utf-8">
+<style>
+body { background: #1a1a2e; color: #e0e0e0; font-family: monospace; margin: 20px; }
+h1 { color: #00ff00; }
+canvas { border: 1px solid #333; image-rendering: pixelated; }
+#info { margin: 10px 0; color: #888; }
+#drop { border: 2px dashed #555; padding: 40px; text-align: center; margin: 10px 0; cursor: pointer; }
+#drop:hover { border-color: #0f0; }
+input[type=file] { margin: 10px 0; }
+.stats { color: #0ff; }
+</style>
+</head>
+<body>
+<h1>RIPview — Kiddo Edition</h1>
+<p>ANSI-to-RIP viewer for chg2rip output verification. GPLv3 — Mystic BBS IRC Fork</p>
+
+<div id="drop">Drop a .RIP file here or click to browse</div>
+<input type="file" id="fileInput" accept=".rip,.RIP" style="display:none">
+
+<div id="info"></div>
+<canvas id="canvas" width="640" height="350"></canvas>
+<div id="stats" class="stats"></div>
+
+<script>
+// ====================================================================
+// RIPview — Kiddo Edition
+// Copyright (C) 2026 Kiddo — GPLv3 — Mystic BBS IRC Fork
+//
+// Standalone RIP v1.54 viewer for verifying chg2rip converter output.
+// Renders !|B (bar), !|@ (text), !|c (color), !|S (fill style),
+// !|Y (font style), !|* (reset), !|1K (RIP mode).
+//
+// Uses embedded VGA 8x16 CP437 font ROM and CGA palette (171/87).
+// ====================================================================
+
+// CGA palette — 171/87 (NOT 170/85!)
+const CGA = [
+  [0,0,0], [171,0,0], [0,171,0], [171,87,0],
+  [0,0,171], [171,0,171], [0,171,171], [171,171,171],
+  [87,87,87], [255,87,87], [87,255,87], [255,255,87],
+  [87,87,255], [255,87,255], [87,255,255], [255,255,255]
+];
+
+// VGA 8x16 CP437 font — loaded from vgafont.js
+let VGAFont = null;
+
+// Mega-number decoder (base-36, 2-digit)
+function megaInt(s) {
+  let v = 0;
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    if (c >= 48 && c <= 57) v = v * 36 + (c - 48);
+    else if (c >= 65 && c <= 90) v = v * 36 + (c - 55);
+    else if (c >= 97 && c <= 122) v = v * 36 + (c - 87);
+  }
+  return v;
+}
+
+function renderRIP(data) {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Find max Y to size canvas
+  let maxY = 350;
+  const lines = [];
+  let buf = '';
+
+  // Parse as raw bytes, split on newlines
+  for (let i = 0; i < data.length; i++) {
+    const b = data[i];
+    if (b === 13) continue; // skip CR
+    if (b === 10) {
+      lines.push(buf);
+      buf = '';
+    } else {
+      buf += String.fromCharCode(b);
+    }
+  }
+  if (buf) lines.push(buf);
+
+  // Scan for max Y coordinate
+  for (const line of lines) {
+    if (!line.startsWith('!|')) continue;
+    const cmd = line.substring(2);
+    if (cmd[0] === 'B' && cmd.length >= 9) {
+      const y2 = megaInt(cmd.substring(7, 9));
+      if (y2 > maxY) maxY = y2;
+    }
+    if (cmd[0] === '@' && cmd.length >= 5) {
+      const y = megaInt(cmd.substring(3, 5));
+      if (y + 16 > maxY) maxY = y + 16;
+    }
+  }
+
+  canvas.height = maxY + 1;
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, 640, canvas.height);
+
+  const imgData = ctx.getImageData(0, 0, 640, canvas.height);
+  const pixels = imgData.data;
+
+  let curColor = 7;
+  let fillColor = 0;
+  let charSize = 1;
+  let barCount = 0;
+  let textCount = 0;
+  let colorCount = 0;
+
+  function setPixel(x, y, colorIdx) {
+    if (x < 0 || x >= 640 || y < 0 || y >= canvas.height) return;
+    const c = CGA[colorIdx & 0xF];
+    const idx = (y * 640 + x) * 4;
+    pixels[idx] = c[0];
+    pixels[idx+1] = c[1];
+    pixels[idx+2] = c[2];
+    pixels[idx+3] = 255;
+  }
+
+  function fillBar(x1, y1, x2, y2, colorIdx) {
+    for (let y = y1; y <= y2; y++)
+      for (let x = x1; x <= x2; x++)
+        setPixel(x, y, colorIdx);
+  }
+
+  function drawChar(ch, x, y, colorIdx, scale) {
+    if (!VGAFont || ch < 0 || ch > 255) return;
+    for (let row = 0; row < 16; row++) {
+      const scanline = VGAFont[ch * 16 + row];
+      for (let bit = 0; bit < 8; bit++) {
+        if (scanline & (0x80 >> bit)) {
+          if (scale > 1) {
+            for (let sy = 0; sy < scale; sy++)
+              for (let sx = 0; sx < scale; sx++)
+                setPixel(x + bit * scale + sx, y + row * scale + sy, colorIdx);
+          } else {
+            setPixel(x + bit, y + row, colorIdx);
+          }
+        }
+      }
+    }
+  }
+
+  // Process RIP commands
+  for (let li = 0; li < lines.length; li++) {
+    const line = lines[li];
+    if (!line.startsWith('!|')) continue;
+    const cmd = line.substring(2);
+
+    if (cmd[0] === '*') {
+      // Reset
+      for (let i = 0; i < pixels.length; i += 4) {
+        pixels[i] = 0; pixels[i+1] = 0; pixels[i+2] = 0; pixels[i+3] = 255;
+      }
+      curColor = 7;
+      fillColor = 0;
+      charSize = 1;
+    }
+    else if (cmd[0] === '1') {
+      // RIP level — ignore
+    }
+    else if (cmd[0] === 'Y') {
+      // Font style: ignored — we use native 8x16 VGA font
+      // RIPterm would scale its 8x8 font, but we render with
+      // the full 8x16 font at 1:1 for pixel-perfect verification
+      charSize = 1;
+    }
+    else if (cmd[0] === 'S' && cmd.length >= 5) {
+      // Fill style: !|SPPCC
+      fillColor = megaInt(cmd.substring(3, 5)) & 0xF;
+      colorCount++;
+    }
+    else if (cmd[0] === 'c' && cmd.length >= 3) {
+      // Drawing color
+      curColor = megaInt(cmd.substring(1, 3)) & 0xF;
+      colorCount++;
+    }
+    else if (cmd[0] === 'B' && cmd.length >= 9) {
+      // Filled bar
+      const x1 = megaInt(cmd.substring(1, 3));
+      const y1 = megaInt(cmd.substring(3, 5));
+      const x2 = megaInt(cmd.substring(5, 7));
+      const y2 = megaInt(cmd.substring(7, 9));
+      fillBar(x1, y1, x2, y2, fillColor);
+      barCount++;
+    }
+    else if (cmd[0] === '@' && cmd.length >= 5) {
+      // Text at position
+      const tx = megaInt(cmd.substring(1, 3));
+      const ty = megaInt(cmd.substring(3, 5));
+
+      // Rest of line is raw text bytes — re-read from original data
+      // Find this line in the raw data to get actual byte values
+      const textPart = cmd.substring(5);
+      for (let i = 0; i < textPart.length; i++) {
+        const ch = textPart.charCodeAt(i) & 0xFF;
+        drawChar(ch, tx + i * 8, ty, curColor, 1);  // 8x16 native, no scaling
+      }
+      textCount++;
+    }
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+
+  document.getElementById('stats').textContent =
+    `Rendered: ${barCount} bars, ${textCount} text, ${colorCount} colors | ` +
+    `Canvas: 640×${canvas.height} | CharSize: ${charSize}`;
+}
+
+// File loading
+const dropZone = document.getElementById('drop');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); e.stopPropagation(); });
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  e.stopPropagation();
+  if (e.dataTransfer.files.length > 0) loadFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e => {
+  if (e.target.files.length > 0) loadFile(e.target.files[0]);
+});
+
+function loadFile(file) {
+  document.getElementById('info').textContent = `Loading: ${file.name} (${file.size} bytes)`;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = new Uint8Array(e.target.result);
+    document.getElementById('info').textContent =
+      `File: ${file.name} | Size: ${data.length} bytes | Lines: ${countLines(data)}`;
+    renderRIP(data);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function countLines(data) {
+  let n = 0;
+  for (let i = 0; i < data.length; i++) if (data[i] === 10) n++;
+  return n;
+}
+
+// Load VGA font
+fetch('vgafont.js').then(r => r.json()).then(data => {
+  VGAFont = data;
+  document.getElementById('info').textContent = 'VGA font loaded. Drop a .RIP file to view.';
+}).catch(() => {
+  // Try inline font generation
+  document.getElementById('info').textContent = 'vgafont.js not found — text rendering disabled. Bars will still work.';
+});
+</script>
+</body>
+</html>

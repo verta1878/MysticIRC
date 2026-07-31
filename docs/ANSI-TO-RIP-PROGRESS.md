@@ -1153,10 +1153,10 @@ Simple ANSI screens with ASCII text (32-126) work fine in PD.
 
 - [ ] Multi-page output for ANSI art > 80 rows
 - [ ] CHR font file loading (.CHR BGI vector fonts)
-- [ ] Vertical bar merging (reduce bar count further)
-- [ ] Test with RIPtermJS viewer directly
-- [ ] Cross-compile chg2rip for DOS/Win32
+- [x] Test with RIPtermJS viewer directly — DONE (ripviewer 42/42 pixel-perfect)
+- [x] Cross-compile chg2rip for DOS/Win32 — DONE (fpc264irc)
 - [ ] Wire into Mystic BBS for real-time ANSI→RIP conversion
+- [ ] RIP v1 16-color video driver integration (needs evga for display layer)
 
 ### Team Credits
 

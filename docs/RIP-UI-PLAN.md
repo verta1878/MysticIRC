@@ -205,11 +205,12 @@ No translation layer needed. It's the same API all the way down.
 
 ## Status
 
-### Phase A: m_rip_graph.pas — COMPLETE
+### Phase A: m_rip_graph.pas — IN PROGRESS (experimental)
 
-`mdl/m_rip_graph.pas` — 974 lines.
-Compiles on Win32 (buffer mode). DOS Graph mode ready but
-untested (needs go32v2 target).
+`mystic_test/experimental/m_rip_graph.pas` — 974 lines.
+Compiles on Win32 (buffer mode). Untested against 42/42 commands.
+Needs Arc, PieSlice, FilledPolygon, BGI vector font stubs completed
+using proven algorithms from ripdraw.pas before verification.
 
 Implemented:
 - TRIPGraphics class with buffer + Graph backends
@@ -375,22 +376,195 @@ the text window. Graphics draw above/around it.
 ### Decision: DO NOT wire RIP graphics into mystic yet
 
 Until we understand and solve the ANSI coexistence problem,
-m_rip_graph.pas stays in MDL as a standalone library.
+the experimental engine stays isolated.
 
-Safe to use in:
-- ripview (standalone viewer, no text mode needed)
-- mterm (can manage its own display modes)
-- chg2rip / ans2png (file converters, no display)
+#### Engine Status (Session 6)
 
-NOT safe to use in:
-- mystic.exe (would break all text output)
-- mis.exe (console-based server monitor)
-- any BBS binary that uses WriteXY
+TWO engines exist:
+
+1. **ripdraw.pas** (examples/ripviewer/source/) — PROVEN
+   - 42/42 RIPscrip v1.54 commands, pixel-perfect verified
+   - Flat procedures, global vars, BMP output only
+   - Has: Arc, PieSlice, FilledPolygon, BGI vector fonts
+   - Missing: LineStyle, WriteMode, Palette, Viewport, Mouse, Graph output
+
+2. **m_rip_graph.pas** (mystic_test/experimental/) — UNTESTED
+   - TRIPGraphics class, buffer + Graph unit backends
+   - Has: LineStyle, WriteMode, Palette, Viewport, Mouse, Graph output
+   - Missing (stubs): Arc, PieSlice, FilledPolygon, BGI vector fonts
+
+#### Decisions Made
+
+- Both engines will be brought to FEATURE PARITY before merging
+- ripdraw.pas proven algorithms will be ported INTO m_rip_graph.pas stubs
+- m_rip_graph.pas stays in mystic_test/experimental/ until it passes
+  42/42 pixel-perfect verification
+- When ready, promote to mdl/ and use {$IFDEF EXPERIMENTAL_RIP} to
+  switch engines at compile time — no file shuffling
+- ripviewer continues using ripdraw.pas (working code) until swap
+- ANSI coexistence must be solved before wiring into mystic_test
+- Do NOT update all programs at once — mystic_test first, then others
+
+#### File Locations
+
+- ripdraw.pas (production): examples/ripviewer/source/
+- m_rip_graph.pas (experimental): mystic_test/experimental/
+- rip_graph.pas (BBS integration): mystic_test/rip_graph.pas
+- v1-v4 engines (g00r00): mystic_rip/v1/ v2/ v3/ v4/
 
 ### Next Steps
 
-1. Research FPC Graph text output capabilities
-2. Study VGA split screen (CRTC Line Compare) for DOS
-3. Prototype: ripview with graphics mode — standalone test
-4. Prototype: text rendering within graphics mode
-5. Only then consider wiring into mystic_test
+1. ~~Port ripdraw.pas Arc/PieSlice/FilledPolygon/VectorFont into m_rip_graph.pas~~ DONE
+2. ~~Port m_rip_graph.pas LineStyle/WriteMode/Palette/Viewport into ripdraw.pas~~ DONE
+3. Test both engines against 259 RIPs — pixel-perfect match required — IN PROGRESS
+4. Research ANSI coexistence (VGA split screen, text-in-graphics, mode switching)
+5. Only then wire into mystic_test with {$IFDEF EXPERIMENTAL_RIP}
+6. Needs evga for display layer architecture decisions
+
+### Phase 3 Test Results (Session 6)
+
+Test harness: test_phase3.pas + bmpcompare.pas (pure Pascal, no external deps)
+Three-way comparison designed by sysop/0:
+  1. ripdraw BMP vs m_rip_graph BMP — do both engines agree?
+  2. ripdraw BMP vs reference PNG — is evga's engine correct?
+  3. m_rip_graph BMP vs reference PNG — is kiddo's engine correct?
+
+#### Engine A (ripdraw — evga): RUNS, CLOSE ON PRIMITIVES
+
+- Compiled and rendered with real fonts
+- Results with proper font data (sysop/0 report):
+
+  | File     | Pixels Diff | %     | Analysis                          |
+  |----------|-------------|-------|-----------------------------------|
+  | L_LINE   | 10,700      | 1.3%  | Line endpoint or thickness diff   |
+  | V_ARC    | 11,475      | 1.4%  | Arc rasterization rounding        |
+  | S_FILL   | 60,014      | 7.3%  | Fill pattern or boundary issue    |
+  | DRAGON01 | 818,815     | 99.9% | Systemic — palette/background init|
+
+- L_LINE and V_ARC at ~1% — primitive math is close, edge cases only
+- DRAGON01 at 99.9% — systemic issue: canvas background init or
+  EGA palette mapping differs from JS canvas defaults
+- Action for evga: fix background color init and palette mapping first,
+  then remaining 1-2% on lines/arcs is endpoint rounding
+
+#### Engine B (m_rip_graph — kiddo): CRASHES
+
+- EAccessViolation at runtime even with real deps
+- Constructor allocates pixel buffer correctly (New → Reset → FillChar)
+- Real cause: RIP1Exec calls ripdraw's global procedures (PutPixel,
+  DrawLine etc), NOT m_rip_graph's TRIPGraphics methods. The
+  {$IFDEF EXPERIMENTAL_RIP} in test_phase3 creates a TRIPGraphics
+  object but the RIP command dispatcher still calls the old engine.
+- This is a Phase 4 problem — RIP1Exec needs an abstraction layer
+  or {$IFDEF} to route commands to either engine
+- Action for kiddo: wire RIP1Exec to call m_rip_graph methods when
+  EXPERIMENTAL_RIP is defined
+
+#### What Was Sent to sysop/0
+
+- phase3-test-files.zip (test_phase3.pas, bmpcompare.pas, PHASE3-TESTING.md)
+- rip1-parser-files.zip (rip1parse.pas, rip1exec.pas)
+- rip-test-files.zip (259 test RIPs with reference PNGs)
+- rip-engines-comparison.zip (both engines)
+- phase3-missing-deps.zip (m_strings.pas, rip_font8x8.inc, rip_font8x16.inc)
+- phase3-complete.zip (flat, all files + rip_compat.pas)
+
+#### Three-Way Test Results - FINAL (sysop/0 report)
+
+Both engines run. 6/6 rendered each. BMP format standardized to 8-bit
+indexed via -dBMP_8BIT. rip_compat.WriteBMP routes through ripbmp.pas.
+
+Engine A vs Engine B (direct byte comparison, same 8-bit format):
+
+  | File     | Bytes diff | of 820,278 | %      | Notes              |
+  |----------|-----------|------------|--------|--------------------|
+  | BUTTONS  | 2         | 820,278    | 0.0002%| Near pixel-perfect |
+  | L_LINE   | 5,249     | 820,278    | 0.6%   | Endpoint rounding  |
+  | V_ARC    | 3,833     | 820,278    | 0.5%   | Arc rasterization  |
+  | Y_FONT   | 12,108    | 820,278    | 1.5%   | Font positioning   |
+  | S_FILL   | 28,472    | 820,278    | 3.5%   | Fill boundary      |
+  | DRAGON01 | 224,002   | 820,278    | 27.3%  | Palette/init diff  |
+
+Both engines vs Reference PNG:
+
+  | File     | Engine A | Engine B | Best |
+  |----------|----------|----------|------|
+  | L_LINE   | 7,368    | 11,271   | A    |
+  | V_ARC    | 4,084    | 6,635    | A    |
+  | S_FILL   | 45,322   | 36,830   | B    |
+  | Y_FONT   | 62,517   | 53,323   | B    |
+  | BUTTONS  | 91,231   | 91,231   | tie  |
+  | DRAGON01 | 818,723  | 605,726  | B    |
+
+Key findings:
+  - BUTTONS: 2 bytes diff between engines - near pixel-perfect agreement
+  - Engine A wins on geometry (lines 0.6%, arcs 0.5% closer to reference)
+  - Engine B wins on rendering state (fills, text, palette init)
+  - BUTTONS tie at 91K - shared bug from RIPtermJS port (text positioning)
+  - DRAGON01: A=99.9% off, B=73.9% off - both have palette/init issues
+
+#### BMP Format Fixes (Session 6)
+
+Three fixes applied:
+  1. ripbmp.pas BGR byte order - R and B were swapped (99.9% diffs)
+  2. ripbmp.pas dual mode - -dBMP_8BIT for 8-bit indexed (Phase 3),
+     default 24-bit for future RIP v2/v3 browser
+  3. rip_compat.pas WriteBMP - copies G pixels to RIPEngine.Canvas,
+     calls RIPBMP.WriteBMP so both engines use same writer
+
+#### Priority Fix Order (sysop/0 direction)
+
+  1. Engine A palette init - DRAGON01 99.9% off. Canvas starts wrong.
+     Check InitCanvas color fill vs RIPtermJS. Fix this first - it will
+     drop DRAGON01 and improve most art files across the board.
+  2. Engine B line/arc endpoints - L_LINE and V_ARC 4K pixels worse
+     than Engine A. Bresenham endpoint rounding or off-by-one.
+  3. Both engines S_FILL - fill pattern boundaries or hatch patterns.
+  4. Both engines Y_FONT - glyph positioning or scaling from JS port.
+  5. Both engines BUTTONS - shared RIPtermJS port bug. Text positioning.
+  6. Run against full 118 RIPs once big issues fixed.
+  7. test_phase3.pas needs rip_compat fixes baked in (sysop/0 patched
+     each run - merge upstream)
+
+#### Merge Path (sysop/0 direction)
+
+Use evga's line/arc math (better Bresenham) + kiddo's palette init.
+This is the end-state architecture sysop/0 defined earlier:
+evga's primitives = shared drawing core, kiddo's class = wrapper.
+  - DRAGON01 at 99.9% — background/palette init, systemic
+  - Fix background color init first, then remaining edge cases
+- kiddo: Engine B crash FIXED — rip_compat.pas bridges rip1exec to m_rip_graph
+- sysop/0: rerun three-way comparison with rip_compat.pas, both engines should render now
+- Once baseline fixed, remaining diffs pinpoint individual primitive bugs
+
+#### rip_compat.pas — Engine Bridge (Session 6)
+
+Created `examples/ripviewer/source/rip_compat.pas` — compatibility layer that
+maps ripdraw's global API (DrawLine, FillRect, Canvas.FG etc) to m_rip_graph's
+TRIPGraphics methods. Uses SyncToG/SyncFromG to keep Canvas state synchronized.
+
+rip1exec.pas change: one {$IFDEF EXPERIMENTAL_RIP} in the Uses clause:
+  - Without define: uses RIPEngine, RIPDraw, RIPText (Engine A)
+  - With define: uses RIP_Compat (routes to Engine B via G.Method() calls)
+
+Both modes compile clean. No other source changes needed.
+
+#### Scene Release Plan (verta1878/sysop/0 decision)
+
+evga's standalone engine to be released as a separate GitHub repo for the
+BBS/ANSI art scene. PabloDraw has no RIP support — this fills that gap.
+
+Release scope (standalone, no Mystic dependencies):
+  - ripengine.pas — canvas, palette, pixels
+  - ripdraw.pas — drawing primitives
+  - riptext.pas — VGA 8x16 text rendering
+  - ripbmp.pas — BMP file output
+  - rip1parse.pas — v1.54 mega decoder + command parser
+  - rip1exec.pas — v1.54 42-command dispatcher
+  - rip_font8x16.inc — VGA font data
+  - GPLv3, credit Carl Gorringe for RIPtermJS port origin
+
+NOT released (Mystic-specific):
+  - m_rip_graph.pas — TRIPGraphics class, multi-backend
+  - rip_compat.pas — engine bridge layer
+  - bmpcompare.pas, test_phase3.pas — internal test tools

@@ -27,20 +27,14 @@ mystic/                  BBS core (clean, no RIP)
 mystic_test/             BBS core + RIP integration + A4 fixes
   mdl/                     Local copy of MDL (self-contained build)
 mdl/                     Mystic Development Library (67 units)
-mystic_rip/              RIPscrip — ALL RIP code lives here
-  v1/                      RIPscrip v1.54 engine
-  v2/                      RIPscrip v2.0 engine
-  v3/                      RIPscrip v3.0 engine
-  v4/                      RIPscrip v4.0 engine
+mystic_rip/              RIPscrip engines + converters
+  v1/                      RIPscrip v1.54 engine (g00r00)
+  v2/                      RIPscrip v2.0 engine (g00r00)
+  v3/                      RIPscrip v3.0 engine (g00r00)
+  v4/                      RIPscrip v4.0 engine (g00r00)
   chg2rip.pas              ANSI→RIP converter (pixel-perfect, v2.3)
   ans2png.pas              ANSI→BMP renderer (pixel-perfect)
-  ripviewer/               RIPView v1.0.0 — 42/42 cmds, CLI + FV TUI
-    source/                  Pascal source (7 units, 1,656 lines)
-    docs/                    ripjsapi.html (merged v1.54/v2.0/v3.0 specs)
-    fonts/                   18 BGI + bitmap fonts
-    icons/                   219 ICN/MSK/HIC files
-    rips/                    259 test RIP files
-    js-reference/            RIPtermJS source (read-only reference)
+  ripscrip-irc-whitepaper.htm  Our RIP implementation whitepaper
 mystic_spell/            Hunspell spell check binding + SETUP.md
 mystic_crypt/            CryptLib SSH/TLS example
 mystic_sdl/              SDL2 graphical terminal
@@ -51,23 +45,35 @@ mystic_ansieditor/       ANSI editor standalone
 mystic_ansieditor2/      ANSI editor v2
 mystic_texteditor/       Text editor standalone
 examples/
-  mterm/                   mterm terminal + OpenOLMS (38 files, 11,721 lines)
-  serial/                  Serial v1.1 + FOSSIL driver (4 files, 1,119 lines)
+  ripviewer/               RIPView v1.0.0 — evga's Pascal viewer (42/42 cmds)
+    source/                  Pascal source (7 units, 1,656 lines)
+    fonts/                   18 BGI + bitmap fonts
+    icons/                   219 ICN/MSK/HIC files
+    rips/                    259 test RIP files
+    ripscrip-irc-whitepaper.htm  Our RIP implementation whitepaper
+  riptermJS/               RIPtermJS (Carl Gorringe, GPLv3) zip + v3.0 txt
+  ripterm154/              RIPterm 1.54 DOS binary (Carl Gorringe archive)
+  mterm/                   mterm terminal + OpenOLMS (37 files)
+  serial/                  Serial v1.1 + FOSSIL driver (5 files)
   door32/                  g00r00's Door32 library (d32.pas)
   utrayit/                 Console tray unit + mkicon ICO generator
-  thdproscan/              THD ProScan archive
+  thdpro/                  THD ProScan (original + clean room remake)
   trapgate/                TrapGate FTN Mailer (43 Pascal, ZLib128, 4 releases)
   naplps/                  NAPLPS specs (NAP.txt, FIPS121 PDF)
-  riptermJS/               RIPtermJS JavaScript viewer (Carl Gorringe, GPLv3)
-  ripterm154/              RIPterm 1.54 DOS binary (Carl Gorringe archive)
   marc/                    MARC ZIP archiver + MP3/MP4 metadata
-  hslink-src/              HS/Link protocol (clean-room Pascal port)
+  hslink-src/              HS/Link protocol source
   ansilove-src/            Ansilove (VGA font source)
-  rip/                     RIP test files
   rez2ans-next/            REZ to ANSI converter
   ciadraw/                 CIA Draw ANSI tool
+  libs-win32.zip           Runtime libs (hunspell, SDL2, cryptlib)
+  libs-linux-i386.zip      Runtime libs (hunspell, SDL2, cryptlib)
+  libs-darwin-i386.zip     Runtime libs (hunspell, SDL2, cryptlib)
 docs/                    Documentation
-attic/                   Retired code (rip2, retired-libs)
+attic/                   Retired code and archives
+  docs-a40/                AreaFix implementation checklist
+  docs-os2-linux-toolchain/  OS/2 cross-compile docs (sysop/0)
+  docs-patches/            Old patch notes
+  toolchain-src.zip        emxbind + binutils + ld64 source
 out-linux/               Linux build output
 out-win32/               Win32 build output
 out-dos/                 DOS build output
