@@ -1,7 +1,0 @@
-Drop the runtime libraries for your platform(s) into this folder (or the Mystic
-root / a system library path).  See README.md in this folder for the file names
-and licenses.  Modules whose library is missing simply stay disabled.
-
-  Hunspell -> libhunspell32.dll / libhunspell64.dll / libhunspell.so / libhunspell.dylib
-  SDL2     -> SDL2.dll / libSDL2-2.0.so.0 / libSDL2.dylib
-  cryptlib -> cl32.dll / libcl.so / libcl.dylib

@@ -1,1 +1,0 @@
-Platform binaries for the WIN32 build go here (see ../README.md).
