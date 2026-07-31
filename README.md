@@ -79,6 +79,7 @@ out-win32/               Win32 build output
 out-dos/                 DOS build output
 out-os2/                 OS/2 build output
 out_darwin/              macOS build output
+out-bsd/                FreeBSD/OpenBSD/NetBSD build output
 ```
 
 ## BBS Binaries (18 Win32 PE32 i386)
