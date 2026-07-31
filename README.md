@@ -28,10 +28,10 @@ mystic_test/             BBS core + RIP integration + A4 fixes
   mdl/                     Local copy of MDL (self-contained build)
 mdl/                     Mystic Development Library (67 units)
 mystic_rip/              RIPscrip engines + converters
-  v1/                      RIPscrip v1.54 engine (g00r00)
-  v2/                      RIPscrip v2.0 engine (g00r00)
-  v3/                      RIPscrip v3.0 engine (g00r00)
-  v4/                      RIPscrip v4.0 engine (g00r00)
+  v1/                      RIPscrip v1.54 engine (evga/wrench)
+  v2/                      RIPscrip v2.0 engine (evga/wrench)
+  v3/                      RIPscrip v3.0 engine (evga/wrench)
+  v4/                      RIPscrip v4.0 engine (evga/wrench)
   chg2rip.pas              ANSI→RIP converter (pixel-perfect, v2.3)
   ans2png.pas              ANSI→BMP renderer (pixel-perfect)
   ripscrip-irc-whitepaper.htm  Our RIP implementation whitepaper
@@ -55,7 +55,7 @@ examples/
   ripterm154/              RIPterm 1.54 DOS binary (Carl Gorringe archive)
   mterm/                   mterm terminal + OpenOLMS (37 files)
   serial/                  Serial v1.1 + FOSSIL driver (5 files)
-  door32/                  g00r00's Door32 library (d32.pas)
+  door32/                  Door32 BBS Door Kit (g00r00, ONiX, SqZ) zip
   utrayit/                 Console tray unit + mkicon ICO generator
   thdpro/                  THD ProScan (original + clean room remake)
   trapgate/                TrapGate FTN Mailer (43 Pascal, ZLib128, 4 releases)
@@ -65,9 +65,7 @@ examples/
   ansilove-src/            Ansilove (VGA font source)
   rez2ans-next/            REZ to ANSI converter
   ciadraw/                 CIA Draw ANSI tool
-  libs-win32.zip           Runtime libs (hunspell, SDL2, cryptlib)
-  libs-linux-i386.zip      Runtime libs (hunspell, SDL2, cryptlib)
-  libs-darwin-i386.zip     Runtime libs (hunspell, SDL2, cryptlib)
+  libs/                    Runtime libs (hunspell, SDL2, cryptlib) per platform
 docs/                    Documentation
 attic/                   Retired code and archives
   docs-a40/                AreaFix implementation checklist
@@ -141,6 +139,7 @@ git clone https://github.com/verta1878/fpc264irc
 | i386-go32v2 (DOS) | ✅ Cross-compiled |
 | i386-os2 | ✅ EMX |
 | i386-darwin | ✅ Needs clang + SDK |
+| x86_64-freebsd | ✅ Source ready, needs cross-compiler RTL |
 
 ## License
 
@@ -150,3 +149,5 @@ GNU General Public License v3. See `LICENSE`.
 
 - Compiler: https://github.com/verta1878/fpc264irc
 - RIPtermJS: https://github.com/cgorringe/RIPtermJS
+- PCBoard 15.4 Revival: https://github.com/verta1878/pcbrevival
+- RIPView scene release: https://github.com/cwensley/pablodraw/issues/136
