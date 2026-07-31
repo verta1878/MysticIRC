@@ -1,9 +1,0 @@
-/tmp/mystic-bbs-irc-main/libs/ansilove-src/libansilove/build/CMakeFiles/objlib.dir
-/tmp/mystic-bbs-irc-main/libs/ansilove-src/libansilove/build/CMakeFiles/ansilove.dir
-/tmp/mystic-bbs-irc-main/libs/ansilove-src/libansilove/build/CMakeFiles/ansilove-static.dir
-/tmp/mystic-bbs-irc-main/libs/ansilove-src/libansilove/build/CMakeFiles/edit_cache.dir
-/tmp/mystic-bbs-irc-main/libs/ansilove-src/libansilove/build/CMakeFiles/rebuild_cache.dir
-/tmp/mystic-bbs-irc-main/libs/ansilove-src/libansilove/build/CMakeFiles/list_install_components.dir
-/tmp/mystic-bbs-irc-main/libs/ansilove-src/libansilove/build/CMakeFiles/install.dir
-/tmp/mystic-bbs-irc-main/libs/ansilove-src/libansilove/build/CMakeFiles/install/local.dir
-/tmp/mystic-bbs-irc-main/libs/ansilove-src/libansilove/build/CMakeFiles/install/strip.dir

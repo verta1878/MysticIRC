@@ -1,2 +1,0 @@
-Platform binaries for the i386-darwin (Mac) build go here (see ../README.md).
-Provided: libcl.dylib (cryptlib). SDL2/Hunspell need a 10.7+ SDK - not bundled.
