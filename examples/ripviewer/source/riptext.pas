@@ -60,7 +60,7 @@ Var
   FontsInit  : Boolean = False;
   FontPath   : String = 'fonts' + DirectorySeparator;
 
-{$I rip_font8x16.inc}
+{$I rip_font8x8.inc}
 
 Procedure InitFonts;
 Var I: Integer;
@@ -229,9 +229,9 @@ Var
 Begin
   Scale := Canvas.FontSize;
   If Scale < 1 Then Scale := 1;
-  XSize := 8; YSize := 16;
+  XSize := 8; YSize := 8;
   For Y := 0 to YSize - 1 Do Begin
-    ScanLine := VGAFont[Value * 16 + Y];
+    ScanLine := Font8x8[Value * 8 + Y];
     For X := 0 to XSize - 1 Do Begin
       If (ScanLine And $80) <> 0 Then Begin
         If Scale > 1 Then Begin
@@ -327,6 +327,6 @@ Begin
     Else ActualScale := 1.0;
     Result := Trunc(CHRFonts[Canvas.FontNum]^.OrgToCap * ActualScale);
   End Else
-    Result := Canvas.FontSize * 16;
+    Result := Canvas.FontSize * 8;
 End;
 End.

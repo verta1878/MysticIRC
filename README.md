@@ -27,6 +27,7 @@ mystic/                  BBS core (clean, no RIP)
 mystic_test/             BBS core + RIP integration + A4 fixes
   mdl/                     Local copy of MDL (self-contained build)
 mdl/                     Mystic Development Library (67 units)
+mystic_sdl/              SDL2 graphical terminal
 mystic_rip/              RIPscrip engines + converters
   v1/                      RIPscrip v1.54 engine (evga/wrench)
   v2/                      RIPscrip v2.0 engine (evga/wrench)
@@ -37,7 +38,6 @@ mystic_rip/              RIPscrip engines + converters
   ripscrip-irc-whitepaper.htm  Our RIP implementation whitepaper
 mystic_spell/            Hunspell spell check binding + SETUP.md
 mystic_crypt/            CryptLib SSH/TLS example
-mdl/                     Mystic Door Library (includes SDL2 units)
 mystic_modem/            Modem/FOSSIL front-end
 mystic_mailer/           BINKP/FidoNet mailer
 mystic_misdos/           DOS MIS

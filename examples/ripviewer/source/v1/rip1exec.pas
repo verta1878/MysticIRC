@@ -647,15 +647,33 @@ Begin
           Canvas.FillColor := BtnStyle.Surface;
           FillRect(X1, Y1, X2, Y2, BtnStyle.Surface);
           { Bevel — draws OUTSIDE the button coords matching JS.
-            JS: drawBeveledBox(left-bev, top-bev+1, right+bev, bot+bev, ...) }
+            SUNKEN (bit 15): swap bright/dark for inset appearance.
+            CHISEL (bit 3): draw inner bevel with swapped colors. }
           If (BtnStyle.Flags And 512) <> 0 Then Begin
-            For I := 1 to BtnStyle.BevSize Do Begin
-              { Bright edges (top/left) }
-              DrawLine(X1 - I, Y1 - I + 1, X2 + I, Y1 - I + 1, BtnStyle.Bright);
-              DrawLine(X1 - I, Y1 - I + 1, X1 - I, Y2 + I, BtnStyle.Bright);
-              { Dark edges (bottom/right) }
-              DrawLine(X1 - I, Y2 + I, X2 + I, Y2 + I, BtnStyle.Dark);
-              DrawLine(X2 + I, Y1 - I + 1, X2 + I, Y2 + I, BtnStyle.Dark);
+            { Determine bright/dark colors — swap if SUNKEN (bit 15) }
+            If (BtnStyle.Flags And 32768) <> 0 Then Begin
+              { SUNKEN: dark on top/left, bright on bottom/right }
+              For I := 1 to BtnStyle.BevSize Do Begin
+                DrawLine(X1 - I, Y1 - I + 1, X2 + I, Y1 - I + 1, BtnStyle.Dark);
+                DrawLine(X1 - I, Y1 - I + 1, X1 - I, Y2 + I, BtnStyle.Dark);
+                DrawLine(X1 - I, Y2 + I, X2 + I, Y2 + I, BtnStyle.Bright);
+                DrawLine(X2 + I, Y1 - I + 1, X2 + I, Y2 + I, BtnStyle.Bright);
+              End;
+            End Else Begin
+              { RAISED: bright on top/left, dark on bottom/right }
+              For I := 1 to BtnStyle.BevSize Do Begin
+                DrawLine(X1 - I, Y1 - I + 1, X2 + I, Y1 - I + 1, BtnStyle.Bright);
+                DrawLine(X1 - I, Y1 - I + 1, X1 - I, Y2 + I, BtnStyle.Bright);
+                DrawLine(X1 - I, Y2 + I, X2 + I, Y2 + I, BtnStyle.Dark);
+                DrawLine(X2 + I, Y1 - I + 1, X2 + I, Y2 + I, BtnStyle.Dark);
+              End;
+            End;
+            { CHISEL: add inner bevel with opposite colors }
+            If (BtnStyle.Flags And 8) <> 0 Then Begin
+              DrawLine(X1, Y1, X2, Y1, BtnStyle.Dark);
+              DrawLine(X1, Y1, X1, Y2, BtnStyle.Dark);
+              DrawLine(X1, Y2, X2, Y2, BtnStyle.Bright);
+              DrawLine(X2, Y1, X2, Y2, BtnStyle.Bright);
             End;
             { Corner pixels }
             PutPixel(X1 - BtnStyle.BevSize, Y1 - BtnStyle.BevSize + 1, BtnStyle.CornerCol);

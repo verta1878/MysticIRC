@@ -315,6 +315,7 @@ Type
 
     // BGI-compatible drawing primitives
     Procedure DrawPixel     (X, Y: SmallInt; Color: Byte);
+    Procedure DrawFillPixel (X, Y: SmallInt);
     Procedure DrawLine      (X0, Y0, X1, Y1: SmallInt);
     Procedure DrawRect      (X0, Y0, X1, Y1: SmallInt);
     Procedure DrawBar       (X0, Y0, X1, Y1: SmallInt);
@@ -589,53 +590,63 @@ Begin
   End;
 End;
 
-Procedure TRIPEngine.DrawLine (X0, Y0, X1, Y1: SmallInt);
-Var
-  DX, DY, SX, SY, Err, E2 : SmallInt;
-  PatBit : Integer;
-  Pat    : Word;
+Procedure TRIPEngine.DrawFillPixel (X, Y: SmallInt);
+{ Draw pixel using current fill pattern. Draws BG for pattern gaps.
+  Backport from ripviewer PutFillPixel. }
+Var PatRow: Byte;
 Begin
-  // Select pattern
+  If Not InView(X, Y) Then Exit;
+  If FillStyle = 0 Then Begin Pixels^[Y, X] := BGColor; Exit; End;
+  If FillStyle = 1 Then Begin Pixels^[Y, X] := FillColor; Exit; End;
+  If FillStyle <= 11 Then Begin
+    PatRow := FillPats[FillStyle, Y And 7];
+    If (PatRow Shr (7 - (X And 7))) And 1 = 1 Then
+      Pixels^[Y, X] := FillColor
+    Else
+      Pixels^[Y, X] := BGColor;
+  End;
+End;
+
+Procedure TRIPEngine.DrawLine (X0, Y0, X1, Y1: SmallInt);
+{ JS-matched Bresenham line algorithm (den/num/numadd).
+  Backport from ripviewer — standard err=dx-dy produces different
+  pixel positions on diagonals, causing bezier curve gap leaks. }
+Var
+  DX, DY: Integer;
+  XI1, XI2, YI1, YI2: Integer;
+  Den, Num, NumAdd, NumPixels: Integer;
+  X, Y, C: Integer;
+  Pat: Word;
+Begin
   Case LineStyle of
     RIP_LINE_DOTTED  : Pat := $CCCC;
     RIP_LINE_CENTER  : Pat := $FC78;
     RIP_LINE_DASHED  : Pat := $F8F8;
     RIP_LINE_USER    : Pat := LinePattern;
   Else
-    Pat := $FFFF;  // solid
+    Pat := $FFFF;
   End;
 
-  PatBit := 0;
+  DX := Abs(X1 - X0); DY := Abs(Y1 - Y0);
+  If X1 >= X0 Then Begin XI1 := 1; XI2 := 1; End
+  Else Begin XI1 := -1; XI2 := -1; End;
+  If Y1 >= Y0 Then Begin YI1 := 1; YI2 := 1; End
+  Else Begin YI1 := -1; YI2 := -1; End;
+  If DX >= DY Then Begin
+    XI1 := 0; YI2 := 0;
+    Den := DX; Num := DX Shr 1; NumAdd := DY; NumPixels := DX;
+  End Else Begin
+    XI2 := 0; YI1 := 0;
+    Den := DY; Num := DY Shr 1; NumAdd := DX; NumPixels := DY;
+  End;
 
-  // Bresenham line algorithm
-  DX := Abs(X1 - X0);
-  DY := Abs(Y1 - Y0);
-
-  If X0 < X1 Then SX := 1 Else SX := -1;
-  If Y0 < Y1 Then SY := 1 Else SY := -1;
-
-  Err := DX - DY;
-
-  While True Do Begin
-    // Only draw if pattern bit is set
-    If (Pat AND (1 SHL (15 - (PatBit AND 15)))) <> 0 Then
-      DrawPixel(X0, Y0, DrawColor);
-
-    Inc(PatBit);
-
-    If (X0 = X1) and (Y0 = Y1) Then Break;
-
-    E2 := 2 * Err;
-
-    If E2 > -DY Then Begin
-      Err := Err - DY;
-      X0  := X0 + SX;
-    End;
-
-    If E2 < DX Then Begin
-      Err := Err + DX;
-      Y0  := Y0 + SY;
-    End;
+  X := X0; Y := Y0;
+  For C := 0 to NumPixels Do Begin
+    If (Pat Shr (C And 15)) And 1 = 1 Then
+      DrawPixel(X, Y, DrawColor);
+    Inc(Num, NumAdd);
+    If Num >= Den Then Begin Dec(Num, Den); Inc(X, XI1); Inc(Y, YI1); End;
+    Inc(X, XI2); Inc(Y, YI2);
   End;
 
   CurX := X1;
@@ -868,34 +879,29 @@ Begin
 End;
 
 Procedure TRIPEngine.DrawBezier (X0, Y0, X1, Y1, X2, Y2, X3, Y3: SmallInt; Count: SmallInt);
+{ Bezier matched to JS: Floor() not Round(), explicit endpoint.
+  Backport from ripviewer Run 17-18. }
 Var
-  I       : SmallInt;
-  T       : Real;
-  PX, PY  : SmallInt;
-  LX, LY  : SmallInt;
-  IT, IT2, IT3, T2, T3 : Real;
+  T, T1, Step : Real;
+  PX, PY      : SmallInt;
+  LX, LY      : SmallInt;
 Begin
   If Count < 2 Then Count := 20;
-
   LX := X0;
   LY := Y0;
-
-  For I := 1 to Count Do Begin
-    T   := I / Count;
-    IT  := 1.0 - T;
-    IT2 := IT * IT;
-    IT3 := IT2 * IT;
-    T2  := T * T;
-    T3  := T2 * T;
-
-    PX := Round(IT3 * X0 + 3 * IT2 * T * X1 + 3 * IT * T2 * X2 + T3 * X3);
-    PY := Round(IT3 * Y0 + 3 * IT2 * T * Y1 + 3 * IT * T2 * Y2 + T3 * Y3);
-
+  Step := 1.0 / Count;
+  T := Step;
+  While T < 1.0 Do Begin
+    T1 := 1.0 - T;
+    PX := Floor(T1*T1*T1*X0 + 3*T*T1*T1*X1 + 3*T*T*T1*X2 + T*T*T*X3);
+    PY := Floor(T1*T1*T1*Y0 + 3*T*T1*T1*Y1 + 3*T*T*T1*Y2 + T*T*T*Y3);
     DrawLine(LX, LY, PX, PY);
-
     LX := PX;
     LY := PY;
+    T := T + Step;
   End;
+  { Final segment to exact endpoint }
+  DrawLine(LX, LY, X3, Y3);
 End;
 
 Procedure TRIPEngine.DrawPolygon (Var Points: Array of TRIPPoint; Count: Integer);
@@ -991,48 +997,63 @@ Begin
 End;
 
 Procedure TRIPEngine.FloodFill (X, Y: SmallInt; Border: Byte);
-// Simple scanline flood fill
+{ Scanline flood fill with visited buffer — backport from ripviewer.
+  Uses heap-allocated visited array to prevent pattern gap leaks.
+  Draws BGCOLOR for pattern gap pixels (PutFillPixel). }
+Type
+  TFFPoint = Record X, Y: SmallInt; End;
+  TVisited = Array[0..639, 0..349] Of Boolean;
+  PVisited = ^TVisited;
 Var
-  Stack : Array[1..4096] of TRIPPoint;
-  SP    : Integer;
-  FillC : Byte;
-
-  Procedure Push (PX, PY: SmallInt);
-  Begin
-    If SP < 4096 Then Begin
-      Inc(SP);
-      Stack[SP].X := PX;
-      Stack[SP].Y := PY;
-    End;
-  End;
-
+  Stack: Array[0..65535] Of TFFPoint;
+  Visited: PVisited;
+  SP, X1, X2, SX: Integer;
+  SpanUp, SpanDn: Boolean;
 Begin
   If Not InView(X, Y) Then Exit;
   If Pixels^[Y, X] = Border Then Exit;
-  If Pixels^[Y, X] = FillColor Then Exit;
+
+  New(Visited);
+  FillChar(Visited^, SizeOf(TVisited), 0);
 
   SP := 0;
-  FillC := FillColor;
-  Push(X, Y);
+  Stack[SP].X := X; Stack[SP].Y := Y; Inc(SP);
 
   While SP > 0 Do Begin
-    X := Stack[SP].X;
-    Y := Stack[SP].Y;
-    Dec(SP);
+    Dec(SP); X := Stack[SP].X; Y := Stack[SP].Y;
 
-    If Not InView(X, Y) Then Continue;
-    If Pixels^[Y, X] = Border Then Continue;
-    If Pixels^[Y, X] = FillC Then Continue;
+    X1 := X;
+    While (X1 >= ViewX0) And (Pixels^[Y, X1] <> Border) Do Dec(X1);
+    Inc(X1);
+    X2 := X + 1;
+    While (X2 <= ViewX1) And (Pixels^[Y, X2] <> Border) Do Inc(X2);
+    Dec(X2);
 
-    Pixels^[Y, X] := FillC;
+    SpanUp := False; SpanDn := False;
+    For SX := X1 to X2 Do Begin
+      DrawFillPixel(SX, Y);
+      Visited^[SX, Y] := True;
 
-    Push(X + 1, Y);
-    Push(X - 1, Y);
-    Push(X, Y + 1);
-    Push(X, Y - 1);
+      If (SX <= ViewX0) Or (SX >= ViewX1) Then Continue;
+
+      If (Not SpanUp) And (Y > ViewY0) And
+         (Pixels^[Y-1, SX] <> Border) And (Not Visited^[SX, Y-1]) Then Begin
+        If SP < 65535 Then Begin Stack[SP].X := SX; Stack[SP].Y := Y-1; Inc(SP); End;
+        SpanUp := True;
+      End Else If SpanUp And (Y > ViewY0) And (Pixels^[Y-1, SX] = Border) Then
+        SpanUp := False;
+
+      If (Not SpanDn) And (Y < ViewY1) And
+         (Pixels^[Y+1, SX] <> Border) And (Not Visited^[SX, Y+1]) Then Begin
+        If SP < 65535 Then Begin Stack[SP].X := SX; Stack[SP].Y := Y+1; Inc(SP); End;
+        SpanDn := True;
+      End Else If SpanDn And (Y < ViewY1) And (Pixels^[Y+1, SX] = Border) Then
+        SpanDn := False;
+    End;
   End;
-End;
 
+  Dispose(Visited);
+End;
 Procedure TRIPEngine.DrawText8x8 (X, Y: SmallInt; S: String);
 // System font text renderer — handles all 5 font modes
 // Mode 0: 8x8,  Mode 1: 8x14,  Mode 2: 16x14,  Mode 3: 7x8,  Mode 4: 7x14
@@ -1626,6 +1647,8 @@ Begin
 End;
 
 Procedure TRIPEngine.DrawButton (X0, Y0, X1, Y1: SmallInt; Label_, HostCmd: String);
+{ Button renderer with bevel OUTSIDE coords — backport from ripviewer.
+  SUNKEN (bit 15): swap bright/dark. CHISEL (bit 3): inner bevel. }
 Var
   SaveColor : Byte;
   Bev, I    : Integer;
@@ -1638,28 +1661,49 @@ Begin
   DrawColor := BtnStyle.Surface;
   DrawBar(X0, Y0, X1, Y1);
 
-  // Draw bevel highlight (top-left), BevelSize pixels thick
-  DrawColor := BtnStyle.BRight;
-  For I := 0 to Bev - 1 Do Begin
-    DrawLine(X0 + I, Y0 + I, X1 - I, Y0 + I);   // top edge
-    DrawLine(X0 + I, Y0 + I, X0 + I, Y1 - I);   // left edge
+  // Bevel draws OUTSIDE the button coords
+  If (BtnStyle.Flags And 512) <> 0 Then Begin
+    If (BtnStyle.Flags And 32768) <> 0 Then Begin
+      // SUNKEN: dark top/left, bright bottom/right
+      DrawColor := BtnStyle.Dark;
+      For I := 1 to Bev Do Begin
+        DrawLine(X0 - I, Y0 - I + 1, X1 + I, Y0 - I + 1);
+        DrawLine(X0 - I, Y0 - I + 1, X0 - I, Y1 + I);
+      End;
+      DrawColor := BtnStyle.BRight;
+      For I := 1 to Bev Do Begin
+        DrawLine(X0 - I, Y1 + I, X1 + I, Y1 + I);
+        DrawLine(X1 + I, Y0 - I + 1, X1 + I, Y1 + I);
+      End;
+    End Else Begin
+      // RAISED: bright top/left, dark bottom/right
+      DrawColor := BtnStyle.BRight;
+      For I := 1 to Bev Do Begin
+        DrawLine(X0 - I, Y0 - I + 1, X1 + I, Y0 - I + 1);
+        DrawLine(X0 - I, Y0 - I + 1, X0 - I, Y1 + I);
+      End;
+      DrawColor := BtnStyle.Dark;
+      For I := 1 to Bev Do Begin
+        DrawLine(X0 - I, Y1 + I, X1 + I, Y1 + I);
+        DrawLine(X1 + I, Y0 - I + 1, X1 + I, Y1 + I);
+      End;
+    End;
+    // CHISEL: inner bevel with opposite colors
+    If (BtnStyle.Flags And 8) <> 0 Then Begin
+      DrawColor := BtnStyle.Dark;
+      DrawLine(X0, Y0, X1, Y0);
+      DrawLine(X0, Y0, X0, Y1);
+      DrawColor := BtnStyle.BRight;
+      DrawLine(X0, Y1, X1, Y1);
+      DrawLine(X1, Y0, X1, Y1);
+    End;
+    // Corner pixels
+    DrawPixel(X0 - Bev, Y0 - Bev + 1, BtnStyle.CornerCol);
+    DrawPixel(X1 + Bev, Y0 - Bev + 1, BtnStyle.CornerCol);
+    DrawPixel(X0 - Bev, Y1 + Bev, BtnStyle.CornerCol);
+    DrawPixel(X1 + Bev, Y1 + Bev, BtnStyle.CornerCol);
   End;
 
-  // Draw bevel shadow (bottom-right), BevelSize pixels thick
-  DrawColor := BtnStyle.DDark;
-  For I := 0 to Bev - 1 Do Begin
-    DrawLine(X0 + I, Y1 - I, X1 - I, Y1 - I);   // bottom edge
-    DrawLine(X1 - I, Y0 + I, X1 - I, Y1 - I);   // right edge
-  End;
-
-  // Draw corner pixels
-  If BtnStyle.CornerCol < 16 Then Begin
-    DrawColor := BtnStyle.CornerCol;
-    DrawPixel(X0, Y0, BtnStyle.CornerCol);
-    DrawPixel(X1, Y0, BtnStyle.CornerCol);
-    DrawPixel(X0, Y1, BtnStyle.CornerCol);
-    DrawPixel(X1, Y1, BtnStyle.CornerCol);
-  End;
 
   // Draw label centered (uses CHR font if loaded)
   DrawColor := BtnStyle.DFore;
@@ -3393,19 +3437,43 @@ Begin
   End;
 
   // Extract RIP commands from the line
-  // Commands start with !| or SOH| or STX|
+  // Commands start with !| or SOH| or STX| or bare | (separator)
+  // BUG FIX (backport from ripviewer): The first command on a line
+  // uses !| prefix. Subsequent commands use just | as separator.
+  // Most RIP files have 5-10 commands per line.
   I := 1;
 
   While I <= Length(LineBuf) Do Begin
-    If ((LineBuf[I] = '!') or (LineBuf[I] = #1) or (LineBuf[I] = #2)) and
-       (I < Length(LineBuf)) and (LineBuf[I + 1] = '|') Then Begin
-      // Find end of RIP command (next !| or end of line)
-      Inc(I, 2);  // skip !|
+    If (((LineBuf[I] = '!') or (LineBuf[I] = #1) or (LineBuf[I] = #2)) and
+       (I < Length(LineBuf)) and (LineBuf[I + 1] = '|')) Then Begin
+      // !| prefix — skip both chars
+      Inc(I, 2);
+      Cmd := '';
+
+      While (I <= Length(LineBuf)) Do Begin
+        // Stop at next !| or bare | separator
+        If ((LineBuf[I] = '!') or (LineBuf[I] = #1) or (LineBuf[I] = #2)) and
+           (I < Length(LineBuf)) and (LineBuf[I + 1] = '|') Then
+          Break;
+        If (LineBuf[I] = '|') Then
+          Break;
+
+        Cmd := Cmd + LineBuf[I];
+        Inc(I);
+      End;
+
+      If Cmd <> '' Then
+        ProcessCommand(Cmd);
+    End Else If (LineBuf[I] = '|') Then Begin
+      // Bare | separator — subsequent command on same line
+      Inc(I);
       Cmd := '';
 
       While (I <= Length(LineBuf)) Do Begin
         If ((LineBuf[I] = '!') or (LineBuf[I] = #1) or (LineBuf[I] = #2)) and
            (I < Length(LineBuf)) and (LineBuf[I + 1] = '|') Then
+          Break;
+        If (LineBuf[I] = '|') Then
           Break;
 
         Cmd := Cmd + LineBuf[I];
@@ -3474,12 +3542,15 @@ Begin
   Case Cmd of
     // RIP_TEXT_WINDOW: w  x0(2) y0(2) x1(2) y1(2) wrap(1) size(1)
     'w' : Begin
+            // RIP_TEXT_WINDOW: w x0(2) y0(2) x1(2) y1(2) wrap(1) size(1)
+            // BUG FIX: wrap and size are 1 mega digit, not 2.
+            // JS format: 222211 = 10 chars total.
             TextWinX0   := MegaNum(Params, P, 2);
             TextWinY0   := MegaNum(Params, P, 2);
             TextWinX1   := MegaNum(Params, P, 2);
             TextWinY1   := MegaNum(Params, P, 2);
-            MegaNum(Params, P, 2);  // wrap mode (ignored server-side)
-            TextWinSize := MegaNum(Params, P, 2);
+            MegaNum(Params, P, 1);  // wrap mode (1 digit)
+            TextWinSize := MegaNum(Params, P, 1);  // size (1 digit)
           End;
 
     // RIP_VIEWPORT: v  x0(2) y0(2) x1(2) y1(2)
