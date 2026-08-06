@@ -2,13 +2,26 @@
 {$H-}
 Unit RIP1Parse;
 {
-  RIPscrip v1.54 Parser — mega-number decoder, command enum, parser.
+  RIPscrip v1.54 Parser - mega-number decoder, command enum, parser.
   Version-specific: v1.54 only.
 
-  Copyright (C) 2026 — GPLv3
+  MegaNum encoding: base-36 digits (0-9, A-Z).
+  DecodeMega2 reads 2 chars = value 0-1295.
+  Used for coordinates, colors, sizes in RIP commands.
+
+  ParseRIPCommand accepts both !| (first command on line) and
+  | (subsequent commands on same line). This is critical - most
+  RIP files have 5-10 commands per line separated by |.
+
+  BUG HISTORY:
+    Run 7: Parser only accepted !| prefix. Commands after the
+    first on each line were silently skipped. DRAGON01 had 387
+    commands but only ~60 were executing (one per line).
+
+  RIPscrip v1.54 specification by TeleGrafix Communications, Inc. (1993)
+  Copyright (C) 2026 - GPLv3
   The Crew: verta1878, sysop/0, evga, kiddo, wrench
 }
-
 Interface
 
 Type
@@ -36,6 +49,7 @@ Type
     { Palette }
     rcSetPalette, rcOnePalette,
     { Reset }
+    rcComment,
     rcNoMore
   );
 
@@ -63,15 +77,26 @@ Begin
 End;
 
 Function ParseRIPCommand(const Line: String; Var Pos: Integer): TRIPCommand;
+{ Parse a RIPscrip command at current position.
+  Accepts both !|X (first command on line) and |X (subsequent commands).
+  BUG FIX: Previously only accepted !| which skipped all subsequent
+  commands on multi-command lines like DRAGON01. }
 Var Ch: Char;
 Begin
   Result := rcUnknown;
   If Pos > Length(Line) Then Exit;
-  If Line[Pos] <> '!' Then Exit;
-  Inc(Pos);
-  If Pos > Length(Line) Then Exit;
-  If Line[Pos] <> '|' Then Exit;
-  Inc(Pos);
+
+  { Accept ! or | as start }
+  If Line[Pos] = '!' Then Begin
+    Inc(Pos);
+    If Pos > Length(Line) Then Exit;
+    If Line[Pos] <> '|' Then Exit;
+    Inc(Pos);
+  End Else If Line[Pos] = '|' Then Begin
+    Inc(Pos);
+  End Else
+    Exit;
+
   If Pos > Length(Line) Then Exit;
 
   Ch := Line[Pos]; Inc(Pos);
@@ -131,6 +156,7 @@ Begin
     'u': Result := rcButtonStyle;
     'Q': Result := rcSetPalette;
     'a': Result := rcOnePalette;
+    '!': Result := rcComment;
   End;
 End;
 

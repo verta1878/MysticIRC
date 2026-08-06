@@ -2,28 +2,37 @@
 {$H-}
 Program TestPhase3;
 {
-  Phase 3 -Pixel-Perfect Verification
-  
+  Phase 3 - Pixel-Perfect Verification
+
   Renders all .rip files in rips/ directory using the current engine,
   saves BMPs to test-output/ directory.
-  
-  Compile twice -once with each engine -compare BMPs with ImageMagick:
-  
-    Engine A (ripdraw -proven):
+
+  Two engines, one compile switch:
+
+    Engine A (ripdraw - evga's proven engine):
       fpc -Mdelphi -Fusource -Fusource/v1 -dBMP_8BIT test_phase3.pas -ot_ripdraw
       ./t_ripdraw
-  
-    Engine B (m_rip_graph -experimental):
+
+    Engine B (m_rip_graph - kiddo's OOP engine):
       fpc -Mdelphi -Fusource -Fusource/v1 -dEXPERIMENTAL_RIP -dBMP_8BIT test_phase3.pas -ot_mrgraph
       ./t_mrgraph
-  
-    Compare:
-      for f in test-output-ripdraw/*.bmp; do
-        b=$(basename "$f");
-        bmpcompare "$f" "test-output-mrgraph/$b" /dev/null 2>&1;
-      done
-  
-  Copyright (C) 2026 -GPLv3
+
+    Compare (pixel-perfect check, no ImageMagick needed):
+      bmpcompare test-output-ripdraw/FILE.bmp test-output-mrgraph/FILE.bmp
+
+  -dBMP_8BIT = 8-bit indexed BMP (672KB, matches reference PNGs)
+  Without it = 24-bit BMP (2.4MB, for future RIP browser)
+
+  BUGS FIXED:
+    v1-v6: DRAGON01 99.9% diff - parser only accepted !| prefix,
+           skipped all subsequent |X commands on multi-command lines.
+           Most RIP files have 5-10 commands per line.
+    v5:    BMP byte order R/B swapped (RGB instead of BGR).
+    v7:    ParseRIPCommand accepts both !| and | as command start.
+           EGA64toRGB conversion for rcSetPalette/rcOnePalette.
+           Engine B Arc/PieSlice upgraded to elliptical (XRad+YRad).
+
+  Copyright (C) 2026 - GPLv3
   The Crew: verta1878, sysop/0, evga, kiddo, wrench
 }
 

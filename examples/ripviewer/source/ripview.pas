@@ -2,25 +2,76 @@
 {$H-}
 Program RIPView;
 {
-  RIPView v1.0.0 — RIPscrip File Viewer
+  RIPView v1.0.0 — RIPscrip v1.54 File Viewer
+  Part of Mystic BBS 1.11IRC
 
-  Single source, two compile targets:
-    fpc -Mdelphi ripview.pas                    → CLI mode
-    fpc -Mdelphi -dFREEVISION ripview.pas       → Free Vision TUI
+  HOW IT WORKS:
+  =============
+  1. ripview.pas (this file) — main program, reads .RIP file line by line
+  2. rip1parse.pas — parses RIP commands: MegaNum decoder, command enum
+     - Accepts both !| (first command) and | (subsequent) on same line
+     - MegaNum: base-36 encoding, 2 chars = 0-1295
+  3. rip1exec.pas — executes parsed commands, dispatches to drawing primitives
+     - 42 RIP v1.54 commands: lines, circles, arcs, beziers, fills, text, etc
+     - Button renderer with 14-param ButtonStyle (bevel, colors, orient)
+     - Icon loading from .ICN files (4-bit EGA planar format)
+     - GetImage/PutImage pixel region copy/paste
+     - EGA64toRGB palette conversion for custom palettes
+  4. ripdraw.pas — drawing primitives matched to RIPtermJS BGI.js
+     - DrawLine: JS-matched Bresenham (den/num/numadd, NOT err=dx-dy)
+     - DrawBezier: Floor() rounding, explicit endpoint
+     - DrawEllipse: Bresenham ellipse (x=-xrad stepping)
+     - FloodFill: scanline with visited buffer, viewport-aware GetPixel
+     - PutFillPixel: 13 BGI fill patterns, draws BGCOLOR for gaps
+     - DrawArcLines: 1-degree stepping with Floor() trig
+  5. riptext.pas — text rendering
+     - VGA 8x16 CP437 bitmap font (built-in)
+     - CHR vector fonts (10 BGI fonts, lazy loading from fonts/ dir)
+     - FontScales[] float lookup table matching JS BGI.fontScales
+     - TextWidth/TextHeight for font-aware positioning
+  6. ripengine.pas — canvas state (640x350 EGA, 16-color palette)
+     - PutPixel with viewport coordinate offset (JS-matched)
+     - GetPixel viewport-aware for flood fill boundary checks
+  7. ripbmp.pas — BMP output (8-bit indexed or 24-bit RGB)
 
-  Modular units:
-    ripengine.pas   — Canvas, palette, pixels (shared)
-    ripdraw.pas     — Drawing primitives (shared)
-    riptext.pas     — VGA 8x16 text rendering (shared)
-    ripbmp.pas      — BMP file output (shared)
-    v1/rip1parse.pas — v1.54 mega decoder + command parser
-    v1/rip1exec.pas  — v1.54 42-command dispatcher
+  RENDERING PIPELINE:
+  ===================
+  Input: .RIP file (text lines with !|COMMAND... sequences)
+    → Parser splits into commands (rip1parse)
+    → Executor dispatches each command (rip1exec)
+    → Drawing primitives modify pixel buffer (ripdraw)
+    → Text/font system renders characters (riptext)
+    → All pixels go through PutPixel which offsets by viewport
+    → BMP writer serializes pixel buffer to file (ripbmp)
+  Output: .BMP file (640x350, 8-bit or 24-bit)
 
-  Copyright (C) 2026 — GPLv3
+  KEY ALGORITHMS (matched to RIPtermJS by Carl Gorringe):
+  =======================================================
+  - Bresenham line: den/num/numadd formulation (NOT standard err=dx-dy)
+    Critical for bezier curve junctions — standard Bresenham creates
+    1-pixel gaps that flood fill leaks through.
+  - Bezier curves: Floor() for coordinates (JS uses Math.floor)
+  - Flood fill: heap-allocated visited buffer prevents pattern leak.
+    Uses viewport-aware GetPixel for boundary checks.
+  - Fill patterns: draws BGCOLOR for pattern gaps (bit=0), not skip.
+    Pattern alignment uses absolute (viewport-offset) coordinates.
+  - Viewport: PutPixel adds ViewX1/ViewY1 to ALL coordinates.
+    GetPixel also offsets. EraseView writes directly to canvas.
+
+  TEST RESULTS (27 runs, 25+ bugs fixed):
+  ========================================
+  3 pixel-perfect (F_FILL1, F_FILL2, v_VIEW)
+  10 of 13 files under 3% diff vs RIPtermJS reference
+  DRAGON01: 98.9% → 1.0% (99x improvement)
+
+  See PHASE3-CHANGELOG.md for full test history.
+  See CREDITS.md for references and attribution.
+
+  Copyright (C) 2026 - GPLv3
   The Crew: verta1878, sysop/0, evga, kiddo, wrench
-  Mystic BBS IRC Fork — Ecstasy BBS FTN 1:152/158
+  Reference implementation: RIPtermJS by Carl Gorringe
+    https://github.com/cgorringe/RIPtermJS
 }
-
 Uses
   SysUtils,
   RIPEngine, RIPDraw, RIPText, RIPBMP, RIP1Parse, RIP1Exec

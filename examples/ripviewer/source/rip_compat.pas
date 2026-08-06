@@ -22,8 +22,8 @@ Const
   RIP_HEIGHT = 350;
 
   EGA_PALETTE : Array[0..15] Of LongWord = (
-    $000000, $AA0000, $00AA00, $AA5500,
-    $0000AA, $AA00AA, $00AAAA, $AAAAAA,
+    $000000, $AA0000, $00AA00, $AAAA00,
+    $0000AA, $AA00AA, $0055AA, $AAAAAA,
     $555555, $FF5555, $55FF55, $FFFF55,
     $5555FF, $FF55FF, $55FFFF, $FFFFFF
   );
@@ -155,7 +155,7 @@ Procedure DrawBezier(NumSeg: Integer; Pts: Array Of Integer; Color: Byte);
 Begin SyncToG; G.SetColor(Color); G.Bezier(NumSeg, Pts); SyncFromG; End;
 
 Procedure DrawArcLines(CX, CY, StAngle, EndAngle, XRad, YRad: Integer; Color: Byte);
-Begin SyncToG; G.SetColor(Color); G.Arc(CX, CY, StAngle, EndAngle, XRad); SyncFromG; End;
+Begin SyncToG; G.SetColor(Color); G.Arc(CX, CY, StAngle, EndAngle, XRad, YRad); SyncFromG; End;
 
 Procedure DrawSector(CX, CY, StAngle, EndAngle, XRad, YRad: Integer;
                      OutColor, FillCol: Byte);
@@ -163,7 +163,7 @@ Begin
   SyncToG;
   G.SetColor(OutColor);
   G.Canvas.FillColor := FillCol;
-  G.PieSlice(CX, CY, StAngle, EndAngle, XRad);
+  G.PieSlice(CX, CY, StAngle, EndAngle, XRad, YRad);
   SyncFromG;
 End;
 

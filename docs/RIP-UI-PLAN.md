@@ -410,7 +410,7 @@ TWO engines exist:
 - ripdraw.pas (production): examples/ripviewer/source/
 - m_rip_graph.pas (experimental): mystic_test/experimental/
 - rip_graph.pas (BBS integration): mystic_test/rip_graph.pas
-- v1-v4 engines (g00r00): mystic_rip/v1/ v2/ v3/ v4/
+- v1-v4 engines: mystic_rip/v1/ v2/ v3/ v4/
 
 ### Next Steps
 
@@ -512,37 +512,81 @@ Three fixes applied:
   3. rip_compat.pas WriteBMP - copies G pixels to RIPEngine.Canvas,
      calls RIPBMP.WriteBMP so both engines use same writer
 
-#### Priority Fix Order (sysop/0 direction)
+#### Phase 3 Test History
 
-  1. Engine A palette init - DRAGON01 99.9% off. Canvas starts wrong.
-     Check InitCanvas color fill vs RIPtermJS. Fix this first - it will
-     drop DRAGON01 and improve most art files across the board.
-  2. Engine B line/arc endpoints - L_LINE and V_ARC 4K pixels worse
-     than Engine A. Bresenham endpoint rounding or off-by-one.
-  3. Both engines S_FILL - fill pattern boundaries or hatch patterns.
-  4. Both engines Y_FONT - glyph positioning or scaling from JS port.
-  5. Both engines BUTTONS - shared RIPtermJS port bug. Text positioning.
-  6. Run against full 118 RIPs once big issues fixed.
-  7. test_phase3.pas needs rip_compat fixes baked in (sysop/0 patched
-     each run - merge upstream)
-  8. Phase 4: wire {$IFDEF EXPERIMENTAL_RIP} into mystic_test
-  9. openwatcomirc compiler fork for pcbirc (hexadecimal)
-  5. Both engines BUTTONS - shared RIPtermJS port bug. Text positioning.
-  6. Run against full 118 RIPs once big issues fixed.
-  7. test_phase3.pas needs rip_compat fixes baked in (sysop/0 patched
-     each run - merge upstream)
+Full test-by-test changelog with numbers, fixes, and what each
+run changed: examples/ripviewer/PHASE3-CHANGELOG.md
+
+7 test runs so far. Key milestones:
+  - Run 2: first real numbers (placeholder fonts fixed)
+  - Run 3: Engine B runs (rip_compat bridge)
+  - Run 5: first direct A-vs-B comparison (8-bit BMP standardized)
+  - Run 7: command parser fix (PENDING retest — expected major improvement)
+
+#### Command Parser Bug — FIXED (Session 6)
+
+MAJOR BUG: The parser only accepted !| as command prefix. RIPscrip uses
+!| for the FIRST command on a line and just | for subsequent commands on
+the same line. DRAGON01 has 8+ commands per line — only the first was
+being executed. All subsequent commands were silently skipped.
+
+Example from DRAGON01.RIP line 1:
+  !|*|1K|w0013271610|c08|W0|=00000001|ZFC0ZFL1OHF0NHM1D1E
+  ^^                                                        processed
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^      ALL SKIPPED
+
+This affected EVERY RIP file with multiple commands per line — which is
+most of them. The 99.9% diff on DRAGON01 was not palette init — it was
+the parser ignoring most of the drawing commands.
+
+Fix applied to rip1parse.pas and rip1exec.pas:
+  - ParseRIPCommand now accepts both !|X and |X as command start
+  - ExecuteRIP loop looks for ! OR | as command entry point
+  - Both engines affected equally since they share rip1parse/rip1exec
+
+Additional fixes applied this round:
+  - EGA64toRGB function added for rcSetPalette and rcOnePalette
+    (previously used wrong conversion: C And 15, LongWord * 256)
+  - Engine B Arc/PieSlice upgraded to elliptical (XRad + YRad)
+    (previously only circular — dropped YRad through rip_compat)
+
+#### Canvas Height Bug - FIXED (Session 6, visual diffs)
+
+sysop/0 sent visual diff images. Root cause immediately visible:
+  - Reference PNG: 640 x 350 (correct EGA)
+  - Engine A BMP:  640 x 1280 (WRONG)
+  - Engine B BMP:  640 x 1280 (WRONG)
+
+ripengine.pas had RIP_HEIGHT = 1280. Fixed to 350.
+This was the 98.9% DRAGON01 diff - not palette, not parser.
+The dragon was rendering correctly in rows 0-349 but the
+BMP file had 930 extra rows of black pixels.
+
+Visual diffs also revealed:
+  - DRAGON01 flood fill fills OUTSIDE the dragon (green background)
+    instead of inside. FloodFill border color or fill direction bug.
+  - BUTTONS renders blank - button drawing code produces no pixels.
+  - Y_FONT some CHR fonts not loading (file path issue).
+
+Awaiting retest by sysop/0 with height fix.
+
+#### Priority Fix Order (updated)
+
+  1. DONE - Command parser | separator fix (the big one)
+  2. DONE - EGA64toRGB palette conversion
+  3. DONE - Engine B elliptical arc support
+  4. Engine B line/arc endpoints - Bresenham rounding vs Engine A
+  5. Both engines S_FILL - fill pattern boundaries
+  6. Both engines Y_FONT - glyph positioning
+  7. Both engines BUTTONS - text positioning
+  8. Run against full 118 RIPs with parser fix
+  9. Phase 4: wire {$IFDEF EXPERIMENTAL_RIP} into mystic_test
 
 #### Merge Path (sysop/0 direction)
 
 Use evga's line/arc math (better Bresenham) + kiddo's palette init.
 This is the end-state architecture sysop/0 defined earlier:
 evga's primitives = shared drawing core, kiddo's class = wrapper.
-  - DRAGON01 at 99.9% — background/palette init, systemic
-  - Fix background color init first, then remaining edge cases
-- kiddo: Engine B crash FIXED — rip_compat.pas bridges rip1exec to m_rip_graph
-- sysop/0: rerun three-way comparison with rip_compat.pas, both engines should render now
-- Once baseline fixed, remaining diffs pinpoint individual primitive bugs
-
 #### rip_compat.pas — Engine Bridge (Session 6)
 
 Created `examples/ripviewer/source/rip_compat.pas` — compatibility layer that
@@ -574,3 +618,125 @@ NOT released (Mystic-specific):
   - m_rip_graph.pas — TRIPGraphics class, multi-backend
   - rip_compat.pas — engine bridge layer
   - bmpcompare.pas, test_phase3.pas — internal test tools
+
+#### Visual Analysis — Test Run 8 (640x350 correct)
+
+sysop/0 visual diffs with corrected canvas height:
+
+  L_LINE: CLOSE. Lines render correctly. Starburst patterns match
+    reference. Small endpoint rounding on diagonals only.
+    FIX NEEDED: None critical — endpoint rounding is sub-pixel.
+
+  S_FILL: PATTERNS MISSING. Fill colors are correct but all fills
+    are solid. Reference shows hatch/stripe/dot/cross patterns.
+    FIX NEEDED: Implement BGI fill patterns in FloodFill and FillRect.
+    The FillStyle field is set but never used — solid fill always.
+
+  Y_FONT: BITMAP OK, VECTOR MISSING. 8x16 bitmap font renders.
+    CHR vector fonts (large colored text) absent.
+    FIX NEEDED: CHR font file path resolution. The .CHR files exist
+    in fonts/ but the engine can't find them at runtime.
+
+  DRAGON01: FLOOD FILL INVERTED. Dragon outlines and bezier curves
+    render correctly. But flood fills fill the OUTSIDE of shapes
+    instead of the inside. Background is green, dragon body is black.
+    FIX NEEDED: FloodFill border color logic — may be comparing
+    against wrong color or starting from wrong seed point.
+
+  BUTTONS: BLANK. Button widget commands parse but nothing draws.
+    FIX NEEDED: Implement rcButton/rcButtonStyle rendering.
+    This is a UI widget system — rectangles + text + bevels.
+    Lower priority — most RIP art doesn't use buttons.
+
+#### JS-Matched Bresenham — FIXED (Session 6 Run 18)
+
+ROOT CAUSE of DRAGON01 flood fill leak: Standard Bresenham (err=dx-dy)
+and JS Bresenham (den/num/numadd) produce DIFFERENT pixel positions on
+diagonal lines. Adjacent bezier curves share endpoints — when the line
+algorithm places the endpoint pixel differently, a 1-pixel gap forms.
+Flood fill leaks through the gap to the entire background.
+
+Fix: Replaced DrawLine with exact JS BGI.js line_bresenham algorithm.
+Bezier curves now produce gap-free junctions. Flood fills stay contained.
+
+DRAGON01 now renders: black background, green dragon body, dark gray
+outlines, red eye, teeth, Continue button, text labels. Locally verified.
+
+Complete fix list this session (Runs 1-18):
+  1. RIP_HEIGHT 1280->350 (canvas too tall)
+  2. | command separator (parser only accepted !|)
+  3. BMP BGR byte order (R/B swapped)
+  4. BMP 8-bit indexed mode (-dBMP_8BIT)
+  5. rip_compat WriteBMP routing (Engine B format mismatch)
+  6. EGA64toRGB palette conversion (rcSetPalette/rcOnePalette)
+  7. Engine B elliptical arcs (XRad+YRad, was circular only)
+  8. rcTextWindow |w parameter length 12->10 (ate |c color command)
+  9. rcGetImage |1C parameter length 10->9
+  10. rcPutImage |1P parameter length 8->7
+  11. Fill patterns (13 BGI patterns in PutFillPixel)
+  12. FloodFill visited buffer (prevent leak through pattern gaps)
+  13. CHR vector font loading (LoadCHRFont with path search)
+  14. Button renderer (rcButton + rcButtonStyle with bevel/colors)
+  15. Bezier Floor() matching JS Math.floor()
+  16. JS-matched Bresenham line algorithm (den/num/numadd)
+  17. Bezier explicit endpoint (last segment to exact P3)
+
+#### Current Scores (awaiting sysop/0 retest with Run 18 code)
+
+Locally verified — all 6 test files render correctly.
+DRAGON01 visually matches reference (green dragon, black background).
+Exact pixel diff numbers pending from sysop/0.
+
+#### Final Scores — Session 6 Complete (20 test runs)
+
+  PIXEL-PERFECT:
+    F_FILL1:       1  (0.0%)
+    F_FILL2:       1  (0.0%)
+
+  EXCELLENT (< 2%):
+    S_FILL:    2,646  (1.2%)
+    DRAGON01:  3,497  (1.6%)
+    V_ARC:     4,114  (1.8%)
+    L_LINE:    4,424  (2.0%)
+
+  NEEDS WORK:
+    Y_FONT:   35,148  (15.7%) — CHR scale improved, needs Y-offset
+
+  Bresenham tradeoff: JS Bresenham fixed DRAGON01 (98.9%->1.6%) but
+  regressed L_LINE (0.8%->2.0%), V_ARC (0.4%->1.8%), S_FILL (0.7%->1.2%).
+  Future work: use JS Bresenham for bezier curves only, original
+  Bresenham for regular lines. Deferred.
+
+  19 bugs fixed across 20 test runs. All documented in
+  examples/ripviewer/PHASE3-CHANGELOG.md with full numbers and
+  root cause analysis.
+
+#### Ripview Completion Status — Session 6 Final
+
+  RENDERING ENGINE: 42/42 RIPscrip v1.54 commands implemented.
+  
+  PIXEL ACCURACY (27 test runs, 25+ bugs fixed):
+    3 pixel-perfect: F_FILL1, F_FILL2, v_VIEW
+    10 of 13 under 3% diff vs RIPtermJS reference
+    DRAGON01: 98.9% → 1.0% (99x improvement)
+
+  ALGORITHMS MATCHED TO JS:
+    - Bresenham line (den/num/numadd)
+    - Bezier curves (Floor rounding, explicit endpoint)
+    - Flood fill (visited buffer, bgcolor for pattern gaps)
+    - Fill patterns (13 BGI patterns, absolute alignment)
+    - Viewport offset (PutPixel/GetPixel add ViewX1/ViewY1)
+    - EGA64 palette (RGBrgb bit order)
+    - CHR font scaling (FontScales float lookup)
+    - Button bevel (draws outside coords)
+
+  REMAINING 3 FILES:
+    Y_FONT 14.7%  — JS moveto/lineto stroke font CP model
+    BUTTONS 17.8% — icon button images, full flag system
+    C_WELL 26.1%  — circle precision (JS has FIXME)
+
+  MDL INTEGRATION:
+    SDL units moved from mystic_sdl/ to mdl/
+    serial_ext.pas added (6 serial functions)
+    utrayit.pas bugfix deployed to all 4 locations
+    MDL-OOP-ANALYSIS.md: 76% already OOP, 3-step migration plan

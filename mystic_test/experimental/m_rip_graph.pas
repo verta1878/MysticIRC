@@ -334,8 +334,8 @@ Type
     Procedure Circle(CX, CY, Radius: Integer);       // !|1O
     Procedure Ellipse(CX, CY, XRad, YRad: Integer);  // !|1o (outline)
     Procedure FilledEllipse(CX, CY, XRad, YRad: Integer); // !|1O (filled)
-    Procedure Arc(CX, CY, StAngle, EndAngle, Rad: Integer); // !|1A
-    Procedure PieSlice(CX, CY, StAngle, EndAngle, Rad: Integer); // !|1I
+    Procedure Arc(CX, CY, StAngle, EndAngle, XRad, YRad: Integer); // !|1A
+    Procedure PieSlice(CX, CY, StAngle, EndAngle, XRad, YRad: Integer); // !|1I
     Procedure FloodFill(X, Y: Integer; Border: Byte); // !|1F
     Procedure Bezier(NumSeg: Integer; Var Pts: Array Of Integer); // !|1Z
     Procedure Polygon(NPts: Integer; Var Pts: Array Of Integer); // !|1P
@@ -771,10 +771,10 @@ Begin
   End;
 End;
 
-Procedure TRIPGraphics.Arc(CX, CY, StAngle, EndAngle, Rad: Integer);
-{ Ported from ripdraw.pas DrawArcLines — proven pixel-perfect.
-  Draws arc by stepping 1-degree increments, connecting with lines.
-  Uses current FColor for drawing. Rad used for both X and Y radius. }
+Procedure TRIPGraphics.Arc(CX, CY, StAngle, EndAngle, XRad, YRad: Integer);
+{ Draws arc by stepping 1-degree increments, connecting with lines.
+  Supports elliptical arcs (separate XRad, YRad).
+  Matched to ripdraw.pas DrawArcLines for pixel-perfect agreement. }
 Var
   N, X1, Y1, X2, Y2: Integer;
   R: Double;
@@ -784,20 +784,20 @@ Begin
   EA := EndAngle;
   If StAngle > EA Then Inc(EA, 360);
   R := StAngle * Pi / 180.0;
-  X1 := CX + Floor(Rad * Cos(R));
-  Y1 := CY - Floor(Rad * Sin(R));
+  X1 := CX + Floor(XRad * Cos(R));
+  Y1 := CY - Floor(YRad * Sin(R));
   For N := StAngle + 1 to EA Do Begin
     R := N * Pi / 180.0;
-    X2 := CX + Floor(Rad * Cos(R));
-    Y2 := CY - Floor(Rad * Sin(R));
+    X2 := CX + Floor(XRad * Cos(R));
+    Y2 := CY - Floor(YRad * Sin(R));
     Line(X1, Y1, X2, Y2);
     X1 := X2; Y1 := Y2;
   End;
 End;
 
-Procedure TRIPGraphics.PieSlice(CX, CY, StAngle, EndAngle, Rad: Integer);
-{ Ported from ripdraw.pas DrawSector — proven pixel-perfect.
-  Draws arc, radial lines from center to arc endpoints, flood fills interior. }
+Procedure TRIPGraphics.PieSlice(CX, CY, StAngle, EndAngle, XRad, YRad: Integer);
+{ Draws arc, radial lines from center to arc endpoints, flood fills interior.
+  Matched to ripdraw.pas DrawSector for pixel-perfect agreement. }
 Var
   R, HalfAngle: Double;
   X1, Y1, X2, Y2, FX, FY: Integer;
@@ -805,26 +805,27 @@ Var
   OldFill: Byte;
 Begin
   If StAngle = EndAngle Then Begin PutPixel(CX, CY, Canvas.FGColor); Exit; End;
-  If Rad < 1 Then Rad := 1;
+  If XRad < 1 Then XRad := 1;
+  If YRad < 1 Then YRad := 1;
   SA := StAngle; EA := EndAngle;
   If SA > EA Then Begin X1 := SA; SA := EA; EA := X1; End;
   { Draw the arc outline }
-  Arc(CX, CY, SA, EA, Rad);
+  Arc(CX, CY, SA, EA, XRad, YRad);
   { Draw radial lines from center to arc endpoints }
   EA2 := EA Mod 360;
   R := SA * Pi / 180.0;
-  X1 := CX + Floor(Rad * Cos(R));
-  Y1 := CY - Floor(Rad * Sin(R));
+  X1 := CX + Floor(XRad * Cos(R));
+  Y1 := CY - Floor(YRad * Sin(R));
   R := EA2 * Pi / 180.0;
-  X2 := CX + Floor(Rad * Cos(R));
-  Y2 := CY - Floor(Rad * Sin(R));
+  X2 := CX + Floor(XRad * Cos(R));
+  Y2 := CY - Floor(YRad * Sin(R));
   Line(CX, CY, X1, Y1);
   Line(CX, CY, X2, Y2);
   { Flood fill at midpoint of sector }
   HalfAngle := (EA - SA) / 2.0 + SA;
   R := HalfAngle * Pi / 180.0;
-  FX := Round(Rad * Cos(R) / 2.0 + CX);
-  FY := Round(Rad * (-Sin(R)) / 2.0 + CY);
+  FX := Round(XRad * Cos(R) / 2.0 + CX);
+  FY := Round(YRad * (-Sin(R)) / 2.0 + CY);
   OldFill := Canvas.FillColor;
   Canvas.FillColor := Canvas.FGColor;
   FloodFill(FX, FY, Canvas.FGColor);

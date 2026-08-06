@@ -37,7 +37,7 @@ mystic_rip/              RIPscrip engines + converters
   ripscrip-irc-whitepaper.htm  Our RIP implementation whitepaper
 mystic_spell/            Hunspell spell check binding + SETUP.md
 mystic_crypt/            CryptLib SSH/TLS example
-mystic_sdl/              SDL2 graphical terminal
+mdl/                     Mystic Door Library (includes SDL2 units)
 mystic_modem/            Modem/FOSSIL front-end
 mystic_mailer/           BINKP/FidoNet mailer
 mystic_misdos/           DOS MIS
@@ -139,7 +139,7 @@ git clone https://github.com/verta1878/fpc264irc
 | i386-go32v2 (DOS) | ✅ Cross-compiled |
 | i386-os2 | ✅ EMX |
 | i386-darwin | ✅ Needs clang + SDK |
-| x86_64-freebsd | ✅ Source ready, needs cross-compiler RTL |
+| x86_64-freebsd | ✅ Cross-compiled (fpc264irc) |
 
 ## License
 

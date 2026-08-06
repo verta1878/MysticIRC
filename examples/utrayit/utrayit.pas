@@ -141,6 +141,7 @@ var
 procedure HelperAddIcon; forward;
 
 function HelperWndProc(h: HWND; msg: UINT; wp: WPARAM; lp: LPARAM): LRESULT; stdcall;
+{ wp unused — callback signature required by Windows }
 var
   nid: TNID;
 begin
@@ -162,7 +163,7 @@ begin
     WM_DESTROY:
       begin
         FillChar(nid, SizeOf(nid), 0);
-        nid.cbSize := SizeOf(nid);
+        nid.cbSize := SizeOf(TNID);  { explicit type, not variable }
         nid.hWnd   := h;
         nid.uID    := 1;
         Shell_NotifyIconW(NIM_DELETE, nid);   { never leave a stuck icon }
@@ -179,15 +180,16 @@ var
   cw: HWND;
 begin
   { Try embedded resource first (MAINICON from mystic.res) }
-  Result := LoadIcon(GetModuleHandleW(nil), 'MAINICON');
+  Result := LoadIcon(GetModuleHandleW(nil), PChar('MAINICON'));
   if Result <> 0 then Exit;
   
   { Fall back to console window class icon }
   cw := XGetConsoleWindow;
   if cw <> 0 then
   begin
-    Result := HICON(GetClassLongW(cw, GCL_HICONSM));
-    if Result = 0 then Result := HICON(GetClassLongW(cw, GCL_HICON));
+    { Bug fix: proper cast for 64-bit safety (backported from C) }
+    Result := HICON(PtrInt(GetClassLongW(cw, GCL_HICONSM)));
+    if Result = 0 then Result := HICON(PtrInt(GetClassLongW(cw, GCL_HICON)));
   end;
   if Result = 0 then Result := LoadIcon(0, IDI_APPLICATION);
 end;
@@ -199,14 +201,14 @@ var
 begin
   if gHelperWnd = 0 then Exit;
   FillChar(nid, SizeOf(nid), 0);
-  nid.cbSize := SizeOf(nid);
+  nid.cbSize := SizeOf(TNID);  { explicit type, not variable }
   nid.hWnd   := gHelperWnd;
   nid.uID    := 1;
   nid.uFlags := NIF_MESSAGE or NIF_ICON or NIF_TIP;
   nid.uCallbackMessage := WM_TRAYCB;
   nid.hIcon  := ConsoleIcon;
   n := Length(gTipW);
-  if n > 127 then n := 127;
+  if n > High(nid.szTip) then n := High(nid.szTip);
   if n > 0 then Move(gTipW[1], nid.szTip[0], n * SizeOf(WideChar));
   nid.szTip[n] := #0;
   if not Shell_NotifyIconW(NIM_ADD, nid) then
@@ -255,9 +257,14 @@ begin
   { icon was clicked -> bring the console back ourselves }
   if gClicked then
   begin
-    ShowWindow(XGetConsoleWindow, SW_SHOW);
-    ShowWindow(XGetConsoleWindow, SW_RESTORE);
-    SetForegroundWindow(XGetConsoleWindow);
+    { Bug fix: check console window handle before use — console may
+      have been destroyed between hide and click (backported from C) }
+    if XGetConsoleWindow <> 0 then
+    begin
+      ShowWindow(XGetConsoleWindow, SW_SHOW);
+      ShowWindow(XGetConsoleWindow, SW_RESTORE);
+      SetForegroundWindow(XGetConsoleWindow);
+    end;
   end;
 end;
 
@@ -305,7 +312,10 @@ begin
   cw := XGetConsoleWindow;
   if cw = 0 then Exit;
 
-  gTipW    := WideString(ATip);
+  if ATip = '' then
+    gTipW := WideString('Console')
+  else
+    gTipW := WideString(ATip);
   gClicked := False;
   gThread  := CreateThread(nil, 0, @HelperThread, nil, 0, gThreadId);
   if gThread = 0 then Exit;
@@ -340,7 +350,7 @@ end;
 
 { ========================================================================= }
 {$ELSE}
-{$IFDEF UNIX}
+{$IFDEF UNIX}  { includes Linux, FreeBSD, macOS/Darwin }
 { ========================================================================= }
 uses
   BaseUnix, termio;
@@ -357,6 +367,7 @@ begin
   fd := FpOpen('/dev/tty', O_WRONLY);
   if fd >= 0 then
   begin
+    { Length(s) is O(1) in Pascal — no double-scan issue }
     Result := FpWrite(fd, s[1], Length(s)) = Length(s);
     FpClose(fd);
   end
