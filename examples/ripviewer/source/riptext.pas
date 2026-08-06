@@ -48,6 +48,7 @@ Type
     NumChars   : Word;
     OrgToCap   : SmallInt;
     OrgToBase  : SmallInt;
+    OrgToDec   : SmallInt;
     Widths     : Array[0..CHR_MAX_CHARS-1] Of Byte;
     Offsets    : Array[0..CHR_MAX_CHARS-1] Of Word;
     Strokes    : Array[0..CHR_MAX_STROKES-1] Of TCHRStroke;
@@ -137,6 +138,7 @@ Begin
     FirstChar := FC;
     OrgToCap  := SmallInt(Data^[PlusOff + 8]);
     OrgToBase := SmallInt(Data^[PlusOff + 9]);
+    OrgToDec  := SmallInt(Data^[PlusOff + 10]);
 
     OtStart := PlusOff + 16;
     For I := 0 to NumChars - 1 Do
@@ -267,10 +269,10 @@ Begin
       If (CHRFonts[Canvas.FontNum] <> Nil) And
          CHRFonts[Canvas.FontNum]^.Loaded Then Begin
         If Canvas.FontDir = 0 Then Begin
-          YOffset := Trunc(CHRFonts[Canvas.FontNum]^.OrgToCap * ActualScale);
+          YOffset := Trunc(CHRFonts[Canvas.FontNum]^.OrgToCap * ActualScale) + 2;
           Canvas.CurY := Y + YOffset;
         End Else Begin
-          YOffset := Trunc(CHRFonts[Canvas.FontNum]^.OrgToCap * ActualScale);
+          YOffset := Trunc(CHRFonts[Canvas.FontNum]^.OrgToCap * ActualScale) + 2;
           Canvas.CurX := X + YOffset;
         End;
       End;

@@ -36,7 +36,7 @@ Uses
   SysUtils,
   rip_Canvas,
   rip_Surface,
-  sdl_Bind;
+  m_sdl_bind;
 
 Type
   TRegionClickEvent = Procedure (Const SendText: AnsiString) of Object;

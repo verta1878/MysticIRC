@@ -267,34 +267,30 @@ End;
 
 // Bresenham line
 Procedure TRipSurface.RawLine (X0, Y0, X1, Y1: Integer; Const C: TRipRGB);
+{ JS-matched Bresenham (den/num/numadd) — backport from ripviewer. }
 Var
-  DX, DY, SX, SY : Integer;
-  Err, E2        : Integer;
+  DX, DY, XI1, XI2, YI1, YI2: Integer;
+  Den, Num, NumAdd, NumPixels: Integer;
+  X, Y, I: Integer;
 Begin
-  DX := Abs(X1 - X0);
-  DY := -Abs(Y1 - Y0);
-
-  If X0 < X1 Then SX := 1 Else SX := -1;
-  If Y0 < Y1 Then SY := 1 Else SY := -1;
-
-  Err := DX + DY;
-
-  While True Do Begin
-    PutPixel (X0, Y0, C);
-
-    If (X0 = X1) And (Y0 = Y1) Then Break;
-
-    E2 := 2 * Err;
-
-    If E2 >= DY Then Begin
-      Err := Err + DY;
-      X0  := X0 + SX;
-    End;
-
-    If E2 <= DX Then Begin
-      Err := Err + DX;
-      Y0  := Y0 + SY;
-    End;
+  DX := Abs(X1 - X0); DY := Abs(Y1 - Y0);
+  If X1 >= X0 Then Begin XI1 := 1; XI2 := 1; End
+  Else Begin XI1 := -1; XI2 := -1; End;
+  If Y1 >= Y0 Then Begin YI1 := 1; YI2 := 1; End
+  Else Begin YI1 := -1; YI2 := -1; End;
+  If DX >= DY Then Begin
+    XI1 := 0; YI2 := 0;
+    Den := DX; Num := DX Shr 1; NumAdd := DY; NumPixels := DX;
+  End Else Begin
+    XI2 := 0; YI1 := 0;
+    Den := DY; Num := DY Shr 1; NumAdd := DX; NumPixels := DY;
+  End;
+  X := X0; Y := Y0;
+  For I := 0 to NumPixels Do Begin
+    PutPixel(X, Y, C);
+    Inc(Num, NumAdd);
+    If Num >= Den Then Begin Dec(Num, Den); Inc(X, XI1); Inc(Y, YI1); End;
+    Inc(X, XI2); Inc(Y, YI2);
   End;
 End;
 
@@ -406,63 +402,73 @@ End;
 
 // flood fill to a border color (explicit stack, no recursion)
 Procedure TRipSurface.FloodFill (X, Y: Integer; Border: TRipColor);
+{ Scanline flood fill with visited buffer — backport from ripviewer. }
 Type
-  TPt = Record
-    PX, PY : Integer;
-  End;
+  TPt = Record PX, PY: Integer; End;
+  TVisArr = Array[0..639, 0..349] Of Boolean;
+  PVisArr = ^TVisArr;
 Var
-  Stack       : Array of TPt;
-  SP          : Integer;
-  Bord, FillC : TRipRGB;
-  CX, CY      : Integer;
-  Cur         : TRipRGB;
+  Stack: Array[0..65535] Of TPt;
+  Visited: PVisArr;
+  SP, X1, X2, SX: Integer;
+  SpanUp, SpanDn: Boolean;
+  Bord, FillC, BgC: TRipRGB;
 
-  Procedure Push (PX, PY: Integer);
-  Begin
-    If (PX < 0) Or (PX >= FW) Or (PY < 0) Or (PY >= FH) Then Exit;
-
-    If Length(Stack) <= SP Then
-      SetLength (Stack, (SP + 1) * 2);
-
-    Stack[SP].PX := PX;
-    Stack[SP].PY := PY;
-
-    Inc (SP);
-  End;
-
-  Function Same (Const A, B: TRipRGB) : Boolean;
-  Begin
-    Result := (A.R = B.R) And (A.G = B.G) And (A.B = B.B);
-  End;
+  Function Same(Const A, B: TRipRGB): Boolean; Inline;
+  Begin Result := (A.R = B.R) And (A.G = B.G) And (A.B = B.B); End;
 
 Begin
+  If (X < 0) Or (X >= FW) Or (Y < 0) Or (Y >= FH) Then Exit;
   Bord  := RIP_EGA_PALETTE[Border And 15];
   FillC := RIP_EGA_PALETTE[FFill];
+  BgC   := RIP_EGA_PALETTE[FBG];
+  If Same(GetPixel(X, Y), Bord) Then Exit;
+
+  New(Visited);
+  FillChar(Visited^, SizeOf(TVisArr), 0);
 
   SP := 0;
-  SetLength (Stack, 1024);
-
-  Push (X, Y);
+  Stack[SP].PX := X; Stack[SP].PY := Y; Inc(SP);
 
   While SP > 0 Do Begin
-    Dec (SP);
+    Dec(SP); X := Stack[SP].PX; Y := Stack[SP].PY;
+    X1 := X;
+    While (X1 >= 0) And (Not Same(GetPixel(X1, Y), Bord)) Do Dec(X1);
+    Inc(X1);
+    X2 := X + 1;
+    While (X2 < FW) And (Not Same(GetPixel(X2, Y), Bord)) Do Inc(X2);
+    Dec(X2);
 
-    CX := Stack[SP].PX;
-    CY := Stack[SP].PY;
+    SpanUp := False; SpanDn := False;
+    For SX := X1 to X2 Do Begin
+      { Draw fill pixel with pattern bgcolor support }
+      If FFillStyle <= 1 Then
+        PutPixel(SX, Y, FillC)
+      Else If FFillStyle <= 12 Then Begin
+        If (FFillPat[Y And 7] Shr (7 - (SX And 7))) And 1 = 1 Then
+          PutPixel(SX, Y, FillC)
+        Else
+          PutPixel(SX, Y, BgC);
+      End;
+      Visited^[SX, Y] := True;
 
-    Cur := GetPixel(CX, CY);
-
-    If Same(Cur, Bord) Or Same(Cur, FillC) Then Continue;
-
-    PutPixel (CX, CY, FillC);
-
-    Push (CX + 1, CY);
-    Push (CX - 1, CY);
-    Push (CX, CY + 1);
-    Push (CX, CY - 1);
+      If (SX <= 0) Or (SX >= FW - 1) Then Continue;
+      If (Not SpanUp) And (Y > 0) And
+         (Not Same(GetPixel(SX, Y-1), Bord)) And (Not Visited^[SX, Y-1]) Then Begin
+        If SP < 65535 Then Begin Stack[SP].PX := SX; Stack[SP].PY := Y-1; Inc(SP); End;
+        SpanUp := True;
+      End Else If SpanUp And (Y > 0) And Same(GetPixel(SX, Y-1), Bord) Then
+        SpanUp := False;
+      If (Not SpanDn) And (Y < FH-1) And
+         (Not Same(GetPixel(SX, Y+1), Bord)) And (Not Visited^[SX, Y+1]) Then Begin
+        If SP < 65535 Then Begin Stack[SP].PX := SX; Stack[SP].PY := Y+1; Inc(SP); End;
+        SpanDn := True;
+      End Else If SpanDn And (Y < FH-1) And Same(GetPixel(SX, Y+1), Bord) Then
+        SpanDn := False;
+    End;
   End;
+  Dispose(Visited);
 End;
-
 Procedure TRipSurface.DrawChar (X, Y: Integer; Ch: Char; Const C: TRipRGB);
 Var
   Row, Col : Integer;
@@ -563,18 +569,22 @@ Begin
 End;
 
 Procedure TRipSurface.Bezier (X1, Y1, X2, Y2, X3, Y3, X4, Y4, Count: Integer);
-Var I: Integer; T, T2, T3, MT, MT2, MT3: Double; PX, PY, LX, LY: Integer;
+{ Bezier matched to JS: Floor() not Round(), explicit endpoint. Backport. }
+Var T, T1, Step: Double; PX, PY, LX, LY: Integer;
 Begin
   If Count < 2 Then Count := 20;
   LX := X1; LY := Y1;
-  For I := 1 to Count Do Begin
-    T := I / Count; T2 := T*T; T3 := T2*T;
-    MT := 1-T; MT2 := MT*MT; MT3 := MT2*MT;
-    PX := Round(MT3*X1 + 3*MT2*T*X2 + 3*MT*T2*X3 + T3*X4);
-    PY := Round(MT3*Y1 + 3*MT2*T*Y2 + 3*MT*T2*Y3 + T3*Y4);
+  Step := 1.0 / Count;
+  T := Step;
+  While T < 1.0 Do Begin
+    T1 := 1.0 - T;
+    PX := Floor(T1*T1*T1*X1 + 3*T*T1*T1*X2 + 3*T*T*T1*X3 + T*T*T*X4);
+    PY := Floor(T1*T1*T1*Y1 + 3*T*T1*T1*Y2 + 3*T*T*T1*Y3 + T*T*T*Y4);
     RawLine(LX, LY, PX, PY, RIP_EGA_PALETTE[FDraw]);
     LX := PX; LY := PY;
+    T := T + Step;
   End;
+  RawLine(LX, LY, X4, Y4, RIP_EGA_PALETTE[FDraw]);
 End;
 
 Procedure TRipSurface.Polygon (Var Points; NumPoints: Integer);

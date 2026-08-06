@@ -23,7 +23,7 @@ Program sdl_demo;
 
 Uses
   SysUtils, Classes,
-  sdl_Bind, sdl_DosScreen;
+  m_sdl_bind, m_sdl_dosscreen;
 
 Var
   Scr     : TDosScreen;
@@ -65,7 +65,7 @@ Begin
   WriteLn('----------------------------------------');
 
   AnsFile := '../mystic_modem/WFCSCRN.ANS';
-  FntFile := 'VGA8X16.FNT';
+  FntFile := 'sdl_vga8x16.fnt';
   If ParamCount >= 1 Then AnsFile := ParamStr(1);
   If ParamCount >= 2 Then FntFile := ParamStr(2);
 

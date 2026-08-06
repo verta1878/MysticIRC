@@ -2535,7 +2535,6 @@ Begin
 End;
 
 Procedure TRIPEngine.DrawButton (X0, Y0, X1, Y1: SmallInt; Label_, HostCmd: String);
-{ Button with bevel OUTSIDE coords. SUNKEN bit 15, CHISEL bit 3. Backport. }
 Var
   SaveColor : Byte;
   Bev, I    : Integer;
@@ -2544,53 +2543,42 @@ Begin
   Bev := BtnStyle.BevelSize;
   If Bev < 1 Then Bev := 1;
 
+  // Draw button surface
   DrawColor := BtnStyle.Surface;
   DrawBar(X0, Y0, X1, Y1);
 
-  If (BtnStyle.Flags And 512) <> 0 Then Begin
-    If (BtnStyle.Flags And 32768) <> 0 Then Begin
-      DrawColor := BtnStyle.Dark;
-      For I := 1 to Bev Do Begin
-        DrawLine(X0 - I, Y0 - I + 1, X1 + I, Y0 - I + 1);
-        DrawLine(X0 - I, Y0 - I + 1, X0 - I, Y1 + I);
-      End;
-      DrawColor := BtnStyle.BRight;
-      For I := 1 to Bev Do Begin
-        DrawLine(X0 - I, Y1 + I, X1 + I, Y1 + I);
-        DrawLine(X1 + I, Y0 - I + 1, X1 + I, Y1 + I);
-      End;
-    End Else Begin
-      DrawColor := BtnStyle.BRight;
-      For I := 1 to Bev Do Begin
-        DrawLine(X0 - I, Y0 - I + 1, X1 + I, Y0 - I + 1);
-        DrawLine(X0 - I, Y0 - I + 1, X0 - I, Y1 + I);
-      End;
-      DrawColor := BtnStyle.Dark;
-      For I := 1 to Bev Do Begin
-        DrawLine(X0 - I, Y1 + I, X1 + I, Y1 + I);
-        DrawLine(X1 + I, Y0 - I + 1, X1 + I, Y1 + I);
-      End;
-    End;
-    If (BtnStyle.Flags And 8) <> 0 Then Begin
-      DrawColor := BtnStyle.Dark;
-      DrawLine(X0, Y0, X1, Y0);
-      DrawLine(X0, Y0, X0, Y1);
-      DrawColor := BtnStyle.BRight;
-      DrawLine(X0, Y1, X1, Y1);
-      DrawLine(X1, Y0, X1, Y1);
-    End;
-    DrawPixel(X0 - Bev, Y0 - Bev + 1, BtnStyle.CornerCol);
-    DrawPixel(X1 + Bev, Y0 - Bev + 1, BtnStyle.CornerCol);
-    DrawPixel(X0 - Bev, Y1 + Bev, BtnStyle.CornerCol);
-    DrawPixel(X1 + Bev, Y1 + Bev, BtnStyle.CornerCol);
+  // Draw bevel highlight (top-left), BevelSize pixels thick
+  DrawColor := BtnStyle.BRight;
+  For I := 0 to Bev - 1 Do Begin
+    DrawLine(X0 + I, Y0 + I, X1 - I, Y0 + I);   // top edge
+    DrawLine(X0 + I, Y0 + I, X0 + I, Y1 - I);   // left edge
   End;
 
+  // Draw bevel shadow (bottom-right), BevelSize pixels thick
+  DrawColor := BtnStyle.DDark;
+  For I := 0 to Bev - 1 Do Begin
+    DrawLine(X0 + I, Y1 - I, X1 - I, Y1 - I);   // bottom edge
+    DrawLine(X1 - I, Y0 + I, X1 - I, Y1 - I);   // right edge
+  End;
+
+  // Draw corner pixels
+  If BtnStyle.CornerCol < 16 Then Begin
+    DrawColor := BtnStyle.CornerCol;
+    DrawPixel(X0, Y0, BtnStyle.CornerCol);
+    DrawPixel(X1, Y0, BtnStyle.CornerCol);
+    DrawPixel(X0, Y1, BtnStyle.CornerCol);
+    DrawPixel(X1, Y1, BtnStyle.CornerCol);
+  End;
+
+  // Draw label centered (uses CHR font if loaded)
   DrawColor := BtnStyle.DFore;
   OutTextXY(X0 + (X1 - X0 - Length(Label_) * GetSysFontW) div 2,
             Y0 + (Y1 - Y0 - GetSysFontH) div 2,
             Label_);
 
   DrawColor := SaveColor;
+
+  // Register mouse field
   AddMouseField(X0, Y0, X1, Y1, HostCmd, Label_);
 End;
 

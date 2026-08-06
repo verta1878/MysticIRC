@@ -121,6 +121,8 @@ Var
   PolyPts : Array[0..1023] Of Integer;
   CmdPos  : Integer;
   DbgStr  : String;
+  IconName : String;
+  SX      : Integer;
   { Icon loading variables }
   IconFile : File;
   IconBuf  : Array[0..65535] Of Byte;
@@ -568,8 +570,8 @@ Begin
                 If (IconW > 0) And (IconW <= 640) And (IconH > 0) And (IconH <= 350) Then Begin
                   { Decode 4 bit-planes per scanline }
                   IconBW := (IconW + 7) Div 8;  { bytes per plane per row }
-                  For Y2 := 0 to IconH - 1 Do Begin
-                    IconOfs := 4 + Y2 * IconBW * 4;  { offset in file }
+                  For R := 0 to IconH - 1 Do Begin
+                    IconOfs := 4 + R * IconBW * 4;  { offset in file }
                     For X2 := 0 to IconBW - 1 Do Begin
                       { Read 4 bit-plane bytes for this 8-pixel column }
                       If IconOfs + X2 + IconBW * 3 < IconSize Then Begin
@@ -584,7 +586,7 @@ Begin
                           BP3 := BP3 Shr 1; BP2 := BP2 Shr 1;
                           BP1 := BP1 Shr 1; BP0 := BP0 Shr 1;
                           If X2 * 8 + I < IconW Then
-                            PutPixel(X1 + X2 * 8 + I, Y1 + Y2, NPts And 15);
+                            PutPixel(X1 + X2 * 8 + I, Y1 + R, NPts And 15);
                         End;
                       End;
                     End;
@@ -626,13 +628,22 @@ Begin
         X2 := DecodeMega2(Line, Pos + 4);
         Y2 := DecodeMega2(Line, Pos + 6);
         Inc(Pos, 14); { skip coords(8) + hotkey(2) + flags(2) + res(2) }
-        { Extract label text: format is ICON<>LABEL<>HOSTCMD }
+        { Extract icon + label: format is ICON<>LABEL<>HOSTCMD
+          or ICON<>HOTICON<>LABEL<>HOSTCMD
+          First segment before <> is the icon filename (if any).
+          Platform note: DOS uses .ICN files directly, JS loads as PNG. }
         DbgStr := Copy(Line, Pos, Length(Line) - Pos + 1);
+        { Stop at | delimiter }
+        I := System.Pos('|', DbgStr);
+        If I > 0 Then DbgStr := Copy(DbgStr, 1, I - 1);
+        { Parse <> delimited fields }
+        IconName := '';
         I := System.Pos('<>', DbgStr);
         If I > 0 Then Begin
+          IconName := Copy(DbgStr, 1, I - 1);  { first field = icon filename }
           Delete(DbgStr, 1, I + 1);
           I := System.Pos('<>', DbgStr);
-          If I > 0 Then DbgStr := Copy(DbgStr, 1, I - 1);
+          If I > 0 Then DbgStr := Copy(DbgStr, 1, I - 1);  { label }
         End;
         { Use ButtonStyle colors if set, else defaults }
         C := Canvas.FillColor;
@@ -683,6 +694,52 @@ Begin
           End;
           { Text positioned based on Orient:
             0=above button, 1=left, 2=center(inside), 3=right, 4=below }
+          { Render icon on button surface if icon filename specified }
+          If (Length(IconName) > 0) And (System.Pos('.', IconName) > 0) Then Begin
+            { Try to load and render the icon centered on button surface }
+            If FileExists('icons' + DirectorySeparator + IconName) Then
+              IconName := 'icons' + DirectorySeparator + IconName;
+            If FileExists(IconName) Then Begin
+              Assign(IconFile, IconName);
+              {$I-} System.Reset(IconFile, 1); {$I+}
+              If IOResult = 0 Then Begin
+                IconSize := FileSize(IconFile);
+                If IconSize <= SizeOf(IconBuf) Then Begin
+                  BlockRead(IconFile, IconBuf, IconSize);
+                  Close(IconFile);
+                  IconW := (IconBuf[1] Shl 8 Or IconBuf[0]) + 1;
+                  IconH := (IconBuf[3] Shl 8 Or IconBuf[2]) + 1;
+                  If (IconW > 0) And (IconW <= 640) And (IconH > 0) And (IconH <= 350) Then Begin
+                    IconBW := (IconW + 7) Div 8;
+                    { Center icon on button surface — use saved button coords }
+                    { NPts = icon X start, IconOfs reused for icon Y start }
+                    NPts := X1 + ((X2 - X1 - IconW) Div 2);
+                    IconSize := Y1 + ((Y2 - Y1 - IconH) Div 2); { reuse as iconY }
+                    For R := 0 to IconH - 1 Do Begin
+                      IconOfs := 4 + R * IconBW * 4;
+                      For C := 0 to IconBW - 1 Do Begin
+                        If IconOfs + C + IconBW * 3 < LongInt(SizeOf(IconBuf)) Then Begin
+                          BP3 := IconBuf[IconOfs + C];
+                          BP2 := IconBuf[IconOfs + C + IconBW];
+                          BP1 := IconBuf[IconOfs + C + IconBW * 2];
+                          BP0 := IconBuf[IconOfs + C + IconBW * 3];
+                          For I := 7 DownTo 0 Do Begin
+                            SX := ((BP3 And 1) Shl 3) Or ((BP2 And 1) Shl 2) Or
+                                  ((BP1 And 1) Shl 1) Or (BP0 And 1);
+                            BP3 := BP3 Shr 1; BP2 := BP2 Shr 1;
+                            BP1 := BP1 Shr 1; BP0 := BP0 Shr 1;
+                            If C * 8 + I < IconW Then
+                              PutPixel(NPts + C * 8 + I, IconSize + R, SX And 15);
+                          End;
+                        End;
+                      End;
+                    End;
+                  End;
+                End Else
+                  Close(IconFile);
+              End;
+            End;
+          End;
           If Length(DbgStr) > 0 Then Begin
             Canvas.FG := BtnStyle.DFore;
             Case BtnStyle.Orient Of

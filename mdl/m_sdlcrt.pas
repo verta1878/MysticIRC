@@ -56,8 +56,8 @@ Goals:
 Interface
 
 Uses
-  SDL,
-  SDL_TTF;
+  m_sdl,
+  m_sdl_ttf;
 
 Const
   keyENTER             = #13;
