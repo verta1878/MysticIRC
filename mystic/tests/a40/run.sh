@@ -7,16 +7,20 @@
 #  compile clean.
 #
 #  Usage:
-#    ./tests/a40/run.sh
-#    FPC=/path/to/ppc386 ./tests/a40/run.sh
+#    ./mystic/tests/a40/run.sh
+#    FPC=/path/to/ppc386 ./mystic/tests/a40/run.sh
+#    FPC=<fpc264irc>/bin/ppc386 FPCROOT=<fpc264irc> ./mystic/tests/a40/run.sh
 #
-#  The compiler defaults to `ppc386` on PATH.  The 2.6.4irc compiler in
-#  Default compiler: libs/fpc264irc.tar.gz r3 (unpack, point FPC= at bin/ppc386).
+#  The compiler defaults to `ppc386` on PATH.  Set FPCROOT to a fpc264irc
+#  checkout to use its bundled cross tools and units (as build-linux.sh does).
 # ==========================================================================
 set -u
-ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# TDIR from $0 so the suite can be relocated; ROOT is three levels up
+# (mystic/tests/a40 -> repo root).
+TDIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT="$(cd "$TDIR/../../.." && pwd)"
 FPC="${FPC:-ppc386}"
-TDIR="$ROOT/tests/a40"
+FPCROOT="${FPCROOT:-}"
 OUT="$(mktemp -d)"
 PASS=0; FAIL=0
 
@@ -26,7 +30,10 @@ no(){  echo "  FAIL: $*"; FAIL=$((FAIL+1)); }
 
 command -v "$FPC" >/dev/null 2>&1 || { echo "no compiler: $FPC (set FPC=)"; exit 2; }
 
-CMN="-Tlinux -Mdelphi -Fu$ROOT/mdl -Fu$ROOT/mystic -Fi$ROOT/mdl -Fi$ROOT/mystic -FE$OUT"
+CMN="-Tlinux -Mdelphi -Fu$ROOT/mdl -Fu$ROOT/mystic -Fi$ROOT/mdl -Fi$ROOT/mystic"
+CMN="$CMN -Fl/usr/lib/i386-linux-gnu -FU$OUT -FE$OUT"
+# Match build-linux.sh: the fork compiler needs its own tools and unit paths.
+[ -n "$FPCROOT" ] && CMN="$CMN -FD$FPCROOT/bin/tools/i386-linux -Fu$FPCROOT/bin/units/i386-linux"
 
 # 1. anchor check (compiles + runs)
 hdr "1. record anchors (SizeOf must be unchanged)"

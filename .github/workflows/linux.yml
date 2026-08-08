@@ -1,0 +1,90 @@
+name: linux
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: linux-i386
+    runs-on: ubuntu-24.04
+    env:
+      # fpc264irc publishes no releases and no tags, so the compiler can only be
+      # pinned by commit. Bump this deliberately; tracking main would let the
+      # compiler move under CI between runs.
+      FPC_REPO: https://github.com/verta1878/fpc264irc
+      FPC_REF: 670c542e1be9d3d279b08dccd7b0c8f1b29e4e31
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Every target is 32-bit, so linking needs i386 libc even on an x86_64
+      # runner. build-linux.sh pre-flights this and exits 1 without it.
+      - name: Install i386 multilib
+        run: |
+          set -euo pipefail
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libc6-dev:i386
+
+      - name: Cache fpc264irc
+        id: fpc-cache
+        uses: actions/cache@v6
+        with:
+          path: ${{ runner.temp }}/fpc264irc
+          key: fpc264irc-${{ env.FPC_REF }}
+
+      # ~270 MB of prebuilt compiler: bin/ppc386 plus bin/tools and bin/units
+      # for each target. Nothing is bootstrapped, so a shallow fetch of the one
+      # pinned commit is enough.
+      - name: Fetch fpc264irc
+        if: steps.fpc-cache.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/fpc264irc"
+          cd "$RUNNER_TEMP/fpc264irc"
+          git init -q
+          git remote add origin "$FPC_REPO"
+          git fetch -q --depth 1 origin "$FPC_REF"
+          git checkout -q FETCH_HEAD
+
+      - name: Build all Linux targets
+        run: |
+          set -euo pipefail
+          chmod +x "$RUNNER_TEMP/fpc264irc/bin/ppc386"
+          # Invoked via bash, not ./build-linux.sh: every .sh in the repo is
+          # committed mode 100644, so the README's ./build-linux.sh exits 126
+          # on a fresh clone.
+          FPCROOT="$RUNNER_TEMP/fpc264irc" \
+          FPC="$RUNNER_TEMP/fpc264irc/bin/ppc386" \
+            bash ./build-linux.sh
+
+      # The on-disk record layouts are frozen: existing installs' .dat files are
+      # read straight into these records, so a size change silently corrupts
+      # live BBS data. This is the gate that matters most in the whole workflow.
+      # Also compiles the A40-touched units and checks the logstamp codes.
+      - name: Record anchors and A40 checks
+        run: |
+          FPC="$RUNNER_TEMP/fpc264irc/bin/ppc386" \
+          FPCROOT="$RUNNER_TEMP/fpc264irc" \
+            bash ./mystic/tests/a40/run.sh
+
+      - name: Test marc archiver
+        run: MARC="$PWD/out-linux/bin/marc" bash ./mystic/tests/marc/run.sh
+
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-logs
+          path: out-linux/*.build.log
+          if-no-files-found: ignore

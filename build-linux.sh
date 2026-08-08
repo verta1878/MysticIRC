@@ -20,7 +20,10 @@ PASS=0; FAIL=0
 # ============================================================
 check_multilib() {
     local missing=""
-    for lib in libc.so libpthread.so libdl.so; do
+    # glibc 2.34 (2021) merged libpthread and libdl into libc, so probing for
+    # libpthread.so/libdl.so rejects every current distro. libc.so alone is the
+    # meaningful test for the i386 development libraries.
+    for lib in libc.so; do
         if ! find /usr/lib/i386-linux-gnu /usr/lib32 /lib/i386-linux-gnu              -name "$lib" 2>/dev/null | grep -q .; then
             missing="$missing $lib"
         fi
@@ -53,7 +56,10 @@ check_multilib
 build () {
     local t="$1" mode="${2:-delphi}"
     local src="mystic/${t}.pas" log="out-linux/${t}.build.log"
-    [ ! -f "$src" ] && { echo "  SKIP  $t (not found)"; return; }
+    # A missing source is a failure, not a skip: the target list below is
+    # fixed, so a silent skip would let the whole build "pass" having produced
+    # nothing.
+    [ ! -f "$src" ] && { echo "  FAIL  $t (source not found)"; FAIL=$((FAIL+1)); return; }
     if [ "$mode" = "objfpc" ]; then
         "$FPC" "${MARCOPTS[@]}" "$src" >"$log" 2>&1
     else
