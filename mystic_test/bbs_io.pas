@@ -43,6 +43,9 @@ Uses
   m_Strings,
   m_Term_Ansi,
   BBS_Records,
+  {$IFDEF EXPERIMENTAL_RIP}
+  BBS_RIP,
+  {$ENDIF}
   BBS_Ansi_Buffer;
 
 Const

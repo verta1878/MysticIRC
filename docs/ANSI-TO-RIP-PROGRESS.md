@@ -143,7 +143,7 @@ The converter produces .rip files but the output doesn't render correctly:
 - Output has spaces and missing content
 - Only ~25 visible rows instead of 120
 
-### chg2rip — planned tool
+### ans2rip — planned tool
 
 Combines ans2png + ans2rip into one tool that:
 - Uses the VGA font ROM for pixel-perfect character analysis
@@ -198,12 +198,12 @@ issue. It was always the palette.
 
 ---
 
-## UPDATE: chg2rip Converter — 86.5% Match (July 24, 2026 session 2)
+## UPDATE: ans2rip Converter — 86.5% Match (July 24, 2026 session 2)
 
-### chg2rip.pas — new pixel-accurate approach
+### ans2rip.pas — new pixel-accurate approach
 
 **Strategy change:** Instead of converting ANSI chars to RIP text commands
-(which was the old ans2rip approach), chg2rip renders the ANSI to a screen
+(which was the old ans2rip approach), ans2rip renders the ANSI to a screen
 buffer (same proven parser as ans2png), then converts each character cell
 to RIP filled bars using the VGA font ROM to determine exact pixel patterns.
 
@@ -256,7 +256,7 @@ No overlap, no draw-order issues.
 | File | Size | Lines |
 |------|------|-------|
 | sd-fluph.ans | 62KB | — |
-| sd-fluph.rip (chg2rip) | 1.9MB | 27K |
+| sd-fluph.rip (ans2rip) | 1.9MB | 27K |
 | sd-fluph.bmp (ans2png) | 3.5MB | — |
 
 The RIP file is large because each character generates multiple bar
@@ -271,7 +271,7 @@ commands (one per font scanline run). Optimization opportunities:
 
 The old ans2rip used `!|S` for color, but `!|S` is actually FillStyle
 in RIPscrip v1.54. The correct color command is `!|c` followed by a
-2-digit mega-number (0-15). Fixed in chg2rip.
+2-digit mega-number (0-15). Fixed in ans2rip.
 
 ### Command Reference Used
 
@@ -288,7 +288,7 @@ in RIPscrip v1.54. The correct color command is `!|c` followed by a
 | File | Lines | Status | Purpose |
 |------|-------|--------|---------|
 | ans2png.pas | ~340 | ✅ 100% | ANSI → BMP (pixel-perfect) |
-| chg2rip.pas | ~350 | 86.5% | ANSI → RIP (draw order bug) |
+| ans2rip.pas | ~350 | 86.5% | ANSI → RIP (draw order bug) |
 | ans2rip.pas | 485 | Superseded | Old approach (per-char conversion) |
 | vgafont.inc | 260 | ✅ | VGA 8x16 CP437 font ROM data |
 | test_ans2rip.pas | ~100 | ✅ 17/17 | Unit tests for old converter |
@@ -303,7 +303,7 @@ compare -metric AE reference.bmp ours.bmp /dev/null
 ./ans2png input.ans output.bmp
 
 # Convert ANSI to RIP (86.5% match)
-./chg2rip input.ans output.rip
+./ans2rip input.ans output.rip
 
 # Verify RIP by rendering with Python and comparing
 # (see session notes for Python RIP renderer)
@@ -316,7 +316,7 @@ compare -metric AE reference.bmp ours.bmp /dev/null
 
 ---
 
-## UPDATE: chg2rip PIXEL PERFECT! (July 24, 2026 session 3)
+## UPDATE: ans2rip PIXEL PERFECT! (July 24, 2026 session 3)
 
 ### 100% pixel match achieved for RIP output
 
@@ -391,7 +391,7 @@ Previous converter used `!|S` for setting color.
 
 | File | Lines | Status | Purpose |
 |------|-------|--------|---------|
-| chg2rip.pas | ~480 | ✅ 100% | ANSI → RIP (pixel-perfect, 80 row cap) |
+| ans2rip.pas | ~480 | ✅ 100% | ANSI → RIP (pixel-perfect, 80 row cap) |
 | ans2png.pas | ~340 | ✅ 100% | ANSI → BMP (pixel-perfect, full art) |
 | vgafont.inc | 260 | ✅ | VGA 8x16 CP437 font ROM data |
 | ripviewer.pas | 132 | ✅ | Pascal RIP viewer (SDL2/BMP) |
@@ -406,7 +406,7 @@ Previous converter used `!|S` for setting color.
    - RIP fill patterns for shade characters (░▒▓)
 3. **CHR font support** — load BGI .CHR vector fonts
 4. **Newer ANSI formats** — extended color, SAUCE font info
-5. **chg2rip.exe** — cross-compile for DOS/Win32
+5. **ans2rip.exe** — cross-compile for DOS/Win32
 
 ---
 
@@ -529,10 +529,10 @@ COORDINATES:
 
 | File | Size | Contents |
 |------|------|----------|
-| chg2rip-v1.0-source.zip | 21KB | Standalone converter source |
+| ans2rip-v1.0-source.zip | 21KB | Standalone converter source |
 | sd-fluph-pd.rip | 1.4MB | PabloDraw-compatible test file |
 
-Build: `fpc -Mdelphi chg2rip.pas` (needs vgafont.inc)
+Build: `fpc -Mdelphi ans2rip.pas` (needs vgafont.inc)
 
 ---
 
@@ -541,7 +541,7 @@ Build: `fpc -Mdelphi chg2rip.pas` (needs vgafont.inc)
 
 ---
 
-## NEXT: chg2rip v2.0 Strategy — Text-First Emission (R1)
+## NEXT: ans2rip v2.0 Strategy — Text-First Emission (R1)
 
 ### The Problem
 
@@ -816,7 +816,7 @@ Carl Gorringe (2020s)  → archived ripterm154 on GitHub
 wrench                 → studied RIPtermJS, ported concepts to Pascal
                        → created ripscript.pas (pre-1.0 RIP API)
 evga                   → built ripscript.pas into full RIP v1-v4 stack
-Kiddo                  → chg2rip converter, ans2png renderer
+Kiddo                  → ans2rip converter, ans2png renderer
 ```
 
 ### RIPtermJS Source Files
@@ -934,7 +934,7 @@ line(x1, y1, x2, y2)          — line drawing
 `bar()` uses the current fill style and fill color (set by `setfillstyle()`).
 `outtextxy()` uses the current drawing color (set by `setcolor()`).
 
-**This confirms our chg2rip approach:**
+**This confirms our ans2rip approach:**
 - `!|S01CC` → `setfillstyle(1, CC)` for solid fill bars
 - `!|cXX` → `setcolor(XX)` for text foreground
 - `!|BXXYYWWHH` → `bar(XX, YY, WW, HH)` for filled rectangles
@@ -1076,7 +1076,7 @@ All other bytes 0-255 are safe, including:
 - Bytes 128-255 — RIPtermJS uses x-user-defined encoding, masks with & 0xFF
 - Space (0x20) — valid within text, just doesn't draw pixels
 
-When `|` or `\` are encountered, chg2rip falls back to per-scanline
+When `|` or `\` are encountered, ans2rip falls back to per-scanline
 pixel bars for that character cell.
 
 ### Version Summary
@@ -1099,7 +1099,7 @@ All versions maintain **100% pixel-perfect** accuracy
 
 ---
 
-## FINAL STATUS: chg2rip v2.3 (July 24, 2026)
+## FINAL STATUS: ans2rip v2.3 (July 24, 2026)
 
 ### Converter
 
@@ -1120,7 +1120,7 @@ All versions maintain **100% pixel-perfect** accuracy
 
 | Tool | Lines | Input | Output | Accuracy |
 |------|-------|-------|--------|----------|
-| chg2rip.pas | ~870 | .ANS | .RIP | 100% pixel-perfect |
+| ans2rip.pas | ~870 | .ANS | .RIP | 100% pixel-perfect |
 | ans2png.pas | ~340 | .ANS | .BMP | 100% pixel-perfect |
 | vgafont.inc | 260 | — | — | VGA 8×16 CP437 ROM |
 
@@ -1131,7 +1131,7 @@ All versions maintain **100% pixel-perfect** accuracy
 | examples/ripterm154/ | RIPterm 1.54 DOS binary, fonts, icons | Carl Gorringe archive |
 | examples/riptermJS/ | JavaScript RIP viewer source (GPLv3) | github.com/cgorringe/RIPtermJS |
 | mystic_rip/v1/ | ripscript.pas — wrench's Pascal RIP v1 API | Based on RIPtermJS study |
-| mystic_rip/ | chg2rip, ans2png, vgafont.inc | Kiddo |
+| mystic_rip/ | ans2rip, ans2png, vgafont.inc | Kiddo |
 
 ### PabloDraw Findings
 
@@ -1140,7 +1140,7 @@ PabloDraw 3.3.14.0 (WinForms) has a bug in its RIP parser:
 `BinaryReader.PeekChar()` which uses `UTF8Encoding`.
 Raw CP437 bytes 128-255 cause `ArgumentException:
 Argument_EncodingConversionOverflowChars`. This is a PD bug,
-not a chg2rip bug — RIPtermJS handles the same bytes correctly.
+not a ans2rip bug — RIPtermJS handles the same bytes correctly.
 
 Dense ANSI block art (sd-fluph.ans = 100% CP437 128+) cannot
 be displayed in PabloDraw as RIP under any approach:
@@ -1154,7 +1154,7 @@ Simple ANSI screens with ASCII text (32-126) work fine in PD.
 - [ ] Multi-page output for ANSI art > 80 rows
 - [ ] CHR font file loading (.CHR BGI vector fonts)
 - [x] Test with RIPtermJS viewer directly — DONE (ripviewer 42/42 pixel-perfect)
-- [x] Cross-compile chg2rip for DOS/Win32 — DONE (fpc264irc)
+- [x] Cross-compile ans2rip for DOS/Win32 — DONE (fpc264irc)
 - [ ] Wire into Mystic BBS for real-time ANSI→RIP conversion
 - [ ] RIP v1 16-color video driver integration (needs evga for display layer)
 
@@ -1164,7 +1164,7 @@ Simple ANSI screens with ASCII text (32-126) work fine in PD.
 Carl Gorringe  — RIPterm 1.54 archive, RIPtermJS (GPLv3)
 wrench         — Studied RIPtermJS, created ripscript.pas
 evga           — Built RIP v1-v4 engine stack, MDL, build system
-Kiddo          — chg2rip converter, ans2png renderer, font/palette discovery
+Kiddo          — ans2rip converter, ans2png renderer, font/palette discovery
 sysop/0        — Project lead, testing, DV archive, direction
 ```
 
@@ -1175,17 +1175,17 @@ sysop/0        — Project lead, testing, DV archive, direction
 
 ---
 
-## FINAL STATUS: chg2rip v2.3 (July 24, 2026)
+## FINAL STATUS: ans2rip v2.3 (July 24, 2026)
 
 ### Deliverables
 
 | Tool | Lines | Status | Output |
 |------|-------|--------|--------|
-| chg2rip.pas | ~880 | ✅ 100% pixel-perfect | .rip (44KB for 62KB ANSI) |
+| ans2rip.pas | ~880 | ✅ 100% pixel-perfect | .rip (44KB for 62KB ANSI) |
 | ans2png.pas | ~340 | ✅ 100% pixel-perfect | .bmp (unlimited rows) |
 | vgafont.inc | 260 | ✅ | VGA 8x16 CP437 font ROM |
 
-### chg2rip v2.3 Final Specs
+### ans2rip v2.3 Final Specs
 
 ```
 Input:   .ANS file (any size, SAUCE auto-stripped)
@@ -1229,7 +1229,7 @@ via x-user-defined encoding masked with & 0xFF.
 examples/ripterm154/   Original RIPterm 1.54 DOS (Carl Gorringe archive)
 examples/riptermJS/    Carl Gorringe's JavaScript RIP viewer (GPLv3)
 docs/ANSI-TO-RIP-PROGRESS.md   This file (33KB+ of documentation)
-mystic_rip/chg2rip.pas         ANSI → RIP converter
+mystic_rip/ans2rip.pas         ANSI → RIP converter
 mystic_rip/ans2png.pas         ANSI → BMP renderer
 mystic_rip/vgafont.inc         VGA font ROM data
 ```
@@ -1240,7 +1240,7 @@ mystic_rip/vgafont.inc         VGA font ROM data
 Carl Gorringe  — RIPtermJS (GPLv3), RIPterm 1.54 archive
 wrench         — Studied RIPtermJS, created ripscript.pas (pre-1.0 API)
 evga           — Built RIP v1-v4 engine stack from ripscript.pas
-Kiddo          — chg2rip converter, ans2png renderer, font/palette discovery
+Kiddo          — ans2rip converter, ans2png renderer, font/palette discovery
 sysop/0        — Project lead, testing, direction
 ```
 

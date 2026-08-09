@@ -24,7 +24,7 @@ uses
   OL_QWK, OL_Config, OL_Packer, OL_Filter, OL_Transfer, OL_Editor;
 
 const
-  VERSION = 'MOLMS 0.1 — Mystic Offline Mail System';
+  VERSION = 'MOLMS 1.0 — Mystic Offline Mail System';
 
   cmBBSConnect   = 200;  cmBBSDisconnect = 201;
   cmDownloadQWK  = 202;  cmUploadREP     = 203;

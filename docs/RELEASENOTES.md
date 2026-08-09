@@ -185,7 +185,7 @@ Version-bumped to 1.10IRC final. No code changes.
 - MDL refactor: pending
 - OS/2 target via fpc264irc EMX linker (working, slow compile)
 
-**ANSI to RIP Converter (chg2rip v2.3):**
+**ANSI to RIP Converter (ans2rip v2.3):**
 - Pixel-perfect ANSI→RIP conversion (100% ImageMagick verified)
 - 44KB output for 62KB ANSI (31x smaller than v1.0 pixel bars)
 - VGA 8x16 font ROM for exact glyph rendering

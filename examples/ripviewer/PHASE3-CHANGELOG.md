@@ -1269,3 +1269,14 @@ No code changes needed. Previous fix attempt was reverted.
 
 ICONS regression from Test Run 34 was fixed: rcLoadIcon PutPixel
 used Y2 (button coord) instead of R (row counter). ICONS back to 1.9%.
+
+## Phase 4 — BBS Integration + Full 213 RIP Test
+
+1. Created bbs_rip.pas — {$IFDEF EXPERIMENTAL_RIP} integration unit
+   for Mystic BBS. Provides RIPSendFile, RIPRenderToBMP, RIPReset,
+   IsRIPFile. Wired into bbs_io.pas Uses clause.
+
+2. BATCH TEST: 213/213 RIP files rendered — ZERO FAILURES.
+   All RIPs from rips/test, rips/set1, rips/set2, rips/set3,
+   rips/jsuite, rips/bugs, rips/v2.0, and mystic_rip/examples
+   rendered to BMP without crashes, hangs, or errors.

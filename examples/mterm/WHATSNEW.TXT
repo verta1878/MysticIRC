@@ -1,0 +1,82 @@
+==============================================================================
+ OpenOLMS - WHAT'S NEW
+==============================================================================
+
+0.5
+  - MOLMS offline mail client: connect to BBS, download QWK via Zmodem,
+    read mail offline, compose replies, upload .REP on next call.
+  - Auto Mail Run: one-key automated mail cycle (connect, login, download,
+    disconnect, reconnect, upload).
+  - BBS address book with auto-login (username, password, door command).
+  - ANSI terminal rendering for color-coded BBS messages (mtterm.pas).
+  - RIPscrip v1.54 graphics engine: 640x350 EGA canvas, Bresenham line,
+    circle, ellipse, arc, flood fill, bar, BMP export (mtripgfx.pas).
+  - Hunspell spell check in reply editor (dynamic loading, optional).
+  - Reply editor: word wrap at column 72, quote prefixing (initials + ">").
+  - OL_Transfer.pas: automated connection, login, door entry, Zmodem
+    download/upload bridge using mterm connection + protocol stack.
+  - Zmodem Int64 fix: removes 2GB file transfer limit.
+  - Ymodem batch, Xmodem 1K/CRC, Kermit sliding window protocols.
+  - Full mterm connection stack: Telnet, Serial/Modem, FOSSIL.
+  - Session capture logging (mtcapture.pas).
+  - GPLv3 license headers on all files with team credits.
+  - Copyright: verta1878, sysop/0, wrench, kiddo, evga.
+  - Mystic protocol code: Copyright James Coyle (g00r00), GPLv3.
+
+0.4
+  - Readable DOS docs: text files now use DOS (CRLF) line endings so they
+    display correctly in DOS/Notepad; README.TXT rewritten in clear sections.
+  - CONFIG.EXE: fixed duplicated field labels / one-row screen shift (caused
+    by a DOS bottom-of-screen scroll).
+  - OLMS.EXE with no switches now prints the command-line options.
+  - Added TODO.TXT, INSTALL.TXT, WHATSNEW.TXT.
+
+0.3
+  - Scans MULTIPLE message areas (JAM and Hudson); set them in CONFIG.EXE.
+  - CONFIG.EXE Message Areas editor (add / edit / delete areas).
+  - Honest archiver reporting (no false "compressed" when PKZIP is missing).
+  - Proper exit codes (0 = ok, 1 = error) for BBS batch files.
+  - Activity logging to OLMS.LOG.
+  - /U processes uploaded <BoardID>.REP reply packets.
+  - Full OLMS command-line switch set; DOS /? help; --version.
+  - BBS identity (system / sysop / board id) read from OLMS.CFG.
+
+0.2
+  - CONFIG.EXE became a real interactive editor (loads / edits / saves
+    OLMS.CFG), replacing an earlier render-only demo.
+  - Archiver now verifies the .QWK was actually produced.
+
+0.1
+  - First release: QWK / QWKE / Blue Wave offline-mail door for DOS.
+    Free Pascal (go32v2), GPLv3.
+==============================================================================
+
+1.0 — Binary Compatibility Release
+  - DROP-IN REPLACEMENT for Peter Rocca's OLMS Version 2000.
+  - All 7 programs: OLMS, CONFIG, EDITOR, MAINTAIN, USERCONF,
+    UPGRADE1, UPGRADE2 — compile and produce correct output.
+  - Binary-compatible packed record types (OL_Compat.pas):
+      OLMS.CFG:      14,889 bytes — SizeOf MATCH
+      USERS.DAT:     30 × 478 bytes — SizeOf MATCH
+      MESSAGES.CTL:  383 × 64 bytes — SizeOf MATCH
+  - ReadTPStr/WriteTPStr: Turbo Pascal ShortString I/O for
+    reading/writing original data files byte-for-byte.
+  - Config round-trip verified: load original, save, 0 diffs.
+  - EDITOR.EXE: full-screen CRT console message editor with
+    spell check, arrow keys, PgUp/PgDn, Ctrl-W save, Ctrl-Q quit.
+  - USERCONF.EXE: archiver/protocol selection, message area
+    toggles (383 areas), reads/writes original USERS.DAT.
+  - UPGRADE1.EXE: upgrades OLMS.CFG + MESSAGES.CTL to v2000,
+    creates index files, backs up originals.
+  - UPGRADE2.EXE: upgrades USERS.DAT to v2000 record layout,
+    auto-detects old record size, creates work directories.
+  - Fixed FPC Lo(200) nibble bug: Lo() on Byte constant returns
+    low nibble (4 bits), not low byte. Use (V and $FF) instead.
+  - OL_Editor: added Lines property, SetLine, DeleteLine,
+    InsertLineAt methods for FPC {$MODE OBJFPC} compatibility.
+  - Integration test: all data files created with correct sizes,
+    version 200 reads back correctly, all fields verified.
+  - Peter Rocca's permission: GPLv3. Clean-room reimplementation.
+  - No original source code used. All record layouts reverse-
+    engineered from published data files and documentation.
+==============================================================================

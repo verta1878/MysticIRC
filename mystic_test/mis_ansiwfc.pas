@@ -2,64 +2,103 @@
 // Mystic BBS Software               Copyright 1997-2013 By James Coyle
 // ====================================================================
 //
-// This file is part of Mystic BBS.
+// MIS 1.12 WFC Screen â€” Tabbed Interface
 //
-// Mystic BBS is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Mystic BBS is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Mystic BBS.  If not, see <http://www.gnu.org/licenses/>.
+// Layout (80x25):
+//   Row 1-5:  ASCII art header + "Press ESCAPE for Menu"
+//   Row 6:    Tab bar (Messages / Connections / Events / Stats)
+//   Row 7-24: Content panel (full width)
+//   Row 25:   (reserved)
 //
 // ====================================================================
 
-Procedure DrawStatusScreen;
 Const
-  IMAGEDATA_WIDTH=80;
-  IMAGEDATA_DEPTH=25;
-  IMAGEDATA_LENGTH=518;
-  IMAGEDATA : array [1..518] of Char = (
-     #1,#23,' ','M','y','s','t','i','c',' ','I','n','t','e','r','n','e',
-    't',' ','S','e','r','v','e','r',#25,#30, #0,'t','e','l','n','e','t',
-    '/','s','m','t','p','/','p','o','p','3','/','f','t','p','/','n','n',
-    't','p',' ',#24, #8,#16,#26,'O','°',#24,'°', #1,'Ú',' ', #7,'C','o',
-    'n','n','e','c','t','i','o','n','s',' ', #1,#26,'%','Ä','¿', #8,'°',
-     #1,'Ú',' ', #7,'S','t','a','t','i','s','t','i','c','s',' ', #1,#26,
-     #9,'Ä','¿', #8,'°',#24,'°', #1,'³',#25,'2','³', #8,'°', #1,'³',#25,
-    #21,'³', #8,'°',#24,'°', #1,'³',#25,'2','³', #8,'°', #1,'³',#25, #5,
-     #7,'P','o','r','t', #8,':',#25,#10, #1,'³', #8,'°',#24,'°', #1,'³',
-    #25,'2','³', #8,'°', #1,'³',#25, #6, #7,'M','a','x', #8,':',#25,#10,
-     #1,'³', #8,'°',#24,'°', #1,'³',#25,'2','³', #8,'°', #1,'³',#25, #3,
-     #7,'A','c','t','i','v','e', #8,':',#25,#10, #1,'³', #8,'°',#24,'°',
-     #1,'³',#25,'2','³', #8,'°', #1,'³',#25, #2, #7,'B','l','o','c','k',
-    'e','d', #8,':',#25,#10, #1,'³', #8,'°',#24,'°', #1,'³',#25,'2','³',
-     #8,'°', #1,'³',#25, #2, #7,'R','e','f','u','s','e','d', #8,':',#25,
-    #10, #1,'³', #8,'°',#24,'°', #1,'³',#25,'2','³', #8,'°', #1,'³',#25,
-     #4, #7,'T','o','t','a','l', #8,':',#25,#10, #1,'³', #8,'°',#24,'°',
-     #1,'³',#25,'2','³', #8,'°', #1,'³',#25,#21,'³', #8,'°',#24,'°', #1,
-    'À',#26,'2','Ä','Ù', #8,'°', #1,'À',#26,#21,'Ä','Ù', #8,'°',#24,#26,
-    'O','°',#24,'°', #1,'Ú',' ', #7,'S','e','r','v','e','r',' ','S','t',
-    'a','t','u','s',' ', #1,#26,'<','Ä','¿', #8,'°',#24,'°', #1,'³',#25,
-    'K','³', #8,'°',#24,'°', #1,'³',#25,'K','³', #8,'°',#24,'°', #1,'³',
-    #25,'K','³', #8,'°',#24,'°', #1,'³',#25,'K','³', #8,'°',#24,'°', #1,
-    '³',#25,'K','³', #8,'°',#24,'°', #1,'³',#25,'K','³', #8,'°',#24,'°',
-     #1,'³',#25,'K','³', #8,'°',#24,'°', #1,'³',#25,'K','³', #8,'°',#24,
-    '°', #1,'À',#26,'K','Ä','Ù', #8,'°',#24,#26,'O','°',#24,#23,' ', #1,
-    'T','A','B','/','S','w','i','t','c','h',' ','W','i','n','d','o','w',
-    #25, #2,' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',#25, #2,'S','P',
-    'A','C','E','/','L','o','c','a','l',#25, #2,'A','L','T','-','K','/',
-    'K','i','l','l',' ','U','s','e','r',#25, #2,'E','S','C','/','S','h',
-    'u','t','d','o','w','n',' ',#24);
+  { Screen layout constants }
+  MIS_HEADER_ROWS  = 5;   { rows 1-5: ASCII art header }
+  MIS_TAB_ROW      = 6;   { row 6: tab bar }
+  MIS_CONTENT_TOP  = 7;   { row 7: first content row }
+  MIS_CONTENT_BOT  = 24;  { row 24: last content row }
+  MIS_CONTENT_ROWS = 18;  { 24 - 7 + 1 }
+
+  { Tab indices }
+  TAB_MESSAGES    = 0;
+  TAB_CONNECTIONS = 1;
+  TAB_EVENTS      = 2;
+  TAB_STATS        = 3;
+  TAB_COUNT        = 4;
+
+  { Color attributes }
+  ATTR_HEADER     = $1B;  { bright cyan on blue }
+  ATTR_HEADER_ART = $19;  { bright blue on blue }
+  ATTR_HEADER_YEL = $1E;  { yellow on blue }
+  ATTR_TAB_NORMAL = $17;  { white on blue }
+  ATTR_TAB_ACTIVE = $1F;  { bright white on blue â€” highlighted }
+  ATTR_TAB_BAR    = $70;  { black on light gray }
+  ATTR_CONTENT    = $07;  { light gray on black }
+  ATTR_CONTENT_HI = $0F;  { bright white on black }
+  ATTR_TIMESTAMP  = $03;  { cyan on black }
+  ATTR_SERVICE    = $0E;  { yellow on black }
+  ATTR_PROMPT     = $1E;  { yellow on blue }
+
+  TabLabels : Array[0..3] of String[16] = (
+    ' Messages ', ' Connections ', ' Events ', ' Stats '
+  );
+
+Procedure DrawHeader;
+{ Draw the ASCII art "MYSTIC" logo in rows 1-5 }
 Begin
-  Console.LoadScreenImage(ImageData, ImageData_Length, ImageData_Width, 1, 1);
+  Console.WriteXY(1, 1, ATTR_HEADER_ART, strPadR('', 80, ' '));
+  Console.WriteXY(1, 2, ATTR_HEADER_ART, strPadR('', 80, ' '));
+  Console.WriteXY(1, 3, ATTR_HEADER_ART, strPadR('', 80, ' '));
+  Console.WriteXY(1, 4, ATTR_HEADER_ART, strPadR('', 80, ' '));
+  Console.WriteXY(1, 5, ATTR_HEADER_ART, strPadR('', 80, ' '));
 
-  //Console.WriteXY (25, 1, 113, strPadC(mysVersionText, 30, ' '));
+  { ASCII art â€” simplified block letters }
+  Console.WriteXY(3, 1, ATTR_HEADER,     '  __  __  _  _  ___  ___  ___  ___');
+  Console.WriteXY(3, 2, ATTR_HEADER,     ' |  \/  || || |/ __||_ _||_ _|/ __|');
+  Console.WriteXY(3, 3, ATTR_HEADER,     ' | |\/| | \_, |\__ \ | |  | || (__ ');
+  Console.WriteXY(3, 4, ATTR_HEADER,     ' |_|  |_|  |_| |___/ |_| |___|\___| ');
 
-  Console.WriteXY (1, 25, 113, strPadC('SPACE/Local TELNET     TAB/Switch     ESC/Shutdown', 79, ' '));
+  Console.WriteXY(55, 4, ATTR_PROMPT,    'Press ESCAPE for Menu');
+End;
+
+Procedure DrawTitleBar(const BBSName: String);
+{ Set console window title to "Mystic Internet Server (BBSName)" }
+Begin
+  Console.WriteXY(3, 5, ATTR_HEADER_YEL,
+    'Mystic Internet Server' + strPadR(' (' + BBSName + ')', 55, ' '));
+End;
+
+Procedure DrawTabBar(ActiveTab: Byte);
+{ Draw the tab bar at row 6 }
+Var
+  X, T: Integer;
+  Attr: Byte;
+Begin
+  Console.WriteXY(1, MIS_TAB_ROW, ATTR_TAB_BAR, strRep(' ', 80));
+  X := 2;
+  For T := 0 to TAB_COUNT - 1 Do Begin
+    If T = ActiveTab Then Attr := ATTR_TAB_ACTIVE
+    Else Attr := ATTR_TAB_NORMAL;
+    Console.WriteXY(X, MIS_TAB_ROW, Attr, TabLabels[T]);
+    Inc(X, Length(TabLabels[T]) + 1);
+  End;
+End;
+
+Procedure ClearContentArea;
+{ Clear rows 7-24 }
+Var Y: Integer;
+Begin
+  For Y := MIS_CONTENT_TOP to MIS_CONTENT_BOT Do
+    Console.WriteXY(1, Y, ATTR_CONTENT, strRep(' ', 80));
+End;
+
+Procedure DrawStatusScreen;
+{ Draw the full 1.12 MIS WFC screen }
+Begin
+  Console.ClearScreen;
+  DrawHeader;
+  DrawTitleBar('');
+  DrawTabBar(TAB_MESSAGES);
+  ClearContentArea;
 End;

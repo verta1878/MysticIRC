@@ -63,4 +63,4 @@ m_crc, m_quicksort, m_inireader, m_bits, m_logroller).
 - The protocol code (Zmodem, BinkP) must stay — custom implementations
 - uforkpty was contributed by fpc264irc maintainer for evga's mis fix
 - utextmouse was for RIPscrip v1 mouse, never wired — retired to attic
-- sdl.pas, sdl_ttf.pas, m_sdlcrt.pas moved to mystic_sdl/
+- m_sdl.pas, m_sdl_ttf.pas, m_sdlcrt.pas moved to mystic_sdl/

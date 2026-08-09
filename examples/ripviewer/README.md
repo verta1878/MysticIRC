@@ -91,7 +91,7 @@ Both compile from the same source file (1602 lines).
 
     Canvas:     640x1280 pixels (80 rows x 16px VGA)
     Font:       VGA 8x16 CP437 ROM (MSB-first, rip_font8x16.inc)
-    Palette:    CGA/ANSI order (1=red 4=blue, matches chg2rip output)
+    Palette:    CGA/ANSI order (1=red 4=blue, matches ans2rip output)
     Output:     24-bit BMP
     Pixel match: 100% against ans2png reference
 
@@ -125,7 +125,7 @@ Both compile from the same source file (1602 lines).
 
     RIPtermJS        github.com/cgorringe/RIPtermJS (BGI.js, ripterm.js)
     RIPscrip v1.54   mystic_rip/v1/ripscript.txt
-    chg2rip v2.3     mystic_rip/chg2rip.pas (ANSI-to-RIP converter)
+    ans2rip v2.3     mystic_rip/ans2rip.pas (ANSI-to-RIP converter)
     ans2png          mystic_rip/ans2png.pas (reference BMP renderer)
 
 ## License

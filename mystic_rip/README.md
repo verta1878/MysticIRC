@@ -1,173 +1,112 @@
-# mystic_rip — RIPscrip v1.54 engine for Mystic BBS
+# Mystic RIP — Utilities & Engines
 
-An optional RIPscrip graphics engine for the Mystic BBS IRC fork.
-Interprets RIPscrip v1.54 commands and renders to a pluggable
-graphics backend. Uses **FPC RTL units only** (no MDL).
+## Standalone Utilities
 
-## Architecture
+### ans2rip.pas (618 lines)
+ANSI art to RIPscrip converter. Reads .ANS files with CP437 characters
+and color attributes, renders each character glyph pixel by pixel using
+the 8x16 VGA font, then emits RIPscrip |B (Bar) commands to reproduce
+the image. Handles run-length merging of adjacent same-color bars to
+minimize output size. Supports up to 80 rows (RIP 2-digit MegaNum limit).
 
-```
-  BBS byte stream
-       │
-  ┌────▼────┐
-  │ TTermRip │  rip_term.pas — parser + command dispatch
-  └────┬────┘
-       │ calls
-  ┌────▼──────┐
-  │ TRipCanvas │  rip_canvas.pas — abstract graphics interface (49 methods)
-  └────┬──────┘
-       │ implemented by
-  ┌────▼───────┐
-  │ TRipSurface │  rip_surface.pas — software 640x350 rasterizer
-  └────┬───────┘
-       │ displayed by
-  ┌────▼───────┐
-  │ TRipWindow  │  rip_window.pas — SDL2 presenter (optional)
-  └────────────┘
+```bash
+fpc -Mdelphi ans2rip.pas && ./ans2rip input.ans output.rip
 ```
 
-TTermRip parallels TTermAnsi exactly: same Create / Process /
-ProcessBuf / SetReplyClient interface, same stream-interpreter role.
+### ans2png.pas (394 lines)
+ANSI art to BMP renderer. Reads .ANS files and renders them to a
+Windows BMP image using the 8x16 VGA font and standard EGA 16-color
+palette. No RIP conversion — direct pixel rendering.
 
-## Commands implemented (51 of 51)
+```bash
+fpc -Mdelphi ans2png.pas && ./ans2png input.ans output.bmp
+```
 
-### Level 0 — drawing primitives
+### ripmake.pas (190 lines)
+RIP file generator — creates simple RIP files programmatically.
+Useful for testing the RIP engines with known-good command sequences.
 
-| Cmd | Name | Fields | Status |
-|-----|------|--------|--------|
-| `c` | Color | color | Done |
-| `W` | WriteMode | mode | Done |
-| `=` | LineStyle | style, pattern | Done |
-| `m` | Move | x, y | Done |
-| `X` | Pixel | x, y | Done |
-| `L` | Line | x0, y0, x1, y1 | Done |
-| `R` | Rectangle | x0, y0, x1, y1 | Done |
-| `B` | Bar (filled) | x0, y0, x1, y1 | Done |
-| `C` | Circle | x, y, radius | Done |
-| `O` | Oval | x, y, xr, yr | Done |
-| `o` | FilledOval | x, y, xr, yr | Done |
-| `F` | FloodFill | x, y, border | Done |
-| `@` | TextXY | x, y, text | Done |
-| `T` | Text | text | Done |
-| `M` | Mouse region | num, x0, y0, x1, y1, params, text | Done |
-| `K` | KillMouse | (none) | Done |
-| `e` | EraseWindow | (none) | Done |
-| `E` | EraseView | (none) | Done |
-| `v` | Viewport | x0, y0, x1, y1 | Done |
-| `w` | TextWindow | x0, y0, x1, y1, wrap | Done |
-| `*` | Reset | (none) | Done |
-| `g` | GotoXY | x, y | Done |
-| `H` | Home | (none) | Done |
-| `>` | EraseEOL | (none) | Done |
-| `Q` | SetPalette | 16 values | Done |
-| `a` | OnePalette | color, ega64 | Done |
-| `Y` | FontStyle | font, dir, size | Done |
-| `A` | Arc | x, y, stAng, endAng, radius | Done |
-| `V` | OvalArc | x, y, stAng, endAng, xr, yr | Done |
-| `I` | PieSlice | x, y, stAng, endAng, radius | Done |
-| `i` | OvalPieSlice | x, y, stAng, endAng, xr, yr | Done |
-| `Z` | Bezier | x1-x4, y1-y4, count | Done |
-| `S` | FillStyle | pattern, color | Done |
-| `s` | FillPattern | 8-byte pattern, color | Done |
-| `#` | NoMore | (none) | Done |
-| `P` | Polygon | points | Done |
-| `p` | FillPolygon | points | Done |
-| `l` | Polyline | points | Done |
+### test_rip_files.pas (131 lines)
+Batch RIP test harness. Loads all .RIP files from a directory, renders
+each through the engine, saves BMPs, and reports success/failure.
 
-### Level 1 — buttons, text blocks, clipboard
+### rip_sample.pas (76 lines)
+Minimal example showing how to use the RIP engine API. Creates a
+simple scene (lines, circles, fills, text) and saves to BMP.
 
-| Cmd | Name | Fields | Status |
-|-----|------|--------|--------|
-| `1B` | ButtonStyle | style params | Done |
-| `1U` | Button | x0, y0, x1, y1, hotkey, flags, text | Done |
-| `1T` | BeginText | x, y, w, h | Done |
-| `1t` | RegionText | justify, text | Done |
-| `1E` | EndText | (none) | Done |
-| `1C` | GetImage | x0, y0, x1, y1 | Done |
-| `1P` | PutImage | x, y, mode | Done |
-| `1W` | WriteIcon | filename | Done |
-| `1I` | LoadIcon | x, y, mode, clip, filename | Done |
-| `1G` | CopyRegion | x0, y0, x1, y1, dx, dy | Done |
-| `1M` | Mouse (L1) | same as level 0 | Done |
-| `1K` | KillMouse (L1) | (none) | Done |
-| `1Q` | Query | (none) → responds RIPSCRIP015400 | Done |
-| `1D` | Define | $ variable | Done |
-| `1R` | ReadScene | filename | Done |
-| `1F` | FileQuery | filename | Done |
+## Support Units
 
-## Tools
+### rip_canvas.pas (157 lines)
+Thin canvas abstraction over TRipSurface. Provides a simplified
+drawing API for utilities that don't need the full v1-v4 engine.
 
-| Tool | Description |
-|------|-------------|
-| `ans2rip` | ANSI-to-RIP converter. PabloDraw-compatible output with base-36 encoding and line wrapping at 70 chars. |
-| `rip_render` | Headless .RIP to BMP renderer. No SDL needed. |
-| `rip_view` | GUI .RIP viewer with SDL2. Clickable mouse regions. |
+### rip_render.pas (119 lines)
+RIP-to-BMP batch renderer. Wraps the engine with file I/O for
+command-line rendering workflows.
 
-## File formats
+### rip_surface.pas (775 lines)
+TRipSurface — canvas/surface split from the v4 engine. Provides
+pixel buffer, drawing primitives, and BMP export independent of
+the command parser. Used by rip_canvas, rip_render, rip_window.
 
-| Extension | Format |
-|-----------|--------|
-| `.rip` | RIPscrip scene — text file, `!|` commands |
-| `.icn` | RIPscrip icon — binary, BGI GetImage format, 24x24 EGA |
-| `.chr` | BGI vector font — binary, Borland stroked font format |
+### rip_term.pas (599 lines)
+Terminal-side RIP integration. Bridges between the terminal emulator's
+data stream and the RIP command parser. Handles RIP detection (!|),
+mode switching, and screen buffer management.
+
+### rip_window.pas (192 lines)
+RIP viewport/window manager. Handles the split between text window
+and graphics viewport as defined by the |w and |v commands.
+
+## Engines (in subdirectories)
+
+| Engine | Location | Lines | Features |
+|--------|----------|-------|----------|
+| v1 | v1/ripscr.pas | 4,123 | Base RIPscrip 1.54 |
+| v2 | v2/rip2api.pas | 5,331 | + 256-color + printers |
+| v3 | v3/rip3api.pas | 8,308 | + RGB24/32 + printers |
+| v4 | v4/rip4api.pas | 8,578 | + native printers |
+
+## v3/v4 Utility Programs
+
+| Utility | Lines | Purpose |
+|---------|-------|---------|
+| ripbind.pas | 338 | Binary scene decoder |
+| ripchnge.pas | 324 | Delta/diff patch decoder |
+| ripdecr.pas | 444 | Stream decoder (incremental) |
+| riplayr.pas | 290 | Layer-based scene decoder |
+| riprndr.pas | 186 | Progressive renderer |
+| riptile.pas | 366 | Tile-based scene decoder |
+
+## v4 Image Decoders
+
+| Decoder | Lines | Format |
+|---------|-------|--------|
+| bmpdec.pas | 186 | Windows BMP/DIB |
+| gifdecr.pas | 510 | GIF (animated) |
+| jpgdecr.pas | 308 | JPEG |
+| pngcodec.pas | 393 | PNG |
+| pcxdec.pas | 179 | ZSoft PCX |
+| tgadec.pas | 185 | Targa TGA |
+| pbmdec.pas | 162 | Netpbm PBM/PGM/PPM |
+| icodec.pas | 182 | Windows ICO/CUR |
+| flidec.pas | 481 | FLI/FLC animation |
 
 ## Build
 
+All utilities compile with Free Pascal 3.2.2+ or fpc264irc:
+
 ```bash
-./build-rip.sh              # Linux x86_64
-./build-rip.sh win32         # Windows cross-compile
+cd mystic_rip
+fpc -Mdelphi -Fu. -Fuv1 -Fu../mdl -Fi../mdl ans2rip.pas
+fpc -Mdelphi -Fu. -Fuv1 -Fu../mdl -Fi../mdl ans2png.pas
 ```
 
-## Content files
+## Code Audit (2026-08-08)
 
-### Display files (text/*.rip)
-
-32 RIPscrip display files for the default Mystic theme. These are the
-RIP equivalents of the standard .ans files. Mystic serves these to RIP
-terminals automatically (CheckFileInPath checks .rip before .ans).
-
-Key files: mainmenu.rip (main menu with buttons), logon.rip, logoff.rip,
-prelogon.rip (matrix), feedback.rip, newuser.rip, teleconf.rip.
-
-### Menu files (menus/*.rip)
-
-5 RIPscrip menu scenes with clickable mouse regions. Each .rip sits
-alongside its .mnu in the menus/ directory. Contains !|1U buttons and
-!|1M mouse regions that send hotkeys to the BBS.
-
-Files: main.rip, matrix.rip, email.rip, file.rip, message.rip.
-
-### Icons (text/icons/*.icn)
-
-8 RIPscrip icon files in BGI GetImage binary format (24x24 pixels, EGA
-16-color). Generated by mkicons.pas. Used by !|1I (LoadIcon) command.
-
-Files: chat.icn, door.icn, files.icn, logo.icn, mail.icn, quit.icn,
-sysinfo.icn, who.icn.
-
-### Fonts (text/fonts/*.CHR)
-
-10 BGI vector stroked fonts in Borland .CHR format. Standard set shipped
-with Free Pascal's Graph unit. Used by !|Y (FontStyle) command.
-
-Files: BOLD, EURO, GOTH, LCOM, LITT, SANS, SCRI, SIMP, TRIP, TSCR.
-
-### Examples (examples/*.RIP)
-
-85 real RIPscrip art files from the BBS era. These are reference scenes
-for testing the parser and renderer. Range from simple menus to complex
-artwork (FIERO.RIP at 56KB, FINISHLN.RIP at 99KB).
-
-## Credits
-
-- RIPscrip v1.54 protocol: TeleGrafix Communications (freely licensed)
-- PabloDraw (MIT): reference for RipWriter base-36 encoding and line wrapping
-- BGI vector fonts (.CHR): originally Borland International, freely available
-- Engine: maintainer's clean-room implementation, FPC RTL only, GPLv3
-
-## Status
-
-Phase 1 complete: parser + software raster + SDL viewer with clickable
-hot regions. Phase 2 (51 commands) complete: full Level 0 + Level 1
-command coverage. Phase 3 (polygon point arrays, Define/ReadScene/
-FileQuery, font rendering) tracked in docs/TODO.md.
+- All utilities compile with zero errors
+- rip_surface.pas: added missing Math unit (Floor)
+- ans2rip.pas: restored RS2 variable after cleanup
+- ans2png.pas: removed 3 unused variables
+- ripdraw.pas: removed unused variable I
+- riptext.pas: removed unused variables R, C

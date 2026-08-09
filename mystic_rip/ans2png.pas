@@ -40,6 +40,7 @@ Const
   CHARH = 16;
   MAX_COLS = 80;
   MAX_ROWS = 500;
+  SGRtoEGA: Array[0..7] of Byte = (0, 4, 2, 6, 1, 5, 3, 7);
 
 Type
   TCellRec = Record
@@ -57,25 +58,25 @@ Var
   SaveX, SaveY : Integer;
   MaxRow     : Integer;
 
-// CGA palette — ANSI SGR color order (not IBM BIOS order!)
+// Standard VGA/EGA palette — BIOS order (matches RIPterm, DOSBox, ripviewer)
 Const
   CGA : Array[0..15, 0..2] of Byte = (
-    (  0,   0,   0),  // 0 black
-    (171,   0,   0),  // 1 red
-    (  0, 171,   0),  // 2 green
-    (171,  87,   0),  // 3 brown/yellow
-    (  0,   0, 171),  // 4 blue
-    (171,   0, 171),  // 5 magenta
-    (  0, 171, 171),  // 6 cyan
-    (171, 171, 171),  // 7 light grey
-    ( 87,  87,  87),  // 8 dark grey
-    (255,  87,  87),  // 9 bright red
-    ( 87, 255,  87),  // 10 bright green
-    (255, 255,  87),  // 11 bright yellow
-    ( 87,  87, 255),  // 12 bright blue
-    (255,  87, 255),  // 13 bright magenta
-    ( 87, 255, 255),  // 14 bright cyan
-    (255, 255, 255)   // 15 bright white
+    ($00, $00, $00),  // 0  Black
+    ($00, $00, $AA),  // 1  Blue
+    ($00, $AA, $00),  // 2  Green
+    ($00, $AA, $AA),  // 3  Cyan
+    ($AA, $00, $00),  // 4  Red
+    ($AA, $00, $AA),  // 5  Magenta
+    ($AA, $55, $00),  // 6  Brown
+    ($AA, $AA, $AA),  // 7  Light Gray
+    ($55, $55, $55),  // 8  Dark Gray
+    ($55, $55, $FF),  // 9  Light Blue
+    ($55, $FF, $55),  // 10 Light Green
+    ($55, $FF, $FF),  // 11 Light Cyan
+    ($FF, $55, $55),  // 12 Light Red
+    ($FF, $55, $FF),  // 13 Light Magenta
+    ($FF, $FF, $55),  // 14 Yellow
+    ($FF, $FF, $FF)   // 15 White
   );
 
 Procedure ClearScreen;
@@ -113,7 +114,6 @@ Var
   Params   : Array[0..15] of Integer;
   ParamCnt : Integer;
   Cmd      : Char;
-  J        : Integer;
 
   Procedure ParseParams;
   Var S: String; P: Integer;
@@ -151,8 +151,8 @@ Var
         7: CurAttr := ((CurAttr And $0F) Shl 4) Or ((CurAttr Shr 4) And $0F);
         22: CurAttr := CurAttr And $F7;  // bold off
         25: CurAttr := CurAttr And $7F;  // blink off
-        30..37: CurAttr := (CurAttr And $F8) Or (Params[K] - 30);
-        40..47: CurAttr := (CurAttr And $0F) Or ((Params[K] - 40) Shl 4);
+        30..37: CurAttr := (CurAttr And $F8) Or SGRtoEGA[Params[K] - 30];
+        40..47: CurAttr := (CurAttr And $8F) Or (SGRtoEGA[Params[K] - 40] Shl 4);
       End;
     End;
   End;
@@ -276,7 +276,6 @@ Var
   R, C, Idx : LongInt;
   B : Byte;
   W : Word;
-  L : LongInt;
   Pad : Array[0..2] of Byte;
 
   Procedure WriteWord(V: Word);   Begin BlockWrite(F, V, 2); End;

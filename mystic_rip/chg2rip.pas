@@ -181,7 +181,6 @@ Var
   SaveX, SaveY : Integer;
   MaxRow     : Integer;
   OutF       : Text;
-  LinePos    : Integer;
 
 // ====================================================================
 // RIP output helpers
@@ -358,19 +357,14 @@ End;
 
 Procedure ConvertToRIP;
 Var
-  Row, Col, PY, PX, CX : Integer;
+  Row, Col, PY, PX : Integer;
   Ch, Attr, FG, BG : Byte;
   ScanLine         : Byte;
-  RunStart, RunEnd : Integer;
-  RunColor, RS2    : Integer;
+  RunStart : Integer;
+  RS2      : Integer;
   PixX, PixY       : Integer;
-  CurScanY         : Integer;
-  PendX1, PendX2   : Integer;
-  PendY1, PendY2   : Integer;
-  PendCol          : Integer;
   TotalBars        : Integer;
   TextBuf          : String;
-  PixRow           : Array[0..639] of Byte;
 
 Const
   MAX_BARS = 200000;
@@ -383,10 +377,6 @@ Type
   End;
 
 Var
-  AllBars  : Array of TBarRec;
-  BarCount : Integer;
-  IsFG             : Boolean;
-  LastColor        : Integer;
   Rows             : Integer;
 Begin
   Rows := MaxRow;
@@ -607,7 +597,6 @@ Begin
   // Open output
   Assign(OutF, OutPath);
   Rewrite(OutF);
-  LinePos := 0;
 
   // Convert
   ConvertToRIP;

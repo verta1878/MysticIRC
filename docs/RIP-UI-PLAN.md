@@ -257,7 +257,7 @@ rendering across everything.
 | mystic_test | mystic_test/ | Live RIP display for RIP terminals. Render .mrp menus. Mouse button hit-test. |
 | mystic_ansieditor2 | mystic_ansieditor2/ | 16-color canvas. Could render ANSI art at pixel level for preview. |
 | mterm | examples/mterm/ | RIP graphics mode when connected to RIP BBS. Replace mtrip.pas text-mode parser with real pixel rendering. |
-| chg2rip | mystic_rip/ | Already uses BGI algorithms. Unify with shared engine. |
+| ans2rip | mystic_rip/ | Already uses BGI algorithms. Unify with shared engine. |
 | ans2png | mystic_rip/ | ANSI renderer. Could use m_rip_graph for pixel buffer + BMP export. |
 
 ### Integration Order
@@ -271,7 +271,7 @@ rendering across everything.
 3. **mterm** — THIRD. Graphics mode for the terminal emulator.
    Receives RIP commands from BBS, renders via m_rip_graph.
 
-4. **chg2rip / ans2png** — FOURTH. Unify the converter tools.
+4. **ans2rip / ans2png** — FOURTH. Unify the converter tools.
    Low risk, same algorithms already proven.
 
 5. **mystic_ansieditor2** — FIFTH. Pixel-level ANSI preview.

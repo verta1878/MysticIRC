@@ -129,13 +129,13 @@ dotnet build Source/Pablo.sln
 
 ### Before fix:
 ```
-chg2rip input.ans output.rip          ← RIP with CP437 bytes 128-255
+ans2rip input.ans output.rip          ← RIP with CP437 bytes 128-255
 PabloDraw → Open → output.rip        ← CRASH: ArgumentException
 ```
 
 ### After fix:
 ```
-chg2rip input.ans output.rip          ← same RIP file
+ans2rip input.ans output.rip          ← same RIP file
 PabloDraw → Open → output.rip        ← loads and renders correctly
 ```
 
@@ -156,7 +156,7 @@ ANSI art and are valid in RIP text commands.
 Carl Gorringe's RIPtermJS handles these correctly using
 `x-user-defined` encoding with `& 0xFF` masking.
 
-Our chg2rip converter uses `!|@` text commands with CP437 bytes
+Our ans2rip converter uses `!|@` text commands with CP437 bytes
 to achieve 31x file size reduction (1.3MB → 44KB) compared to
 pixel-level bar commands.
 
@@ -182,4 +182,4 @@ without the CP437 encoding fix.
 ---
 
 *Kiddo — Copyright (C) 2026 — GPLv3 — Mystic BBS IRC Fork*
-*Bug found while developing chg2rip ANSI-to-RIPscrip converter*
+*Bug found while developing ans2rip ANSI-to-RIPscrip converter*

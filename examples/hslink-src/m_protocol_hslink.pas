@@ -706,7 +706,6 @@ Function TProtocolHSLink.VerifyResumePos (Pos: LongInt) : Boolean;
 // Verify that the existing file data matches up to Pos
 Var
   Buf     : Array[0..4095] of Byte;
-  F       : File;
   FSize   : LongInt;
   BytesRead : LongInt;
   FileCRC : LongInt;
@@ -766,10 +765,8 @@ Var
   PType   : Byte;
   Data    : Array[0..4095] of Byte;
   DataLen : Word;
-  Hdr     : THSFileHeader;
   Pos     : Integer;
   I       : Integer;
-  TempPos : LongInt;
 Begin
   If Not RecvPacket(PType, Data, DataLen) Then Exit;
 

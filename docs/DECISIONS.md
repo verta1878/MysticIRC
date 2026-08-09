@@ -50,8 +50,8 @@ Clean shutdown within 1 second.
 
 ## Master Phase Plan — Mystic BBS 1.11IRC
 
-**Phase 1: chg2rip / RIPView** ✅ COMPLETE
-- chg2rip v2.3 pixel-perfect ANSI→RIP converter
+**Phase 1: ans2rip / RIPView** ✅ COMPLETE
+- ans2rip v2.3 pixel-perfect ANSI→RIP converter
 - RIPView v1.0.0 — 42/42 commands, 100% pixel match
 - Modular: 7 units, CLI + Free Vision TUI
 - VGA 8x16 font, baud emulation, debug mode
@@ -100,7 +100,7 @@ Clean shutdown within 1 second.
 - Full runtime testing across platforms
 
 **Phase 10: Runtime Testing (LAST)** ⏳ DEFERRED
-- PabloDraw CP437 crash fix (chg2rip compat mode)
+- PabloDraw CP437 crash fix (ans2rip compat mode)
 - Cross-platform verification
 - FidoNet mail testing
 

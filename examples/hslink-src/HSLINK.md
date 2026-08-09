@@ -169,3 +169,41 @@ The protocol is documented in the HS/Link Developer Kit (HDK):
 - Samuel H. Smith — original HS/Link protocol design (1992)
 - Mystic BBS IRC Fork — clean-room Pascal implementation (2026)
 - Licensed under GNU General Public License v3
+
+## Code Audit (2026-08-08)
+
+### Bugs Fixed
+1. **Unused variables removed** — F, Hdr, TempPos removed from
+   VerifyResumePos and ProcessIncoming (was dead code)
+2. **@filelist support** — hslink.pas now reads file lists from
+   @response files (was a TODO stub)
+
+### Known Issues
+1. **VerifyResumePos CRC not compared** — FileCRC is computed but
+   never compared against remote CRC. The actual verification
+   happens via SendVerify/HandleResume packet exchange. The local
+   CRC computation is preparation for a future enhancement where
+   the function could reject mismatched data before sending Verify.
+
+### Buffer Safety
+- EncodeData: worst case 2x expansion (4096→8192) — buffers sized correctly
+- SendDataBlock: Pkt[0..4097] holds seq byte + 4096 data — OK
+- RecvPacket: Raw[0..8199] handles max encoded packet — OK
+- CRC24: uses `Absolute` overlay, no copy — safe
+
+### Compile Status
+- m_protocol_hslink.pas: 0 errors, 1 note (FileCRC — by design)
+- hslink.pas: compiles with mdl units
+- test_hslink.pas: test harness
+
+### File Inventory
+| File | Lines | Purpose |
+|------|-------|---------|
+| m_protocol_hslink.pas | 1,063 | Protocol engine (TProtocolHSLink) |
+| hslink.pas | 250 | Standalone program (BBS external protocol) |
+| test_hslink.pas | 315 | Test harness with loopback |
+| HSLINK.DOC | — | Original Samuel Smith documentation |
+| HSLINK.HST | — | Version history |
+| hdk/ | — | HS/Link Developer Kit (protocol spec) |
+| COPYING | — | GPLv3 license |
+| *.C, *.H | — | Original C source (reference only, not used) |

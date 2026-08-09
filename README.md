@@ -16,7 +16,7 @@ Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
 | verta1878 | Project lead, Ecstasy BBS FTN 1:152/158 |
 | sysop/0 | serial.pas UART layer, architecture |
 | evga | Free Pascal Compiler 2.6.4irc, RIP engines, MDL |
-| kiddo | serial_irq.pas ISR, text rendering, MPL, chg2rip |
+| kiddo | serial_irq.pas ISR, text rendering, MPL, ans2rip |
 | wrench | fossil.pas, netfosdl.pas FOSSIL driver, netmodem2irc |
 | hexadecimal | PCBoard 15.4 Revival |
 
@@ -33,7 +33,7 @@ mystic_rip/              RIPscrip engines + converters
   v2/                      RIPscrip v2.0 engine (evga/wrench)
   v3/                      RIPscrip v3.0 engine (evga/wrench)
   v4/                      RIPscrip v4.0 engine (evga/wrench)
-  chg2rip.pas              ANSI→RIP converter (pixel-perfect, v2.3)
+  ans2rip.pas              ANSI→RIP converter (pixel-perfect, -p flag)
   ans2png.pas              ANSI→BMP renderer (pixel-perfect)
   ripscrip-irc-whitepaper.htm  Our RIP implementation whitepaper
 mystic_spell/            Hunspell spell check binding + SETUP.md
@@ -53,7 +53,7 @@ examples/
     ripscrip-irc-whitepaper.htm  Our RIP implementation whitepaper
   riptermJS/               RIPtermJS (Carl Gorringe, GPLv3) zip + v3.0 txt
   ripterm154/              RIPterm 1.54 DOS binary (Carl Gorringe archive)
-  mterm/                   mterm terminal + OpenOLMS (37 files)
+  mterm/                   mterm terminal + OpenOLMS (44 files)
   serial/                  Serial v1.1 + FOSSIL driver (5 files)
   door32/                  Door32 BBS Door Kit (g00r00, ONiX, SqZ) zip
   utrayit/                 Console tray unit + mkicon ICO generator
@@ -100,20 +100,22 @@ out-bsd/                FreeBSD/OpenBSD/NetBSD build output
 | install_make | ✅ |
 | 109to110 | ✅ |
 | ripview | ✅ |
-| chg2rip | ✅ |
+| ans2rip | ✅ |
 | ans2png | ✅ |
 
 ## Key Features (1.11IRC A4)
 
 - g00r00 1.10 A38 base with A39-A63 features ported
 - g00r00 1.11 A1-A3 items: VAR records, TimerMS, FormatDate, Searchlight menus
-- RIPscrip v1.54: RIPView 42/42 commands pixel-perfect
+- RIPscrip v1.54: 9 RIP engines, RIPView 42/42 commands pixel-perfect
 - Password MD5 hashing with auto-upgrade (bbs_crypt.pas)
 - Hunspell spell check in FS editor
 - Serial v1.1 + FOSSIL driver + IRQ ring buffer
 - mterm terminal + OpenOLMS offline mail reader
+- MIS 1.12 rebuild plan (tabbed UI, ASCII art header, ESC menu)
 - Stale node detection, MIS shutdown fix, ANSI editor fix
 - Zmodem >2GB file transfers (Int64)
+- HS/Link bidirectional protocol (clean-room Pascal, 1067 lines)
 - Embedded taskbar/tray icon (utrayit + mkicon)
 - 20 MPL scripts, 237 functions documented
 

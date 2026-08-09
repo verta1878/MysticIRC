@@ -8,11 +8,11 @@
 #### Bugs Fixed
 - **rcResetWindows (`!|#`) erased canvas** — was wiping pixel buffer right
   before BMP output. Fixed to reset viewport/cursor only (matching JS).
-- **8×8 font instead of 8×16** — chg2rip outputs VGA 8×16 coordinates.
+- **8×8 font instead of 8×16** — ans2rip outputs VGA 8×16 coordinates.
   Added vgafont.inc (8×16 CP437 ROM) and switched to MSB-first bit order.
 - **EGA palette order vs CGA/ANSI order** — palette had indices 1=blue/4=red
-  (EGA order) but chg2rip outputs SGR indices 1=red/4=blue (CGA order).
-  Reordered palette constant to match chg2rip output.
+  (EGA order) but ans2rip outputs SGR indices 1=red/4=blue (CGA order).
+  Reordered palette constant to match ans2rip output.
 - **Duplicate rcGotoXY handler** — removed.
 - **'o' mapped to rcMove instead of rcFilledOval** — fixed parser.
 - **rcMove orphan in enum** — removed ('m' = rcGotoXY is the move command).
@@ -51,7 +51,7 @@ Expanded '1' prefix handler for: 1K, 1C, 1P, 1I, 1M, 1U, 1B commands.
 
 #### Build Status
 - ripviewer: 1107 lines, compiles clean (0 errors, 0 warnings)
-- chg2rip: compiles clean
+- ans2rip: compiles clean
 - All BBS binaries: compile clean
 
 ### ripviewer CLI Features

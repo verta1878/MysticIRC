@@ -31,6 +31,7 @@ Interface
 Uses
   SysUtils,
   Classes,
+  Math,
   rip_Canvas;
 
 Type

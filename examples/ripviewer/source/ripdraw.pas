@@ -391,7 +391,6 @@ Procedure DrawBezier(NumSeg: Integer; Pts: Array Of Integer; Color: Byte);
   - This prevents 1-pixel gaps between adjacent bezier curves
     that share endpoints (DRAGON01 flood fill leak fix). }
 Var
-  I: Integer;
   T, T1, Step: Double;
   PX, PY, LX, LY: Integer;
 Begin

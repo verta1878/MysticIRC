@@ -1,0 +1,66 @@
+==============================================================================
+ OpenOLMS v1.0 — Installation Guide
+==============================================================================
+
+REQUIREMENTS
+  - DOS (real-mode or DOSBox) or Linux (FPC native)
+  - RemoteAccess 2.x, PCBoard, or any BBS with drop file support
+  - QWK-compatible offline mail reader (BlueWave, OLX, MultiMail)
+
+NEW INSTALLATION
+  1. Create an OLMS directory:  MD C:\OLMS
+  2. Copy all OpenOLMS files to C:\OLMS
+  3. Run UPGRADE1.EXE to create data files:
+       UPGRADE1 C:\OLMS
+     Creates: OLMS.CFG, MESSAGES.CTL, MESSAGES.INF, USERS.IDX
+  4. Run UPGRADE2.EXE to create user database:
+       UPGRADE2 C:\OLMS
+     Creates: USERS.DAT, WORK1\, WORK2\
+  5. Run CONFIG.EXE to configure:
+       CONFIG
+     Set BBS name, sysop name, paths, archivers, protocols
+  6. Add OLMS to your BBS as a door:
+       OLMS /P:1 /B:115200 /D:C:\RA
+
+UPGRADING FROM ORIGINAL OLMS
+  1. BACK UP your existing OLMS directory
+  2. Copy OpenOLMS EXEs over the originals:
+       COPY OLMS.EXE C:\OLMS\OLMS.EXE
+       COPY CONFIG.EXE C:\OLMS\CONFIG.EXE
+       COPY EDITOR.EXE C:\OLMS\EDITOR.EXE
+       COPY MAINTAIN.EXE C:\OLMS\MAINTAIN.EXE
+       COPY USERCONF.EXE C:\OLMS\USERCONF.EXE
+  3. Run UPGRADE1 and UPGRADE2 to expand data files
+     (backs up originals automatically):
+       UPGRADE1 C:\OLMS
+       UPGRADE2 C:\OLMS
+  4. Your existing configuration, users, and message areas
+     are preserved. No reconfiguration needed.
+
+COMMAND-LINE OPTIONS (OLMS.EXE)
+  /P:n     COM port number
+  /B:n     Baud rate
+  /D:path  Drop file directory
+  /N:n     Node number
+  /L       Local mode (no modem)
+  /U       Process uploaded .REP files only
+  /?       Show help
+
+FILES
+  OLMS.EXE       Main BBS door
+  CONFIG.EXE     Configuration editor
+  EDITOR.EXE     Standalone message editor
+  MAINTAIN.EXE   Database maintenance/packing
+  USERCONF.EXE   User self-configuration
+  UPGRADE1.EXE   Config + area upgrade tool
+  UPGRADE2.EXE   User database upgrade tool
+
+DATA FILES
+  OLMS.CFG       Configuration (14,889 bytes)
+  MESSAGES.CTL   Message area config (24,512 bytes)
+  MESSAGES.IDX   Message index
+  MESSAGES.INF   Message info header
+  USERS.DAT      User database (14,340 bytes)
+  USERS.IDX      User index
+  SCREENS.DAT    ANSI display screens
+==============================================================================

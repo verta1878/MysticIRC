@@ -120,11 +120,11 @@ Low:
 | 9 | + | OS/2 target via fpc264irc EMX linker | ✅ Working (slow compile) |
 
 
-## ANSI to RIP Converter (chg2rip v2.3)
+## ANSI to RIP Converter (ans2rip v2.3)
 
 | Tool | Status | Output |
 |------|--------|--------|
-| chg2rip.pas | ✅ 100% pixel-perfect | .rip (44KB) |
+| ans2rip.pas | ✅ 100% pixel-perfect | .rip (44KB) |
 | ans2png.pas | ✅ 100% pixel-perfect | .bmp |
 | vgafont.inc | ✅ | VGA 8x16 font ROM |
 

@@ -61,6 +61,8 @@ Var
   FileCount  : Integer;
   I          : Integer;
   Param      : String;
+  ListFile   : Text;
+  ListLine   : String;
   ExitOK     : Boolean;
 
 Procedure Usage;
@@ -132,10 +134,21 @@ Begin
     End Else Begin
       // Filename or @filelist
       If S[1] = '@' Then Begin
-        // Read file list from file
-        // For now, treat as single filename
-        Inc(FileCount);
-        FileList[FileCount] := Copy(S, 2, Length(S));
+        // Read file list from @response file
+        If FileExist(Copy(S, 2, Length(S))) Then Begin
+          Assign(ListFile, Copy(S, 2, Length(S)));
+          System.Reset(ListFile);
+          While Not EOF(ListFile) Do Begin
+            ReadLn(ListFile, ListLine);
+            ListLine := strStripB(ListLine, ' ');
+            If (Length(ListLine) > 0) and (FileCount < 50) Then Begin
+              Inc(FileCount);
+              FileList[FileCount] := ListLine;
+            End;
+          End;
+          Close(ListFile);
+        End Else Begin
+          WriteLn('Warning: list file not found: ', Copy(S, 2, Length(S)));
       End Else Begin
         Inc(FileCount);
         FileList[FileCount] := S;

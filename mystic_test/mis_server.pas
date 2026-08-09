@@ -57,6 +57,7 @@ Type
     NodeInfo      : TNodeData;
     Server        : TIOSocket;
     ServerStatus  : TStringList;
+    ServerName    : String[8];   { 1.12: service name for log (TELNET, SMTP, etc) }
     LogFile       : String[20];
     StatusUpdated : Boolean;
     ClientList    : TList;
@@ -317,7 +318,7 @@ Begin
     If ServerStatus.Count > MaxStatusText Then
       ServerStatus.Delete(0);
 
-    Res := FormatDate (CurDateDT, 'NNN DD HH:II') + ' ' + strI2S(ProcID + 1) + ' ' + Str;
+    Res := FormatDate (CurDateDT, 'HH:II:SS') + ' ' + strPadR(ServerName, 7, ' ') + ' ' + strI2S(ProcID + 1) + '-' + Str;
 
     If Length(Res) > 74 Then Begin
       ServerStatus.Add(Copy(Res, 1, 74));

@@ -11,7 +11,7 @@ License: GPLv3
 | verta1878    | Project lead, Ecstasy BBS FTN 1:152/158           |
 | sysop/0      | Architecture, serial layer, Phase 3 testing        |
 | evga         | Free Pascal Compiler 2.6.4irc, RIP engines         |
-| kiddo        | serial_irq.pas ISR, text rendering, MPL, chg2rip   |
+| kiddo        | serial_irq.pas ISR, text rendering, MPL, ans2rip   |
 | wrench       | fossil.pas, netfosdl.pas FOSSIL driver              |
 | hexadecimal  | PCBoard 15.4 Revival                                |
 

@@ -82,6 +82,7 @@ Var
   EventThread  : TEventEngine;
   FocusPTR     : TServerManager;
   FocusCurrent : Byte;
+  ActiveTab    : Byte = 0;  { 1.12 view tab: 0=Messages 1=Connections 2=Events 3=Stats }
   TopPage      : Integer;
   BarPos       : Integer;
   NodeData     : TNodeData;
@@ -146,31 +147,31 @@ Begin
 
     Case FocusCurrent of
         0 : If NI.Busy Then Begin
-              Console.WriteXY (3, 3 + PosY, Attr,
+              Console.WriteXY (3, 7 + PosY, Attr,
       	        strPadL(strI2S(NI.Num), 3, '0') + ' ' +
                 strPadR(NI.User, 12, ' ') + ' ' +
                 strPadR(NI.Action, 18, ' ') + ' ' +
                 strPadL(NI.IP, 15, ' '));
             End Else
             If Count <= FocusPtr.ClientMax Then
-              Console.WriteXY (3, 3 + PosY, Attr, strPadL(strI2S(NI.Num), 3, '0') + strPadR(' Waiting', 48, ' '))
+              Console.WriteXY (3, 7 + PosY, Attr, strPadL(strI2S(NI.Num), 3, '0') + strPadR(' Waiting', 48, ' '))
             Else
-              Console.WriteXY (3, 3 + PosY, Attr, strRep(' ', 51));
+              Console.WriteXY (3, 7 + PosY, Attr, strRep(' ', 51));
         1,
         2,
         3,
         4,
         5 : If (Count <= FocusPtr.ClientList.Count) And (FocusPtr.ClientList[Count - 1] <> NIL) Then Begin
-              Console.WriteXY (3, 3 + PosY, Attr,
+              Console.WriteXY (3, 7 + PosY, Attr,
                 strPadL(strI2S(Count), 3, '0') + ' ' +
                 strPadR(TFTPServer(FocusPtr.ClientList[Count - 1]).User.Handle, 31, ' ') + ' ' +
                 strPadL(TFTPServer(FocusPtr.ClientList[Count - 1]).Client.PeerIP, 15, ' '));
                 // this is broken... see the typecast of tftpserver kludge
             End Else
             If Count <= FocusPtr.ClientMax Then
-              Console.WriteXY (3, 3 + PosY, Attr, strPadL(strI2S(Count), 3, '0') + strPadR(' Waiting', 48, ' '))
+              Console.WriteXY (3, 7 + PosY, Attr, strPadL(strI2S(Count), 3, '0') + strPadR(' Waiting', 48, ' '))
             Else
-              Console.WriteXY (3, 3 + PosY, Attr, strRep(' ', 51));
+              Console.WriteXY (3, 7 + PosY, Attr, strRep(' ', 51));
     End;
   End;
 End;
@@ -186,10 +187,10 @@ Begin
 
   // UPDATE CONNECTION STATS
 
-  Console.WriteXY (69,  7, 7, strPadR(strI2S(FocusPtr.ClientActive), 5, ' '));
-  Console.WriteXY (69,  8, 7, strPadR(strI2S(FocusPtr.ClientBlocked), 5, ' '));
-  Console.WriteXY (69,  9, 7, strPadR(strI2S(FocusPtr.ClientRefused), 5, ' '));
-  Console.WriteXY (69, 10, 7, strPadR(strI2S(FocusPtr.ClientTotal), 5, ' '));
+  Console.WriteXY (20, 10, 7, strPadR(strI2S(FocusPtr.ClientActive), 5, ' '));
+  Console.WriteXY (20, 11, 7, strPadR(strI2S(FocusPtr.ClientBlocked), 5, ' '));
+  Console.WriteXY (20, 12, 7, strPadR(strI2S(FocusPtr.ClientRefused), 5, ' '));
+  Console.WriteXY (20, 13, 7, strPadR(strI2S(FocusPtr.ClientTotal), 5, ' '));
 
   // UPDATE STATUS MESSAGES
 
@@ -199,9 +200,9 @@ Begin
     If Offset > 0 Then Begin
       Dec(Offset);
 
-      Console.WriteXY (4, Count, 7, strPadR(FocusPtr.ServerStatus.Strings[Offset], 74, ' '));
+      Console.WriteXY (2, Count + 4, 7, strPadR(FocusPtr.ServerStatus.Strings[Offset], 74, ' '));
     End Else
-      Console.WriteXY (4, Count, 7, strPadR(' ', 74, ' '));
+      Console.WriteXY (2, Count + 4, 7, strPadR(' ', 74, ' '));
   End;
 
   UpdateConnectionList;
@@ -213,7 +214,7 @@ Var
   Loop  : LongInt;
   Attr  : Byte;
 Begin
-  Console.WriteXY (4, 3, 7, 'Event Queue');
+  Console.WriteXY (2, 7, 15, 'Event Queue');
 
   Loop := EventThread.EventList.Count;
 
@@ -224,9 +225,9 @@ Begin
       Else
         Attr := 7;
 
-      Console.WriteXY (3, 3 + Count, Attr, EventThread.EventList.Strings[Loop - 1] + ' ')
+      Console.WriteXY (2, 7 + Count, Attr, EventThread.EventList.Strings[Loop - 1] + ' ')
     End Else
-      Console.WriteXY (3, 3 + Count, 7, strRep(' ', 51));
+      Console.WriteXY (2, 7 + Count, 7, strRep(' ', 51));
 
     Dec (Loop);
   End;
@@ -235,9 +236,9 @@ Begin
 
   For Count := 8 DownTo 1 Do Begin
     If Loop > 0 Then
-      Console.WriteXY (4, 14 + Count, 7, strPadR(EventThread.StatusList.Strings[Loop - 1], 75, ' '))
+      Console.WriteXY (2, 15 + Count, 7, strPadR(EventThread.StatusList.Strings[Loop - 1], 75, ' '))
     Else
-      Console.WriteXY (4, 14 + Count, 7, strRep(' ', 75));
+      Console.WriteXY (2, 15 + Count, 7, strRep(' ', 75));
 
     Dec (Loop);
   End;
@@ -264,16 +265,18 @@ Begin
     End;
   Until False;
 
-  Console.WriteXY (43, 1, 112, 'telnet/smtp/pop3/ftp/nntp/binkp/event');
+  { 1.12: Show active service in title bar row 5 }
+  Console.WriteXY(3, 5, ATTR_HEADER_YEL,
+    'Mystic Internet Server' + strPadR('', 55, ' '));
 
   Case FocusCurrent of
-    FocusTelnet : Console.WriteXY (43, 1, 113, 'TELNET');
-    FocusSMTP   : Console.WriteXY (50, 1, 113, 'SMTP');
-    FocusPOP3   : Console.WriteXY (55, 1, 113, 'POP3');
-    FocusFTP    : Console.WriteXY (60, 1, 113, 'FTP');
-    FocusNNTP   : Console.WriteXY (64, 1, 113, 'NNTP');
-    FocusBINKP  : Console.WriteXY (69, 1, 113, 'BINKP');
-    FocusEVENT  : Console.WriteXY (75, 1, 113, 'EVENT');
+    FocusTelnet : Console.WriteXY(26, 5, ATTR_PROMPT, '[TELNET]');
+    FocusSMTP   : Console.WriteXY(26, 5, ATTR_PROMPT, '[SMTP]');
+    FocusPOP3   : Console.WriteXY(26, 5, ATTR_PROMPT, '[POP3]');
+    FocusFTP    : Console.WriteXY(26, 5, ATTR_PROMPT, '[FTP]');
+    FocusNNTP   : Console.WriteXY(26, 5, ATTR_PROMPT, '[NNTP]');
+    FocusBINKP  : Console.WriteXY(26, 5, ATTR_PROMPT, '[BINKP]');
+    FocusEVENT  : Console.WriteXY(26, 5, ATTR_PROMPT, '[EVENT]');
   End;
 
   FocusPtr := GetFocusPtr;
@@ -284,7 +287,7 @@ Begin
 
     UpdateStatus;
 
-    Console.WriteXY (4, 3, 7, 'Connections');
+    Console.WriteXY (2, 7, 15, 'Connections');
   End Else
     Case FocusCurrent of
       FocusEVENT : EventStatus;
@@ -437,6 +440,7 @@ Begin
 
   If bbsCfg.InetTNUse Then Begin
     TelnetServer := TServerManager.Create(bbsCfg, bbsCfg.InetTNPort, bbsCfg.INetTNNodes, NodeData, @CreateTelnet);
+    TelnetServer.ServerName := 'TELNET';
 
     TelnetServer.Server.FTelnetServer := True;
     TelnetServer.ClientMaxIPs         := bbsCfg.InetTNDupes;
@@ -449,6 +453,7 @@ Begin
 
   If bbsCfg.InetSMTPUse Then Begin
     SMTPServer := TServerManager.Create(bbsCfg, bbsCfg.INetSMTPPort, bbsCfg.inetSMTPMax, NodeData, @CreateSMTP);
+    SMTPServer.ServerName := 'SMTP';
 
     SMTPServer.Server.FTelnetServer := False;
     SMTPServer.ClientMaxIPs         := bbsCfg.INetSMTPDupes;
@@ -461,6 +466,7 @@ Begin
 
   If bbsCfg.InetPOP3Use Then Begin
     POP3Server := TServerManager.Create(bbsCfg, bbsCfg.INetPOP3Port, bbsCfg.inetPOP3Max, NodeData, @CreatePOP3);
+    POP3Server.ServerName := 'POP3';
 
     POP3Server.Server.FTelnetServer := False;
     POP3Server.ClientMaxIPs         := bbsCfg.inetPOP3Dupes;
@@ -473,6 +479,7 @@ Begin
 
   If bbsCfg.InetFTPUse Then Begin
     FTPServer := TServerManager.Create(bbsCfg, bbsCfg.InetFTPPort, bbsCfg.inetFTPMax, NodeData, @CreateFTP);
+    FTPServer.ServerName := 'FTP';
 
     FTPServer.Server.FTelnetServer := False;
     FTPServer.ClientMaxIPs         := bbsCfg.inetFTPDupes;
@@ -485,6 +492,7 @@ Begin
 
   If bbsCfg.InetNNTPUse Then Begin
     NNTPServer := TServerManager.Create(bbsCfg, bbsCfg.InetNNTPPort, bbsCfg.inetNNTPMax, NodeData, @CreateNNTP);
+    NNTPServer.ServerName := 'NNTP';
 
     NNTPServer.Server.FTelnetServer := False;
     NNTPServer.ClientMaxIPs         := bbsCfg.inetNNTPDupes;
@@ -497,6 +505,7 @@ Begin
 
   If bbsCfg.InetBINKPUse Then Begin
     BINKPServer := TServerManager.Create(bbsCfg, bbsCfg.InetBINKPPort, bbsCfg.inetBINKPMax, NodeData, @CreateBINKP);
+    BINKPServer.ServerName := 'BINKP';
 
     BINKPServer.Server.FTelnetServer := False;
     BINKPServer.ClientMaxIPs         := bbsCfg.inetBINKPDupes;
@@ -718,7 +727,12 @@ Begin
                         UpdateConnectionList;
                       End;
               End;
-        #09 : SwitchFocus;
+        #09 : Begin { TAB = cycle view tabs }
+              ActiveTab := (ActiveTab + 1) mod 4;
+              DrawTabBar(ActiveTab);
+              ClearContentArea;
+            End;
+        '+' : SwitchFocus; { + = cycle service focus }
 //        #13 : {$IFDEF UNIX}Snoop{$ENDIF};
         #27 : Break;
 //      	#32 : LocalLogin;
