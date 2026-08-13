@@ -67,8 +67,8 @@ Compiles 44/46 on Linux (2 Windows-only expected).
 - Risk: prompts after the 1.10 count may shift existing prompts
 
 ### Version numbering
-- Keep 1.10IRC for FidoNet version compatibility
-- 1.10IRC is in alpha testing
+- Keep 1.11IRC for FidoNet version compatibility
+- 1.11IRC is in alpha testing
 - 1.11 is future roadmap
 - upgrade.txt needs updating for IRC fork changes
 - whatsnew.txt is current through A61

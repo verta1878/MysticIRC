@@ -1,0 +1,3288 @@
+{
+  "api": [
+    {
+      "args": [],
+      "asm_name": "_spectrum_info_show_game",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_info_show_game",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_info_show_setup",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_info_show_setup",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_info_show_game_setup",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_info_show_game_setup",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_info_show_preflight",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_info_show_preflight",
+      "return": "void"
+    },
+    {
+      "args": [
+        "uint8_t row"
+      ],
+      "asm_name": "_spectrum_info_clear_tail",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_info_clear_tail",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *line"
+      ],
+      "asm_name": "_spectrum_info_line",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_info_line",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *text"
+      ],
+      "asm_name": "_spectrum_render_status_error",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_render_status_error",
+      "return": "void"
+    },
+    {
+      "asm_name": "_overlay_code_slot",
+      "kind": "object",
+      "name": "overlay_code_slot",
+      "type": "uint8_t []"
+    },
+    {
+      "asm_name": "_spectrum_overlay_loaded_id",
+      "kind": "object",
+      "name": "spectrum_overlay_loaded_id",
+      "type": "uint8_t"
+    },
+    {
+      "args": [
+        "uint8_t ovl_id",
+        "uint8_t entry_id"
+      ],
+      "asm_name": "_spectrum_overlay_exec",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_overlay_exec",
+      "return": "uint8_t"
+    },
+    {
+      "args": [
+        "uint8_t ovl_id",
+        "uint8_t entry_id"
+      ],
+      "asm_name": "_spectrum_overlay_exec_cached",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_overlay_exec_cached",
+      "return": "uint8_t"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_frame_wait",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_frame_wait",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_gui_tick",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_gui_tick",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_key_poll",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_key_poll",
+      "return": "uint8_t"
+    },
+    {
+      "args": [
+        "uint16_t frames"
+      ],
+      "asm_name": "_spectrum_uart_flush",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_uart_flush",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *s"
+      ],
+      "asm_name": "_spectrum_uart_send_string",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_uart_send_string",
+      "return": "uint8_t"
+    },
+    {
+      "args": [
+        "const uint8_t *data",
+        "uint8_t len"
+      ],
+      "asm_name": "_spectrum_uart_send_bytes",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_uart_send_bytes",
+      "return": "uint8_t"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_uart_send_crlf",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_uart_send_crlf",
+      "return": "uint8_t"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_uart_ready",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_uart_ready",
+      "return": "uint8_t"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_uart_read",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_uart_read",
+      "return": "uint8_t"
+    },
+    {
+      "args": [
+        "char *dst",
+        "const char *src"
+      ],
+      "asm_name": "_spectrum_append_text",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_append_text",
+      "return": "char *"
+    },
+    {
+      "args": [
+        "char *dst",
+        "uint16_t value"
+      ],
+      "asm_name": "_spectrum_append_u16",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_append_u16",
+      "return": "char *"
+    },
+    {
+      "args": [
+        "const char *text"
+      ],
+      "asm_name": "_spectrum_gui_set_status",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_gui_set_status",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *text"
+      ],
+      "asm_name": "_spectrum_gui_set_status_error",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_gui_set_status_error",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_gui_draw_status",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_gui_draw_status",
+      "return": "void"
+    },
+    {
+      "args": [
+        "uint8_t connected"
+      ],
+      "asm_name": "_spectrum_gui_set_connected",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_gui_set_connected",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *text",
+        "uint8_t is_error"
+      ],
+      "asm_name": "_spectrum_gui_notify",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_gui_notify",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *text"
+      ],
+      "asm_name": "_spectrum_gui_notify_persistent",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_gui_notify_persistent",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *text"
+      ],
+      "asm_name": "_spectrum_gui_notify_success",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_gui_notify_success",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *ply",
+        "const char *move"
+      ],
+      "asm_name": "_spectrum_gui_add_move",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_gui_add_move",
+      "return": "void"
+    },
+    {
+      "args": [
+        "char who",
+        "const char *text"
+      ],
+      "asm_name": "_spectrum_gui_add_chat",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_gui_add_chat",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *move"
+      ],
+      "asm_name": "_spectrum_gui_prepare_move",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_gui_prepare_move",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *move"
+      ],
+      "asm_name": "_spectrum_gui_apply_move",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_gui_apply_move",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *text"
+      ],
+      "asm_name": "_spectrum_gui_set_input",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_gui_set_input",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *text",
+        "uint8_t len",
+        "uint8_t cursor"
+      ],
+      "asm_name": "_spectrum_gui_set_input_edit",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_gui_set_input_edit",
+      "return": "void"
+    },
+    {
+      "args": [
+        "uint8_t pos",
+        "char c",
+        "uint8_t cursor"
+      ],
+      "asm_name": "_spectrum_gui_input_cell",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_gui_input_cell",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_gui_redraw_board_squares",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_gui_redraw_board_squares",
+      "return": "void"
+    },
+    {
+      "args": [
+        "uint8_t row",
+        "uint8_t col"
+      ],
+      "asm_name": "_spectrum_gui_redraw_square",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_gui_redraw_square",
+      "return": "void"
+    },
+    {
+      "args": [
+        "uint8_t row",
+        "uint8_t col"
+      ],
+      "asm_name": "_spectrum_board_view_redraw_square",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_board_view_redraw_square",
+      "return": "void"
+    },
+    {
+      "asm_name": "_spectrum_board_view_flipped",
+      "kind": "object",
+      "name": "spectrum_board_view_flipped",
+      "type": "uint8_t"
+    },
+    {
+      "args": [
+        "const char *board"
+      ],
+      "asm_name": "_spectrum_render_board",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_render_board",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *text"
+      ],
+      "asm_name": "_spectrum_render_status",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_render_status",
+      "return": "void"
+    },
+    {
+      "args": [
+        "uint8_t connected"
+      ],
+      "asm_name": "_spectrum_render_connection",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_render_connection",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *moves"
+      ],
+      "asm_name": "_spectrum_render_moves",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_render_moves",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *line"
+      ],
+      "asm_name": "_spectrum_render_move_at",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_render_move_at",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_render_moves_scroll",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_render_moves_scroll",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *chat"
+      ],
+      "asm_name": "_spectrum_render_chat",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_render_chat",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *line"
+      ],
+      "asm_name": "_spectrum_render_chat_at",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_render_chat_at",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_render_chat_scroll",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_render_chat_scroll",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *spec"
+      ],
+      "asm_name": "_spectrum_render_square",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_render_square",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *spec"
+      ],
+      "asm_name": "_spectrum_render_square_attr",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_render_square_attr",
+      "return": "void"
+    },
+    {
+      "args": [
+        "const char *spec"
+      ],
+      "asm_name": "_spectrum_render_square_mark",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_render_square_mark",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_board_reset",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_board_reset",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_net_start_uart",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_net_start_uart",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_net_background_drain",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_net_background_drain",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_board_cells",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_board_cells",
+      "return": "const char *"
+    },
+    {
+      "args": [
+        "uint8_t row",
+        "uint8_t col"
+      ],
+      "asm_name": "_spectrum_board_cell",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_board_cell",
+      "return": "char"
+    },
+    {
+      "args": [
+        "const char *move"
+      ],
+      "asm_name": "_spectrum_board_apply_trusted_move",
+      "calling_convention": "fastcall",
+      "kind": "function",
+      "name": "spectrum_board_apply_trusted_move",
+      "return": "uint8_t"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_net_runtime_clock_ready",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_net_runtime_clock_ready",
+      "return": "uint8_t"
+    },
+    {
+      "args": [
+        "uint8_t hour",
+        "uint8_t minute",
+        "uint8_t second"
+      ],
+      "asm_name": "_spectrum_net_runtime_set_clock",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_net_runtime_set_clock",
+      "return": "void"
+    },
+    {
+      "args": [
+        "uint16_t date",
+        "uint16_t time"
+      ],
+      "asm_name": "_spectrum_net_runtime_set_fat_stamp",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_net_runtime_set_fat_stamp",
+      "return": "void"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_net_runtime_fat_date",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_net_runtime_fat_date",
+      "return": "uint16_t"
+    },
+    {
+      "args": [],
+      "asm_name": "_spectrum_net_runtime_fat_time",
+      "calling_convention": "z88dk_c",
+      "kind": "function",
+      "name": "spectrum_net_runtime_fat_time",
+      "return": "uint16_t"
+    }
+  ],
+  "markers": {
+    "__BSS_END_tail": "0xF6D4",
+    "__CODE_END_tail": "0xF51B",
+    "__data_compiler_tail": "0xF542",
+    "_overlay_code_slot": "0x6800"
+  },
+  "missing_required": [],
+  "overlay_constants": [
+    {
+      "name": "SPECTRUM_OVL_RULES",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_RULES_PLAY",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_RULES_CHECK",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_BOARD",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_BOARD_APPLY",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_BOARD_SNAPSHOT_SAVE",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_BOARD_SNAPSHOT_RESTORE",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_BOARD_UNDO_RESTORE",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_GUI_LOG",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_GUI_LOG_ADD_MOVE",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_GUI_LOG_ADD_CHAT",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_GUI_LOG_NOTIFY_MSG",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_GUI_LOG_REMOVE_LAST_MOVE",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_NET_CONNECT",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_MQTT_CONNECT",
+      "raw_value": "SPECTRUM_OVL_NET_CONNECT",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_MQTT_CONNECT_START",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_MQTT_CONNECT_ACTIVATE",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_NET_PREFLIGHT",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_MQTT_CONNECT_PROBE_SEAT",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_MQTT_TX",
+      "raw_value": "4u",
+      "value": 4
+    },
+    {
+      "name": "SPECTRUM_OVL_MQTT_TX_SEND_TEXT",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_MQTT_TX_PUBLISH_SETUP",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_MQTT_TX_SYNC_TIME",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_MQTT_TX_PUBLISH_PRESENCE",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_DIRECT",
+      "raw_value": "5u",
+      "value": 5
+    },
+    {
+      "name": "SPECTRUM_OVL_DIRECT_LISTEN",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_DIRECT_CONNECT",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_DIRECT_WAIT_CONNECT",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_DIRECT_READ",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_DIRECT_SEND",
+      "raw_value": "4u",
+      "value": 4
+    },
+    {
+      "name": "SPECTRUM_OVL_MENU_CONFIG",
+      "raw_value": "6u",
+      "value": 6
+    },
+    {
+      "name": "SPECTRUM_OVL_MENU_CONFIG_RUN",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_MENU_CONFIG_PAINT_ATTRS",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_MENU_CONFIG_VALIDATE_IP",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_MENU_CONFIG_EDIT_LINE",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_MENU_CONFIG_RENDER",
+      "raw_value": "4u",
+      "value": 4
+    },
+    {
+      "name": "SPECTRUM_OVL_HINTS",
+      "raw_value": "SPECTRUM_OVL_RULES",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_HINTS_SHOW",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_HINTS_CLEAR",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP",
+      "raw_value": "8u",
+      "value": 8
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP_STEP",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_INPUT_EDIT",
+      "raw_value": "9u",
+      "value": 9
+    },
+    {
+      "name": "SPECTRUM_OVL_INPUT_EDIT_RENDER",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_INPUT_EDIT_BEGIN_EMPTY",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_INPUT_EDIT_STOP_CLEAR",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_INPUT_EDIT_KEY",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_INPUT_EDIT_HISTORY_ADD",
+      "raw_value": "4u",
+      "value": 4
+    },
+    {
+      "name": "SPECTRUM_OVL_SAVELOAD",
+      "raw_value": "10u",
+      "value": 10
+    },
+    {
+      "name": "SPECTRUM_OVL_SAVELOAD_LOAD_NCZS",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_SAVELOAD_SAVE_NCZS",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_SAVELOAD_ERASE_NCZS",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_RESTORE",
+      "raw_value": "11u",
+      "value": 11
+    },
+    {
+      "name": "SPECTRUM_OVL_RESTORE_BUILD_FRAME",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_RESTORE_DECODE",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_ABOUT",
+      "raw_value": "12u",
+      "value": 12
+    },
+    {
+      "name": "SPECTRUM_OVL_ABOUT_RENDER",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_FILEUI",
+      "raw_value": "13u",
+      "value": 13
+    },
+    {
+      "name": "SPECTRUM_OVL_FILEUI_RENDER",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_FILEUI_PICK",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_CONTROL",
+      "raw_value": "14u",
+      "value": 14
+    },
+    {
+      "name": "SPECTRUM_OVL_CONTROL_CLASSIFY",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_STATUS",
+      "raw_value": "7u",
+      "value": 7
+    },
+    {
+      "name": "SPECTRUM_OVL_STATUS_PHASE",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_INVALID",
+      "raw_value": "0xffu",
+      "value": 255
+    },
+    {
+      "name": "SPECTRUM_OVL_BLOCK_SIZE",
+      "raw_value": "2048u",
+      "value": 2048
+    }
+  ],
+  "overlay_context_constants": [
+    {
+      "name": "SPECTRUM_OVERLAY_CONTEXT_SIZE",
+      "raw_value": "NETCHESSZX_LOWRAM_OVERLAY_CONTEXT_SIZE",
+      "value": 8
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_PTR_LO",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_PTR_HI",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_GUI_MOVE_PLY_LO",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_GUI_MOVE_PLY_HI",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_GUI_MOVE_TEXT_LO",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_GUI_MOVE_TEXT_HI",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_GUI_RENDER",
+      "raw_value": "4u",
+      "value": 4
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_GUI_CHAT_WHO",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_GUI_CHAT_TEXT_LO",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_GUI_CHAT_TEXT_HI",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_GUI_MSG_ID",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_GUI_MSG_KIND",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_INPUT_KEY",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_INPUT_CMD_TEXT_LO",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_INPUT_CMD_TEXT_HI",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_INPUT_CMD_ARG_LO",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_INPUT_CMD_ARG_HI",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_SAVELOAD_NAME_LO",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_SAVELOAD_NAME_HI",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_SAVELOAD_BUF_LO",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_SAVELOAD_BUF_HI",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_SAVELOAD_RESULT",
+      "raw_value": "4u",
+      "value": 4
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_RESTORE_SNAP_LO",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_RESTORE_SNAP_HI",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_RESTORE_META_LO",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_RESTORE_META_HI",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_RESTORE_TEXT_LO",
+      "raw_value": "4u",
+      "value": 4
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_RESTORE_TEXT_HI",
+      "raw_value": "5u",
+      "value": 5
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_RESTORE_CHUNK",
+      "raw_value": "6u",
+      "value": 6
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_HINTS_BOARD_LO",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_HINTS_BOARD_HI",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_HINTS_SIDE_TO_MOVE",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_HINTS_SQUARE",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_HINTS_CASTLE",
+      "raw_value": "4u",
+      "value": 4
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_HINTS_EP",
+      "raw_value": "5u",
+      "value": 5
+    },
+    {
+      "name": "SPECTRUM_OVL_SAVELOAD_OK",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_SAVELOAD_ERR_NAME",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_SAVELOAD_ERR_OPEN",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_SAVELOAD_ERR_IO",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_SAVELOAD_ERR_DATA",
+      "raw_value": "4u",
+      "value": 4
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_FILEUI_KEY",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_FILEUI_SEL",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_FILEUI_ACTION",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_FILEUI_NAME_LO",
+      "raw_value": "4u",
+      "value": 4
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_FILEUI_NAME_HI",
+      "raw_value": "5u",
+      "value": 5
+    },
+    {
+      "name": "SPECTRUM_OVL_FILEUI_ACT_NONE",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_FILEUI_ACT_LOAD",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_FILEUI_ACT_SAVE",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_FILEUI_ACT_ERASE",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_FILEUI_ACT_FAIL",
+      "raw_value": "0xffu",
+      "value": 255
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_PREFLIGHT_OK",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_PREFLIGHT_RETRY",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_PREFLIGHT_RETRY_DEFAULT",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_PREFLIGHT_RETRY_AGAIN",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_STATUS_PHASE",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_STATUS_LINE_TEXT_SIZE",
+      "raw_value": "53u",
+      "value": 53
+    },
+    {
+      "name": "SPECTRUM_OVL_STATUS_LINE_SIZE",
+      "raw_value": "(SPECTRUM_OVL_STATUS_LINE_TEXT_SIZE + 1u)",
+      "value": "(SPECTRUM_OVL_STATUS_LINE_TEXT_SIZE + 1u)"
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_SETUP_KEY",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_SETUP_FORCE_LO",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_SETUP_FORCE_HI",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_SETUP_CLEAR_FROM",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_SETUP_ACTION",
+      "raw_value": "4u",
+      "value": 4
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_SETUP_NOTICE",
+      "raw_value": "5u",
+      "value": 5
+    },
+    {
+      "name": "SPECTRUM_OVL_CTX_SETUP_FLAGS",
+      "raw_value": "6u",
+      "value": 6
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP_FLAG_RENDER",
+      "raw_value": "0x01u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP_FLAG_PAINT",
+      "raw_value": "0x02u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP_FLAG_EDIT",
+      "raw_value": "0x04u",
+      "value": 4
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP_FLAG_SUPPRESS",
+      "raw_value": "0x08u",
+      "value": 8
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP_ACTION_NONE",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP_ACTION_BOARD",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP_ACTION_SET",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP_ACTION_START",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP_NOTICE_NONE",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP_NOTICE_SELECT",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP_NOTICE_PENDING",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SPECTRUM_OVL_SETUP_NOTICE_BAD_IP",
+      "raw_value": "3u",
+      "value": 3
+    }
+  ],
+  "resident_symbols": [
+    {
+      "address": "0x6800",
+      "api": {
+        "asm_name": "_overlay_code_slot",
+        "kind": "object",
+        "name": "overlay_code_slot",
+        "type": "uint8_t []"
+      },
+      "name": "_overlay_code_slot",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0x5FE0",
+      "name": "_spectrum_overlay_context",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF6CF",
+      "api": {
+        "asm_name": "_spectrum_overlay_loaded_id",
+        "kind": "object",
+        "name": "spectrum_overlay_loaded_id",
+        "type": "uint8_t"
+      },
+      "name": "_spectrum_overlay_loaded_id",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xEDDB",
+      "api": {
+        "args": [
+          "uint8_t ovl_id",
+          "uint8_t entry_id"
+        ],
+        "asm_name": "_spectrum_overlay_exec",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_overlay_exec",
+        "return": "uint8_t"
+      },
+      "name": "_spectrum_overlay_exec",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xEDDF",
+      "api": {
+        "args": [
+          "uint8_t ovl_id",
+          "uint8_t entry_id"
+        ],
+        "asm_name": "_spectrum_overlay_exec_cached",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_overlay_exec_cached",
+        "return": "uint8_t"
+      },
+      "name": "_spectrum_overlay_exec_cached",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF351",
+      "name": "_NETCHESS_PROTO_GAME_START",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xEFFD",
+      "name": "ovl_close_overlay_file",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xB05D",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_frame_wait",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_frame_wait",
+        "return": "void"
+      },
+      "name": "_spectrum_frame_wait",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xCC04",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_gui_tick",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_gui_tick",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_tick",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xEA0B",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_key_poll",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_key_poll",
+        "return": "uint8_t"
+      },
+      "name": "_spectrum_key_poll",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xB09F",
+      "api": {
+        "args": [
+          "uint16_t frames"
+        ],
+        "asm_name": "_spectrum_uart_flush",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_uart_flush",
+        "return": "void"
+      },
+      "name": "_spectrum_uart_flush",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xB101",
+      "api": {
+        "args": [
+          "const char *s"
+        ],
+        "asm_name": "_spectrum_uart_send_string",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_uart_send_string",
+        "return": "uint8_t"
+      },
+      "name": "_spectrum_uart_send_string",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xB116",
+      "api": {
+        "args": [
+          "const uint8_t *data",
+          "uint8_t len"
+        ],
+        "asm_name": "_spectrum_uart_send_bytes",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_uart_send_bytes",
+        "return": "uint8_t"
+      },
+      "name": "_spectrum_uart_send_bytes",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xB13D",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_uart_send_crlf",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_uart_send_crlf",
+        "return": "uint8_t"
+      },
+      "name": "_spectrum_uart_send_crlf",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xB14F",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_uart_ready",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_uart_ready",
+        "return": "uint8_t"
+      },
+      "name": "_spectrum_uart_ready",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xB15C",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_uart_read",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_uart_read",
+        "return": "uint8_t"
+      },
+      "name": "_spectrum_uart_read",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xED3C",
+      "api": {
+        "args": [
+          "char *dst",
+          "const char *src"
+        ],
+        "asm_name": "_spectrum_append_text",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_append_text",
+        "return": "char *"
+      },
+      "name": "_spectrum_append_text",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xED4A",
+      "api": {
+        "args": [
+          "char *dst",
+          "uint16_t value"
+        ],
+        "asm_name": "_spectrum_append_u16",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_append_u16",
+        "return": "char *"
+      },
+      "name": "_spectrum_append_u16",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xC7B8",
+      "api": {
+        "args": [
+          "const char *text"
+        ],
+        "asm_name": "_spectrum_gui_set_status",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_gui_set_status",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_set_status",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xCADC",
+      "api": {
+        "args": [
+          "const char *text"
+        ],
+        "asm_name": "_spectrum_gui_set_status_error",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_gui_set_status_error",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_set_status_error",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xD31A",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_gui_draw_status",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_gui_draw_status",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_draw_status",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xCB41",
+      "api": {
+        "args": [
+          "uint8_t connected"
+        ],
+        "asm_name": "_spectrum_gui_set_connected",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_gui_set_connected",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_set_connected",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xCBBC",
+      "api": {
+        "args": [
+          "const char *text",
+          "uint8_t is_error"
+        ],
+        "asm_name": "_spectrum_gui_notify",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_gui_notify",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_notify",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xCBE4",
+      "api": {
+        "args": [
+          "const char *text"
+        ],
+        "asm_name": "_spectrum_gui_notify_persistent",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_gui_notify_persistent",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_notify_persistent",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xCBF5",
+      "api": {
+        "args": [
+          "const char *text"
+        ],
+        "asm_name": "_spectrum_gui_notify_success",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_gui_notify_success",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_notify_success",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xD383",
+      "api": {
+        "args": [
+          "const char *ply",
+          "const char *move"
+        ],
+        "asm_name": "_spectrum_gui_add_move",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_gui_add_move",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_add_move",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xD3B3",
+      "api": {
+        "args": [
+          "char who",
+          "const char *text"
+        ],
+        "asm_name": "_spectrum_gui_add_chat",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_gui_add_chat",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_add_chat",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xD13E",
+      "api": {
+        "args": [
+          "const char *move"
+        ],
+        "asm_name": "_spectrum_gui_prepare_move",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_gui_prepare_move",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_prepare_move",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xD170",
+      "api": {
+        "args": [
+          "const char *move"
+        ],
+        "asm_name": "_spectrum_gui_apply_move",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_gui_apply_move",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_apply_move",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xCCE1",
+      "api": {
+        "args": [
+          "const char *text"
+        ],
+        "asm_name": "_spectrum_gui_set_input",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_gui_set_input",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_set_input",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xCCEC",
+      "api": {
+        "args": [
+          "const char *text",
+          "uint8_t len",
+          "uint8_t cursor"
+        ],
+        "asm_name": "_spectrum_gui_set_input_edit",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_gui_set_input_edit",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_set_input_edit",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xCD38",
+      "api": {
+        "args": [
+          "uint8_t pos",
+          "char c",
+          "uint8_t cursor"
+        ],
+        "asm_name": "_spectrum_gui_input_cell",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_gui_input_cell",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_input_cell",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xCF37",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_gui_redraw_board_squares",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_gui_redraw_board_squares",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_redraw_board_squares",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xCF20",
+      "api": {
+        "args": [
+          "uint8_t row",
+          "uint8_t col"
+        ],
+        "asm_name": "_spectrum_gui_redraw_square",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_gui_redraw_square",
+        "return": "void"
+      },
+      "name": "_spectrum_gui_redraw_square",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xCF20",
+      "api": {
+        "args": [
+          "uint8_t row",
+          "uint8_t col"
+        ],
+        "asm_name": "_spectrum_board_view_redraw_square",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_board_view_redraw_square",
+        "return": "void"
+      },
+      "name": "_spectrum_board_view_redraw_square",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xA3A3",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_net_runtime_clock_ready",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_net_runtime_clock_ready",
+        "return": "uint8_t"
+      },
+      "name": "_spectrum_net_runtime_clock_ready",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xA372",
+      "api": {
+        "args": [
+          "uint8_t hour",
+          "uint8_t minute",
+          "uint8_t second"
+        ],
+        "asm_name": "_spectrum_net_runtime_set_clock",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_net_runtime_set_clock",
+        "return": "void"
+      },
+      "name": "_spectrum_net_runtime_set_clock",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xA3A8",
+      "api": {
+        "args": [
+          "uint16_t date",
+          "uint16_t time"
+        ],
+        "asm_name": "_spectrum_net_runtime_set_fat_stamp",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_net_runtime_set_fat_stamp",
+        "return": "void"
+      },
+      "name": "_spectrum_net_runtime_set_fat_stamp",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xA3C0",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_net_runtime_fat_date",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_net_runtime_fat_date",
+        "return": "uint16_t"
+      },
+      "name": "_spectrum_net_runtime_fat_date",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xA3C4",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_net_runtime_fat_time",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_net_runtime_fat_time",
+        "return": "uint16_t"
+      },
+      "name": "_spectrum_net_runtime_fat_time",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xB186",
+      "name": "_spectrum_net_last_ip",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xB430",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_net_start_uart",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_net_start_uart",
+        "return": "void"
+      },
+      "name": "_spectrum_net_start_uart",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xD81B",
+      "api": {
+        "args": [
+          "const char *board"
+        ],
+        "asm_name": "_spectrum_render_board",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_render_board",
+        "return": "void"
+      },
+      "name": "_spectrum_render_board",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xD896",
+      "api": {
+        "args": [
+          "const char *text"
+        ],
+        "asm_name": "_spectrum_render_status",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_render_status",
+        "return": "void"
+      },
+      "name": "_spectrum_render_status",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xD89A",
+      "api": {
+        "args": [
+          "const char *text"
+        ],
+        "asm_name": "_spectrum_render_status_error",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_render_status_error",
+        "return": "void"
+      },
+      "name": "_spectrum_render_status_error",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xD9DD",
+      "api": {
+        "args": [
+          "uint8_t connected"
+        ],
+        "asm_name": "_spectrum_render_connection",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_render_connection",
+        "return": "void"
+      },
+      "name": "_spectrum_render_connection",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDA08",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_info_show_setup",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_info_show_setup",
+        "return": "void"
+      },
+      "name": "_spectrum_info_show_setup",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDA0D",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_info_show_game_setup",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_info_show_game_setup",
+        "return": "void"
+      },
+      "name": "_spectrum_info_show_game_setup",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDAD0",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_info_show_preflight",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_info_show_preflight",
+        "return": "void"
+      },
+      "name": "_spectrum_info_show_preflight",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDB07",
+      "api": {
+        "args": [
+          "const char *line"
+        ],
+        "asm_name": "_spectrum_info_line",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_info_line",
+        "return": "void"
+      },
+      "name": "_spectrum_info_line",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDCE4",
+      "api": {
+        "args": [
+          "const char *moves"
+        ],
+        "asm_name": "_spectrum_render_moves",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_render_moves",
+        "return": "void"
+      },
+      "name": "_spectrum_render_moves",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDD0F",
+      "api": {
+        "args": [
+          "const char *line"
+        ],
+        "asm_name": "_spectrum_render_move_at",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_render_move_at",
+        "return": "void"
+      },
+      "name": "_spectrum_render_move_at",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDD6A",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_render_moves_scroll",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_render_moves_scroll",
+        "return": "void"
+      },
+      "name": "_spectrum_render_moves_scroll",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDDB1",
+      "api": {
+        "args": [
+          "const char *chat"
+        ],
+        "asm_name": "_spectrum_render_chat",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_render_chat",
+        "return": "void"
+      },
+      "name": "_spectrum_render_chat",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDDDC",
+      "api": {
+        "args": [
+          "const char *line"
+        ],
+        "asm_name": "_spectrum_render_chat_at",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_render_chat_at",
+        "return": "void"
+      },
+      "name": "_spectrum_render_chat_at",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDD70",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_render_chat_scroll",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_render_chat_scroll",
+        "return": "void"
+      },
+      "name": "_spectrum_render_chat_scroll",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDB11",
+      "api": {
+        "args": [
+          "const char *spec"
+        ],
+        "asm_name": "_spectrum_render_square",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_render_square",
+        "return": "void"
+      },
+      "name": "_spectrum_render_square",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDB17",
+      "api": {
+        "args": [
+          "const char *spec"
+        ],
+        "asm_name": "_spectrum_render_square_attr",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_render_square_attr",
+        "return": "void"
+      },
+      "name": "_spectrum_render_square_attr",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDBEA",
+      "api": {
+        "args": [
+          "const char *spec"
+        ],
+        "asm_name": "_spectrum_render_square_mark",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_render_square_mark",
+        "return": "void"
+      },
+      "name": "_spectrum_render_square_mark",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDCCA",
+      "name": "compute_square_bc",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xEC25",
+      "name": "compute_attr_base",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xE39E",
+      "name": "set_square_attr_2x2",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xEBFA",
+      "name": "compute_screen_base",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF6B6",
+      "name": "board_row",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF6B7",
+      "name": "board_col",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF6B3",
+      "name": "tmp_attr",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDBE5",
+      "name": "board_theme_hint_inks",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF69C",
+      "name": "_spectrum_gui_board_flipped",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF69C",
+      "api": {
+        "asm_name": "_spectrum_board_view_flipped",
+        "kind": "object",
+        "name": "spectrum_board_view_flipped",
+        "type": "uint8_t"
+      },
+      "name": "_spectrum_board_view_flipped",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF529",
+      "name": "_netchesszx_board_theme_index",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0x5FF0",
+      "name": "_netchesszx_hinted_rows",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xBF30",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_board_reset",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_board_reset",
+        "return": "void"
+      },
+      "name": "_spectrum_board_reset",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xBFE2",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_board_cells",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_board_cells",
+        "return": "const char *"
+      },
+      "name": "_spectrum_board_cells",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xC008",
+      "api": {
+        "args": [
+          "uint8_t row",
+          "uint8_t col"
+        ],
+        "asm_name": "_spectrum_board_cell",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_board_cell",
+        "return": "char"
+      },
+      "name": "_spectrum_board_cell",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xC213",
+      "api": {
+        "args": [
+          "const char *move"
+        ],
+        "asm_name": "_spectrum_board_apply_trusted_move",
+        "calling_convention": "fastcall",
+        "kind": "function",
+        "name": "spectrum_board_apply_trusted_move",
+        "return": "uint8_t"
+      },
+      "name": "_spectrum_board_apply_trusted_move",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF679",
+      "name": "_side_to_move",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF67A",
+      "name": "_castle_rights",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF67B",
+      "name": "_ep_square",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF698",
+      "name": "_last_ply_seen",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF69A",
+      "name": "_move_line_count",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF69B",
+      "name": "_chat_line_count",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF573",
+      "name": "_setup_choice",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF579",
+      "name": "_setup_focus_choice",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF57F",
+      "name": "_setup_focus_board_theme",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF580",
+      "name": "_setup_defined_mask",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF582",
+      "name": "_setup_visible_mask",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF584",
+      "name": "_setup_cursor",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF585",
+      "name": "_setup_room_editing",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF586",
+      "name": "_setup_edit_row",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF587",
+      "name": "_setup_port_text",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xA91E",
+      "name": "_netchesszx_session_peer_ready",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDA34",
+      "name": "_spectrum_render_ikkle_at",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDA71",
+      "name": "_spectrum_render_fileui_frame",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xDA4B",
+      "name": "_spectrum_render_fileui_select",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF680",
+      "name": "_spectrum_fileui_count",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF681",
+      "name": "_spectrum_fileui_used_mask",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF546",
+      "name": "_local_input_len",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF547",
+      "name": "_local_input_cursor",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF548",
+      "name": "_local_input_mode",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF549",
+      "name": "_input_history_count",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xF54A",
+      "name": "_input_history_pos",
+      "present": true,
+      "required": true
+    },
+    {
+      "address": "0xD7B7",
+      "name": "_netchess_after_prefix",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xD731",
+      "name": "_netchess_mqtt_session_parse_u16_token",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF311",
+      "name": "_NETCHESS_PROTO_ACK_PREFIX",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF316",
+      "name": "_NETCHESS_PROTO_NACK_PREFIX",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF31C",
+      "name": "_NETCHESS_PROTO_MOVE_PREFIX",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF322",
+      "name": "_NETCHESS_PROTO_CHAT_PREFIX",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF328",
+      "name": "_NETCHESS_PROTO_DRAW",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF32D",
+      "name": "_NETCHESS_PROTO_CANCEL_DRAW",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF339",
+      "name": "_NETCHESS_PROTO_CANCEL_RESET",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF346",
+      "name": "_NETCHESS_PROTO_ACK_RESIGN",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF35C",
+      "name": "_NETCHESS_PROTO_NACK_RESET",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF367",
+      "name": "_NETCHESS_PROTO_BYE",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF36B",
+      "name": "_NETCHESS_PROTO_TAKEBACK_PREFIX",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF5D1",
+      "name": "_line_buf",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0x5F3A",
+      "name": "_last_ip",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF603",
+      "name": "_direct_rx_payload",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF633",
+      "name": "_direct_rx_payload2",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF663",
+      "name": "_direct_rx_link",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF664",
+      "name": "_direct_rx_link2",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF665",
+      "name": "_direct_rx_count",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF666",
+      "name": "_direct_rx_head",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF667",
+      "name": "_direct_rx_payload_len",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF668",
+      "name": "_direct_ipd_remaining",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF66A",
+      "name": "_direct_ipd_accept",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF66B",
+      "name": "_direct_ipd_link",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF66C",
+      "name": "_direct_link_closed",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF66D",
+      "name": "_direct_peer_valid",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF541",
+      "name": "_direct_intruder_link",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF602",
+      "name": "_active_link",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF601",
+      "name": "_line_pos",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xA363",
+      "name": "_net_wait_frame",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xB177",
+      "name": "_reset_line_buf",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xB18A",
+      "name": "_read_line",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_line_has",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": "0xB25F",
+      "name": "_wait_for_ok",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xB2BF",
+      "name": "_wait_for_prompt",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF670",
+      "name": "_mqtt_next_id",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF672",
+      "name": "_mqtt_stream_len",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_mqtt_packet",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_at_cmd",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_guard_wait",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": "0xB2E6",
+      "name": "_spectrum_net_at_cmd",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xB310",
+      "name": "_spectrum_net_guard_wait",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xB374",
+      "name": "_spectrum_net_ensure_command_mode",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_spectrum_net_query_ip_with_retry",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": "0xB400",
+      "api": {
+        "args": [],
+        "asm_name": "_spectrum_net_background_drain",
+        "calling_convention": "z88dk_c",
+        "kind": "function",
+        "name": "spectrum_net_background_drain",
+        "return": "void"
+      },
+      "name": "_spectrum_net_background_drain",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF429",
+      "name": "_spectrum_net_at_cipclose",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF435",
+      "name": "_spectrum_net_at_cipmode_0",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF442",
+      "name": "_spectrum_net_at_cipmux_0",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF44E",
+      "name": "_spectrum_net_at_cipserver_0",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xB50F",
+      "name": "_mqtt_enter_stream_mode",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xB55A",
+      "name": "_mqtt_abort_stream_mode",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xB7D0",
+      "name": "_mqtt_send_raw_packet",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_mqtt_send_packet",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": "0xB82A",
+      "name": "_mqtt_wait_packet_into",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_mqtt_wait_packet",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_mqtt_wait_suback_into",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_mqtt_wait_suback",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_mqtt_subscribe_suffix",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_mqtt_publish_suffix",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": "0xA3C8",
+      "name": "_netchesszx_session_configure",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF522",
+      "name": "_netchesszx_session_role",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF523",
+      "name": "_netchesszx_transport",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF524",
+      "name": "_netchesszx_local_color",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF525",
+      "name": "_netchesszx_host_color",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF526",
+      "name": "_netchesszx_host_color_ready",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_netchesszx_text_game_start",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": "0xF2FD",
+      "name": "_netchesszx_mqtt_host",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF5BD",
+      "name": "_netchesszx_mqtt_code",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF30F",
+      "name": "_netchesszx_mqtt_port",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF52D",
+      "name": "_netchesszx_mqtt_session_id",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF52F",
+      "name": "_netchesszx_direct_host",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xF53F",
+      "name": "_netchesszx_direct_port",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xBACA",
+      "name": "_spectrum_net_mqtt_out_suffix",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xBAD4",
+      "name": "_spectrum_net_mqtt_out_ack_suffix",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xBACF",
+      "name": "_spectrum_net_mqtt_in_suffix",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xBAD9",
+      "name": "_spectrum_net_mqtt_in_ack_suffix",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xBAF0",
+      "name": "_spectrum_net_mqtt_peer_presence_suffix",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xBADE",
+      "name": "_spectrum_net_mqtt_presence_suffix",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xBAF5",
+      "name": "_spectrum_net_mqtt_presence_payload",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xBB44",
+      "name": "_spectrum_net_mqtt_setup_payload",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xB3C1",
+      "name": "_spectrum_net_sync_time",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xBBAA",
+      "name": "_spectrum_mqtt_subscribe",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": "0xBC2C",
+      "name": "_spectrum_mqtt_publish",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_memcmp",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_memcpy",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_memset",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_strcmp",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": "0x7066",
+      "name": "_strcmp_callee",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_strlen",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "_strlen_fastcall",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gchar1",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gchar2",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gchar3",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "asm0_memcpy",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "asm1_memcpy",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "asm_memcpy",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": "0x706C",
+      "name": "asm_strcmp",
+      "present": true,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "asm_strlen",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_eq",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gchar",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gcharspsp",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_ge",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gint",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gint1sp",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gint3sp",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gint4sp",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gint5sp",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gint6sp",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gint7sp",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gint8sp",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_g2intspsp",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gintspsp",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_asl",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_asr_u_hl_by_e",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_uge",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_le",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_lneg",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_ne",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_pint",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_asr_u",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_sxt",
+      "present": false,
+      "required": false
+    },
+    {
+      "address": null,
+      "name": "l_gt",
+      "present": false,
+      "required": false
+    }
+  ],
+  "root": "/private/tmp/NetChessZX-g7-56d30ab",
+  "session_route_constants": [
+    {
+      "name": "SESSION_ROUTE_DEFAULT",
+      "raw_value": "0u",
+      "value": 0
+    },
+    {
+      "name": "SESSION_ROUTE_CONTROL",
+      "raw_value": "1u",
+      "value": 1
+    },
+    {
+      "name": "SESSION_ROUTE_PRESENCE",
+      "raw_value": "2u",
+      "value": 2
+    },
+    {
+      "name": "SESSION_ROUTE_GAME",
+      "raw_value": "3u",
+      "value": 3
+    },
+    {
+      "name": "SESSION_ROUTE_ACK",
+      "raw_value": "4u",
+      "value": 4
+    },
+    {
+      "name": "SESSION_ROUTE_PRESENCE_PEER",
+      "raw_value": "5u",
+      "value": 5
+    },
+    {
+      "name": "SESSION_ROUTE_META",
+      "raw_value": "6u",
+      "value": 6
+    }
+  ],
+  "sources": {
+    "lowram_map": "src/spectrum/lowram_map.h",
+    "map": "build/SHATRANJ.map",
+    "overlay_api": "src/spectrum/overlay/overlay_api.h",
+    "overlay_context": "src/spectrum/overlay/overlay_context.h",
+    "overlay_header": "src/spectrum/overlay/overlay.h",
+    "session_header": "src/common/session/session.h"
+  },
+  "version": 3
+}

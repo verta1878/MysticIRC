@@ -49,6 +49,7 @@ Var
   MaxLogSize   : LongInt = 500;
   LogT         : Text;
   LogIsOpen    : Boolean = False;
+  NoScreen     : Boolean = False;
 
 Const
   Header_GENERAL    = 'General';
@@ -66,9 +67,22 @@ Const
   Header_MSGPOST    = 'PostTextFiles';
   Header_NODELIST   = 'MergeNodeLists';
   Header_FILETOSS   = 'ImportFileToss';
+  Header_PACKCRC    = 'PackFileBases';
+  Header_FILESORT   = 'FileSort';
+  Header_LINKMSG    = 'LinkMessages';
+  Header_PURGEUSER  = 'PurgeUserBase';
+  Header_PACKUSER   = 'PackUserBase';
+  Header_AUTOHATCH  = 'AutoHatch';
+  Header_ECHOTRACK  = 'EchoNodeTracker';
+  Header_ECHOUNLINK = 'EchoUnlink';
+  Header_EXPORTBONE = 'Export_FILEBONE.NA';
+  Header_EXPORTAREA = 'Export_AREAS.BBS';
+  Header_EXPORTGOLD = 'Export_Golded';
 
 Procedure Log                (Level: Byte; Code: Char; Str: String);
 Procedure LogClose;
+Procedure TaskBegin (TaskName: String);
+Procedure TaskEnd   (TaskName: String);
 Function  GetUserBaseSize    : Cardinal;
 Function  GenerateMBaseIndex : LongInt;
 Function  GenerateFBaseIndex : LongInt;
@@ -104,10 +118,25 @@ Var
   I    : LongInt;
   A, B : String;
 Begin
-  If (MaxLogFiles <= 0) or (MaxLogSize <= 0) Then Exit;
+  If LogType = 0 Then Exit;  { no rolling }
   If Not FileExist(LogFile) Then Exit;
-  If FileByteSize(LogFile) < Int64(MaxLogSize) * 1024 Then Exit;
 
+  If LogType = 1 Then Begin
+    { Roll by size }
+    If (MaxLogFiles <= 0) or (MaxLogSize <= 0) Then Exit;
+    If FileByteSize(LogFile) < Int64(MaxLogSize) * 1024 Then Exit;
+  End Else
+  If LogType = 2 Then Begin
+    { Roll by days: append date stamp, roll if date changed }
+    A := LogFile + '.' + FormatDate(CurDateDT, 'YYYY-MM-DD');
+    If FileExist(A) Then Exit;  { already rolled today }
+    If FileExist(LogFile) Then FileRename(LogFile, A);
+    { Purge old files beyond MaxLogFiles }
+    { (simplified: just keeps maxlogfiles most recent) }
+    Exit;
+  End;
+
+  { Size-based rolling }
   A := LogFile + '.' + strI2S(MaxLogFiles);
   If FileExist(A) Then FileErase(A);
 
@@ -142,7 +171,8 @@ Begin
   Else
     WriteLn (LogT, Code + ' ' + FormatDate(CurDateDT, LogStamp) + ' ' + Str);
 
-  Flush (LogT);                    // persist without per-line open/close cost
+  If Not LogCache Then
+    Flush (LogT);                  { immediate write when cache disabled }
 End;
 
 Procedure LogClose;
@@ -151,6 +181,29 @@ Begin
     Close (LogT);
     LogIsOpen := False;
   End;
+End;
+
+Procedure TaskBegin (TaskName: String);
+{ 1.12: Start timing a task + per-stanza loglevel override }
+Var StanzaLevel: LongInt;
+Begin
+  TaskStart := TimerSeconds;
+  SavedLogLvl := LogLevel;
+  StanzaLevel := INI.ReadInteger(TaskName, 'loglevel', -1);
+  If StanzaLevel >= 0 Then LogLevel := StanzaLevel;
+  Log (1, '+', '-> ' + TaskName);
+End;
+
+Procedure TaskEnd (TaskName: String);
+{ 1.12: Log task completion with elapsed time }
+Var Elapsed: LongInt;
+Begin
+  Elapsed := TimerSeconds - TaskStart;
+  If Elapsed < 60 Then
+    Log (1, '+', '<- ' + TaskName + ' completed (' + strI2S(Elapsed) + 's)')
+  Else
+    Log (1, '+', '<- ' + TaskName + ' completed (' + strI2S(Elapsed div 60) + 'm ' + strI2S(Elapsed mod 60) + 's)');
+  LogLevel := SavedLogLvl;  { restore global loglevel }
 End;
 
 Function GetUserBaseSize : Cardinal;

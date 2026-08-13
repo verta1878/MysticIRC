@@ -16,6 +16,7 @@ Welcome to **Mystic BBS 1.11IRC** — the community fork.
 | `mystic_test/` | BBS core + RIP integration + experimental |
 | `mdl/` | Mystic Development Library (67 shared units) |
 | `mystic_rip/` | RIPscrip engines (v1-v4), converters, tools |
+| `mystic_perl/` | Perl integration (planned) |
 | `mystic_rip/v1/` | RIPscrip v1.54 engine (4,123 lines) |
 | `mystic_rip/v2/` | RIPscrip v2.0 engine + 256-color (5,331 lines) |
 | `mystic_rip/v3/` | RIPscrip v3.0 engine + RGB24/32 (8,308 lines) |

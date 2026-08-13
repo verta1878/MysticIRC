@@ -1,0 +1,28 @@
+{
+  "pipeline": 2,
+  "sets": [
+    "california",
+    "mpchess",
+    "totoy"
+  ],
+  "boards": [
+    "black&white",
+    "blue3",
+    "green",
+    "brown",
+    "wood"
+  ],
+  "pieces_per_set": 12,
+  "bytes_per_pattern": 256,
+  "piece_draw_size": 14,
+  "bytes_per_set": 3072,
+  "piece_sets": 3,
+  "board_pattern_base": 12,
+  "board_patterns": 10,
+  "marker_pattern_base": 22,
+  "marker_patterns": 4,
+  "total_bytes": 12800,
+  "transparent_index": 227,
+  "palette_entries": 160,
+  "browser": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+}

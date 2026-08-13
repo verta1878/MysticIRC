@@ -1,0 +1,33 @@
+#include <windows.h>
+
+#define IDI_SHATRANJ 101
+IDI_SHATRANJ ICON "@SHATRANJ_WINDOWS_ICON@"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+ PRODUCTVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+ FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+ FILEFLAGS 0x0L
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "M. Ignacio Monge Garcia"
+            VALUE "FileDescription", "Shatranj"
+            VALUE "FileVersion", "@SHATRANJ_DISPLAY_VERSION@"
+            VALUE "InternalName", "shatranj-client"
+            VALUE "LegalCopyright", "(C) 2026 M. Ignacio Monge Garcia"
+            VALUE "OriginalFilename", "shatranj-client.exe"
+            VALUE "ProductName", "Shatranj"
+            VALUE "ProductVersion", "@SHATRANJ_DISPLAY_VERSION@"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END

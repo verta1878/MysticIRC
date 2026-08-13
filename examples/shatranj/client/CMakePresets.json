@@ -1,0 +1,50 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 22,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "msvc",
+      "displayName": "MSVC x64 (no vcvars needed)",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "$env{LOCALAPPDATA}/netchesszx/pc-build",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "$env{QT_ROOT_DIR};$env{QTDIR}"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "environment": {
+        "MSBUILDDISABLENODEREUSE": "1"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "msvc-release",
+      "configurePreset": "msvc",
+      "configuration": "Release"
+    },
+    {
+      "name": "msvc-debug",
+      "configurePreset": "msvc",
+      "configuration": "Debug"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "msvc-release",
+      "configurePreset": "msvc",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

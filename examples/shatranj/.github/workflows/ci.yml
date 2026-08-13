@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  QT_VERSION: 6.10.3
+  QT_QPA_PLATFORM: offscreen
+
+jobs:
+  spectrum-and-host:
+    name: Spectrum and host contracts
+    runs-on: ubuntu-24.04
+    container: z88dk/z88dk:2.4
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Python
+        run: apk add --no-cache python3
+      - name: Run full contract suite
+        run: make full-check
+
+  desktop-unix:
+    name: Qt (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-24.04
+          - macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          cache: true
+      - name: Build and test desktop client
+        run: make client-test
+
+  desktop-windows:
+    name: Qt (windows-2022)
+    runs-on: windows-2022
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          arch: win64_msvc2022_64
+          dir: C:/
+          cache: true
+      - name: Build and test desktop client
+        shell: cmd
+        run: client\build-pc.cmd

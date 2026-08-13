@@ -133,15 +133,15 @@ IMPORTANT: `install_data.mys` is a binary payload - it is marked `binary` in
     ./make_release.sh <tag> <bin-dir> [full|upgrade|both] [out-dir]
       tag  = lnx | win | mac | os2 | dos     (the target platform)
       mode = both (default) | full | upgrade
-    env: VER    = version token   (default 1.10irc)
+    env: VER    = version token   (default 1.11irc)
          STAMP  = date or FINAL   (default today, MM-DD-YYYY)
 
 Archive names carry the version, platform, mode, AND a stamp:
 
     mystic-<VER>-<tag>-<mode>-<STAMP>.zip
 
-    in-progress:  mystic-1.10irc-win-full-07-10-2026.zip
-    completed:    STAMP=FINAL ... -> mystic-1.10irc-win-full-FINAL.zip
+    in-progress:  mystic-1.11irc-win-full-07-10-2026.zip
+    completed:    STAMP=FINAL ... -> mystic-1.11irc-win-full-FINAL.zip
 
 ### The STAMP: dated vs FINAL
 While an alpha's fixes are still being imported, builds carry the **date**
@@ -150,7 +150,7 @@ and verified, build with `STAMP=FINAL` and the stamp becomes `FINAL`.
 
 ### Each archive extracts into its OWN folder
 The contents are packaged inside a top-level folder named after the archive
-(e.g. `mystic-1.10irc-win-full-07-10-2026/`). This means extracting the FULL
+(e.g. `mystic-1.11irc-win-full-07-10-2026/`). This means extracting the FULL
 and UPGRADE archives side by side does NOT merge their loose files - a mistake
 that previously made it look like the installer files had been replaced by
 upgrade files.
@@ -168,8 +168,8 @@ Example (OS/2, built on Linux via the emx toolchain):
 
     LINK=1 ./build-os2.sh                     # -> out/bin-os2/*.exe
     ./make_release.sh os2 out/bin-os2         # both -> release/os2/
-                                              #   mystic-1.10irc-os2-full-<date>.zip
-                                              #   mystic-1.10irc-os2-update-<date>.zip
+                                              #   mystic-1.11irc-os2-full-<date>.zip
+                                              #   mystic-1.11irc-os2-update-<date>.zip
 
 The script: copies the bin dir, strips build intermediates
 (`.o .ppu .a .s .out`), generates `FILE_ID.DIZ` (see §4a), adds
@@ -241,10 +241,10 @@ Each target gets its own directory under `release/`, named by the platform tag,
 holding its FULL install and its UPGRADE bundle (names carry VER + stamp):
 
     release/
-      lnx/  mystic-1.10irc-lnx-full-<STAMP>.zip   ...-lnx-update-<STAMP>.zip
-      win/  mystic-1.10irc-win-full-<STAMP>.zip   ...-win-update-<STAMP>.zip
-      mac/  mystic-1.10irc-mac-full-<STAMP>.zip   ...-mac-update-<STAMP>.zip
-      os2/  mystic-1.10irc-os2-full-<STAMP>.zip   ...-os2-update-<STAMP>.zip
+      lnx/  mystic-1.11irc-lnx-full-<STAMP>.zip   ...-lnx-update-<STAMP>.zip
+      win/  mystic-1.11irc-win-full-<STAMP>.zip   ...-win-update-<STAMP>.zip
+      mac/  mystic-1.11irc-mac-full-<STAMP>.zip   ...-mac-update-<STAMP>.zip
+      os2/  mystic-1.11irc-os2-full-<STAMP>.zip   ...-os2-update-<STAMP>.zip
 
     <STAMP> = build date (MM-DD-YYYY) while importing, or FINAL when complete.
 

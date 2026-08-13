@@ -39,7 +39,7 @@ Uses
   BBS_Records;
 
 Const
-  MaxStatusText = 20;
+  MaxStatusText = 500;  { 1.12: larger scrollback buffer }
 
 Type
   TServerManager    = Class;
@@ -232,7 +232,7 @@ Begin
     Result := Copy(Res, 1, 3) = '127';
 
     If Result Then
-      Status (-1, 'Connection DNS blacklisted ' + Res);
+      Status (-1, '-Blocked (DNS blacklisted) ' + Res);
   End;
 
   If Not Result and Config.inetUseDNSCC and (Config.inetDNSCC <> '') Then Begin
@@ -318,15 +318,18 @@ Begin
     If ServerStatus.Count > MaxStatusText Then
       ServerStatus.Delete(0);
 
-    Res := FormatDate (CurDateDT, 'HH:II:SS') + ' ' + strPadR(ServerName, 7, ' ') + ' ' + strI2S(ProcID + 1) + '-' + Str;
+    If ProcID < 0 Then
+      Res := FormatDate (CurDateDT, 'HH:II:SS') + ' MANAGER ' + Str
+    Else
+      Res := FormatDate (CurDateDT, 'HH:II:SS') + ' ' + strPadR(ServerName, 7, ' ') + ' ' + Str;
 
-    If Length(Res) > 74 Then Begin
-      ServerStatus.Add(Copy(Res, 1, 74));
+    If Length(Res) > 77 Then Begin
+      ServerStatus.Add(Copy(Res, 1, 77));
 
       If ServerStatus.Count > MaxStatusText Then
         ServerStatus.Delete(0);
 
-      ServerStatus.Add(strRep(' ', 15) + Copy(Res, 75, 255));
+      ServerStatus.Add(strRep(' ', 15) + Copy(Res, 78, 255));
     End Else
       ServerStatus.Add(Res);
 
@@ -369,7 +372,7 @@ Begin
   If ClientMax = 0 Then
   	Status(-1, 'WARNING: At least one server is configured 0 max clients');
 
-  Status(-1, 'Opening server socket on port ' + strI2S(Port));
+  Status(-1, 'Listening on port ' + strI2S(Port));
 
   Repeat
     NewClient := Server.WaitConnection(1000);
@@ -382,7 +385,7 @@ Begin
     If (ClientMax > 0) And (ClientActive >= ClientMax) Then Begin
       Inc (ClientRefused);
 
-      Status (-1, 'BUSY: ' + NewClient.PeerIP + ' (' + NewClient.PeerName + ')');
+      Status (-1, strI2S(ClientActive) + '-Refused (Server Full) ' + NewClient.PeerIP);
 
       If Not NewClient.WriteFile('', TextPath + 'busy.txt') Then
         NewClient.WriteLine('BUSY');
@@ -394,7 +397,7 @@ Begin
     If IsBlockedIP(NewClient) Then Begin
       Inc (ClientBlocked);
 
-      Status(-1, 'BLOCK: ' + NewClient.PeerIP + ' (' + NewClient.PeerName + ')');
+      Status(-1, '-Blocked connection ' + NewClient.PeerIP);
 
       If Not NewClient.WriteFile('', TextPath + 'blocked.txt') Then
         NewClient.WriteLine('BLOCKED');
@@ -406,14 +409,14 @@ Begin
     If IsFloodIP(NewClient.PeerIP) Then Begin
       Inc (ClientBlocked);
 
-      Status(-1, 'FLOOD: ' + NewClient.PeerIP + ' (auto-banned)');
+      Status(-1, '-Auto banning IP ' + NewClient.PeerIP);
 
       NewClient.Free;
     End Else
     If (ClientMaxIPs > 0) and (DuplicateIPs(NewClient) >= ClientMaxIPs) Then Begin
       Inc (ClientRefused);
 
-      Status(-1, 'MULTI: ' + NewClient.PeerIP + ' (' + NewClient.PeerName + ')');
+      Status(-1, strI2S(DuplicateIPs(NewClient)) + '-Refused (Duplicate IP) ' + NewClient.PeerIP);
 
       If Not NewClient.WriteFile('', TextPath + 'dupeip.txt') Then
         NewClient.WriteLine('Only ' + strI2S(ClientMaxIPs) + ' connection(s) per user');
@@ -425,7 +428,8 @@ Begin
       Inc (ClientTotal);
       Inc (ClientActive);
 
-      Status (-1, 'Connect: ' + NewClient.PeerIP + ' (' + NewClient.PeerName + ')');
+      Status (-1, '> Connect on slot ' + strI2S(ClientActive) + '/' + strI2S(ClientMax) + ' (' + NewClient.PeerIP + ')');
+      Status (-1, strI2S(ClientActive) + '-HostName ' + NewClient.PeerName);
 
       NewClientProc(Self, Config, NodeInfo, NewClient);
     End;

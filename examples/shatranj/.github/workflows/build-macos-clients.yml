@@ -1,0 +1,57 @@
+name: Build macOS clients
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: macOS ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+          - arch: x86_64
+            runner: macos-15-intel
+
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        run: |
+          brew install qt
+          echo "$(brew --prefix qt)/bin" >> "$GITHUB_PATH"
+
+      - name: Build and test
+        run: |
+          make client-test \
+            CLIENT_CMAKE_BUILD_DIR="build/qt-client-${{ matrix.arch }}" \
+            CLIENT_CMAKE_ARGS="-DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} -DCMAKE_OSX_DEPLOYMENT_TARGET=15.0"
+
+      - name: Package application
+        run: |
+          app_dir="$RUNNER_TEMP/shatranj-${{ matrix.arch }}"
+          version="$(tr -d '\r\n' < VERSION)"
+          archive="release/Qt/Shatranj-${version}-macOS-${{ matrix.arch }}.zip"
+
+          make client \
+            CLIENT_CMAKE_BUILD_DIR="build/qt-client-${{ matrix.arch }}" \
+            CLIENT_CMAKE_ARGS="-DCMAKE_OSX_ARCHITECTURES=${{ matrix.arch }} -DCMAKE_OSX_DEPLOYMENT_TARGET=15.0" \
+            CLIENT_MAC_APPLICATIONS_DIR="$app_dir"
+
+          test "$(lipo -archs "$app_dir/Shatranj.app/Contents/MacOS/shatranj-client")" = "${{ matrix.arch }}"
+          mkdir -p release/Qt
+          ditto -c -k --sequesterRsrc --keepParent "$app_dir/Shatranj.app" "$archive"
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Shatranj-${{ matrix.arch }}-macOS
+          path: release/Qt/Shatranj-*-macOS-${{ matrix.arch }}.zip
+          if-no-files-found: error

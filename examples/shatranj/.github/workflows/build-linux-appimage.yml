@@ -1,0 +1,81 @@
+name: Build Linux AppImage
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  QT_VERSION: 6.10.3
+  APPIMAGE_EXTRACT_AND_RUN: "1"
+  LINUXDEPLOY_VERSION: 1-alpha-20251107-1
+  LINUXDEPLOY_QT_VERSION: 1-alpha-20250213-1
+
+jobs:
+  build:
+    name: Linux x86_64 AppImage
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          cache: true
+
+      - name: Build and test
+        run: make client-test
+
+      - name: Install application
+        run: |
+          cmake --install build/qt-client --prefix "$RUNNER_TEMP/AppDir/usr"
+          test -x "$RUNNER_TEMP/AppDir/usr/bin/shatranj-client"
+          test -f "$RUNNER_TEMP/AppDir/usr/bin/assets/pc-client/about/about-shatranj.png"
+
+      - name: Build AppImage
+        env:
+          APPDIR: ${{ runner.temp }}/AppDir
+        run: |
+          curl --fail --location --retry 3 \
+            --output "$RUNNER_TEMP/linuxdeploy-x86_64.AppImage" \
+            "https://github.com/linuxdeploy/linuxdeploy/releases/download/${LINUXDEPLOY_VERSION}/linuxdeploy-x86_64.AppImage"
+          curl --fail --location --retry 3 \
+            --output "$RUNNER_TEMP/linuxdeploy-plugin-qt-x86_64.AppImage" \
+            "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/${LINUXDEPLOY_QT_VERSION}/linuxdeploy-plugin-qt-x86_64.AppImage"
+          chmod +x "$RUNNER_TEMP"/linuxdeploy*.AppImage
+          mkdir -p release/Qt
+          PATH="$RUNNER_TEMP:$PATH" "$RUNNER_TEMP/linuxdeploy-x86_64.AppImage" \
+            --appdir "$APPDIR" \
+            --desktop-file "$APPDIR/usr/share/applications/io.github.ignaciomonge.shatranj.desktop" \
+            --icon-file "$APPDIR/usr/share/pixmaps/shatranj.png" \
+            --plugin qt \
+            --output appimage
+          generated="$(find . -maxdepth 1 -name '*.AppImage' -print -quit)"
+          test -n "$generated"
+          mv "$generated" "release/Qt/Shatranj-$(tr -d '\r\n' < VERSION)-Linux-x86_64.AppImage"
+
+      - name: Inspect package
+        run: |
+          appimage="$(find release/Qt -name '*.AppImage' -print -quit)"
+          test -n "$appimage"
+          env -u APPIMAGE_EXTRACT_AND_RUN "$appimage" --appimage-extract
+          test -x squashfs-root/usr/bin/shatranj-client
+          test -f squashfs-root/usr/bin/assets/pc-client/about/about-shatranj.png
+          ! ldd squashfs-root/usr/bin/shatranj-client | grep -q "not found"
+          set +e
+          QT_QPA_PLATFORM=offscreen timeout 5s squashfs-root/AppRun
+          status=$?
+          set -e
+          test "$status" -eq 124
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Shatranj-Linux-x86_64
+          path: release/Qt/*.AppImage
+          if-no-files-found: error

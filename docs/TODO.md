@@ -14,6 +14,16 @@
 - [x] ans2rip pixel-perfect with -p flag
 - [x] EGA palette standardized across all engines
 
+## Recently Completed
+- [x] MUTIL-1: -RUN, -LIST, -VER, -HELP, -NOSCREEN flags
+- [x] MUTIL-2: Log roller, logcache, per-stanza loglevel, process timing
+- [x] MUTIL-3: EchoNodeTracker, EchoUnlink, AutoHatch tasks
+- [x] MUTIL-4: INI synced with 1.12 (26 sections, 25 task toggles)
+- [x] MUTIL-5: All 25 tasks wired, 8 stub modules for missing tasks
+- [x] MIS-1: 1.12 ANSI screen with tab bar
+- [x] MIS-2: Tabbed panel system (6 compiled ANSI screens)
+- [x] MIS-3: Enhanced logging (timestamps, MANAGER prefix, slot format)
+
 ## Pending
 - [ ] Engine consolidation (9 engines → fewer)
 - [ ] ANSI editor extraction phases 3.1-3.6

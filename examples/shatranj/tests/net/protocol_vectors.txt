@@ -1,0 +1,32 @@
+# NetChessZX wire compatibility vectors
+# payload | expected handling
+HELLO DIRECT HOST WHITE=HOST | direct host hello
+HELLO DIRECT HOST WHITE=GUEST | direct host hello
+HELLO DIRECT GUEST | direct guest hello
+GAME START | mqtt game start; also parseable as generic game start
+GAME START WHITE=HOST | direct game start; tolerated by generic parser
+GAME START WHITE=GUEST | direct game start; tolerated by generic parser
+ACK GAME START | game start accepted
+NACK GAME START BUSY | game start rejected with advisory reason
+MOVE 1 e2e4 | move without notation
+MOVE 2 g1f3 Nf3 | move with notation
+MOVE 3 e7e8q Q | queen promotion
+MOVE 4 e7e8r R | rook underpromotion
+MOVE 5 e7e8b B | bishop underpromotion
+MOVE 6 e7e8n N | knight underpromotion
+ACK 1 | generic ply ack
+ACK 2 Nf3 | generic ply ack with notation
+NACK 3 ILLEGAL | generic ply nack with reason
+TAKEBACK 6 | takeback request
+DRAW | draw request
+ACK DRAW | draw accepted
+NACK DRAW | draw rejected
+RESET | reset request
+ACK RESET | reset accepted
+NACK RESET BUSY | reset rejected with reason
+RESIGN | resignation; retransmitted until acked
+ACK RESIGN | resignation acknowledged
+CHAT hello | chat
+PING | keepalive ping
+ACK PING | keepalive ack
+BYE | disconnect

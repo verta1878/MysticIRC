@@ -1,0 +1,10 @@
+	sub	a,0x01
+	ld	a,0x00
+	rla
+	xor	a,0x01
+=
+	sub	a,0x01
+	sbc	a,a
+	inc	a
+	or	a,a
+	; peephole netchess-bool-nonzero

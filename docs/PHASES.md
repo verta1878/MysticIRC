@@ -26,25 +26,25 @@ See docs/MIS-112-REBUILD.md for full details + 1.12 screenshot.
 |-------|-------------|
 | MIS-1 | New ANSI screen — ASCII art header + tab bar | ✅ |
 | MIS-2 | Tabbed panel system (Messages/Connections/Events/Stats) |
-| MIS-3 | Enhanced logging (timestamps, IP, hostname, duplicate IP) |
+| MIS-3 | Enhanced logging (timestamps, IP, hostname, duplicate IP) | ✅ |
 | MIS-4 | ESC menu system (replaces status bar hotkeys) |
 | MIS-5 | BBS name in console title |
 | MIS-6 | Slot-based connection management |
 | MIS-UI | TUI rendering — Console.WriteXY, color attrs, tab highlight, scroll region |
 
-## Pending — mDraw (ANSI Editor)
+## Pending — ansiedit (ANSI Editor)
 
-Standalone ANSI drawing tool — separate from mystic -cfg.
-Extracted from BBS editor code but rebuilt as independent program.
+Separate binary inside /mystic — compiled alongside mystic, mis, mplc, mide, mutil, fidopoll.
+Extracted from BBS ANSI editor code. Ships as ansiedit.exe / ansiedit.
 
 | Phase | Description |
 |-------|-------------|
-| MDRAW-1 | Core canvas — 80x25+ screen buffer, CP437 charset, 16-color attrs |
-| MDRAW-2 | Drawing tools — freehand, line, box, fill, text entry |
-| MDRAW-3 | Block operations — select, copy, paste, move, flip, mirror |
-| MDRAW-4 | Undo system — multi-level undo/redo stack |
-| MDRAW-5 | File I/O — load/save .ANS, .ASC, SAUCE metadata |
-| MDRAW-6 | UI chrome — status bar, color picker, character set, tool palette |
+| ANSIEDIT-1 | Core canvas — 80x25+ screen buffer, CP437 charset, 16-color attrs |
+| ANSIEDIT-2 | Drawing tools — freehand, line, box, fill, text entry |
+| ANSIEDIT-3 | Block operations — select, copy, paste, move, flip, mirror |
+| ANSIEDIT-4 | Undo system — multi-level undo/redo stack |
+| ANSIEDIT-5 | File I/O — load/save .ANS, .ASC, SAUCE metadata |
+| ANSIEDIT-6 | UI chrome — status bar, color picker, character set, tool palette |
 
 ## Pending — mterm Phase 4+
 
@@ -68,3 +68,21 @@ Extracted from BBS editor code but rebuilt as independent program.
 | Phase | Description |
 |-------|-------------|
 | MIS-7 | IPv6 support (evga cleanup from 1.12). Dual-stack: listen on IPv6 when available, fall back to IPv4 on XP/systems without IPv6 stack. Auto-detect at startup. |
+
+## Pending — MIS Script Server
+
+| Phase | Description |
+|-------|-------------|
+| MIS-8 | Script Server — TScriptServer class, MPL clientread/clientwrite/clientconnected functions, per-port script config. See docs/MIS-112-BINARY-AUDIT.md and examples/scripts/ for examples. |
+
+## Pending — MUTIL 1.12 Upgrade
+
+See docs/MUTIL-112-AUDIT.md for full binary audit.
+
+| Phase | Description |
+|-------|-------------|
+| MUTIL-1 | Command line: -RUN, -LIST, -VER, -HELP, -NOSCREEN | done |
+| MUTIL-2 | Logging: timestamp, log roller, cache, per-stanza loglevel, timing | done |
+| MUTIL-3 | New tasks: EchoNodeTracker, EchoUnlink, AutoHatch | done |
+| MUTIL-4 | INI file synced with 1.12 (26 sections, 25 task toggles) | done |
+| MUTIL-5 | All 25 tasks wired, 8 stub modules created | done |

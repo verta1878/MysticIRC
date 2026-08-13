@@ -1,4 +1,4 @@
-# Mystic BBS 1.10IRC — Release Notes
+# Mystic BBS 1.11IRC — Release Notes
 
 **Release: July 2026**
 **Status: Alpha Testing**
@@ -6,7 +6,7 @@
 **Compiler: FPC 2.6.4irc r3.1+**
 **License: GNU General Public License v3**
 
-## What is 1.10IRC?
+## What is 1.11IRC?
 
 A community fork of Mystic BBS maintained by Antonio Rico (Reapern66),
 Ecstasy BBS, FTN node 1:152/158. All alpha patches A41 through A63
@@ -89,7 +89,7 @@ Output buffering, @TEXTDIZ/@TEXTVIEW/@TEXTSHOW, DI baud rates,
 hourly events, DOS CRLF export, 80-char auto-wrap fix
 
 ### A62-A63
-Version-bumped to 1.10IRC final. No code changes.
+Version-bumped to 1.11IRC final. No code changes.
 
 ## New Subsystems
 - uforkpty.pas: pure FPC forkpty() — no libc dependency

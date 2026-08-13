@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Shatranj
+Comment=Online chess over Direct TCP or MQTT
+Exec=shatranj-client
+Icon=shatranj
+Terminal=false
+Categories=Game;BoardGame;Network;

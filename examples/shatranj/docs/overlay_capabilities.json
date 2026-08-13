@@ -1,0 +1,208 @@
+{
+  "description": "Source-level overlay resident-symbol capability policy. Debt caps are allowed temporarily but must shrink during the modular refactor. board_view is the resident board presentation adapter exposed to rules/hints overlays; it is currently an explicit, checked alias boundary over GUI-owned redraw/flip state.",
+  "board_view_aliases": {
+    "_spectrum_board_view_flipped": "_spectrum_gui_board_flipped",
+    "_spectrum_board_view_redraw_square": "_spectrum_gui_redraw_square"
+  },
+  "overlays": {
+    "about": {
+      "allowed_symbols": [
+        "ovl_close_overlay_file"
+      ]
+    },
+    "board": {
+      "allowed_caps": [
+        "board",
+        "libc",
+        "runtime"
+      ]
+    },
+    "control": {
+      "allowed_caps": [
+        "runtime"
+      ],
+      "allowed_symbols": [
+        "NETCHESS_PROTO_ACK_PREFIX",
+        "NETCHESS_PROTO_ACK_RESIGN",
+        "NETCHESS_PROTO_BYE",
+        "NETCHESS_PROTO_CANCEL_DRAW",
+        "NETCHESS_PROTO_CANCEL_RESET",
+        "NETCHESS_PROTO_CHAT_PREFIX",
+        "NETCHESS_PROTO_DRAW",
+        "NETCHESS_PROTO_GAME_START",
+        "NETCHESS_PROTO_MOVE_PREFIX",
+        "NETCHESS_PROTO_NACK_PREFIX",
+        "NETCHESS_PROTO_NACK_RESET",
+        "NETCHESS_PROTO_TAKEBACK_PREFIX",
+        "netchess_after_prefix",
+        "netchess_mqtt_session_parse_u16_token"
+      ]
+    },
+    "direct": {
+      "allowed_caps": [
+        "config",
+        "direct_state",
+        "input",
+        "libc",
+        "net",
+        "runtime",
+        "text",
+        "uart"
+      ]
+    },
+    "fileui": {
+      "allowed_caps": [
+        "libc",
+        "render",
+        "runtime"
+      ],
+      "allowed_symbols": [
+        "spectrum_fileui_count",
+        "spectrum_fileui_used_mask",
+        "spectrum_net_background_drain"
+      ]
+    },
+    "gui_log": {
+      "allowed_caps": [
+        "gui",
+        "gui_state",
+        "libc",
+        "render",
+        "runtime",
+        "text",
+        "time"
+      ]
+    },
+    "status": {
+      "allowed_caps": [
+        "config",
+        "gui",
+        "net",
+        "runtime",
+        "session",
+        "text"
+      ]
+    },
+    "hints": {
+      "allowed_caps": [
+        "board",
+        "board_view",
+        "config",
+        "libc",
+        "render",
+        "runtime"
+      ]
+    },
+    "input_edit": {
+      "allowed_caps": [
+        "gui",
+        "gui_state",
+        "libc",
+        "runtime"
+      ],
+      "allowed_symbols": [
+        "local_input_len",
+        "local_input_cursor",
+        "local_input_mode",
+        "input_history_count",
+        "input_history_pos"
+      ]
+    },
+    "menu_config": {
+      "allowed_caps": [
+        "config",
+        "gui",
+        "gui_state",
+        "libc",
+        "net",
+        "overlay",
+        "render",
+        "runtime",
+        "text",
+        "time"
+      ]
+    },
+    "menu_logic": {
+      "allowed_caps": [
+        "config",
+        "gui_state",
+        "libc",
+        "runtime",
+        "text"
+      ]
+    },
+    "mqtt_connect": {
+      "allowed_caps": [
+        "config",
+        "gui",
+        "gui_state",
+        "libc",
+        "mqtt",
+        "net",
+        "overlay",
+        "render",
+        "runtime",
+        "session",
+        "text",
+        "time"
+      ],
+      "allowed_symbols": [
+        "spectrum_uart_flush"
+      ]
+    },
+    "mqtt_tx": {
+      "allowed_caps": [
+        "config",
+        "libc",
+        "mqtt",
+        "net",
+        "overlay",
+        "runtime",
+        "session",
+        "text"
+      ],
+      "allowed_symbols": [
+        "netchess_after_prefix",
+        "line_buf",
+        "spectrum_uart_send_crlf",
+        "spectrum_uart_send_string"
+      ]
+    },
+    "rules": {
+      "allowed_caps": [
+        "board",
+        "board_view",
+        "config",
+        "libc",
+        "render",
+        "runtime"
+      ],
+      "allowed_symbols": [
+        "board_theme_hint_inks"
+      ]
+    },
+    "restore": {
+      "allowed_caps": [
+        "board",
+        "libc",
+        "runtime"
+      ]
+    },
+    "saveload": {
+      "allowed_caps": [
+        "libc",
+        "net",
+        "runtime"
+      ]
+    },
+    "setup": {
+      "allowed_caps": [
+        "config",
+        "gui_state",
+        "libc",
+        "runtime",
+        "text"
+      ]
+    }
+  }
+}

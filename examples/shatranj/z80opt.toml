@@ -1,0 +1,50 @@
+# NetChessZX optimization policy — read by optimize-z80 / shrink-z80 skills.
+# Policy beats auto-detection; forbidden.* = true means REJECT, not demote.
+# Gates are measured acceptance limits; update only from same-build artifacts.
+
+target = "zx-spectrum"            # primary target; dual-target details in [targets]
+profile = "mixed-c-asm-overlays"
+priority = ["resident-size", "ux", "maintainability"]
+
+[forbidden]
+undocumented = true               # opt-in per experiment only (Next core ok, emulator fidelity unproven)
+smc = true                        # release maintainability
+sp_abuse = true                   # no stack blitting; UART ISR + esxDOS live here
+interrupt_windows = false         # overlay execs under DI are an established project pattern
+hardware_timing = true            # chess app; no beam racing / floating bus
+# Banking is allowed only for measured cold code/data splits that preserve the
+# 48K product, keep mutable session state resident, avoid nested overlays and
+# pass every target's size/stack/ABI gates. Moving the hot canonical reducer or
+# raising a resident allowance remains an explicit architecture decision.
+banking_changes = false
+
+[constraints]
+cpu_floor = "nmos-z80"            # real 48K Spectrums
+overlay_size = 2048               # SPECTRUM_OVL_BLOCK_SIZE, fixed slot at 0x6800
+maintainability = "release"
+abi_check = true                  # make abi-check
+size_check = true                 # make size-check
+module_guards = true              # make module-guards
+
+[build]
+command = "make NO_COLOR=1 PYTHON=C:/Progra~1/Python311/python.exe test abi-check size-check"
+
+# --- Extension: per-target acceptance gates (multi-target rule) ---
+# A candidate is accepted only when EVERY target below meets its resident
+# ceiling AND its stack-gap floor, measured per target on the same build.
+# Builds are serial (targets share objects). tap-next is part of `make test`.
+
+[targets.zx]
+artifact = "build/SHATRANJ.map"
+resident_ceiling = 34363          # baseline resident (CODE+DATA)
+stack_gap_floor = 1935            # baseline SP gap
+
+[targets.next-tap]
+artifact = "build/next/SHATRANJ.map"
+resident_ceiling = 34398          # baseline + confirmed margin
+stack_gap_floor = 1902
+
+[targets.next-nex]
+artifact = "build/nex/SHATRANJ.map"
+resident_ceiling = 35358          # accepted 2026-07-18; HW baseline 35361 (-3)
+stack_gap_floor = 840             # accepted 2026-07-18; HW baseline 838 (+2)

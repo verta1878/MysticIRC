@@ -1,0 +1,80 @@
+name: Build Windows client
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  QT_VERSION: 6.10.3
+  QT_QPA_PLATFORM: offscreen
+
+jobs:
+  build:
+    name: Windows x86_64
+    runs-on: windows-2022
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          arch: win64_msvc2022_64
+          dir: C:/
+          cache: true
+
+      - name: Build and test
+        shell: cmd
+        run: client\build-pc.cmd
+
+      - name: Deploy application
+        shell: pwsh
+        run: client/build-msvc.ps1 -QtDir $env:QT_ROOT_DIR
+
+      - name: Package and inspect
+        shell: pwsh
+        run: |
+          $version = (Get-Content VERSION -Raw).Trim()
+          $stage = Join-Path $env:RUNNER_TEMP "Shatranj"
+          $archive = "release/Qt/Shatranj-$version-Windows-x86_64.zip"
+          New-Item -ItemType Directory -Force -Path "release/Qt" | Out-Null
+          Copy-Item -Recurse -Force "release/shatranj-client" $stage
+          Compress-Archive -Path $stage -DestinationPath $archive -Force
+
+          $inspect = Join-Path $env:RUNNER_TEMP "inspect"
+          Expand-Archive -Path $archive -DestinationPath $inspect -Force
+          $app = Join-Path $inspect "Shatranj"
+          if (-not (Test-Path "$app/shatranj-client.exe")) {
+              throw "Packaged executable is missing"
+          }
+          if (-not (Test-Path "$app/assets/pc-client/about/about-shatranj.png")) {
+              throw "Packaged About asset is missing"
+          }
+          if ((Get-ChildItem "$app/assets/pc-client/piece_sets" -Directory).Count -ne 5) {
+              throw "Unexpected packaged piece-set count"
+          }
+          if ((Get-ChildItem "$app/assets/pc-client/boards" -File).Count -ne 5) {
+              throw "Unexpected packaged board count"
+          }
+
+          $process = Start-Process "$app/shatranj-client.exe" -PassThru
+          Start-Sleep -Seconds 5
+          if ($process.HasExited) {
+              if ($process.ExitCode -ne 0) {
+                  throw "Packaged client exited with code $($process.ExitCode)"
+              }
+          } else {
+              Stop-Process -Id $process.Id
+          }
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Shatranj-Windows-x86_64
+          path: release/Qt/Shatranj-*-Windows-x86_64.zip
+          if-no-files-found: error

@@ -84,13 +84,13 @@ WATT32LIB=/path/to/watt ./build-dos.sh     # 14/14
 ## Notes
 
 - **Stale headers:** the `build-*.sh` script header comments still say
-  "1.10IRC fork". This is cosmetic - the scripts compile whatever is in the
+  "1.11IRC fork". This is cosmetic - the scripts compile whatever is in the
   tree, so the imported A40 work builds regardless. (Tied to the open
   "what alpha is this fork" version-label decision.)
 - **Packaging:** after building a target's binaries, use `make_release.sh`
   to assemble the FULL / UPDATE archives - see `docs/CREATING-THE-INSTALLER.md`.
   Archives are named `mystic-<VER>-<tag>-<mode>-<STAMP>.zip` (VER default
-  `1.10irc`; STAMP defaults to today, MM-DD-YYYY, or pass `STAMP=FINAL` once an
+  `1.11irc`; STAMP defaults to today, MM-DD-YYYY, or pass `STAMP=FINAL` once an
   alpha's import is complete). Each archive unpacks into a matching top-level
   folder so FULL and UPDATE never merge, and its FILE_ID.DIZ ends with a
   `Released: <STAMP>` line.

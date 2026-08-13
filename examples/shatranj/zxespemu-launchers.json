@@ -1,0 +1,19 @@
+{
+  "schema": 2,
+  "owner": "netchess",
+  "version": "1.1.0",
+  "launchers": [
+    {
+      "name": "NetChessZX Classic",
+      "bundle_id": "com.ignaciomongegarcia.netchesszx.classic",
+      "arguments": ["--program", "netchess", "--target", "classic"],
+      "icon": "client/shatranj.icns"
+    },
+    {
+      "name": "NetChessZX Next",
+      "bundle_id": "com.ignaciomongegarcia.netchesszx.next",
+      "arguments": ["--program", "netchess", "--target", "next"],
+      "icon": "client/shatranj.icns"
+    }
+  ]
+}
