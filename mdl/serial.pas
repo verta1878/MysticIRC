@@ -75,6 +75,8 @@ begin
     '3': PortIdx := 2; '4': PortIdx := 3;
   else Exit; end;
   Base := COM_BASE[PortIdx];
+  { B-6 note: scratch register probe may fail on some UART clones
+    that don't implement register 7. Works on 8250/16450/16550. }
   Port[Base + 7] := $55;
   if Port[Base + 7] <> $55 then Exit;
   Result := PortIdx;
@@ -157,25 +159,34 @@ function SerGetRI(Handle: TSerialHandle): Boolean;
 begin Result:=(Port[GetBase(Handle)+UART_MSR] and MSR_RI)<>0; end;
 
 procedure SerFlushInput(Handle: TSerialHandle);
-var B: Word; X: Byte;
+var B: Word; X: Byte; Limit: LongInt;
 begin B:=GetBase(Handle); if B=0 then Exit;
-  while (Port[B+UART_LSR] and LSR_DR)<>0 do X:=Port[B+UART_RBR]; end;
+  Limit := 0;
+  while ((Port[B+UART_LSR] and LSR_DR)<>0) and (Limit < 65536) do
+    begin X:=Port[B+UART_RBR]; Inc(Limit); end;
+end;  { B-4 fix: added iteration limit }
 
 procedure SerFlushOutput(Handle: TSerialHandle); begin SerDrain(Handle); end;
 procedure SerSync(Handle: TSerialHandle); begin SerDrain(Handle); end;
 
 procedure SerDrain(Handle: TSerialHandle);
-var B: Word;
+var B: Word; Timeout: LongInt;
 begin B:=GetBase(Handle); if B=0 then Exit;
-  while (Port[B+UART_LSR] and LSR_TEMT)=0 do; end;
+  Timeout := 0;
+  while ((Port[B+UART_LSR] and LSR_TEMT)=0) and (Timeout < 50000) do Inc(Timeout);
+end;  { B-3 fix: added timeout counter }
 
 function SerDataAvailable(Handle: TSerialHandle): Boolean;
 begin Result:=(Port[GetBase(Handle)+UART_LSR] and LSR_DR)<>0; end;
 
 procedure SerBreak(Handle: TSerialHandle);
-var B: Word; L: Byte;
+var B: Word; L: Byte; I: LongInt;
 begin B:=GetBase(Handle); if B=0 then Exit;
-  L:=Port[B+UART_LCR]; Port[B+UART_LCR]:=L or $40; Port[B+UART_LCR]:=L; end;
+  L:=Port[B+UART_LCR];
+  Port[B+UART_LCR]:=L or $40;
+  For I := 1 to 10000 Do;  { B-5 fix: delay between set/clear }
+  Port[B+UART_LCR]:=L;
+end;
 
 function SerDetectUART(Handle: TSerialHandle): String;
 var B: Word;

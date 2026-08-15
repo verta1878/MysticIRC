@@ -232,8 +232,14 @@ Begin
     fbSerial : Result := FSer.ReadAvail;
     fbInt14  :
       {$IFDEF FOSSIL_INT14}
-        While (Int14($03, $00, FPort) and $0100) <> 0 Do
-          Result := Result + Chr(Lo(Int14($02, $00, FPort)));
+      Begin
+        { B-7 fix: avoid O(n²) string concat }
+        SetLength(Result, 0);
+        While (Int14($03, $00, FPort) and $0100) <> 0 Do Begin
+          SetLength(Result, Length(Result) + 1);
+          Result[Length(Result)] := Chr(Lo(Int14($02, $00, FPort)));
+        End;
+      End;
       {$ELSE} ;
       {$ENDIF}
   End;
@@ -255,8 +261,12 @@ Begin
   Result := False;
   If Not FActive Then Exit;
   Case FBackend of
-    // On serial, DSR is the portable carrier proxy the FPC unit exposes.
-    fbSerial : Result := FSer.GetDSR;
+    { Try DCD first (real carrier detect), fall back to DSR
+      for USB-serial adapters that don't report DCD. }
+    fbSerial : Begin
+                 Result := FSer.GetDCD;
+                 If Not Result Then Result := FSer.GetDSR;
+               End;
     fbInt14  : {$IFDEF FOSSIL_INT14} Result := (Int14($03, $00, FPort) and $0080) <> 0;
                {$ELSE} Result := False; {$ENDIF}
   End;

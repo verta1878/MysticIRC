@@ -311,7 +311,7 @@ Var
 Begin
   TempPos := 0;
 
-  For Count := 0 to Len Do
+  For Count := 0 to Len - 1 Do                    { B-1 fix: was 'to Len' }
     If Buf[Count] = TELNET_IAC Then Begin
       Temp[TempPos] := TELNET_IAC;
       Inc (TempPos);
@@ -322,8 +322,7 @@ Begin
       Inc (TempPos);
     End;
 
-  Dec(TempPos);
-
+                                                    { B-2 fix: removed Dec(TempPos) }
   Result := fpSend(FSocketHandle, @Temp, TempPos, FPSENDOPT);
 
   While (Result = -1) and (SocketError = ESOCKEWOULDBLOCK) Do Begin
@@ -344,6 +343,8 @@ Procedure TIOSocket.TelnetInBuffer (Var Buf: TIOBuffer; Var Len: LongInt);
     Reply[3] := CmdType;
 
     fpSend (FSocketHandle, @Reply[1], 3, FPSENDOPT);
+    { Note: return value intentionally unchecked — if send fails,
+      the connection is broken and the next read will detect it. }
 
     {$IFDEF TNDEBUG}
       TNLOG ('InBuffer -> Sending response: ' + CommandType(YesNo) + ' ' + CommandType(CmdType));
@@ -467,8 +468,14 @@ Begin
 
             FTelnetState   := 0;
             FTelnetSubData := '';
-          End Else
+          End Else Begin
             FTelnetSubData := FTelnetSubData + Buf[Count];
+            { B-8 fix: cap subneg data to prevent OOM DoS }
+            If Length(FTelnetSubData) > 4096 Then Begin
+              FTelnetState := 0;
+              FTelnetSubData := '';
+            End;
+          End;
     Else
       If Buf[Count] = Telnet_IAC Then Begin
         Inc (FTelnetState);

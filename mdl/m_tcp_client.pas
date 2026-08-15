@@ -88,8 +88,6 @@ Begin
 
   If Client.FSocketHandle = -1 Then Exit;
 
-  //WriteLn ('DEBUG SENT ' + Str);
-
   Client.PurgeInputData(1);
 
   Client.WriteLine(Str);

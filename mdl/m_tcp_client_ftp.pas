@@ -238,8 +238,18 @@ Var
   F      : File;
   Res    : LongInt;
   Buffer : Array[1..16 * 1024] of Char;
+  SafeName : String;
 Begin
   Result := ftpResFailed;
+
+  { Security: sanitize filename — strip path, reject traversal }
+  SafeName := JustFile(FileName);
+  If (SafeName = '') or (SafeName = '.') or (SafeName = '..') or
+     (Pos('..', SafeName) > 0) or (Pos('/', SafeName) > 0) or
+     (Pos('\', SafeName) > 0) Then Exit;
+
+  { Use original path + safe basename }
+  FileName := JustPath(FileName) + SafeName;
 
   If FileExist(FileName) Then Exit;
 

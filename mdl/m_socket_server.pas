@@ -173,6 +173,10 @@ Begin
     End;
 
     For A := 1 to Length(Str) Do
+      If A > Length(Str2) Then Begin     { B-9 fix: don't read past Str2 }
+        Result := False;
+        Break;
+      End Else
       If Str2[A] = '*' Then
         Break
       Else
