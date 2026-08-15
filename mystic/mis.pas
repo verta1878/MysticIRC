@@ -23,6 +23,10 @@ Program MIS;
 
 {$I M_OPS.PAS}
 
+{$IFDEF WINDOWS}
+  {$R mystic.res}
+{$ENDIF}
+
 Uses
   {$IFDEF DEBUG}
     HeapTrc,
@@ -78,11 +82,13 @@ Var
   EventThread  : TEventEngine;
   FocusPTR     : TServerManager;
   FocusCurrent : Byte;
+  ActiveTab    : Byte = 0;  { 1.12 view tab: 0=Messages 1=Connections 2=Events 3=Stats }
   TopPage      : Integer;
   BarPos       : Integer;
   NodeData     : TNodeData;
   DaemonMode   : Boolean = False;
   TrayMode     : Boolean = False;
+  ShutdownRequested : Boolean = False;
 
 {$I MIS_ANSIWFC.PAS}
 
@@ -121,12 +127,15 @@ Begin
 End;
 
 Procedure UpdateConnectionList;
+{ 1.12: Connections tab — SERVER USER STATUS ORIGIN columns }
 Var
   Count : Byte;
   Attr  : Byte;
   PosY  : Byte;
   NI    : TNodeInfoRec;
 Begin
+
+  If ActiveTab <> TAB_CONNECTIONS Then Exit;
   If FocusPtr = NIL Then Exit;
 
   NodeData.SynchronizeNodeData;
@@ -134,73 +143,99 @@ Begin
   PosY := 0;
 
   For Count := TopPage to TopPage + 7 Do Begin
-  	NodeData.GetNodeInfo(Count, NI);
+    NodeData.GetNodeInfo(Count, NI);
 
     Inc (PosY);
 
     If Count = BarPos Then Attr := 31 Else Attr := 7;
 
     Case FocusCurrent of
-        0 : If NI.Busy Then Begin
-              Console.WriteXY (3, 3 + PosY, Attr,
-      	        strPadL(strI2S(NI.Num), 3, '0') + ' ' +
-                strPadR(NI.User, 12, ' ') + ' ' +
-                strPadR(NI.Action, 18, ' ') + ' ' +
-                strPadL(NI.IP, 15, ' '));
-            End Else
-            If Count <= FocusPtr.ClientMax Then
-              Console.WriteXY (3, 3 + PosY, Attr, strPadL(strI2S(NI.Num), 3, '0') + strPadR(' Waiting', 48, ' '))
-            Else
-              Console.WriteXY (3, 3 + PosY, Attr, strRep(' ', 51));
-        1,
-        2,
-        3,
-        4,
-        5 : If (Count <= FocusPtr.ClientList.Count) And (FocusPtr.ClientList[Count - 1] <> NIL) Then Begin
-              Console.WriteXY (3, 3 + PosY, Attr,
-                strPadL(strI2S(Count), 3, '0') + ' ' +
-                strPadR(TFTPServer(FocusPtr.ClientList[Count - 1]).User.Handle, 31, ' ') + ' ' +
-                strPadL(TFTPServer(FocusPtr.ClientList[Count - 1]).Client.PeerIP, 15, ' '));
-                // this is broken... see the typecast of tftpserver kludge
-            End Else
-            If Count <= FocusPtr.ClientMax Then
-              Console.WriteXY (3, 3 + PosY, Attr, strPadL(strI2S(Count), 3, '0') + strPadR(' Waiting', 48, ' '))
-            Else
-              Console.WriteXY (3, 3 + PosY, Attr, strRep(' ', 51));
+      0 : If NI.Busy Then Begin
+            { 1.12 format: SERVER USER STATUS ORIGIN }
+            Console.WriteXY (2, 8 + PosY, Attr,
+              strPadR(FocusPtr.ServerName, 8, ' ') +
+              strPadR(NI.User, 15, ' ') +
+              strPadR(NI.Action, 25, ' ') +
+              strPadL(NI.IP, 22, ' '));
+          End Else
+          If Count <= FocusPtr.ClientMax Then
+            Console.WriteXY (2, 8 + PosY, Attr,
+              strPadR(FocusPtr.ServerName, 8, ' ') +
+              strPadR('Waiting', 15, ' ') +
+              strPadR('slot ' + strI2S(Count) + '/' + strI2S(FocusPtr.ClientMax), 25, ' ') +
+              strRep(' ', 22))
+          Else
+            Console.WriteXY (2, 8 + PosY, Attr, strRep(' ', 70));
+      1,
+      2,
+      3,
+      4,
+      5 : If (Count <= FocusPtr.ClientList.Count) And (FocusPtr.ClientList[Count - 1] <> NIL) Then Begin
+            Console.WriteXY (2, 8 + PosY, Attr,
+              strPadR(FocusPtr.ServerName, 8, ' ') +
+              strPadR(TFTPServer(FocusPtr.ClientList[Count - 1]).User.Handle, 15, ' ') +
+              strPadR('Connected', 25, ' ') +
+              strPadL(TFTPServer(FocusPtr.ClientList[Count - 1]).Client.PeerIP, 22, ' '));
+          End Else
+          If Count <= FocusPtr.ClientMax Then
+            Console.WriteXY (2, 8 + PosY, Attr,
+              strPadR(FocusPtr.ServerName, 8, ' ') +
+              strPadR('Waiting', 15, ' ') +
+              strPadR('slot ' + strI2S(Count) + '/' + strI2S(FocusPtr.ClientMax), 25, ' ') +
+              strRep(' ', 22))
+          Else
+            Console.WriteXY (2, 8 + PosY, Attr, strRep(' ', 70));
     End;
   End;
 End;
 
 Procedure UpdateStatus;
 Var
-  Offset : Integer;
-  Count  : Integer;
+  Offset  : Integer;
+  Count   : Integer;
+  LogLine : String;
 Begin
   If FocusPtr = NIL Then Exit;
 
   FocusPtr.StatusUpdated := False;
 
-  // UPDATE CONNECTION STATS
-
-  Console.WriteXY (69,  7, 7, strPadR(strI2S(FocusPtr.ClientActive), 5, ' '));
-  Console.WriteXY (69,  8, 7, strPadR(strI2S(FocusPtr.ClientBlocked), 5, ' '));
-  Console.WriteXY (69,  9, 7, strPadR(strI2S(FocusPtr.ClientRefused), 5, ' '));
-  Console.WriteXY (69, 10, 7, strPadR(strI2S(FocusPtr.ClientTotal), 5, ' '));
-
-  // UPDATE STATUS MESSAGES
-
-  Offset := FocusPtr.ServerStatus.Count;
-
-  For Count := 22 DownTo 15 Do Begin
-    If Offset > 0 Then Begin
-      Dec(Offset);
-
-      Console.WriteXY (4, Count, 7, strPadR(FocusPtr.ServerStatus.Strings[Offset], 74, ' '));
-    End Else
-      Console.WriteXY (4, Count, 7, strPadR(' ', 74, ' '));
+  // Stats tab: show connection statistics
+  If ActiveTab = TAB_STATS Then Begin
+    Console.WriteXY (20, 10, 7, strPadR(strI2S(FocusPtr.ClientActive), 5, ' '));
+    Console.WriteXY (20, 11, 7, strPadR(strI2S(FocusPtr.ClientBlocked), 5, ' '));
+    Console.WriteXY (20, 12, 7, strPadR(strI2S(FocusPtr.ClientRefused), 5, ' '));
+    Console.WriteXY (20, 13, 7, strPadR(strI2S(FocusPtr.ClientTotal), 5, ' '));
   End;
 
-  UpdateConnectionList;
+  // Messages tab: show scrolling server log with colored fields
+  // Format: "HH:MM:SS SERVICE TEXT" or "HH:MM:SS MANAGER TEXT"
+  If ActiveTab = TAB_MESSAGES Then Begin
+    Offset := FocusPtr.ServerStatus.Count;
+
+    For Count := MIS_CONTENT_BOT DownTo MIS_CONTENT_TOP Do Begin
+      If Offset > 0 Then Begin
+        Dec(Offset);
+        LogLine := FocusPtr.ServerStatus.Strings[Offset];
+        { Color-code: timestamp(cyan) service(yellow) text(gray) }
+        If Length(LogLine) >= 17 Then Begin
+          Console.WriteXY (2, Count, ATTR_TIMESTAMP, Copy(LogLine, 1, 8));
+          Console.WriteXY (10, Count, ATTR_SERVICE, Copy(LogLine, 10, 8));
+          If Pos('Refused', LogLine) > 0 Then
+            Console.WriteXY (18, Count, ATTR_ERROR, strPadR(Copy(LogLine, 18, 255), 61, ' '))
+          Else If Pos('> Connect', LogLine) > 0 Then
+            Console.WriteXY (18, Count, ATTR_CONTENT_HI, strPadR(Copy(LogLine, 18, 255), 61, ' '))
+          Else
+            Console.WriteXY (18, Count, ATTR_CONTENT, strPadR(Copy(LogLine, 18, 255), 61, ' '));
+        End Else
+          Console.WriteXY (2, Count, ATTR_CONTENT, strPadR(LogLine, 77, ' '));
+      End Else
+        Console.WriteXY (2, Count, ATTR_CONTENT, strRep(' ', 77));
+    End;
+  End;
+
+  // Connections tab: update connection list
+  If ActiveTab = TAB_CONNECTIONS Then
+    UpdateConnectionList;
 End;
 
 Procedure EventStatus;
@@ -209,7 +244,10 @@ Var
   Loop  : LongInt;
   Attr  : Byte;
 Begin
-  Console.WriteXY (4, 3, 7, 'Event Queue');
+  If ActiveTab <> TAB_EVENTS Then Begin
+    EventThread.Updated := False;
+    Exit;
+  End;
 
   Loop := EventThread.EventList.Count;
 
@@ -220,9 +258,9 @@ Begin
       Else
         Attr := 7;
 
-      Console.WriteXY (3, 3 + Count, Attr, EventThread.EventList.Strings[Loop - 1] + ' ')
+      Console.WriteXY (2, 7 + Count, Attr, EventThread.EventList.Strings[Loop - 1] + ' ')
     End Else
-      Console.WriteXY (3, 3 + Count, 7, strRep(' ', 51));
+      Console.WriteXY (2, 7 + Count, 7, strRep(' ', 51));
 
     Dec (Loop);
   End;
@@ -231,9 +269,9 @@ Begin
 
   For Count := 8 DownTo 1 Do Begin
     If Loop > 0 Then
-      Console.WriteXY (4, 14 + Count, 7, strPadR(EventThread.StatusList.Strings[Loop - 1], 75, ' '))
+      Console.WriteXY (2, 15 + Count, 7, strPadR(EventThread.StatusList.Strings[Loop - 1], 75, ' '))
     Else
-      Console.WriteXY (4, 14 + Count, 7, strRep(' ', 75));
+      Console.WriteXY (2, 15 + Count, 7, strRep(' ', 75));
 
     Dec (Loop);
   End;
@@ -260,16 +298,18 @@ Begin
     End;
   Until False;
 
-  Console.WriteXY (43, 1, 112, 'telnet/smtp/pop3/ftp/nntp/binkp/event');
+  { 1.12: Show active service in title bar row 5 }
+  Console.WriteXY(3, 5, ATTR_HEADER_YEL,
+    'Mystic Internet Server' + strPadR('', 55, ' '));
 
   Case FocusCurrent of
-    FocusTelnet : Console.WriteXY (43, 1, 113, 'TELNET');
-    FocusSMTP   : Console.WriteXY (50, 1, 113, 'SMTP');
-    FocusPOP3   : Console.WriteXY (55, 1, 113, 'POP3');
-    FocusFTP    : Console.WriteXY (60, 1, 113, 'FTP');
-    FocusNNTP   : Console.WriteXY (64, 1, 113, 'NNTP');
-    FocusBINKP  : Console.WriteXY (69, 1, 113, 'BINKP');
-    FocusEVENT  : Console.WriteXY (75, 1, 113, 'EVENT');
+    FocusTelnet : Console.WriteXY(26, 5, ATTR_PROMPT, '[TELNET]');
+    FocusSMTP   : Console.WriteXY(26, 5, ATTR_PROMPT, '[SMTP]');
+    FocusPOP3   : Console.WriteXY(26, 5, ATTR_PROMPT, '[POP3]');
+    FocusFTP    : Console.WriteXY(26, 5, ATTR_PROMPT, '[FTP]');
+    FocusNNTP   : Console.WriteXY(26, 5, ATTR_PROMPT, '[NNTP]');
+    FocusBINKP  : Console.WriteXY(26, 5, ATTR_PROMPT, '[BINKP]');
+    FocusEVENT  : Console.WriteXY(26, 5, ATTR_PROMPT, '[EVENT]');
   End;
 
   FocusPtr := GetFocusPtr;
@@ -280,7 +320,7 @@ Begin
 
     UpdateStatus;
 
-    Console.WriteXY (4, 3, 7, 'Connections');
+    Console.WriteXY (2, 7, 15, 'Connections');
   End Else
     Case FocusCurrent of
       FocusEVENT : EventStatus;
@@ -288,6 +328,68 @@ Begin
 End;
 
 (*
+Procedure ShowESCMenu;
+{ 1.12: ESC opens popup menu instead of immediate shutdown }
+Var
+  Ch     : Char;
+  MenuY  : Integer;
+  MenuDone : Boolean;
+Begin
+  MenuY := 10;
+
+  { Draw menu box }
+  Console.WriteXY(25, MenuY,   $1F, '  浜様様様様様様様様様様様様?  ');
+  Console.WriteXY(25, MenuY+1, $1F, '  ?  Mystic Internet Server ?  ');
+  Console.WriteXY(25, MenuY+2, $1F, '  麺様様様様様様様様様様様様?  ');
+  Console.WriteXY(25, MenuY+3, $1E, '  ?  L  Local Login          ?  ');
+  Console.WriteXY(25, MenuY+4, $1E, '  ?  K  Kill User            ?  ');
+  Console.WriteXY(25, MenuY+5, $1E, '  ?  S  Switch Service       ?  ');
+  Console.WriteXY(25, MenuY+6, $1E, '  ?  H  Help                 ?  ');
+  Console.WriteXY(25, MenuY+7, $1F, '  麺様様様様様様様様様様様様?  ');
+  Console.WriteXY(25, MenuY+8, $1C, '  ?  Q  Shutdown Servers     ?  ');
+  Console.WriteXY(25, MenuY+9, $1F, '  藩様様様様様様様様様様様様?  ');
+
+  MenuDone := False;
+  Repeat
+    If Keyboard.KeyWait(100) Then Begin
+      Ch := UpCase(Keyboard.ReadKey);
+      Case Ch of
+        'L': Begin
+          MenuDone := True;
+          LocalLogin;
+          DrawStatusScreen;
+          ActiveTab := TAB_MESSAGES;
+        End;
+        'K': Begin
+          { TODO: Kill user by node number }
+          MenuDone := True;
+        End;
+        'S': Begin
+          SwitchFocus;
+          MenuDone := True;
+        End;
+        'H': Begin
+          DrawHelpScreen;
+          Repeat Until Keyboard.ReadKey = #13;
+          MenuDone := True;
+        End;
+        'Q': Begin
+          Console.WriteXY(25, MenuY+8, $4F, '  ?  Shutdown Servers?  Y/N  ?  ');
+          Repeat
+            Ch := UpCase(Keyboard.ReadKey);
+            If Ch = 'Y' Then Begin ShutdownRequested := True; MenuDone := True; End;
+            If Ch in ['N', #27] Then MenuDone := True;
+          Until Ch in ['Y', 'N', #27];
+        End;
+        #27: MenuDone := True;
+      End;
+    End;
+  Until MenuDone;
+
+  { Redraw the screen }
+  DrawTabScreen(ActiveTab);
+End;
+
 Procedure LocalLogin;
 Const
   BufferSize = 1024 * 4;
@@ -364,6 +466,7 @@ Begin
   FocusCurrent := FocusMax;
 
   DrawStatusScreen;
+  ActiveTab := TAB_MESSAGES;
 
   SwitchFocus;
 End;
@@ -433,6 +536,8 @@ Begin
 
   If bbsCfg.InetTNUse Then Begin
     TelnetServer := TServerManager.Create(bbsCfg, bbsCfg.InetTNPort, bbsCfg.INetTNNodes, NodeData, @CreateTelnet);
+    TelnetServer.ServerName := 'TELNET';
+    TelnetServer.Status(-1, 'Starting TELNET');
 
     TelnetServer.Server.FTelnetServer := True;
     TelnetServer.ClientMaxIPs         := bbsCfg.InetTNDupes;
@@ -445,6 +550,8 @@ Begin
 
   If bbsCfg.InetSMTPUse Then Begin
     SMTPServer := TServerManager.Create(bbsCfg, bbsCfg.INetSMTPPort, bbsCfg.inetSMTPMax, NodeData, @CreateSMTP);
+    SMTPServer.ServerName := 'SMTP';
+    SMTPServer.Status(-1, 'Starting SMTP');
 
     SMTPServer.Server.FTelnetServer := False;
     SMTPServer.ClientMaxIPs         := bbsCfg.INetSMTPDupes;
@@ -457,6 +564,8 @@ Begin
 
   If bbsCfg.InetPOP3Use Then Begin
     POP3Server := TServerManager.Create(bbsCfg, bbsCfg.INetPOP3Port, bbsCfg.inetPOP3Max, NodeData, @CreatePOP3);
+    POP3Server.ServerName := 'POP3';
+    POP3Server.Status(-1, 'Starting POP3');
 
     POP3Server.Server.FTelnetServer := False;
     POP3Server.ClientMaxIPs         := bbsCfg.inetPOP3Dupes;
@@ -469,6 +578,8 @@ Begin
 
   If bbsCfg.InetFTPUse Then Begin
     FTPServer := TServerManager.Create(bbsCfg, bbsCfg.InetFTPPort, bbsCfg.inetFTPMax, NodeData, @CreateFTP);
+    FTPServer.ServerName := 'FTP';
+    FTPServer.Status(-1, 'Starting FTP');
 
     FTPServer.Server.FTelnetServer := False;
     FTPServer.ClientMaxIPs         := bbsCfg.inetFTPDupes;
@@ -481,6 +592,8 @@ Begin
 
   If bbsCfg.InetNNTPUse Then Begin
     NNTPServer := TServerManager.Create(bbsCfg, bbsCfg.InetNNTPPort, bbsCfg.inetNNTPMax, NodeData, @CreateNNTP);
+    NNTPServer.ServerName := 'NNTP';
+    NNTPServer.Status(-1, 'Starting NNTP');
 
     NNTPServer.Server.FTelnetServer := False;
     NNTPServer.ClientMaxIPs         := bbsCfg.inetNNTPDupes;
@@ -493,6 +606,8 @@ Begin
 
   If bbsCfg.InetBINKPUse Then Begin
     BINKPServer := TServerManager.Create(bbsCfg, bbsCfg.InetBINKPPort, bbsCfg.inetBINKPMax, NodeData, @CreateBINKP);
+    BINKPServer.ServerName := 'BINKP';
+    BINKPServer.Status(-1, 'Starting BINKP');
 
     BINKPServer.Server.FTelnetServer := False;
     BINKPServer.ClientMaxIPs         := bbsCfg.inetBINKPDupes;
@@ -558,6 +673,7 @@ Begin
     FocusCurrent := FocusMax;
 
     DrawStatusScreen;
+  ActiveTab := TAB_MESSAGES;
 
     SwitchFocus;
   End;
@@ -658,6 +774,10 @@ Begin
   Count := 0;
 
   DrawStatusScreen;
+  ActiveTab := TAB_MESSAGES;
+
+  { 1.12: BBS name in console title }
+  Console.SetWindowTitle('Mystic Internet Server (' + bbsCfg.BBSName + ')');
 
   // Tray mode: minimize to system tray (Windows) or iconify (Unix)
   Tray := TTrayIt.Create;
@@ -714,11 +834,23 @@ Begin
                         UpdateConnectionList;
                       End;
               End;
-        #09 : SwitchFocus;
+        #09 : Begin { TAB = cycle view tabs }
+              ActiveTab := (ActiveTab + 1) mod TAB_COUNT;
+              DrawTabScreen(ActiveTab);
+              { Force immediate content update for new tab }
+              Case ActiveTab of
+                TAB_MESSAGES    : If FocusPtr <> NIL Then FocusPtr.StatusUpdated := True;
+                TAB_CONNECTIONS : UpdateConnectionList;
+                TAB_EVENTS      : If Assigned(EventThread) Then EventThread.Updated := True;
+              End;
+            End;
+        '+' : SwitchFocus; { + = cycle service focus }
 //        #13 : {$IFDEF UNIX}Snoop{$ENDIF};
-        #27 : Break;
-//      	#32 : LocalLogin;
+        #27 : ShowESCMenu;
+        '+' : SwitchFocus; { + = cycle service focus }
       End;
+
+    If ShutdownRequested Then Break;
 
     If (FocusPtr <> NIL) Then
       If FocusPtr.StatusUpdated Then Begin
@@ -738,8 +870,14 @@ Begin
 
   Console.WriteLine ('Mystic Internet Server Version ' + mysVersion);
   Console.WriteLine ('');
+
+  { 1.12: Log shutdown to server status before freeing }
+  If FocusPtr <> NIL Then
+    FocusPtr.Status(-1, 'Server shutdown received from console');
+
   Console.WriteStr  ('Shutting down servers: TELNET');
 
+  If FocusPtr <> NIL Then FocusPtr.Status(-1, 'Shutdown: TELNET');
   TelnetServer.Free;
 
   Console.WriteStr (' SMTP');
@@ -759,6 +897,8 @@ Begin
   If HTTPServer <> NIL Then HTTPServer.Free;
 
   Console.WriteLine (' (DONE)');
+
+  Console.WriteLine ('Shutdown complete');
 
   // Restore console from tray before exit
   If TrayMode Then Tray.UnTrayConsole;

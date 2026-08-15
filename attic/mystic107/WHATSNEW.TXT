@@ -1,0 +1,70 @@
+ WHATS NEW IN MYSTIC BBS 1.07.2
+
+ ! MCFG: The New User Settings 1 -> Language file setting was backwards.
+   It'd say "Ask" when it really should have said "Use default".
+
+ ! MCFG: The option New User Settings 2 -> Ask Screen Size was missing from
+   the options but available from within Mystic's internal configuration.
+
+ ! Fixed a bug in the QWK system that would cause certain messages in a
+   packet to get scrambled.
+
+ ! The QWK system was creating .NDX files for bases that didn't have any
+   messages in them.  This is fine for most QWK readers, but there are a few
+   that didn't like that.  In addition, the .NDX files were not getting
+   created correctly under certain operating systems.
+
+ + Mystic will now restore the screen on the user's side after sysop chat
+   modes.
+
+ + Mystic was looking for FILE_ID.DIZ in the Linux version of Mystic.  This
+   has been changed to look for file_id.diz instead.
+
+ ! In line quote mode, Mystic would not allow you to quote a range of text
+   that wasn't already displayed.
+
+ ! MIDE: When changing the file name during a "Save As", MIDE was not
+   renaming the window to the new file name.
+
+ + Added new MPL function: PATHCHAR.  This will allow for MPE programs to
+   be easily written to work on both Unix and DOS type file systems.
+
+ ! The index files in Squish message bases were getting written incorrectly.
+   I think i've managed to nail this bug but I haven't had any substancial
+   testing done as none of my alpha sites run Squish message bases. :(
+
+ + MCFG: Added (ALT+S) Sort into the status line of the file base editor.
+   Sorting was always available, but for some reason I never put it on
+   the status line.  Even the help listing had ALT-S documented. =]
+
+ + Changed the INSTALL program to use CTRL-S to start the installation,
+   instead of the F2 key that was used.  Linux users were not able to
+   use F2 over an xterminal.
+
+ + MPL: Added new procedure called GETSCREENINFO.  This is used to read the
+   values of the Screen Info MCI codes.  This will come in handy when
+   creating lightbar mods which use ANSI templates similar to the rest of
+   Mystic.
+
+ ! Fixed a small memory leak in the DOS/WIN/OS2 versions caused when running
+   external programs (doors).
+
+ ! Fixed the DOOR32 problems in Windows version.  I had some code commented
+   out when I released 1.07.  I forgot to 'put things back to normal' when
+   I was done testing some things before the release. =]
+
+ ! Fixed the viewing of the BBS list in the Linux version.  Just the case of
+   an error in file casing.  Mystic was looking for a data file in all
+   uppercased letters when it should have been lowercased.
+
+ ! Fixed the error with inserting a new menu in the Linux internal menu
+   editor.
+
+ ! Fixed a small problem with displaying the time in twelve hour format.
+   It'd display 12:01am when it should have said been 12:01pm.
+
+ ! The BI mci code (User's Birthdate) wasn't being displayed correctly.
+
+.------------------------------------------------.
+| Mystic BBS v1.07.2 RELEASED : January 20, 2000 |
+`------------------------------------------------'

@@ -93,6 +93,11 @@
   {$DEFINE FS_IGNORE}
 {$ENDIF}
 
+{$IFDEF MSDOS}
+  {$DEFINE DOS}
+  {$DEFINE FS_IGNORE}
+{$ENDIF}
+
 { ------------------------------------------------------------------------- }
 
 {$MODE DELPHI}

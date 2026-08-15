@@ -50,6 +50,10 @@ Var
   LogT         : Text;
   LogIsOpen    : Boolean = False;
   NoScreen     : Boolean = False;
+  LogType      : Byte    = 0;
+  LogCache     : Boolean = True;
+  TaskStart    : LongInt = 0;
+  SavedLogLvl  : Byte    = 1;
 
 Const
   Header_GENERAL    = 'General';

@@ -136,3 +136,16 @@ ppc386 -Twin32 -Mdelphi -Fumystic -Fumdl -Fimystic -Fimdl \
 cd mripedit
 fpc -Mobjfpc mripedit.pas
 ```
+
+## Building ansiedit
+
+ansiedit is a separate binary, not part of the main BBS build.
+
+```bash
+cd mystic/ansiedit
+fpc -Mdelphi -Fu../../mdl -Fi../../mdl ansiedit.pas
+```
+
+Output: `ansiedit` (Linux) or `ansiedit.exe` (Windows)
+
+Copy to your Mystic BBS directory alongside the other binaries.

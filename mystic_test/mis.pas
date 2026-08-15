@@ -88,6 +88,7 @@ Var
   NodeData     : TNodeData;
   DaemonMode   : Boolean = False;
   TrayMode     : Boolean = False;
+  ShutdownRequested : Boolean = False;
 
 {$I MIS_ANSIWFC.PAS}
 
@@ -126,54 +127,64 @@ Begin
 End;
 
 Procedure UpdateConnectionList;
+{ 1.12: Connections tab — SERVER USER STATUS ORIGIN columns }
 Var
   Count : Byte;
   Attr  : Byte;
   PosY  : Byte;
   NI    : TNodeInfoRec;
 Begin
-  
+
   If ActiveTab <> TAB_CONNECTIONS Then Exit;
-If FocusPtr = NIL Then Exit;
+  If FocusPtr = NIL Then Exit;
 
   NodeData.SynchronizeNodeData;
 
   PosY := 0;
 
   For Count := TopPage to TopPage + 7 Do Begin
-  	NodeData.GetNodeInfo(Count, NI);
+    NodeData.GetNodeInfo(Count, NI);
 
     Inc (PosY);
 
     If Count = BarPos Then Attr := 31 Else Attr := 7;
 
     Case FocusCurrent of
-        0 : If NI.Busy Then Begin
-              Console.WriteXY (3, 7 + PosY, Attr,
-      	        strPadL(strI2S(NI.Num), 3, '0') + ' ' +
-                strPadR(NI.User, 12, ' ') + ' ' +
-                strPadR(NI.Action, 18, ' ') + ' ' +
-                strPadL(NI.IP, 15, ' '));
-            End Else
-            If Count <= FocusPtr.ClientMax Then
-              Console.WriteXY (3, 7 + PosY, Attr, strPadL(strI2S(NI.Num), 3, '0') + strPadR(' Waiting', 48, ' '))
-            Else
-              Console.WriteXY (3, 7 + PosY, Attr, strRep(' ', 51));
-        1,
-        2,
-        3,
-        4,
-        5 : If (Count <= FocusPtr.ClientList.Count) And (FocusPtr.ClientList[Count - 1] <> NIL) Then Begin
-              Console.WriteXY (3, 7 + PosY, Attr,
-                strPadL(strI2S(Count), 3, '0') + ' ' +
-                strPadR(TFTPServer(FocusPtr.ClientList[Count - 1]).User.Handle, 31, ' ') + ' ' +
-                strPadL(TFTPServer(FocusPtr.ClientList[Count - 1]).Client.PeerIP, 15, ' '));
-                // this is broken... see the typecast of tftpserver kludge
-            End Else
-            If Count <= FocusPtr.ClientMax Then
-              Console.WriteXY (3, 7 + PosY, Attr, strPadL(strI2S(Count), 3, '0') + strPadR(' Waiting', 48, ' '))
-            Else
-              Console.WriteXY (3, 7 + PosY, Attr, strRep(' ', 51));
+      0 : If NI.Busy Then Begin
+            { 1.12 format: SERVER USER STATUS ORIGIN }
+            Console.WriteXY (2, 8 + PosY, Attr,
+              strPadR(FocusPtr.ServerName, 8, ' ') +
+              strPadR(NI.User, 15, ' ') +
+              strPadR(NI.Action, 25, ' ') +
+              strPadL(NI.IP, 22, ' '));
+          End Else
+          If Count <= FocusPtr.ClientMax Then
+            Console.WriteXY (2, 8 + PosY, Attr,
+              strPadR(FocusPtr.ServerName, 8, ' ') +
+              strPadR('Waiting', 15, ' ') +
+              strPadR('slot ' + strI2S(Count) + '/' + strI2S(FocusPtr.ClientMax), 25, ' ') +
+              strRep(' ', 22))
+          Else
+            Console.WriteXY (2, 8 + PosY, Attr, strRep(' ', 70));
+      1,
+      2,
+      3,
+      4,
+      5 : If (Count <= FocusPtr.ClientList.Count) And (FocusPtr.ClientList[Count - 1] <> NIL) Then Begin
+            Console.WriteXY (2, 8 + PosY, Attr,
+              strPadR(FocusPtr.ServerName, 8, ' ') +
+              strPadR(TFTPServer(FocusPtr.ClientList[Count - 1]).User.Handle, 15, ' ') +
+              strPadR('Connected', 25, ' ') +
+              strPadL(TFTPServer(FocusPtr.ClientList[Count - 1]).Client.PeerIP, 22, ' '));
+          End Else
+          If Count <= FocusPtr.ClientMax Then
+            Console.WriteXY (2, 8 + PosY, Attr,
+              strPadR(FocusPtr.ServerName, 8, ' ') +
+              strPadR('Waiting', 15, ' ') +
+              strPadR('slot ' + strI2S(Count) + '/' + strI2S(FocusPtr.ClientMax), 25, ' ') +
+              strRep(' ', 22))
+          Else
+            Console.WriteXY (2, 8 + PosY, Attr, strRep(' ', 70));
     End;
   End;
 End;
@@ -317,6 +328,68 @@ Begin
 End;
 
 (*
+Procedure ShowESCMenu;
+{ 1.12: ESC opens popup menu instead of immediate shutdown }
+Var
+  Ch     : Char;
+  MenuY  : Integer;
+  MenuDone : Boolean;
+Begin
+  MenuY := 10;
+
+  { Draw menu box }
+  Console.WriteXY(25, MenuY,   $1F, '  浜様様様様様様様様様様様様?  ');
+  Console.WriteXY(25, MenuY+1, $1F, '  ?  Mystic Internet Server ?  ');
+  Console.WriteXY(25, MenuY+2, $1F, '  麺様様様様様様様様様様様様?  ');
+  Console.WriteXY(25, MenuY+3, $1E, '  ?  L  Local Login          ?  ');
+  Console.WriteXY(25, MenuY+4, $1E, '  ?  K  Kill User            ?  ');
+  Console.WriteXY(25, MenuY+5, $1E, '  ?  S  Switch Service       ?  ');
+  Console.WriteXY(25, MenuY+6, $1E, '  ?  H  Help                 ?  ');
+  Console.WriteXY(25, MenuY+7, $1F, '  麺様様様様様様様様様様様様?  ');
+  Console.WriteXY(25, MenuY+8, $1C, '  ?  Q  Shutdown Servers     ?  ');
+  Console.WriteXY(25, MenuY+9, $1F, '  藩様様様様様様様様様様様様?  ');
+
+  MenuDone := False;
+  Repeat
+    If Keyboard.KeyWait(100) Then Begin
+      Ch := UpCase(Keyboard.ReadKey);
+      Case Ch of
+        'L': Begin
+          MenuDone := True;
+          LocalLogin;
+          DrawStatusScreen;
+          ActiveTab := TAB_MESSAGES;
+        End;
+        'K': Begin
+          { TODO: Kill user by node number }
+          MenuDone := True;
+        End;
+        'S': Begin
+          SwitchFocus;
+          MenuDone := True;
+        End;
+        'H': Begin
+          DrawHelpScreen;
+          Repeat Until Keyboard.ReadKey = #13;
+          MenuDone := True;
+        End;
+        'Q': Begin
+          Console.WriteXY(25, MenuY+8, $4F, '  ?  Shutdown Servers?  Y/N  ?  ');
+          Repeat
+            Ch := UpCase(Keyboard.ReadKey);
+            If Ch = 'Y' Then Begin ShutdownRequested := True; MenuDone := True; End;
+            If Ch in ['N', #27] Then MenuDone := True;
+          Until Ch in ['Y', 'N', #27];
+        End;
+        #27: MenuDone := True;
+      End;
+    End;
+  Until MenuDone;
+
+  { Redraw the screen }
+  DrawTabScreen(ActiveTab);
+End;
+
 Procedure LocalLogin;
 Const
   BufferSize = 1024 * 4;
@@ -703,6 +776,9 @@ Begin
   DrawStatusScreen;
   ActiveTab := TAB_MESSAGES;
 
+  { 1.12: BBS name in console title }
+  Console.SetWindowTitle('Mystic Internet Server (' + bbsCfg.BBSName + ')');
+
   // Tray mode: minimize to system tray (Windows) or iconify (Unix)
   Tray := TTrayIt.Create;
 
@@ -770,9 +846,11 @@ Begin
             End;
         '+' : SwitchFocus; { + = cycle service focus }
 //        #13 : {$IFDEF UNIX}Snoop{$ENDIF};
-        #27 : Break;
-//      	#32 : LocalLogin;
+        #27 : ShowESCMenu;
+        '+' : SwitchFocus; { + = cycle service focus }
       End;
+
+    If ShutdownRequested Then Break;
 
     If (FocusPtr <> NIL) Then
       If FocusPtr.StatusUpdated Then Begin

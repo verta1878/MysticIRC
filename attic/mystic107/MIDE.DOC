@@ -1,0 +1,2680 @@
+
+                        €›         ﬁ€ €€‹‹‹‹‹‹‹  €€‹
+                        €€‹       ‹€€ €€€   ﬁ€≤€ €€€
+                        €€€€€‹ ‹€€€≤€ €€€    €€€ €€€
+                        €€€›ﬂ€€€ﬂﬁ€€€ €€€   ﬁ€€ﬂ €€€
+                        €€≤  ﬁ€›  €€≤ €€≤ ‹‹ﬂﬂ   €€≤
+                        €≤±   ≤   €≤± €≤±    ∞   €≤±
+                        ≤±∞   ±   ≤±∞ ≤±∞        ≤±∞
+                     ∞  ±∞    ∞   ±∞  ±∞         ±∞   ∞
+
+      .--------------------------------------------------------------.
+      | Mystic BBS Programming Language                Documentation |
+      `--------------------------------------------------------------'
+
+                            Table of contents
+
+          1.0  About the Mystic BBS Programming Language (MPL)
+          2.0  Using MPLC: The Command Line Compiler
+          3.0  Using MIDE: The Integrated Development Environment
+          4.0  Programming Language Syntax
+          5.0  Function and Procedure Reference
+
+      .--------------------------------------------------------------.
+      | 1.0   About The Mystic BBS Programming Language (MPL)        |
+      `--------------------------------------------------------------'
+
+        1.1   About this documentation
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 1.1   About This Documentation                               |
+      `--------------------------------------------------------------'
+
+       The MPL documentation and help system are not designed to teach
+       theories and programming in general.  It is assumed that most
+       people dabbling into MPL have some other type of programming
+       experience.  The goal of this documentation is to reference all
+       of the MPL syntax and functions, not to teach programming
+       itself.
+
+       If MPL is your first try at any type of computer programming,
+       it is recommended that you purchase a book on programming in
+       Turbo Pascal and download one of the many free Pascal compilers
+       found on the Internet.  You may also be able to teach yourself
+       by examining and modifying existing MPL programs which can also
+       be found on the Internet.
+
+       Also note that at this time, this documentation has not been
+       fully completed.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 2.0   Using MPLC: The Command Line Compiler                  |
+      `--------------------------------------------------------------'
+
+       MPLC is the Mystic Programming Language command line compiler,
+       used for compiling MPL source files (.MPS) from the command line.
+
+       The syntax for using MPLC.EXE is as follows:
+
+       MPLC.EXE [source file mask].MPS
+
+       The source file mask can be any file name or any wildcard file
+       name.  The file extention is not required, MPLC will automatically
+       append .MPS to the source mask.
+
+       Examples of using MPLC.EXE:
+
+       MPLC.EXE MPSDEMO      - Compiles the source file MPSDEMO.MPS
+       MPLC.EXE *            - Compiles all .MPS files in a directory
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 3.0   Using MIDE: The Integrated Developement Environment    |
+      `--------------------------------------------------------------'
+
+           3.1   Using The MIDE Editor
+           3.2   Using The Editor Window
+           3.3   Setting MIDE Configuration Options
+           3.4   Using the MIDE Online Help System
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 3.1   Using MIDE: Using The Editor                           |
+      `--------------------------------------------------------------'
+
+       The following options are globally available within MIDE:
+
+       F1 - Help
+       ---------
+       This option loads the MIDE online help system.  For more information
+       see section 3.4 - Using The MIDE Help System.
+
+       F2 - Save
+       ---------
+       This option allows the file being edited in the current editor window
+       to be saved to disk.  If there are no open edit windows, the command
+       is disabled.
+
+       F3 - Open
+       ---------
+       This option allows a new file to be loaded.  When selected, an Open
+       File box will appear where a file can be loaded, deleted, or created.
+       MIDE supports a maximum of 9 files opened at once time, limited only
+       by available memory.
+
+       F4 - Close
+       ----------
+       This option closes the file being edited in the current window.  If
+       there are no open files this option is disabled.  When a file is
+       closed, MIDE will ask to save the file if any changes were made since
+       it was loaded.
+
+       F5 - Find
+       ---------
+       This option seaches for text in the current edit window.  If no
+       windows are open, this command is disabled.
+
+       F6 - Again
+       ----------
+       This option repeats the previous search command, starting from the
+       last matching text.
+
+       F8 - Options
+       ------------
+       This option brings up the MIDE options dialog.  For more information
+       see section 3.3 - Setting MIDE Configuration Options.
+
+       F9 - Compile
+       ------------
+       This option will compile the source code in the current window into
+       a Mystic BBS Programming Executable, or MPE.  If an error occurs
+       during compilation, MIDE will abort the compile, report the error,
+       and attempt to locate the cursor the exact line where the error has
+       occured.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 3.2   Using MIDE: Using The Editor Window                    |
+      `--------------------------------------------------------------'
+
+       Cursor movement commands:
+       -------------------------
+       Character left  - Left arrow
+       Character right - Right arrow
+       Line up         - Up arrow
+       Line down       - Down arrow
+       Page up         - Page up
+       Page down       - Page down
+       Start of line   - Home
+       End of line     - End
+       Tab Spacing     - Tab
+
+       Text editing commands:
+       ----------------------
+       Delete line      - CTRL+Y
+       Delete character - Delete
+       Erase character  - Backspace
+
+       Block text editing commands:
+       ----------------------------
+       Lines of text can be cut, copied, deleted, and pasted into other
+       areas.  A block of text can be defined by holding down the
+       SHIFT while using the up and down arrow keys to highlight text.
+
+       When the SHIFT key is let up, MIDE will give four options:
+
+           Unmark - Unmark text and abort functions
+             Copy - Copy the text block into the clipboard, leaving
+                    the mark text untouched
+              Cut - Copy the text block into the clipboard, deleting
+                    the mark block of text
+           Delete - Delete the marked block of text without copying text
+                    into the clipboard
+
+       Text that has been entered into the clipboard can be cleared or
+       pasted at any time using the ALT+C (to clear) and ALT+P (to paste)
+       commands.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 3.3   Using MIDE: Setting MIDE Configuration Options         |
+      `--------------------------------------------------------------'
+
+       The options menu can be selected by pressing the F8 key while in
+       the editor.  The following options can be set:
+
+       Syntax Highlighting: Yes / No
+       -----------------------------
+       This option can be used to turn off/on MIDE's syntax highlighting.
+       When on, certain parts of your code will be displayed in different
+       colors, depending on the type of code it is.
+
+       If you are using a slower computer and editing code with MIDE seems
+       sluggish, try turning the syntax highlighting off and you should
+       see a very noticable speed up with screen updates.
+
+       Tab Spaces : 1 through 9
+       ------------------------
+       This option is used to specify the number of spaces MIDE will fill
+       when the TAB key is pressed in the editor.  MIDE will also filter
+       out all TAB characters while loading a file and replace them with
+       the specified number of spaces.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 3.4   Using The MIDE Online Help System                      |
+      `--------------------------------------------------------------'
+
+       The MIDE help system is a powerful reference system, which helps
+       assist in speedy developement of Mystic Programming Executables.
+
+       When the help system is initially activated, MIDE will look at the
+       word under the cursor in the current edit window.  If the word is a
+       valid MPL function or procdure, MIDE will automatically load the
+       context help for that command.  If the word is not a valid command,
+       or the help system is activated without any active edit windows,
+       MIDE will load the main help index.
+
+       Navigating the help system menus:
+       ---------------------------------
+       Line up        - Up arrow
+       Line down      - Down arrow
+       Page up        - Page up
+       Page down      - Page down
+       Top of page    - Home
+       Bottom of page - End
+       Link left      - Left arrow
+       Link right     - Right arrow
+       Previous topic - CTRL + Left arrow
+       Next topic     - CTRL + Right arrow
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 4.0   Mystic Programming Language Syntax                     |
+      `--------------------------------------------------------------'
+
+        4.1 Source Code Comments        4.2 Defining Variables
+        4.3 Equation Operators          4.4 IF/THEN/ELSE Statements
+        4.5 WHILE/WEND Statements       4.6 REPEAT/UNTIL Statements
+        4.7 FOR/FEND Loops              4.8 Defining Procedures
+        4.9 Include Files
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 4.1   Source Code Comments                                   |
+      `--------------------------------------------------------------'
+
+       A source code comment is a line of text or portion of a line of
+       text that is ignored by the compiler.  Source code comments can
+       be inserted almost anywhere within a program's source code by
+       using the # character.  Some examples:
+
+          # this is a comment
+
+          Var
+            SomeVar Byte         # this is another comment
+          Begin
+            # another comment...
+          End
+
+       The # character is also used to include another .mps source
+       file into program.  For more information on this, see the
+       section on include files.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 4.2   Defining Variables                                     |
+      `--------------------------------------------------------------'
+
+       Defining variables can be done in the following format:
+
+          VAR [variable name] [variable type]
+
+       The following variable types are supported:
+
+          Type            Format            Range
+          --------- ------------ -----------------------------
+          Boolean   FALSE/TRUE   0..1
+          Char      Text         1 character
+          String    Text         Sequence of 1..255 characters
+          Byte      Numerical    0..255
+          Integer   Numerical    -32767..32767
+          Word      Numerical    0..65535
+          LongInt   Numerical    -2147483648..214748364
+          --------- ------------ -----------------------------
+
+       Multiple variables can be defined with a single VAR command if
+       a comma is added after the variable type:
+
+          Var
+            SomeByte Byte,
+            SomeChar Char
+
+       Single dimension Array variables can be defined by appending
+       the ARRAY command after the variable type:
+
+          Var
+            SomeArray Byte Array(1..20)
+
+       Constant variables can also be defined using the following
+       format:
+
+          CONST [variable name] = [value]
+
+       The MPL compilers will automatically determine the variable
+       type based on the value provided.  For example:
+
+          Const
+            MyStr  = 'This is a constant string'
+            MyByte = 100
+
+       As a general note, any variables defined within a procedure
+       are accessible only by that procedure.  Any variables defined
+       in the main program block are global to all procedures found
+       after the definition:
+
+          Var
+            MyGlobalVar Byte
+
+          Procedure Test
+          Var
+            Count Byte
+          Begin
+            WriteLn ('Global variable is ' + Int2Str(MyGlobalVar))
+          Pend
+
+          Begin
+            WriteLn ('Global variable is ' + Int2Str(MyGlobalVar))
+          End
+
+       In the above code, the MyGlobalVar variable can be used in
+       the Test procedure and throughout.  The Count variable can
+       only be used within the Test procedure.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 4.3   Equation Operators                                     |
+      `--------------------------------------------------------------'
+
+       MPL does not follow the order of operations when calculating
+       mathmatical equations (ie PEMDAS - parenthesis, exponents,
+       multiplication, division, addition, and subtraction).
+
+       Equations are calculated in the order that they appear in the
+       expression.  This doesn't mean that equations cannot be done
+       by order of operations, it just means that they will have to
+       be arranged differently in some cases.
+
+       The following operation codes are supported for mathmatical
+       equations:
+
+          -   Subtraction
+          +   Addition
+          *   Multiplication
+          /   Division
+          MOD Modulus Operator
+
+       Boolean operations are addressed using the keywords TRUE and
+       FALSE.  When evaluating a Boolean value, the TRUE keyword can
+       optionally be omitted.  For example:
+
+          Var
+            SomeBol Boolean
+
+          Begin
+            If SomeBol Then
+              WriteLn ('SomeBol is TRUE!')
+            EndIf
+          End
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 4.4   IF/THEN/ELSE Statements                                |
+      `--------------------------------------------------------------'
+
+       The IF statement in MPL goes along with several other keywords
+       for evaluating expressions: IF/THEN/ELSE/ELSEIF/ENDIF, which
+       are used in the following format:
+
+         IF [boolean statement] THEN
+           code here
+         ELSEIF [boolean statement] THEN
+           code here
+         ELSE
+           code here
+         ENDIF
+
+       The ELSEIF and ELSE commands are optional.  The basic IF statment
+       must consist of at least an IF and ENDIF command:
+
+         If SomeVar = 10 Then
+           WriteLn ('SomeVar is 10')
+         EndIf
+
+       Using ELSEIF and ELSE, a much more complicated branch can be
+       evaluated:
+
+         If SomeVar = 10 Then
+           WriteLn ('SomeVar is 10')
+         ElseIf SomeVar = 11 Then
+           WriteLn ('SomeVar is 11')
+         Else
+           WriteLn ('SomeVar is not 10 or 11')
+         EndIf
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 4.5   WHILE/WEND Statements                                  |
+      `--------------------------------------------------------------'
+
+        One method of creating a code loop is by using the WHILE and
+        WEND keywords.  An alternative to this is the REPEAT/UNTIL
+        loop.  WHILE/WEND uses the following syntax:
+
+           WHILE [boolean statement]
+             code here
+           WEND
+
+        For example:
+
+           Var
+             SomeVar Byte
+           Begin
+             SomeVar := 0
+
+             While SomeVar < 10
+               SomeVar := SomeVar + 1
+             Wend
+           End
+
+       The above example will repeat the code between the WHILE and
+       WENT statements while the value of SomeVar is less than 10.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 4.6   REPEAT/UNTIL Statements                                |
+      `--------------------------------------------------------------'
+
+        One method of creating a code loop is by using the REPEAT and
+        UNTIL keywords.  An alternative to this is the WHILE/WEND
+        loop.  REPEAT uses the following syntax:
+
+           REPEAT
+             code here
+           UNTIL [boolean statement]
+
+        For example:
+
+           Var
+             SomeVar Byte
+           Begin
+             SomeVar := 0
+
+             Repeat
+               SomeVar := SomeVar + 1
+             Until SomeVar = 10
+           End
+
+       The above example will repeat the code between the REPEAT and
+       UNTIL statements until the value of SomeVar equals 10.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 4.7   FOR/FEND Loops                                         |
+      `--------------------------------------------------------------'
+
+       The FOR/FEND loop can be used to create a loop that cycles for
+       and specified number of times before exiting.  The FOR/FEND
+       loop uses the following syntax:
+
+       FOR [variable] := [start value] [mode] [end value]
+         code here
+       FEND
+
+       The [variable] must be a variable of a numeric type and holds
+       the current count of the loop.  The [start value] is where the
+       loop count will start, the [end value] is where the loop count
+       will end.  The [mode] variable can be one of two keywords: TO
+       or DOWNTO.  The TO keyword will cause the loop to increment
+       each step while the DOWNTO keyword will cause the loop to
+       decrement each step.
+
+       Example:
+
+         Var
+           Count Byte
+
+         Begin
+           WriteLn ('Counting forwards...')
+
+           For Count := 1 to 5
+             WriteLn ('Loop #' + Int2Str(Count))
+           Fend
+
+           WriteLn ('Counting backwards...')
+
+           For Count := 5 DownTo 1
+             WriteLn ('Loop #' + Int2Str(Count))
+           Fend
+         End
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 4.8   Defining Procedures And Functions                      |
+      `--------------------------------------------------------------'
+
+       Procedures are a section of code that performs a specific
+       action.  Procedures can also have a set of parameters passed
+       to it, or return a result.  A procedure that returns a result
+       is called a FUNCTION.  The Syntax for a defining a procedure
+       is as follows:
+
+          PROCEDURE [procedure name]
+
+       or
+
+          PROCEDURE [procedure name] (parameters)
+
+       Example:
+
+          Procedure Test
+          Begin
+            WriteLn ('This is a test')
+          Pend
+
+          Procedure PrintString (Str String)
+          Begin
+            WriteLn (Str)
+          Pend
+
+          Begin
+            Test
+            PrintString('Hello world!')
+          End
+
+       The above example defines two procedures, one without any
+       data passed to it, and one with data being passed to it.  When
+       the program is executed, the Procedures are not executed until
+       called within the main program block.  When a procedure is
+       finished execution will return to the spot where the procedure
+       was called.
+
+       Procedures with a result value are called FUNCTIONS.  These use
+       the same sytax as a procedure except they use the keyword
+       FUNCTION and declare a result variable type:
+
+          FUNCTION [function name] ( parameters ) : [result type]
+
+       For example:
+
+          Function MakeFalse (Bol Boolean) : Boolean
+          Begin
+            If Bol Then
+              Bol := False
+            EndIf
+
+            MakeFile := Bol
+          Pend
+
+          Var MyBoolean Boolean
+
+          Begin
+            MyBoolean := True
+            MyBoolean := MakeFalse(MyBoolean)
+          End
+
+       The above example defines a Function called MakeFalse.  This
+       takes a boolean parameter, makes it false and returns the
+       value.  Functions are used in expressions and evaluations
+       since they have a resulting value, thus in this example
+       MyBoolean will be set to False since the result of MakeFalse
+       is stored in MyBoolean.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 4.9   Using Include Files                                    |
+      `--------------------------------------------------------------'
+
+       Source files can be included within other source files using
+       a variation of the comment system.  This can be useful for
+       creating a library of common procedures or to split up a large
+       projects into more organized smaller files.  The syntax for
+       include files is as follows:
+
+          #include [filename]
+
+       Example:
+
+          #include common.mps
+
+          Begin
+          End
+
+       In the above example, any variables and procedures found within
+       the common.mps file will be included into the current source tree
+       as if it were all a single file.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 5.0   Function And Procedure Reference                       |
+      `--------------------------------------------------------------'
+
+       5.1 String and Integer functions   5.2 Disk access functions
+       5.3 Date and Time functions        5.4 BBS data access functions
+       5.5 Input functions                5.6 Output functions
+       5.7 Miscellaneous functions        5.8 Function listing from A-Z
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 5.1   String and Integer functions                           |
+      `--------------------------------------------------------------'
+
+             CHR        - Converts a byte value to a char value
+             COPY       - Copies part of a string value
+             DELETE     - Delete part of a string value
+             INSERT     - Insert into a string value
+             INT2STR    - Convert integer value to a string
+             LENGTH     - Returns the length of a string value
+             LOWER      - Converts a string to lower case letters
+             ODD        - Returns TRUE if integer is an odd number
+             ORD        - Converts a char value into a byte
+             PADCT      - Pads a string value to the center
+             PADLT      - Pads a string value to the left
+             PADRT      - Pads a string value to the right
+             POS        - Searches for a substring in a string
+             STR2INT    - Converts a string to an integer value
+             STRIPMCI   - Strips MCI codes from a string
+             STRREP     - Repeats a character into string
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                             CHR                              |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function Chr (B Byte) : Char
+
+       Description:
+
+          The CHR function takes a numerical byte value and returns its
+          corresponding ASCII character.  In other words, CHR(13) would
+          return ASCII character #13.
+
+       Example:
+
+          Var Count Byte
+
+          For Count := 32 to 126
+            Write (Chr(Count))
+          Fend
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                             COPY                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function Copy (Str String, Index Byte, Count Byte) : String
+
+       Description:
+
+         Copy returns a string containing "Count" number of characters of
+         string "Str", starting an the "Index" character.
+
+       Example:
+
+         Var Str String
+
+         Str := 'Mystic BBS'
+         Str := Copy(Str, 1, 6)
+
+         WriteLn (Str)
+
+         The above example will copy the first 6 letters of string STR,
+         starting at the first character.  In this case, it will return
+         "Mystic" and store the result into the STR variable.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            DELETE                            |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure DELETE (Str String, Index Byte, Count Byte)
+
+       Description:
+
+          This procedure will delete a defined portion of a string
+          variable.
+
+       Example:
+
+         Var Str String
+
+         Str := 'Hello World'
+         Delete (Str, 6, 6);
+         WriteLn (Str)
+
+       This example will delete 6 characters from the string Str starting
+       at the 6th character.  The resulting output from WriteLn will be
+       "Hello"
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            INSERT                            |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure INSERT (Source String, Str String, Index Byte)
+
+       Description:
+
+          Insert takes a string and inserts its contents into another
+          string starting a Index.
+
+       Example:
+
+          Var
+            Str String
+          Begin
+            Str := 'Mystic v1.07'
+            Insert ('BBS', Str, 8)
+          End
+
+       The above example takes the text of the STR variable and inserts
+       the text "BBS" into it at position 8.  The resulting output would
+       be "Mystic BBS v1.07".
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            INT2STR                           |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function INT2STR (Number LongInt) : String
+
+       Description:
+
+          Int2Str takes a numerical value or variable and converts it
+          into a string variable or value.
+
+       Example:
+
+          Var
+            Number Byte
+          Begin
+            Number := 10
+            WriteLn ('The value of number is: ' + Int2Str(Number))
+          End
+
+       The above example uses Int2Str to convert the value of Number to
+       a string so it can be written to the screen with the WriteLn
+       procedure.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            LENGTH                            |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function LENGTH (Str String) : Byte
+
+       Description:
+
+          The Length function will take a string value and return its
+          length in characters.
+
+       Example:
+
+          WriteLn ('Hello World!')
+          WriteLn (Length('Hello World!'))
+
+       The above example prints the text "Hello World!" to the screen,
+       then uses the Length function to print the length in characters of
+       "Hello World!" to the screen.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            LOWER                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function LOWER (Str String) : String
+
+       Description:
+
+          The Lower function takes a string value and converts it to
+          all lowercased letters.
+
+       Example:
+
+          WriteLn (Lower('HELLO WORLD!'))
+
+       The above example uses the lower function to convert the HELLO
+       WORLD! text to lower cased letters.  The resulting output to the
+       screen would be "hello world!"
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            ODD                               |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function ODD (Number LongInt) : Boolean
+
+       Description:
+
+          Returns TRUE if the supplied number is an ODD number
+
+       Example:
+
+          If Odd(3) Then
+            WriteLn ('The number 3 is ODD')
+          Else
+            WriteLn ('The number 3 is NOT ODD')
+          EndIf
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            ORD                               |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function ORD (Ch Char) : Byte
+
+       Description:
+
+          Converts a Char variable into its corresponding ASCII value
+
+       Example:
+
+          WriteLn ('The ASCII value of "A" is: ' + Int2Str(Ord('A')))
+
+       The above example uses the ORD function to convert the 'A' character
+       to its ASCII value, then uses Int2Str to convert the ASCII value
+       into a string so it can be printed to the screen.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            PADCT                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function PADCT (Str String, Size Byte, Ch Char) : String
+
+       Description:
+
+          PADCT takes a string value and pads it to the center with the
+          specified character.  The Size parameter specifies the length
+          of the padded string.
+
+       Example:
+
+          Var
+            Str String
+          Begin
+            Str := PadCT('Hello', 40, '*')
+
+            WriteLn(Str)
+          End
+
+       The above example uses the PadCT function to center the text
+       "Hello" into a string of 40 characters in length, using the '*'
+       character to fill the empty spaces.  The result would be:
+
+       *****************Hello******************
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            PADLT                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function PADLT (Str String, Size Byte, Ch Char) : String
+
+       Description:
+
+          PADLT takes a string value and pads it to the left with the
+          specified character.  The Size parameter specifies the length
+          of the padded string.
+
+       Example:
+
+          Var
+            Str String
+          Begin
+            Str := PadLT('Hello', 40, '*')
+
+            WriteLn(Str)
+          End
+
+       The above example uses the PadLT function to pad the text "Hello"
+       to the left.  The result is a string of 40 characters in length,
+       using the '*' character to fill the empty spaces.  The result would
+       be:
+
+       ***********************************Hello
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            PADRT                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function PADRT (Str String, Size Byte, Ch Char) : String
+
+       Description:
+
+          PADRT takes a string value and pads it to the right with the
+          specified character.  The Size parameter specifies the length
+          of the padded string.
+
+       Example:
+
+          Var
+            Str String
+          Begin
+            Str := PadRT('Hello', 40, '*')
+
+            WriteLn(Str)
+          End
+
+       The above example uses the PadRT function to pad the text "Hello"
+       to the right.  The result is a string of 40 characters in length,
+       using the '*' character to fill the empty spaces.  The result would
+       be:
+
+       Hello***********************************
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            POS                               |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function POS (SubStr String, Str String) : Byte
+
+       Description:
+
+          This function returns the starting position of a substring
+          within a string.  If the substring does not exist in the
+          string, POS returns 0.
+
+       Example:
+
+          Var A Byte
+
+          A := POS('World', 'Hello World')
+
+          WriteLn (A)
+
+       The above example uses the POS code to find out the position of
+       "World" in the string "Hello World".  The result is then printed
+       on the screen, which would be "7".
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            STR2INT                           |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function STR2INT (Str String) : LongInt
+
+       Description:
+
+          Str2Int takes a string value or variable and converts it
+          into a numeric variable or value.
+
+       Example:
+
+          Var
+            Str String
+            Num Byte
+          Begin
+            Str := '10'
+            Num := Str2Int(Str)
+
+            WriteLn ('The value of num is: ' + Int2Str(Num))
+          End
+
+       The above example uses Str2Int to convert the string variable
+       Str into a number.  Int2Str is then used to convert the Num
+       variable back into a string to be printed on the screen with the
+       WriteLn command.  The resulting output would be:
+
+       The value of num is: 10
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            STRIPMCI                          |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function StripMCI (Str String) : String
+
+       Description:
+
+          The StripMCI function strips valid MCI codes from a string.
+
+       Example:
+
+          WriteLn (StripMCI('|CRHello World!'))
+
+       The above example uses the StripMCI function to remove MCI codes
+       from the string.  The resulting output would be:
+
+       Hello World!
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                            STRREP                            |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function STRREP (Ch Char, Len Byte) : String
+
+       Description:
+
+          The StrRep function takes a character and returns a string
+          of that character Len characters long.
+
+       Example:
+
+          WriteLn (StrRep('!', 20))
+
+       The above example uses the StrRep function to create a string
+       20 characters in length of the '!' character.  The resulting
+       output would be:
+
+       !!!!!!!!!!!!!!!!!!!!
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 5.2   Disk Access Functions                                  |
+      `--------------------------------------------------------------'
+
+             DOSERROR   - Returns the current DOS error
+             EOF        - Returns TRUE if at end of file
+             FCLOSE     - Closes an opened file
+             FCOPY      - Copies a file from one location to another
+             FERASE     - Erases a file from the disk
+             FEXIST     - Returns TRUE if a file exists
+             FILEPOS    - Returns the current position of a file
+             FILESIZE   - Returns the total size of an open file
+             FINDCLOSE  - Closes a search for files on disk
+             FINDFIRST  - Starts a search for files on disk
+             FINDNEXT   - Continues a search for files on disk
+             FOPEN      - Opens a file for reading/writing
+             FREAD      - Reads data from an opened file
+             FREADLN    - Reads a line of text from an opened text file
+             FREADREC   - Reads data from a Pascal-style record file
+             FSEEK      - Seeks to a position in a binary file
+             FWRITE     - Writes data to a binary file
+             FWRITELN   - Writes a line of text to a text file
+             FWRITEREC  - Writes data to a Pascal-style record file
+             PATHCHAR   - Returns "/" or "\" based on the file system
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           DOSERROR                           |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function DOSERROR : Byte
+
+       Description:
+
+          This function returns the current DosError and is used with the
+          FindFirst and FindNext functions.  The possible values which may
+          be returned by DosError are as follows:
+
+          Value  Meaning
+          -----  ---------------------
+            0    No error
+            2    File not found
+            3    Path not found
+            5    Access denied
+            6    Invalid handle
+            8    Not enough memory
+           10    Invalid environment
+           11    Invalid format
+           18    No more files
+          -----  ---------------------
+
+       Example:
+
+          FindFirst ('*.*', AnyFile)
+
+          While DosError = 0
+            WriteLn ('File Name: ' + DirName)
+            FindNext
+          Wend
+
+          FindClose
+
+       The above example will list all files in the current directory.
+       The DosError function is used to return when there are no more
+       files to be listed.  For more information on this see the reference
+       for the FindFirst and FindNext functions.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           EOF                                |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function EOF (FileNum Byte) : Boolean
+
+       Description:
+
+          This function will return true if the file position of an opened
+          file is at the End Of the File (EOF).  The passed Handle value is
+          the file number of the already opened file.
+
+       Example:
+
+          Var Str String
+
+          FOpen (1, Text, Reset, 'BLAH.TXT')
+
+          While Not Eof(1)
+            FReadLn (1, Str)
+            WriteLn (Str)
+          Wend
+
+          FClose (1)
+
+       The above example will open a text file under the filename of
+       BLAH.TXT.  The WHILE loop is used to repeat the code until the
+       EOF (end of file) is reached.  The FCLOSE statement will close
+       the file after it is done being accessed.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FCLOSE                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure FCLOSE (FileNum Byte)
+
+       Description:
+
+          This procedure closes an already opened file.  The passed Handle
+          value is the file number of the opened file.  All files which
+          are opened MUST be closed after they are not being accessed any
+          more.
+
+       Example:
+
+          fOpen  (1, Text, ReWrite, 'BLAH.TXT')
+
+          <Code to access file goes here>
+
+          fClose (1)
+
+       The above example opens a file using the FOPEN procedure.  When
+       the file has been opened successfully, it can be accessed in
+       various ways using the file I/O functions.  Afterwards, it MUST
+       be closed using the FCLOSE procedure as shown above.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FCOPY                              |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function FCOPY (Source String, Dest String) : Boolean
+
+       Description:
+
+          This function will copy a file from the specified source location
+          to the specified destination location.  The function will return
+          as TRUE if the file was copied successfully, or FALSE if an error
+          occured.  Note:  The file which is being copied should not already
+          be opened for File I/O by the program.
+
+       Example:
+
+          Write ('Copying C:\HELLO.TXT -> D:\HELLO.TXT: ')
+
+          If fCopy ('C:\HELLO.TXT', 'D:\HELLO.TXT') Then
+            WriteLn ('OK')
+          Else
+            WriteLn ('ERROR')
+          EndIf
+
+       The above example will attempt to copy the file "C:\HELLO.TXT" to
+       the destination of "D:\HELLO.TXT".  If the file is copied without
+       any problems an "OK" will be printed to the screen.  If an error
+       occured while copying, "ERROR" will be printed to the screen.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FERASE                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure FERASE (FileName String)
+
+       Description:
+
+          This procedure is used to erase an existing file from the disk.
+          The FileName variable is a string variable which contains the
+          file name which is to be erased.  The result of the FERASE
+          procedure can be checked by checking the DOSERROR function.
+          DOSERROR will return a 0 if successful or a 2 if an error occured.
+
+       Example:
+
+          FErase ('C:\HELLO.TXT')
+
+       The above example will erase the file "C:\HELLO.TXT" if it exists.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FEXIST                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function FEXIST (FileName String) : Boolean
+
+       Description:
+
+          The above function will check to see if a file exists, and return
+          TRUE if it does.  The passed FileName string if the path and file
+          name of the file to check.  This file should not already be opened
+          with the FOPEN procedure.
+
+       Example:
+
+          If FExist('BLAH.TXT') Then
+            WriteLn ('BLAH.TXT exists.')
+          Else
+            WriteLn ('BLAH.TXT does NOT exist.')
+          EndIf
+
+       The above example will check to see if the file "BLAH.TXT" exists
+       and if it does, will output "BLAH.TXT exists" to the screen.  If
+       BLAH.TXT does NOT exist, the output will be "BLAH.TXT does NOT
+       exist".
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FILEPOS                            |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function FILEPOS (Handle) : LongInt
+
+       Description:
+
+          This function returns the current file position of an opened
+          file.  The passed Handle is the file handle number used when the
+          file was opened.  The FilePos function only works for files that
+          are opened as Binary, since Text files are read line by line.
+
+       Example:
+
+          fOpen (1, Bin, Reset, 'TEST.DAT')
+          If FilePos(1) = FileSize(1)
+            WriteLn ('END OF FILE.')
+          EndIf
+          fClose (1)
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FILESIZE                           |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function FILESIZE (Handle) : LongInt
+
+       Description:
+
+          This function returns the total file size of an opened file.  The
+          passed Handle is the file handle number used when the file was
+          opened.  This function only works with files that have been opened
+          as Binary since Text files are read line by line.
+
+       Example:
+
+          fOpen  (1, Bin, Reset, 'TEST.DAT')
+          WriteLn ('This file is ' + Int2Str(FileSize(1)) + ' bytes in size.')
+          fClose (1)
+
+          The above example opens the file "TEST.DAT", writes the size of
+          the file to the screen, and then closes the file.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FINDCLOSE                          |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure FINDCLOSE
+
+       Description:
+
+          This function is used along with the FindFirst and FindNext
+          functions.  It is called only after all "Find" procedures have
+          completed.  See the "FindFirst" and "FindNext" command references
+          for more information.
+
+       Example:
+
+          See example in FINDFIRST help
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FINDFIRST                          |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure FINDFIRST (Mask String, Attributes)
+
+       Description:
+
+          This function is used to search a drive for files using a supplied
+          file mask and attribute list.  The results of the search are held
+          in the DIR variables as listed below.
+
+          Mask : The mask variable must contain at least a file mask
+                 (ie "*.*") but can also contain a drive and directory name
+                 as well (ie "C:\MYSTIC\TEXT\*.*").
+
+          Attributes : The file attributes are used to specify what type of
+                       files to return in the DIR variables.  The following
+                       is a list of supported file attributes:
+
+                       Attribute   Description
+                       ----------- -------------------------
+                       ReadOnly    Return files marked as "read only".
+                       Hidden      Return files marked as "hidden".
+                       SysFile     Return files marked as "system files".
+                       VolumeID    Return files marked as "volume ID".
+                       Directory   Return files marked as "directory".
+                       Archive     Return files marked as "archive".
+                       AnyFile     Returns any and all files.
+
+                       These attributes can be combined when passed to
+                       FindFirst.  For example: READONLY + HIDDEN will return
+                       any files which have been marked as "readonly" OR
+                       "hidden".  Example: DIRECTORY will only return names
+                       of directories.
+
+          DIR Variables : The DIR variables are what contain the information
+                          returned by the FindFirst command.  If your program
+                          is going to use these variables, it must be declared
+                          with the USES statement at the beginning of your
+                          program source code.  The following DIR variables
+                          are supported:
+
+                          DirName : Holds the file name.
+                          DirSize : Holds the file size.
+                          DirTime : Holds the file date and time in packed
+                                    date format.  The DateSTR and TimeSTR
+                                    functions will need to be used in order
+                                    to display these.
+
+       Example:
+
+          USES DIR
+
+          WriteLn ('The following files are in the C:\ directory:')
+          WriteLn ('')
+
+          FindFirst ('C:\*.*', ReadOnly + Archive)
+          While DosError = 0
+               WriteLn ('File Name: ', DirName)
+               WriteLn ('     Size: ', DirSize)
+               WriteLn ('     Date: ', DateSTR(DirTime), 0)
+               WriteLn ('     Time: ', TimeSTR(DirTime), 1)
+               Write   ('Press a key to search for more.~PN')
+               FindNext
+          Wend
+          FindClose
+
+          WriteLn ('No more files have been found.')
+
+       The above example will list all files which fit the file mask of
+       "C:\*.*" and fit the attributes of either ReadOnly or Archive.
+       The DOSERROR function is used to determine when there are no more
+       files found (See the DOSERROR reference).  If a file has been
+       found, it will then be printed to the screen using the DIR
+       variables.  The FindNext functon is used to find the next file
+       that matches the name and attributes specified in the earlier call
+       to FindFirst.  FindClose is used when all "Find" functions have been
+       completed.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FINDNEXT                           |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure FINDNEXT
+
+       Description:
+
+          This procedure is used to find the next file which matches the file
+          mask and attibutes specified in the last call to FindFirst.
+
+       Example:
+
+          See example in FINDFIRST help
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FOPEN                              |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure FOPEN (Handle: Byte, fType, oType, Name: String)
+
+       Description:
+
+          This procedure opens a text or binary file for file operations.
+
+          Handle : The passed Handle value is the file handle number and
+                   must be a value between 1 to 10 (MPL allows up to 10
+                   files opened at one time).
+          fType  : This is the type of file being opened.  It must be either
+                   "Text" for a text file, or "Bin" for a binary file.
+          oType  : This specifies how MPL will open the file.  The following
+                   open types are supported:
+
+                         RESET   : This will open an already existing file
+                                   at the beginning of the file.
+                         REWRITE : This will erase an existing file and
+                                   recreate it, leaving the file position
+                                   at the beginning of the file.  If the
+                                   file does not already exist, MPL will
+                                   create the file.
+                         APPEND  : This will open an already existing file
+                                   at the end of the file.
+
+          Name   : This specifies the path and filename to open.
+
+       Example:
+
+          fOpen    (1, Text, ReWrite, 'BLAH.TXT')
+          fWriteLn (1, 'Hello World!')
+          fClose   (1)
+
+       The above example creates a text file under the name 'BLAH.TXT'.
+       If BLAH.TXT already exists, it will be erased and replaced by a
+       new BLAH.TXT file.  The FWriteLn writes the text "Hello World" to
+       the file, and then FClose closes the file.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FREAD                              |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure FREAD (FileNum Byte, Variable, Size)
+
+       Description:
+
+          This procedure reads SIZE number of bytes from an opened data
+          file, storing the result in the VARIABLE variable.
+
+       Example:
+
+          Var Str String
+
+          fOpen  (1, Bin, Reset, 'SOMEFILE.DAT')
+          fRead  (1, Str, 40)
+          fClose (1)
+
+       The above example opens the binary file "SOMEFILE.DAT", and
+       reads 40 bytes into the STR variable.  The file is then closed.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FREADLN                            |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure FREADLN (FileNum Byte, Variable)
+
+       Description:
+
+          This procedure reads a single line of text from a text file
+          and stores the result into a variable.  This procedure can
+          only be used on files opened as text files.
+
+       Example:
+
+          Var Str String
+
+          fOpen (1, Text, Reset, 'C:\MYSTIC\MYSTIC.DOC')
+
+          While Not Eof(1)
+            fReadLn (1, Str)
+            WriteLn (Str)
+          Wend
+
+          fClose (1)
+
+       The above example opens the file "MYSTIC.DOC" in text mode and
+       then reads the file line by line, displaying it to the screen,
+       until the end of file is reached.  The file is then closed.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FREADREC                           |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure FREADREC (FileNum Byte, Variable, <Length>)
+
+       Description:
+
+          This procedure reads a variable from a binary file, following
+          the style of data storage used by Pascal compilers.  When reading
+          a non-string variable, the format is:
+
+             fReadRec (FileNum, VariableName)
+
+          When using a string variable a third parameter must be passed,
+          which is the maximum length of the string:
+
+             fReadRec (FileNum, StringVar, StringMaxLength)
+
+          Pascal stores is string variables differently than some other
+          compilers.  It uses the first byte to store the actual length
+          of the string, followed by the string data itself padded to the
+          maximum string length.  So a string written to a file would store
+          like this:
+
+             <actual string length><string data           >
+
+          This is really only useful to know when calculating a record
+          size, since if a string of length 30 was written to the data
+          file, it would actually take of 31 bytes of data, after counting
+          the lead byte which determins the actual length.
+
+          So, in Pascal, a record like this:
+
+          Type
+            SomeRec = Record
+              SomeByte   : Byte;            # 1 byte
+              SomeWord   : Word;            # 2 bytes
+              SomeString : String[30];      # 31 bytes (str size + 1)
+            End
+
+          Would actually have a record size of 34, rather than the 33 bytes
+          that are typed in the record.
+
+       Example:
+
+          (Assuming a TEST.DAT file already exists with data in it)
+
+          Var
+            SomeByte   Byte,
+            SomeWord   Word,
+            SomeString String
+          Begin
+            fOpen    (1, Bin, Reset, 'TEST.DAT')
+            fReadRec (1, SomeByte)
+            fReadRec (1, SomeWord)
+            fReadRec (1, SomeString, 30)
+            fClose   (1)
+          End
+
+       The above example would open the TEST.DAT file, which we assume
+       already has records saved to the file.  It will then read the
+       equivalent of SomeRec (shown above), as it would have been saved
+       using a Pascal program.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FSEEK                              |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure FSEEK (FileNum Byte, Position LongInt)
+
+       Description:
+
+          The FSEEK procedure will seek to a current byte position in a
+          file opened as binary.
+
+       Example:
+
+          fOpen (1, Bin, Reset, 'TEST.DAT')
+          fSeek (1, 34)
+
+       The above example will open a file called 'TEST.DAT' in binary
+       mode, and then seek to the 34th byte in the file using the FSEEK
+       procedure.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FWRITE                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+       Description:
+       Example:
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FWRITELN                           |
+      `--------------------------------------------------------------'
+
+       Syntax:
+       Description:
+       Example:
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           FWRITEREC                          |
+      `--------------------------------------------------------------'
+
+       Syntax:
+       Description:
+       Example:
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           PATHCHAR                           |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function PathChar : Char
+
+       Description:
+
+          This function returns either a foreslash or backslash based
+          on the type of file system.  For example, when an MPE program
+          is executed in Linux, PATHCHAR will return "/".  When that same
+          MPE is executed under DOS, Windows, or OS/2, a "\" will be
+          returned.
+
+          This function is needed when doing an file I/O if you want your
+          programs to be portable between all versions of Mystic BBS.
+
+       Example:
+
+          Var
+            FileName String
+
+          Begin
+            FileName := 'TEMP' + Int2Str(NodeNum) + PathChar + 'TEST.TXT')
+
+            fOpen    (1, Text, ReWrite, FileName)
+            fWriteLn (1, 'This is a test!')
+            fClose   (1)
+
+            DispFile(FileName)
+          End
+
+       The above example uses PATHCHAR in place of where a backslash
+       would have been.  This will allow the file 'TEST.TXT' to be
+       created in Unix-type file systems AND Dos-type file systems.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 5.3   Date and Time Functions                                |
+      `--------------------------------------------------------------'
+
+             DATESTR    - Converts a date/time stamp to a string date
+             DATETIME   - Returns the current date/time stamp
+             TIMER      - Returns the number of seconds since midnight
+             TIMESTR    - Converts a date/time stamp to a string time
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           DATESTR                            |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function DATESTR (DT LongInt, Format Byte) : String
+
+       Description:
+
+          This function will take a packed datetime number and convert it to
+          a date string.  The dType parameter is used to set the format of the
+          date which is returned.  Valid types are:
+
+              0 = Returns date in format that the user has set.
+              1 = Returns date in format: MM/DD/YY
+              2 = Returns date in format: DD/MM/YY
+              3 = Returns date in format: YY/DD/MM
+
+       Example:
+
+          GetThisUser
+          WriteLn ('Welcome.  You last called on ' + DateStr(UserLast))
+
+       The above example loads the currently logged in user's information
+       into the USER variables using GETTHISUSER, then displays the last
+       time the user has called to the screen using the DATESTR procedure.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           DATETIME                           |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+         Function DATETIME : LongInt
+
+       Description:
+
+         This function returns the current Date and Time in the packed
+         format.  DATESTR and TIMESTR can be used to convert this value
+         into strings.
+
+       Example:
+
+         WriteLn ('Current Date: ' + DateStr(DateTime, 0))
+         WriteLn ('Current Time: ' + TimeStr(DateTime, 1))
+
+       The above example outputs the current date and time to the screen
+       using the DATESTR and TIMESTR functions.  The DateTime function
+       which is passed to DATESTR and TIMESTR, contains the current date
+       and time in the packed format.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           TIMER                              |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function TIMER : LongInt
+
+       Description:
+
+          This function returns the number of seconds which have passed
+          since midnight.
+
+       Example:
+
+          WriteLn ('Seconds since midnight: ' + Int2Str(Timer))
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           TIMESTR                            |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function TIMESTR (DT LongInt, Format Byte) : String
+
+       Description:
+
+          This function takes a packed date/time record and returns the
+          time in a string format, where Format is one of the following:
+
+             0 = Returns time string in 24 format: 17:32
+             1 = Returns time string in 12 format: 10:21a
+
+       Example:
+
+          GetThisUser
+          WriteLn ('Last call on: ' + DateStr(UserLast, 0))
+          WriteLn ('          at: ' + TimeStr(UserLast, 1))
+
+       The above example uses GetThisUser to read information on the
+       current user.  It then uses DateSTR and TimeSTR to display the
+       last time and date that the user called.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 5.4   BBS Data Access Functions                              |
+      `--------------------------------------------------------------'
+
+             GETCFG        - Reads current configuration data
+             GETFBASE      - Reads file base configuration data
+             GETFGROUP     - Reads file group configuation data
+             GETMBASE      - Reads message base configuration data
+             GETMGROUP     - Reads message group configuration data
+             GETPROMPT     - Reads a prompt from the current language
+             GETSCREENINFO - Reads values of ScreenInfo MCI codes
+             GETTEXTSTR    - Reads data from the text buffer
+             GETTHISUSER   - Reads data from the current user
+             GETUSER       - Reads data from the user database
+             PUTFBASE      - Writes file base configuration data
+             PUTFGROUP     - Writes file group configuration data
+             PUTMBASE      - Writes message base configuration data
+             PUTMGROUP     - Writes message group configuration data
+             PUTTEXTSTR    - Writes data from the text buffer
+             PUTTHISUSER   - Writes data from the current user
+             PUTUSER       - Writes data to the user database
+             SETPROMPT     - Writes a prompt to the current language
+             USES          - Defines support for BBS data modules
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           USES                               |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Uses [module type]
+
+       Description:
+
+          The USES command declares that a certain "group" of predefined
+          MPE variables and functions will be used in your program.  It
+          should be declared at the top of your program, before any other
+          code, and must contain one of the valid modules:
+
+             CFG    - Allow use of Configuration variables and commands
+             DIR    - Allow use of Directory reading variables and commands
+             FBASE  - Allow use of File Base variables and commands
+             FGROUP - Allow use of File Group variables and commands
+             MBASE  - Allow use of Message Base variables and commands
+             MGROUP - Allow use of Message Group variables and commands
+             USER   - Allow use of User Base variables and commands
+
+       Example:
+
+          Uses USER
+
+          Begin
+            GetThisUser
+
+            WriteLn ('Welcome to this program ' + UserHandle)
+          End
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 5.5   Input Functions                                        |
+      `--------------------------------------------------------------'
+
+             INPUT       - Prompts the user for input
+             INPUTNY     - Prompts user with a Yes/No question
+             INPUTYN     - Prompts user with a Yes/No question
+             ISARROW     - TRUE if last key was an arrow key
+             ISLOCALKEY  - TRUE if last key was from local keyboard
+             KEYPRESSED  - TRUE is a key is in the input buffer
+             ONEKEY      - Reads a single character from the keyboard
+             READKEY     - Reads a single character from the keyboard
+             STUFFKEY    - Stuffs characters into the input buffer
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           INPUTNY                            |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function InputNY (Text String) : Boolean
+
+       Description:
+
+          Prompts the user with a Yes/No question, defaulting the input to
+          NO.  The function will return TRUE if the user selects Yes, and
+          FALSE if the user selects NO.
+
+       Example:
+
+          If Not InputNY('Do you want to run this program?') Then
+            Halt
+          EndIf
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           INPUTYN                            |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function InputYN (Text String) : Boolean
+
+       Description:
+
+          Prompts the user with a Yes/No question, defaulting the input to
+          YES.  The function will return TRUE if the user selects Yes, and
+          FALSE if the user selects NO.
+
+       Example:
+
+          If Not InputYN('Do you want to run this program?') Then
+            Halt
+          EndIf
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           ISARROW                            |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function IsArrow : Boolean
+
+       Description:
+
+         IsArrow is used along with the ReadKey function to process arrow keys
+         and other types of extended input.  It should be called directly
+         after calling ReadKey and returns TRUE if the character returned is
+         an extended input character.
+
+         Extended input characters are:
+
+         ASCII #     Chr     Key Pressed
+         -------     ---     -----------
+           71         G      Home
+           72         H      Up Arrow
+           73         I      Page Up
+           75         K      Left Arrow
+           77         M      Right Arrow
+           79         O      End
+           80         P      Down Arrow
+           81         Q      Page Down
+           83         S      Delete
+
+       Example:
+
+         Var Ch Char
+
+         Ch := ReadKey
+
+         If IsArrow Then
+           If Ch = Chr(72) Then
+             WriteLn ('Up arrow has been entered')
+           ElseIf Ch = Chr(80) Then
+             WriteLn ('Down arrow has been entered')
+           EndIf
+         Else
+           WriteLn ('Regular key received: ' + Ch)
+         EndIf
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           ISLOCALKEY                         |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function IsLocalKey : Boolean
+
+       Description:
+
+          IsLocalKey is used along with the READKEY function to determine if
+          the character just received was entered from the local or remote
+          keyboard.  TRUE will be returned if the key was entered from the
+          local keyboard.  FALSE will be returned if the key was entered
+          from a remote keyboard.
+
+       Example:
+
+          Ch := ReadKey
+
+          If IsLocalKey Then
+            WriteLn ('Key pressed from the local keyboard.')
+          Else
+            WriteLn ('Key pressed from the remote keyboard.')
+          EndIf
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 5.6   Output Functions                                       |
+      `--------------------------------------------------------------'
+
+             CLS           - Clears the screen
+             DISPFILE      - Displays a file to the user
+             GOTOXY        - Moves the cursor to a X/Y position
+             ISNOFILE      - TRUE after DISPFILE if file doesn't exist
+             MOVEX         - Moves the cursor to a X coordinate
+             MOVEY         - Moves the cursor to a Y coordinate
+             TEXTATTR      - Returns the current text attribute
+             TEXTCOLOR     - Changes the current text color
+             WHEREX        - Returns the current X cursor position
+             WHEREY        - Returns the current Y cursor position
+             WRITE         - Writes a string/text to the screen
+             WRITELN       - Writes a string/text to the screen with a CR
+             WRITELOCALXY  - Writes text to the local screen only
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           CLS                                |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure CLS
+
+       Description:
+
+          Clears the screen and returns the cursor to the top left side of
+          the screen.
+
+       Example:
+
+          CLS
+          WriteLn ('The screen was just cleared!')
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           DISPFILE                           |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure DISPFILE (FileName String)
+
+       Description:
+
+          This procedure displays a text or ANSI file to the screen.  If a
+          path not included in the passed filename, Mystic will look for
+          the file in the language text file directory.  If no file
+          extension is provided in the passed file name, Mystic will display
+          the correct file according to the user's graphics settings
+          (ie .ANS for ANSI, .ASC for non-ansi).
+
+       Example:
+
+          DispFile ('WELCOME')
+
+       The above example will display the text file "WELCOME" from the
+       language text file directory.  Since there is no file extension
+       provided, Mystic will display "WELCOME.ANS" or "WELCOME.ASC"
+       depending on what the user's terminal settings are.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           GOTOXY                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure GotoXY (X Byte, Y Byte)
+
+       Description:
+
+          Locates the cursor to the specified X and Y position on the screen.
+          This procedure only works if the user has ANSI terminal emulation
+          enabled.
+
+       Example:
+
+          CLS
+          GotoXY (1, 10)
+          Write ('This is the 10th line of the screen')
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           ISNOFILE                           |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function IsNoFile : Boolean
+
+       Description:
+
+          Returns TRUE after a call to DISPFILE if the file that was
+          attemped to display did not exist.
+
+       Example:
+
+          Begin
+            DispFile('HELLO')
+
+            If IsNoFile Then
+              WriteLn ('HELLO.XXX does not exist.')
+            EndIf
+          End
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           MOVEX                              |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure MoveX (XPos Byte)
+
+       Description:
+
+          This procedure moves the cursor from the current position to
+          the passed X coordinate on the screen.  This procedure only
+          works if the user has ANSI compatible terminal.
+
+       Example:
+
+          Begin
+            MoveX (25)
+            Write ('This text is on column 25')
+          End
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           MOVEY                              |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure MoveY (YPos Byte)
+
+       Description:
+
+          This procedure moves the cursor from the current position to
+          the passed Y coordinate on the screen.  This procedure only
+          works if the user has ANSI compatible terminal.
+          
+       Example:
+
+          Begin
+            MoveY (10)
+            Write ('This text is on line 10')
+          End
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           TEXTATTR                           |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function TextAttr : Byte
+
+       Description:
+
+          This function returns the current text attribute.  See
+          the help for  WRITELOCALXY  for a detailed
+          description of the text attribute colors.
+
+       Example:
+
+          Begin
+            WriteLn ('The current text attribute is: ' + Int2Str(TextAttr))
+          End
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           TEXTCOLOR                          |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure TextColor (Color Byte)
+
+       Description:
+
+          This procedure changes the current text color to the passed
+          text attribute.  See the help for  WRITELOCALXY 
+          for more detailed information on the text attribute.
+
+       Example:
+
+          Begin
+            TextColor (31)
+            WriteLn ('This text is a White on Blue Background!')
+          End
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           WHEREX                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+       Description:
+       Example:
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           WHEREY                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+       Description:
+       Example:
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           WRITE                              |
+      `--------------------------------------------------------------'
+
+       Syntax:
+       Description:
+       Example:
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           WRITELN                            |
+      `--------------------------------------------------------------'
+
+       Syntax:
+       Description:
+       Example:
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                         WRITELOCALXY                         |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure WriteLocalXY (X Byte, Y Byte, Text String, Attr Byte)
+
+       Description:
+
+          This procedure allows text to be written to the local screen only,
+          at a specified X/Y position and text attribute.
+
+          The text attribute can be calculated with the following formula:
+             Foreground color + (Background color * 16)
+
+             Foreground colors:                        Background colors:
+               0 - Black      8 - Dark Grey              0 - Black
+               1 - Blue       9 - Light Blue             1 - Blue
+               2 - Green     10 - Light Green            2 - Green
+               3 - Cyan      11 - Light Cyan             3 - Cyan
+               4 - Red       12 - Light Red              4 - Red
+               5 - Magenta   13 - Light Magenta          5 - Magenta
+               6 - Brown     14 - Yellow                 6 - Brown
+               7 - Grey      15 - White                  7 - Grey
+
+          Therefore, a white forground with a blue background would be the
+          text attribute of 31, as used in the example below.
+
+       Example:
+
+         WriteLocalXY (1, 1, 'Only printed on the local screen', 31)
+
+       The above example prints the text to the local screen only at the
+       first column of the first line.  The text will be printed with a
+       white foreground on a blue background.
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 5.7   Miscellaneous Functions                                |
+      `--------------------------------------------------------------'
+
+             ACS          - Returns TRUE if user passes an ACS string
+             DELAY        - Delays for a specified number of milliseconds
+             EXIT         - Exits the current function or procedure immediately
+             GRAPHICS     - Returns the current user's graphic type
+             HALT         - Exits the MPL program immediately
+             HANGUP       - Disconnects the user immediately
+             LOCAL        - Returns TRUE if user is logged in locally
+             MENUCMD      - Executes a menu command
+             NODENUM      - Returns the current node number
+             PARAMCOUNT   - Returns the current number of parameters
+             PARAMSTR     - Returns specific parameter data
+             RANDOM       - Returns a randomly generated number
+             SETUSERTIME  - Sets the user's time left
+             STATUSUPDATE - Updates the status line
+             SYSOPLOG     - Writes a string to the system log file
+             UPUSER       - Upgrades a user's security level
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                          ACS                                 |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Function ACS (AcsStr String) : Boolean
+
+       Description:
+
+          Checks an access string with the current user's information and
+          returns either TRUE or FALSE based on if they user passed.
+
+       Example:
+
+          If ACS('s20') Then
+            WriteLn ('Your security level is higher than 20!')
+          Else
+            WriteLn ('Your security level is less than 20!')
+          EndIf
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                          DELAY                               |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure DELAY (MilliSec Word)
+
+       Description:
+
+          Delays for a specified number of milliseconds
+
+       Example:
+
+          WriteLn('Pausing for 1 second...')
+          Delay(1000)
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           GRAPHICS                           |
+      `--------------------------------------------------------------'
+
+       Syntax:
+       Description:
+       Example:
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                         HALT                                 |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure HALT
+
+       Description:
+
+          Halts execution of the program and returns the user immediately
+          back to the BBS.
+
+       Example:
+
+          If Graphics = 0 Then
+            WriteLn ('Sorry, this program requires ANSI graphics.')
+            Halt
+          EndIf
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           HANGUP                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+       Description:
+       Example:
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           LOCAL                              |
+      `--------------------------------------------------------------'
+
+       Syntax:
+       Description:
+       Example:
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                         SETUSERTIME                          |
+      `--------------------------------------------------------------'
+
+       Syntax:
+       Description:
+       Example:
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                         SYSOPLOG                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+
+          Procedure SysopLog (Text String)
+
+       Description:
+
+          This procedure adds a line of text to the current node's Sysop log
+          file.  The date and time will automatically be added into the log
+          as well, keeping the same format as all the other entries into the
+          log.
+
+       Example:
+
+          SysopLog ('This will be in the log file now!')
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      |                           UPUSER                             |
+      `--------------------------------------------------------------'
+
+       Syntax:
+       Description:
+       Example:
+
+       --------------------------------------------------------------
+
+      .--------------------------------------------------------------.
+      | 5.8   Function Listing From A-Z                              |
+      `--------------------------------------------------------------'
+
+       --------------------------------------------------------------
+
+          A
+
+             ACS 
+
+          B
+
+          C
+
+             CHR 
+             CLS 
+             COPY 
+
+          D
+
+             DATESTR 
+             DATETIME 
+             DELAY 
+             DELETE 
+             DISPFILE 
+             DOSERROR 
+
+          E
+
+             EOF 
+             EXIT 
+
+          F
+
+             FCLOSE 
+             FCOPY 
+             FERASE 
+             FEXIST 
+             FOPEN 
+             FILEPOS 
+             FILESIZE 
+             FINDCLOSE 
+             FINDFIRST 
+             FINDNEXT 
+             FREAD 
+             FREADLN 
+             FREADREC 
+             FSEEK 
+             FWRITE 
+             FWRITELN 
+             FWRITEREC 
+
+          G
+
+             GETCFG 
+             GETFBASE 
+             GETFGROUP 
+             GETMBASE 
+             GETMGROUP 
+             GETPROMPT 
+             GETSCREENINFO 
+             GETTEXTSTR 
+             GETTHISUSER 
+             GETUSER 
+             GOTOXY 
+             GRAPHICS 
+
+          H
+
+             HALT 
+             HANGUP 
+
+          I
+
+             INPUT 
+             INPUTNY 
+             INPUTYN 
+             INSERT 
+             INT2STR 
+             ISARROW 
+             ISLOCALKEY 
+             ISNOFILE 
+
+          J
+
+          K
+
+             KEYPRESSED 
+
+          L
+
+             LENGTH 
+             LOCAL 
+             LOWER 
+
+          M
+
+             MENUCMD 
+             MOVEX 
+             MOVEY 
+
+          N
+
+             NODENUM 
+
+          O
+
+             ODD 
+             ONEKEY 
+             ORD 
+
+          P
+
+             PADCT 
+             PADLT 
+             PADRT 
+             PARAMCOUNT 
+             PARAMSTR 
+             PATHCHAR 
+             POS 
+             PUTFBASE 
+             PUTFGROUP 
+             PUTMBASE 
+             PUTMGROUP 
+             PUTTEXTSTR 
+             PUTTHISUSER 
+             PUTUSER 
+
+          Q
+
+          R
+
+             RANDOM 
+             READKEY 
+
+          S
+
+             SETPROMPT 
+             SETUSERTIME 
+             STATUSMODE 
+             STATUSUPDATE 
+             STR2INT 
+             STRIPMCI 
+             STRREP 
+             STUFFKEY 
+             SYSOPLOG 
+
+          T
+
+             TEXTATTR 
+             TEXTCOLOR 
+             TIMER 
+             TIMESTR 
+
+          U
+
+             UPPER 
+             UPUSER 
+             USES 
+
+          V
+
+          W
+
+             WHEREX 
+             WHEREY 
+             WRITE 
+             WRITELN 
+             WRITELOCALXY 
+
+          X
+
+          Y
+
+          Z
+
+       --------------------------------------------------------------
