@@ -342,9 +342,8 @@ Procedure TIOSocket.TelnetInBuffer (Var Buf: TIOBuffer; Var Len: LongInt);
     Reply[2] := Char(YesNo); {DO/DONT, WILL/WONT}
     Reply[3] := CmdType;
 
-    fpSend (FSocketHandle, @Reply[1], 3, FPSENDOPT);
-    { Note: return value intentionally unchecked — if send fails,
-      the connection is broken and the next read will detect it. }
+    If fpSend (FSocketHandle, @Reply[1], 3, FPSENDOPT) < 0 Then
+      Len := 0;  { signal broken connection — stop processing }
 
     {$IFDEF TNDEBUG}
       TNLOG ('InBuffer -> Sending response: ' + CommandType(YesNo) + ' ' + CommandType(CmdType));
@@ -368,7 +367,8 @@ Procedure TIOSocket.TelnetInBuffer (Var Buf: TIOBuffer; Var Len: LongInt);
     Reply[6 + DataLen] := Telnet_IAC;
     Reply[7 + DataLen] := Telnet_SE;
 
-    fpSend (FSocketHandle, @Reply[1], 7 + DataLen, FPSENDOPT);
+    If fpSend (FSocketHandle, @Reply[1], 7 + DataLen, FPSENDOPT) < 0 Then
+      Len := 0;
 
     {$IFDEF TNDEBUG}
       TNLOG ('InBuffer -> Sending data response');

@@ -298,9 +298,9 @@ begin
   Hdr[2] := (Msg.Len shr 16) and $FF;
   Hdr[3] := (Msg.Len shr 24) and $FF;
   Hdr[4] := Msg.Cmd;
-  fpSend(Sock, @Hdr, 5, PD_SEND_FLAGS);
+  If fpSend(Sock, @Hdr, 5, PD_SEND_FLAGS) < 0 Then Exit;
   if Msg.Len > 1 then
-    fpSend(Sock, @Msg.Data, Msg.Len - 1, PD_SEND_FLAGS);
+    If fpSend(Sock, @Msg.Data, Msg.Len - 1, PD_SEND_FLAGS) < 0 Then Exit;
 end;
 
 procedure TPDNetServer.SendToAll(const Msg: TPDNetMsg; ExceptIdx: Integer);
@@ -683,9 +683,9 @@ begin
   Hdr[2] := (Msg.Len shr 16) and $FF;
   Hdr[3] := (Msg.Len shr 24) and $FF;
   Hdr[4] := Msg.Cmd;
-  fpSend(FSocket, @Hdr, 5, PD_SEND_FLAGS);
+  If fpSend(FSocket, @Hdr, 5, PD_SEND_FLAGS) < 0 Then Begin FConnected := False; Exit; End;
   if Msg.Len > 1 then
-    fpSend(FSocket, @Msg.Data, Msg.Len - 1, PD_SEND_FLAGS);
+    If fpSend(FSocket, @Msg.Data, Msg.Len - 1, PD_SEND_FLAGS) < 0 Then FConnected := False;
 end;
 
 function TPDNetClient.Connect(const Host: String; APort: Word;

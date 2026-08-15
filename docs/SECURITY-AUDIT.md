@@ -8,7 +8,7 @@ Performed by sysop/0. Mystic BBS 1.11IRC full source scan.
 |---|----------|------|-------|--------|
 | 3 | MEDIUM | m_tcp_client_ftp.pas:246 | FTP path traversal — FileName sanitized with JustFile, rejects `..` | FIXED |
 | 5 | MEDIUM | m_fossil_io.pas:258 | DSR vs DCD — tries DCD first, falls back to DSR | FIXED |
-| 1 | LOW | m_io_sockets.pas:346 | fpSend return on IAC — documented as intentional | FIXED |
+| 1 | LOW | m_io_sockets.pas:346 | fpSend return checked — sets Len:=0 on failure to stop processing | FIXED |
 | 6 | LOW | m_tcp_client.pas:91 | Debug WriteLn removed | FIXED |
 
 ## Findings from second scan — ALL FIXED
