@@ -20,8 +20,28 @@ PASS=0; FAIL=0
 # ============================================================
 check_multilib() {
     local missing=""
-    for lib in libc.so libpthread.so libdl.so; do
-        if ! find /usr/lib/i386-linux-gnu /usr/lib32 /lib/i386-linux-gnu              -name "$lib" 2>/dev/null | grep -q .; then
+    # libc is always required
+    if ! find /usr/lib/i386-linux-gnu /usr/lib32 /lib/i386-linux-gnu \
+             -name "libc.so*" 2>/dev/null | grep -q .; then
+        missing="$missing libc.so"
+    fi
+    # glibc 2.34+: libpthread and libdl merged into libc.
+    # Check for standalone .so first; if absent, check if libc is new enough.
+    for lib in libpthread.so libdl.so; do
+        if ! find /usr/lib/i386-linux-gnu /usr/lib32 /lib/i386-linux-gnu \
+                 /usr/lib/x86_64-linux-gnu /usr/lib \
+                 -name "$lib" 2>/dev/null | grep -q .; then
+            # Not found as separate lib — check if glibc >= 2.34 (merged)
+            local glibcver
+            glibcver=$(ldd --version 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+$')
+            if [ -n "$glibcver" ]; then
+                local major minor
+                major=$(echo "$glibcver" | cut -d. -f1)
+                minor=$(echo "$glibcver" | cut -d. -f2)
+                if [ "$major" -gt 2 ] || { [ "$major" -eq 2 ] && [ "$minor" -ge 34 ]; }; then
+                    continue  # glibc 2.34+ — already in libc, skip
+                fi
+            fi
             missing="$missing $lib"
         fi
     done

@@ -426,7 +426,7 @@ Type
     RipFallback     : Boolean;                                  // Fall back to ANSI if no .rip file
     RipVersion      : Byte;                                     // 0=v1.54 (only supported version)
 
-    Reserved          : Array[1..546] of Char;                  // was 552, minus 6 for RIP fields
+    Reserved          : Array[1..547] of Char;                  // was 552, minus 6 for RIP fields, +1 for UseRipDetect removal
   End;
 
 Const

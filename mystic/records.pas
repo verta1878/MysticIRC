@@ -420,7 +420,7 @@ Type
     inetBINKPRename   : Byte;
     inetBINKPExempt   : Boolean;
 
-    Reserved          : Array[1..552] of Char;
+    Reserved          : Array[1..553] of Char;
   End;
 
 Const
