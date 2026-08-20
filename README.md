@@ -24,34 +24,34 @@ Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
 
 ```
 mdl/                     Mystic Development Library (67 units)
+  m_rip/                   Mystic Development for RIP (WIP)
+     v1/                      RIPscript v1.54 engine (evga/wrench)
+     v2/                      RIPscript v2.0 engine (evga/wrench)
+     v3/                      RIPscript v3.0 engine (evga/wrench)
+     v4/                      RIPscript v4.0 engine (evga/wrench)
+  ans2rip.pas              ANSI→RIP converter (pixel-perfect, -p flag)
+  ans2png.pas              ANSI→BMP renderer (pixel-perfect)
+  ripscrip-irc-whitepaper.htm  Our RIP implementation whitepaper
 mystic/                  BBS core (clean, no RIP)
 mystic_test/             BBS core + RIP integration + A4 fixes
   mdl/                     Local copy of MDL (self-contained build)
 mystic_sdl/              SDL2 graphical terminal
-mystic_rip/              RIPscrip engines + converters
-  v1/                      RIPscrip v1.54 engine (evga/wrench)
-  v2/                      RIPscrip v2.0 engine (evga/wrench)
-  v3/                      RIPscrip v3.0 engine (evga/wrench)
-  v4/                      RIPscrip v4.0 engine (evga/wrench)
-  ans2rip.pas              ANSI→RIP converter (pixel-perfect, -p flag)
-  ans2png.pas              ANSI→BMP renderer (pixel-perfect)
-  ripscrip-irc-whitepaper.htm  Our RIP implementation whitepaper
+mystic_view/               RIPscript Browser
 mystic_spell/            Hunspell spell check binding + SETUP.md
 mystic_crypt/            CryptLib SSH/TLS example
 mystic_modem/            Modem/FOSSIL front-end
 mystic_mailer/           BINKP/FidoNet mailer
 mystic_ansiedit/         ANSI editor cfg
 mystic_texteditor/       Text editor standalone
+mystic_ripview/          RIPView v1.0.0 — evga's Pascal viewer (42/42 cmds)
+mystic_mterm/            mterm terminal + OpenOLMS (44 files)
 examples/
-  ripview/                 RIPView v1.0.0 — evga's Pascal viewer (42/42 cmds)
     source/                  Pascal source (7 units, 1,656 lines)
     fonts/                   18 BGI + bitmap fonts
     icons/                   219 ICN/MSK/HIC files
     rips/                    259 test RIP files
     ripscrip-irc-whitepaper.htm  Our RIP implementation whitepaper
   riptermJS/               RIPtermJS (Carl Gorringe, GPLv3) zip + v3.0 txt
-  ripterm154/              RIPterm 1.54 DOS binary (Carl Gorringe archive)
-  mterm/                   mterm terminal + OpenOLMS (44 files)
   serial/                  Serial v1.1 + FOSSIL driver (5 files)
   door32/                  Door32 BBS Door Kit (g00r00, ONiX, SqZ) zip
   utrayit/                 Console tray unit + mkicon ICO generator
@@ -64,7 +64,9 @@ examples/
   rez2ans-next/            REZ to ANSI converter
   ciadraw/                 CIA Draw ANSI tool
   libs/                    Runtime libs (hunspell, SDL2, cryptlib) per platform
-docs/                    Documentation
+todo/                    Documentation
+historical/
+  ripterm154/              RIPterm 1.54 DOS binary (Carl Gorringe archive)
 attic/                   Retired code and archives
   docs-a40/                AreaFix implementation checklist
   docs-os2-linux-toolchain/  OS/2 cross-compile docs (sysop/0)

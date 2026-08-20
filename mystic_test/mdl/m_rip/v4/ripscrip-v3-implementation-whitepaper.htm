@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<title>RIPscrip v3.0 — Implementation White Paper</title>
+<style>
+body{font-family:"Courier New",monospace;background:#1a1a2e;color:#c0c0c0;max-width:80em;margin:2em auto;padding:0 2em;font-size:14px;line-height:1.6}
+h1{color:#00ff00;font-size:1.6em;border-bottom:2px solid #00ff00;padding-bottom:0.3em}
+h2{color:#00ccff;font-size:1.3em;border-bottom:1px solid #00ccff;padding-bottom:0.2em;margin-top:2em}
+h3{color:#ffcc00;font-size:1.1em;margin-top:1.5em}
+table{border-collapse:collapse;width:100%;margin:1em 0}
+th,td{border:1px solid #444;padding:6px 10px;text-align:left}
+th{background:#222;color:#00ccff}
+td{color:#c0c0c0}
+.done{color:#00ff00;font-weight:bold}
+.miss{color:#ff4444;font-weight:bold}
+.defer{color:#ffcc00}
+pre{background:#111;padding:1em;overflow-x:auto;border:1px solid #333}
+code{color:#ff6600}
+a{color:#00ccff}
+.gpl{color:#888;font-size:12px;margin-top:3em;border-top:1px solid #333;padding-top:1em}
+</style></head><body>
+
+<h1>RIPscrip v3.0 Implementation White Paper</h1>
+
+<p><b>Mystic BBS IRC Fork — Server-Side Rendering Engine</b></p>
+<p>Document Date: July 21, 2026</p>
+<p>Engine: rip3api.pas — 8,293 lines, 300 items, 69 commands</p>
+<p>Compiler: Free Pascal 2.6.4irc r3 (-Mdelphi, {$H-})</p>
+<p>License: GNU General Public License v3</p>
+<p>Tests: 592/592 passing (14 test suites)</p>
+
+<hr>
+
+<h2>1. Introduction</h2>
+
+<p>This document describes the Mystic BBS IRC Fork implementation of
+RIPscrip v3.0, a server-side rendering engine for the Remote Imaging
+Protocol Scripting Language. It is a companion to the original
+<i>RIPscrip 3.0 Technical White Paper</i> by Jeff Reeder
+(TeleGrafix Communications, December 1996), which described the
+planned v3.0 specification.</p>
+
+<p>TeleGrafix dissolved before completing RIPscrip 3.0. Their whitepaper
+described the vision; this document describes what we built. Where
+TeleGrafix's plan was a client-side terminal protocol, our
+implementation is a server-side rendering engine that produces pixel
+buffers from RIP commands. The server owns all rendering; the client
+displays pixels and handles user input.</p>
+
+<h3>1.1 Scope</h3>
+
+<p>The engine processes RIPscrip v1.54, v2.0, and v3.0 commands,
+renders to an in-memory pixel buffer (Indexed8, RGB24, or RGB32),
+and exports to BMP. It is designed for integration into BBS software
+(Mystic BBS) but compiles as a standalone unit with zero external
+dependencies.</p>
+
+<h3>1.2 Lineage</h3>
+
+<pre>
+  ripscript.pas (v1.54)  →  rip2api.pas (v2.0)  →  rip3api.pas (v3.0)
+      4,041 lines              5,173 lines             8,293 lines
+      51 commands               67 commands              69 commands
+      16 colors                256 colors              16M colors
+      640×350 fixed           1280×1024 max           + world coords
+</pre>
+
+<p>Each engine is backward-compatible with the previous version.
+A v3.0 engine can render any v1.54 or v2.0 scene file.</p>
+
+<h3>1.3 Platforms</h3>
+
+<p>All FPC 2.6.4irc targets: Win32, Linux (x86/x64), FreeBSD,
+Darwin, DOS (DPMI), OS/2. Pure Pascal — no ASM, no C, no
+external libraries. Compiles with a single command:</p>
+
+<pre>ppcx64 -Mdelphi -Fuimg -Fuwav -Fuprg -Fupasjpeg rip3api.pas</pre>
+
+<hr>
+
+<h2>2. Architecture</h2>
+
+<h3>2.1 Server/Client Split</h3>
+
+<p>Unlike TeleGrafix's client-side terminal approach, our engine
+uses a server/client architecture:</p>
+
+<pre>
+  SERVER (BBS host)                    CLIENT (terminal)
+  ─────────────────                    ─────────────────
+  TRIPEngine instance                  Pixel display
+  Processes RIP commands               Receives rendered pixels
+  Manages pixel buffer                 Handles keyboard/mouse
+  Audio state management               Audio playback (wavplay)
+  Table/form data model                Form input (text fields)
+  Variable storage + scoping           Variable display
+  Progressive rendering                Progressive display
+</pre>
+
+<p>The server owns all data and rendering state. The client is a
+thin display layer. This simplifies BBS integration — the server
+generates the scene, the client shows it.</p>
+
+<h3>2.2 Pixel Buffer</h3>
+
+<p>The engine supports three pixel formats, switchable at runtime:</p>
+
+<table>
+<tr><th>Format</th><th>Bytes/pixel</th><th>Colors</th><th>Buffer</th></tr>
+<tr><td>Indexed8</td><td>1</td><td>256 (palette)</td><td>Pixels^[Y,X]</td></tr>
+<tr><td>RGB24</td><td>3</td><td>16.7 million</td><td>PixelsRGB</td></tr>
+<tr><td>RGB32</td><td>4</td><td>16.7M + alpha</td><td>PixelsRGB32</td></tr>
+</table>
+
+<p>All drawing primitives work across all formats. In Indexed mode,
+the engine uses palette lookup for backward compatibility with
+v1.54 scenes. In RGB modes, colors are specified directly.</p>
+
+<h3>2.3 Codec Architecture</h3>
+
+<p>117 codec files organized in four directories:</p>
+
+<pre>
+  img/  — 20 image, animation, and graphics codecs
+  wav/  — 33 audio, streaming, and utility codecs
+  prg/  —  6 progressive rendering codecs
+  pasjpeg/ — 58 JPEG library files (IJG port)
+</pre>
+
+<p>All codecs are standalone Pascal units. They operate on raw byte
+buffers and pixel arrays — no framework coupling, no TStream, no
+Classes unit. Each codec compiles independently.</p>
+
+<hr>
+
+<h2>3. Implementation vs TeleGrafix Whitepaper</h2>
+
+<p>The original TeleGrafix whitepaper (December 1996) described
+planned features for RIPscrip 3.0. This section maps their plan
+to our implementation.</p>
+
+<h3>3.1 Graphical Primitives (Whitepaper §3.4)</h3>
+
+<p class="done">IMPLEMENTED — exceeds specification</p>
+
+<p>All v1.54 drawing primitives (pixel, line, rectangle, bar,
+circle, ellipse, arc, pie, bezier, polygon, flood fill) are
+retained. v3.0 adds:</p>
+
+<table>
+<tr><th>Feature</th><th>API</th><th>Codec</th></tr>
+<tr><td>Gradient fills (3 types)</td><td>GradientRect</td><td>grfill.pas</td></tr>
+<tr><td>Drop shadows</td><td>DropShadow</td><td>grfx.pas</td></tr>
+<tr><td>Outer glow / bloom</td><td>OuterGlow</td><td>grfx.pas</td></tr>
+<tr><td>Variable-width bezier</td><td>BezierVarWidth</td><td>grbezier.pas</td></tr>
+<tr><td>Texture mapping</td><td>TextureQuad</td><td>grtexmap.pas</td></tr>
+<tr><td>Alpha compositing</td><td>CompositAlpha</td><td>grfx.pas</td></tr>
+<tr><td>Clipping paths</td><td>ClipBegin/End</td><td>grclip.pas</td></tr>
+<tr><td>World coordinates</td><td>SetWorldCoords</td><td>(built-in)</td></tr>
+</table>
+
+<p>TeleGrafix did not plan gradient fills, drop shadows, texture
+mapping, or clipping paths. These are new to our implementation.</p>
+
+<h3>3.2 User Interface Objects (Whitepaper §3.5)</h3>
+
+<p class="done">IMPLEMENTED</p>
+
+<p>The v1.54 button system (3D bevel, radio, checkbox, hotkey,
+tab navigation) is retained. v3.0 adds server-side data tables
+and forms:</p>
+
+<pre>
+  Tables:  TableCreate → AddCol → AddRow → SetCell → Render → Scroll
+  Forms:   FormAddField → SetOptions → BindVar → Validate → Render
+  Binding: FormSyncToVars / FormSyncFromVars (bidirectional)
+  Types:   text, dropdown, listbox, checkbox, label
+</pre>
+
+<h3>3.3 Image Formats (Whitepaper §3.7)</h3>
+
+<p class="done">IMPLEMENTED — exceeds specification</p>
+
+<p>TeleGrafix planned JPEG, GIF, and PNG support. We implement
+11 image formats:</p>
+
+<table>
+<tr><th>Format</th><th>Decoder</th><th>Features</th></tr>
+<tr><td>JPEG</td><td>jpegdecraw.pas</td><td>+ progressive streaming (Init/Feed/Complete)</td></tr>
+<tr><td>GIF</td><td>gifdecraw.pas</td><td>+ animated frames, interlaced streaming</td></tr>
+<tr><td>PNG</td><td>pngdecraw.pas</td><td>+ alpha channel, Adam7 interlaced streaming</td></tr>
+<tr><td>BMP</td><td>bmpdec.pas</td><td>1/4/8/16/24/32-bit, RLE4, RLE8</td></tr>
+<tr><td>PCX</td><td>pcxdec.pas</td><td>1-8 bit, RLE, 256-color VGA palette</td></tr>
+<tr><td>TGA</td><td>tgadec.pas</td><td>8/16/24/32-bit, RLE, RGBA</td></tr>
+<tr><td>PBM/PGM/PPM</td><td>pbmdec.pas</td><td>P1-P6 (ASCII + binary)</td></tr>
+<tr><td>ICO/CUR</td><td>icodec.pas</td><td>RGBA extraction</td></tr>
+<tr><td>ICN/MSK/HIC</td><td>(built-in)</td><td>EGA planar (v1.54 format)</td></tr>
+<tr><td>RFF</td><td>rffdecraw.pas</td><td>v2.2 scalable vector font strokes</td></tr>
+<tr><td>PNG (encode)</td><td>pngcodec.pas</td><td>Encoder + decoder</td></tr>
+</table>
+
+<h3>3.4 Data Tables (Whitepaper §3.8)</h3>
+
+<p class="done">IMPLEMENTED</p>
+
+<p>Server-side table rendering with column types, alignment,
+header/cell colors, scrolling, and variable-height rows.
+See Phase 20 in PHASES.md.</p>
+
+<h3>3.5 Text Variables (Whitepaper §3.10.5)</h3>
+
+<p class="done">IMPLEMENTED — exceeds specification</p>
+
+<p>v1.54 had global text variables. v3.0 adds scoped variables:</p>
+
+<table>
+<tr><th>Scope</th><th>Lifetime</th><th>Use Case</th></tr>
+<tr><td>LOCAL</td><td>Cleared on ClearScreen</td><td>Scene-specific state</td></tr>
+<tr><td>SESSION</td><td>Cleared on disconnect</td><td>Login session data</td></tr>
+<tr><td>PERSIST</td><td>Saved to disk</td><td>User preferences</td></tr>
+</table>
+
+<p>Extended variables: $PIXFMT$, $CANVASW$, $CANVASH$, $RFFFONT$,
+$MAFRES$. Action variables: $RESET(PAL)$, $RESET(ALL)$.</p>
+
+<h3>3.6 Streaming Audio (Whitepaper §4.3)</h3>
+
+<p class="done">IMPLEMENTED — exceeds specification</p>
+
+<p>TeleGrafix planned "compressed, streaming audio" as a future
+goal. We implement a full audio subsystem:</p>
+
+<pre>
+  4-stream simultaneous playback
+  13 audio format decoders (WAV, VOC, MP3, FLAC, AIFF, AU,
+    MOD, S3M, XM, MIDI, ANSI music, ADPCM + LZMA compression)
+  WAV streaming: WAVStreamStart → Feed → End (chunked)
+  Cue points: CueAdd(frame, action) — 64 timed events
+  Background audio with crossfade transitions
+  Ring buffer for streaming playback (ringbuf.pas)
+  Network audio streaming (netaudio.pas)
+</pre>
+
+<h3>3.7 Scalable Fonts</h3>
+
+<p class="done">IMPLEMENTED</p>
+
+<p>Two font systems, both exceeding v1.54's CHR-only support:</p>
+
+<table>
+<tr><th>System</th><th>Type</th><th>Features</th></tr>
+<tr><td>RFF v2.2</td><td>Stroke vector</td><td>8 fonts, 10 faces each, arbitrary scaling, rotation, kerning, leading, tracking, word wrap + alignment</td></tr>
+<tr><td>MAF</td><td>Bitmap</td><td>Multi-resolution, multi-height (8-16px), auto-selects for screen resolution</td></tr>
+<tr><td>CHR</td><td>Stroke vector</td><td>Borland BGI format (v1.54 backward compat)</td></tr>
+<tr><td>CP437 8x8/8x14</td><td>Bitmap</td><td>Built-in, 256 chars, 5 system text modes</td></tr>
+</table>
+
+<h3>3.8 Full-Motion Video (Whitepaper §4.2)</h3>
+
+<p class="defer">DEFERRED TO v4.0</p>
+
+<p>TeleGrafix planned full-motion video as a future goal. Our
+v3.0 engine provides animation support through frame counters,
+cue points, and progressive rendering codecs. Full video codec
+support (AVI/MPEG decoding) is deferred to v4.0.</p>
+
+<h3>3.9 Document Oriented Interface (Whitepaper §4.6)</h3>
+
+<p class="defer">DEFERRED TO v4.0</p>
+
+<p>TeleGrafix envisioned a page layout engine within RIPscrip.
+Our v3.0 table and form system (Phase 20) provides structured
+data presentation. A general-purpose document layout engine is
+deferred to v4.0.</p>
+
+<h3>3.10 HTML Rendering (Whitepaper §4.7)</h3>
+
+<p class="defer">DEFERRED TO v4.0</p>
+
+<p>TeleGrafix planned to embed HTML rendering within RIPscrip 3.0.
+Modern BBS clients (SyncTERM, NetRunner) handle HTML separately.
+HTML rendering within the engine is deferred to v4.0.</p>
+
+<h3>3.11 MIDI Synthesis</h3>
+
+<p class="done">IMPLEMENTED</p>
+
+<p>The engine parses MIDI files via mididec.pas and synthesizes
+audio via midisynth.pas — a 2-operator FM synthesis engine
+(OPL2/AdLib style) with 16 MIDI channels. midisynth.pas is
+{$H-} compatible and renders MIDI events directly to PCM.
+midiplay.pas bridges the parser and synth for file playback
+(uses {$H+}, host-side). The engine stores the filename via
+MIDILoad; the host can use midiplay.pas for full playback or
+midisynth.pas directly for real-time note events.</p>
+
+<h3>3.12 Full Unicode</h3>
+
+<p class="defer">DEFERRED</p>
+
+<p>The engine maps UTF-8 to CP437 via UTF8ToCP437 (full 256-char
+mapping). A rip3unicode.pas companion unit is tracked for future
+implementation, providing full Unicode pass-through for RFF fonts
+with wider character ranges. Current CP437 mapping is sufficient
+for BBS use.</p>
+
+<hr>
+
+<h2>4. Progressive Rendering</h2>
+
+<p>This is entirely new — not in the TeleGrafix whitepaper. Over
+slow modem connections, the user sees partial results as data
+arrives, rather than waiting for the complete scene.</p>
+
+<p>Five progressive rendering codecs in the prg/ directory:</p>
+
+<table>
+<tr><th>Codec</th><th>Strategy</th><th>Best For</th></tr>
+<tr><td>ripdecraw.pas</td><td>Incremental stream (cmd-by-cmd)</td><td>Interactive, fast connections</td></tr>
+<tr><td>ripbindec.pas</td><td>Binary scene (compact pre-compiled)</td><td>Cached menus, splash pages</td></tr>
+<tr><td>riptile.pas</td><td>Tile-based (64×64 mosaic)</td><td>Full-screen art, slow modems</td></tr>
+<tr><td>riplayerdec.pas</td><td>Layer-based (bg → overlays)</td><td>Complex UI with background</td></tr>
+<tr><td>ripchange.pas</td><td>Changed-region patches</td><td>Animations, live updates</td></tr>
+</table>
+
+<p>Additionally, riprender.pas provides a unified progressive
+renderer that integrates all five codecs with Phase 23 graphics.</p>
+
+<p>Image streaming codecs complement progressive rendering:</p>
+<ul style="list-style:none">
+<li>jpegprog.pas — progressive JPEG (scan-by-scan)</li>
+<li>gifinterlace.pas — interlaced GIF (4-pass)</li>
+<li>pnginterlace.pas — Adam7 interlaced PNG (7-pass)</li>
+<li>gifanim.pas — animated GIF frame playback</li>
+<li>spriteanim.pas — sprite sheet animation</li>
+</ul>
+
+<hr>
+
+<h2>5. Codec Directory Reference</h2>
+
+<h3>5.1 Image and Graphics (img/ — 20 files)</h3>
+
+<pre>
+  Decoders:     jpegdecraw  gifdecraw   pngdecraw   pngcodec
+                bmpdec      pcxdec      tgadec      pbmdec
+                icodec      rffdecraw
+
+  Animation:    gifanim     gifinterlace   jpegprog
+                pnginterlace   spriteanim
+
+  Graphics:     grfill      grfx        grbezier
+                grtexmap    grclip
+</pre>
+
+<h3>5.2 Audio and Streaming (wav/ — 33 files)</h3>
+
+<pre>
+  Decoders:     wavdec      vocdec      mp3dec      flacdec
+                aiffdec     audec       adpcmdec    mididec
+                ansimusic   moddec      s3mdec      xmdec
+
+  MP3 pipeline: mp3full     mp3huff     mp3imdct
+                mp3requant  mp3synth
+
+  PCM pipeline: pcmdecraw   pcmdec      pcmmix
+
+  Streaming:    wavstream   vocstream   modstream
+                audstream   asyncplay   netaudio    ringbuf
+
+  Output:       wavplay     dosplay
+
+  Utilities:    fixedmath   lzmadecpas  dfm2lfm
+</pre>
+
+<h3>5.3 Progressive Rendering (prg/ — 6 files)</h3>
+
+<pre>
+  ripdecraw     ripbindec     riptile
+  riplayerdec   ripchange     riprender
+</pre>
+
+<h3>5.4 JPEG Library (pasjpeg/ — 58 files)</h3>
+
+<p>IJG JPEG library ported to Pascal. Used by jpegdecraw.pas
+for standalone JPEG decoding without external C dependencies.</p>
+
+<hr>
+
+<h2>6. Phase Summary</h2>
+
+<table>
+<tr><th>Phase</th><th>Feature</th><th>Items</th><th>Status</th></tr>
+<tr><td>15</td><td>True Color Pixel Buffer</td><td>14</td><td class="done">COMPLETE</td></tr>
+<tr><td>16</td><td>Resolution-Independent Coordinates</td><td>10</td><td class="done">COMPLETE</td></tr>
+<tr><td>17</td><td>Image Format Support</td><td>8</td><td class="done">COMPLETE</td></tr>
+<tr><td>18</td><td>Scalable Font Rendering</td><td>16</td><td class="done">COMPLETE</td></tr>
+<tr><td>19</td><td>Polygon and Geometry</td><td>4</td><td class="done">COMPLETE</td></tr>
+<tr><td>20</td><td>Data Tables and Forms</td><td>6</td><td class="done">COMPLETE</td></tr>
+<tr><td>21</td><td>Text Variables v3.0</td><td>4</td><td class="done">COMPLETE</td></tr>
+<tr><td>22</td><td>Advanced Multimedia</td><td>6</td><td class="done">COMPLETE</td></tr>
+<tr><td>23</td><td>Advanced Graphics</td><td>6</td><td class="done">COMPLETE</td></tr>
+<tr><td>24</td><td>Documentation</td><td>7</td><td class="done">COMPLETE</td></tr>
+<tr><td colspan="2"><b>Total</b></td><td><b>300</b></td><td class="done"><b>ALL COMPLETE</b></td></tr>
+</table>
+
+<p>v1.54 base: 51 commands, 175 items (Phases 1-8).<br>
+v2.0 extensions: 16 new commands, 106 items (Phases 9-14).<br>
+v3.0 extensions: 2 new commands, 300 items (Phases 15-24).</p>
+
+<hr>
+
+<h2>7. Testing</h2>
+
+<table>
+<tr><th>Engine</th><th>Tests</th><th>Suites</th></tr>
+<tr><td>v1 (ripscript.pas)</td><td>97/97</td><td>2</td></tr>
+<tr><td>v2 (rip2api.pas)</td><td>102/102</td><td>2</td></tr>
+<tr><td>v3 (rip3api.pas)</td><td>592/592</td><td>14</td></tr>
+<tr><td><b>Grand total</b></td><td><b>791/791</b></td><td><b>18</b></td></tr>
+</table>
+
+<p>All three engines compile clean. Server and client demos run
+with zero errors. All 59 codec units compile independently.</p>
+
+<hr>
+
+<h2>8. What TeleGrafix Got Right</h2>
+
+<p>Reading the 1996 whitepaper thirty years later, TeleGrafix's
+vision was remarkably prescient:</p>
+
+<p>Their emphasis on <b>text-based commands over binary protocols</b>
+(§3.2) proved essential for BBS compatibility — our ProcessLine
+function still parses the same pipe-delimited text format.</p>
+
+<p>Their <b>image format support</b> (§3.7) correctly predicted
+that JPEG, GIF, and PNG would dominate. We added eight more
+formats, but those three remain the most-used.</p>
+
+<p>Their <b>data tables</b> (§3.8) anticipated that BBS software
+would need structured data presentation beyond simple text and
+graphics — file listings, user lists, message headers.</p>
+
+<p>Their <b>streaming audio</b> (§4.3) was the right call for
+modem connections. Our ring buffer and chunked streaming design
+follows exactly the architecture they described.</p>
+
+<p>Where they overreached was <b>HTML rendering</b> (§4.7) and
+<b>full-motion video</b> (§4.2) — both reasonable goals for 1996,
+but better handled by dedicated software (web browsers, media
+players) than by a graphics terminal protocol.</p>
+
+<hr>
+
+<h2>10. Known Limitations</h2>
+
+<p>• CompositAlpha requires a full canvas-sized source buffer
+(FXAlphaBlend operates on the complete pixel array).</p>
+
+<p>• mididec.pas uses Classes/TStream — incompatible with the
+engine's {$H-} mode. The engine stores the MIDI filename; the
+host application handles actual MIDI parsing and playback.</p>
+
+<p>• RFF stroke rendering uses lines only (MoveToEx/LineTo) — no
+curves. This is correct per the RIPaint 2.0 GDI analysis
+(RIPAINT_FINDINGS.md).</p>
+
+<p>• Full Unicode is deferred. Current CP437 mapping covers all
+256 characters needed for BBS use.</p>
+
+<p>• TRIPVariable.Name is String[31] (was String[12] in v1.54,
+expanded to support form field names like LOGIN_REMEMBER).</p>
+
+<hr>
+
+
+<h2>11. v4.0 Extended Features</h2>
+
+<p>The v4.0 engine extends the v3.0 base with features from all seven
+sections of the TeleGrafix whitepaper's "Future Goals" (section 4):</p>
+
+<table>
+<tr><th>TeleGrafix §</th><th>Feature</th><th>v4.0 Implementation</th></tr>
+<tr><td>4.1</td><td>International Language Support</td><td>cp437u8.pas (CP437↔UTF-8), u8render.pas (UTF-8 renderer), ttfglyph.pas (TTF loader), rip4uni.pas (companion unit)</td></tr>
+<tr><td>4.2</td><td>Full-Motion Video</td><td>MPEG-1 (mpgdemux+mpgvdec+mpgvbuf+mpgplay+mpgstrm) + FLI/FLC (flidec.pas)</td></tr>
+<tr><td>4.3</td><td>Compressed, Streaming Audio</td><td>Inherited from v3: 13 decoders, 4-stream, WAV streaming, MIDI FM synth</td></tr>
+<tr><td>4.4</td><td>Integrated GUI Environment</td><td>Inherited from v3: tables, forms, buttons. v4 adds HTML form rendering</td></tr>
+<tr><td>4.5</td><td>Forms and Tables</td><td>Inherited from v3: full server/client form system with validation</td></tr>
+<tr><td>4.6</td><td>Document Oriented Interface</td><td>htmllayo.pas: box model layout, text flow, margins, page concept</td></tr>
+<tr><td>4.7</td><td>HTML</td><td>5-unit HTML 1.0 stack: parser, DOM tree, layout, RIP translator, pixel renderer</td></tr>
+</table>
+
+<p>Additionally, v4.0 provides:</p>
+<table>
+<tr><th>Feature</th><th>Units</th></tr>
+<tr><td>Print API</td><td>prnapi + 5 drivers (ESC/P, PCL, PostScript, BMP, Raw)</td></tr>
+<tr><td>FONT COLOR/SIZE</td><td>#RRGGBB + 10 named colors, sizes 1-7 (8-28px)</td></tr>
+<tr><td>BODY BGCOLOR</td><td>#RRGGBB + named colors, fills canvas background</td></tr>
+<tr><td>DOS 8.3 compliance</td><td>All 83 codec filenames ≤ 8 characters</td></tr>
+<tr><td>RIPforge editor</td><td>Planned WYSIWYG editor/viewer for RIP + HTML scenes</td></tr>
+</table>
+
+
+<h3>11.1 v4.0 Engine API</h3>
+
+<table>
+<tr><th>Method</th><th>Description</th></tr>
+<tr><td>HTMLRenderPage(Source, Len)</td><td>Parse HTML and render to pixel buffer</td></tr>
+<tr><td>HTMLRenderToRIP(Source, Len)</td><td>Convert HTML to RIP commands (blocked by heap bug)</td></tr>
+<tr><td>PrintPage(Driver, DPI, Device)</td><td>Print pixel buffer (ESC/P, PCL, PS, BMP, Raw)</td></tr>
+<tr><td>DrawTextUTF8(X, Y, S)</td><td>Draw UTF-8 text with CP437 mapping</td></tr>
+<tr><td>TTFLoadFont(FileName)</td><td>Load TrueType font file</td></tr>
+<tr><td>TTFFreeFont</td><td>Release TTF font data</td></tr>
+<tr><td>MPEGOpen(FileName)</td><td>Open MPEG-1 file for decoding</td></tr>
+<tr><td>MPEGGetFrameCount</td><td>Return total video frames</td></tr>
+<tr><td>MPEGRenderFrame(FrameIdx)</td><td>Decode and render a video frame</td></tr>
+<tr><td>MPEGClose</td><td>Release MPEG file data</td></tr>
+</table>
+
+<h3>11.2 v4.0 Testing</h3>
+
+<table>
+<tr><th>Engine</th><th>Tests</th><th>Suites</th></tr>
+<tr><td>v1 (ripscript.pas)</td><td>97/97</td><td>2</td></tr>
+<tr><td>v2 (rip2api.pas)</td><td>115/115</td><td>2</td></tr>
+<tr><td>v3 (rip3api.pas)</td><td>592/592</td><td>14</td></tr>
+<tr><td>v4 (rip4api.pas)</td><td>622/622</td><td>15</td></tr>
+<tr><td><b>Grand total</b></td><td><b>1,426/1,426</b></td><td><b>33</b></td></tr>
+</table>
+
+<h3>11.3 v4.0 Codec Totals</h3>
+
+<p>141 codec files (83 units + 58 pasjpeg) across 4 directories.
+All filenames DOS 8.3 compliant. All {$H-} compatible.
+Compiles on all FPC 2.6.4irc targets.</p>
+
+<p>Engine: rip4api.pas — 8,525 lines, 315+ methods.</p>
+
+<h2>12. Related Documents</h2>
+
+<table>
+<tr><th>Document</th><th>Contents</th></tr>
+<tr><td>rip3api.htm / .doc</td><td>Complete API reference (all phases)</td></tr>
+<tr><td>features.txt</td><td>Feature comparison v1/v2/v3</td></tr>
+<tr><td>PHASES.md</td><td>Implementation roadmap (300/300 done)</td></tr>
+<tr><td>CLIENTSERVER.md</td><td>Server/client architecture details</td></tr>
+<tr><td>PROGRESSIVE.md</td><td>Progressive rendering guide</td></tr>
+<tr><td>CODEC_REFERENCE.md</td><td>Codec catalog and descriptions</td></tr>
+<tr><td>RFF_FORMAT_NOTESv3.md</td><td>RFF v2.2 stroke font format</td></tr>
+<tr><td>MAF_FORMAT_NOTES.md</td><td>MAF bitmap font format</td></tr>
+<tr><td>RIPTEL_PROTOCOL_ANALYSIS.md</td><td>RIPtel v3.1 protocol analysis</td></tr>
+<tr><td>RIPAINT_FINDINGS.md</td><td>RIPaint 2.0 GDI binary analysis</td></tr>
+<tr><td>rip4api.htm / .doc</td><td>v4.0 API reference (all v4 methods)</td></tr>
+<tr><td>HTML_V1_NOTES.md</td><td>HTML 1.0 features, limitations, extended features</td></tr>
+<tr><td>RIPSCRIPT_V4_ROADMAP.md</td><td>v4.0 roadmap and status</td></tr>
+<tr><td>PRINT_AND_HTML_SPEC.md</td><td>Print API and HTML parser specification</td></tr>
+<tr><td>FPCIRC-BUG-REPORT-HEAP-CRASH.md</td><td>Compiler heap bug report</td></tr>
+</table>
+
+<p>Original TeleGrafix whitepaper preserved at:<br>
+<code>docs/rip/ripscrip-v3-whitepaper.htm</code><br>
+<code>docs/rip/ripscript_whitepaper3_and_older.zip</code></p>
+
+<hr>
+
+<div class="gpl">
+<p>Copyright (c) 2026 Mystic BBS IRC Fork Contributors</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.</p>
+</div>
+
+</body></html>
