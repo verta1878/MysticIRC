@@ -1,0 +1,20 @@
+RIPscrip v2.0 Server-Side Rendering Engine
+Version: 2.0.15
+Status:  Phase 15 backports COMPLETE
+Lines:   5304 (rip2api.pas)
+Tests:   115/115 (2 suites)
+
+Phase 15 backports from v3:
+  [x] WAV streaming (WAVStreamInit/Feed/Stop/IsPlaying)
+  [x] JPEG streaming (JPEGStreamInit/Feed/Complete)
+  [x] PNG support (LoadPNG via pngdecr.pas)
+  [x] FLAC decoder (flacdec.pas)
+  [x] MP3 decoder (mp3dec.pas)
+  [x] Audio codec wiring (pcmdecraw/pcmmix/wavplay)
+
+Codec directories:
+  img/ — 2 (jpegdecraw, pngdecr)
+  wav/ — 8 (wavdec, dosplay, flacdec, mp3dec, pcmdec, pcmdecraw, pcmmix, wavplay)
+  pasjpeg/ — 58
+
+License: GPLv3

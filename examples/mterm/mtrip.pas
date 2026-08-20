@@ -27,6 +27,8 @@ type
     FillStyle: Byte;
     FillColor: Byte;
     LineStyle: Byte;
+    LineThick: Byte;
+    UserPattern: Word;
     WriteMode: Byte;
     FontStyle: Byte;
     FontSize: Byte;
@@ -39,6 +41,14 @@ type
     FClipData: array[0..639, 0..349] of Byte;
     FClipW, FClipH: Integer;
     FClipValid: Boolean;
+    { Text region state (|1T / |1t / |1E) }
+    FTextActive: Boolean;
+    FTextX1, FTextY1, FTextX2, FTextY2: Integer;
+    FTextCurY: Integer;  { current Y position in text region }
+    { Text variables ($APP0$-$APP9$, user defined) }
+    FVarNames: Array[0..31] of String[40];
+    FVarValues: Array[0..31] of String[80];
+    FVarCount: Integer;
     FMouseFields: array[0..127] of TRIPMouseField;
     FMouseCount: Integer;
     function ParseMegaNum(const S: String; Pos: Integer): Integer;
@@ -84,6 +94,7 @@ type
   public
     constructor Create;
     procedure ProcessCommand(const RIPLine: String);
+    procedure ProcessFile(const FileName: String);
     procedure Reset;
     { Terminal features }
     function  MouseHitTest(X, Y: Integer): String;
@@ -96,17 +107,18 @@ type
 
 implementation
 
-uses SysUtils, Math;
+uses SysUtils, Math, mtsound;
 
 constructor TRIPParser.Create;
 begin
   inherited;
   FCanvas := TRIPCanvas.Create;
+  SoundInit;
   Reset;
 end;
 
 destructor TRIPParser.Destroy;
-begin FCanvas.Free; inherited; end;
+begin SoundShutdown; FCanvas.Free; inherited; end;
 
 procedure TRIPParser.Reset;
 var I: Integer;
@@ -121,11 +133,18 @@ begin
   FState.FillStyle := 1;
   FState.FillColor := 0;
   FState.LineStyle := 0;
+  FState.LineThick := 1;
+  FState.UserPattern := $FFFF;
   FState.WriteMode := 0;
   FState.FontStyle := 0;
   FState.FontSize := 1;
   FMouseCount := 0;
   FClipValid := False;
+  FTextActive := False;
+  FTextX1 := 0; FTextY1 := 0;
+  FTextX2 := 0; FTextY2 := 0;
+  FTextCurY := 0;
+  FVarCount := 0;
   for I := 0 to 127 do FMouseFields[I].Active := False;
 end;
 
@@ -188,8 +207,24 @@ begin
   end;
 end;
 
+procedure TRIPParser.ProcessFile(const FileName: String);
+var
+  F: Text;
+  Line: String;
+begin
+  {$I-} Assign(F, FileName); System.Reset(F); {$I+}
+  if IOResult <> 0 then Exit;
+  While Not EOF(F) Do Begin
+    ReadLn(F, Line);
+    ProcessCommand(Line);
+  End;
+  Close(F);
+end;
+
 procedure TRIPParser.ExecCommand(const Cmd: String);
-var Op: Char; Params: String;
+var Op: Char; Params, S, VarName, VarVal: String;
+    I, J, K, Plane, Pix, RowBytes: Integer; Found: Boolean;
+    ICNFile: File; ICNBuf: Array[0..79] of Byte;
 begin
   if Length(Cmd) = 0 then Exit;
   Op := Cmd[1];
@@ -200,38 +235,59 @@ begin
     'w': CmdTextWindow(Params);
     'v': CmdViewport(Params);
     'e': CmdEraseWindow;
-    'K': CmdEraseEOL;
+    'E': CmdEraseWindow;      { |E — Erase View (same as erase window) }
+    'K': CmdEraseEOL;         { legacy mapping }
+    '>': CmdEraseEOL;         { |> — Erase EOL (spec-correct) }
     'c': CmdColor(Params);
     'S': CmdFillStyle(Params);
-    'l': CmdLineStyle(Params);
-    '=': CmdWriteMode(Params);
+    '=': CmdLineStyle(Params);  { |= — Line Style (spec-correct) }
+    'W': CmdWriteMode(Params);  { |W — Write Mode (spec-correct) }
+    'l': CmdPolyLine(Params);   { |l — Polyline (spec-correct, was LineStyle) }
     'Y': CmdFontStyle(Params);
     'X': CmdPixel(Params);
     'L': CmdLine(Params);
     'R': CmdRectangle(Params);
     'B': CmdBar(Params);
     'C': CmdCircle(Params);
-    'O': CmdOval(Params);
+    'O': CmdOval(Params);       { |O — Oval/Elliptical Arc }
+    'V': CmdOval(Params);       { |V — Oval Arc (same as O per riplib) }
     'o': CmdFilledOval(Params);
     'A': CmdArc(Params);
     'I': CmdPieSlice(Params);
+    'i': CmdPieSlice(Params);   { |i — Oval Pie Slice (same params as I) }
     'F': CmdFill(Params);
     'G': CmdGotoXY(Params);
+    'g': CmdGotoXY(Params);     { |g — GotoXY Text (text cursor) }
     'H': CmdHome;
     'T': CmdOutText(Params);
     '@': CmdOutTextXY(Params);
     'M': CmdMove(Params);
+    'm': CmdMove(Params);       { |m — Move (lowercase, same as M) }
     'P': CmdPolyLine(Params);
     'p': CmdFilledPolygon(Params);
     'Z': CmdBezier(Params);
     'a': begin { |a — One Palette: set single palette entry }
       if Length(Params) >= 4 then begin
-        { TODO: EGA64 palette conversion }
+        { color:2 value:2 — value is EGA64 index (0-63) }
+        I := ParseMegaNum(Params, 1) and 15;
+        J := ParseMegaNum(Params, 3) and 63;
+        { EGA64 bit layout: bit5=r' bit4=g' bit3=b' bit2=R bit1=G bit0=B }
+        { 2-bit RGB: combine high and low intensity bits }
+        FCanvas.SetPaletteEntry(I,
+          (((J shr 2) and 1) shl 1) or ((J shr 5) and 1),  { R }
+          (((J shr 1) and 1) shl 1) or ((J shr 4) and 1),  { G }
+          (((J shr 0) and 1) shl 1) or ((J shr 3) and 1)); { B }
       end;
     end;
-    'Q': begin { |Q — Set All Palette: 16 entries }
+    'Q': begin { |Q — Set All Palette: 16 entries, each EGA64 value:2 }
       if Length(Params) >= 32 then begin
-        { TODO: full palette set }
+        for I := 0 to 15 do begin
+          J := ParseMegaNum(Params, 1 + I * 2) and 63;
+          FCanvas.SetPaletteEntry(I,
+            (((J shr 2) and 1) shl 1) or ((J shr 5) and 1),
+            (((J shr 1) and 1) shl 1) or ((J shr 4) and 1),
+            (((J shr 0) and 1) shl 1) or ((J shr 3) and 1));
+        end;
       end;
     end;
     '1': begin { Two-char extended commands }
@@ -256,12 +312,156 @@ begin
         'K': CmdKillMouseFields;
         'M': CmdMouseField(Copy(Params, 2, Length(Params) - 1));
         'T': CmdBeginText(Copy(Params, 2, Length(Params) - 1));
+        't': begin { |1t — Region Text: justify:1 + text string }
+          if FTextActive and (Length(Params) >= 2) then begin
+            { Params[1] is '1' prefix, Params[2] is justify, rest is text }
+            if Length(Params) >= 3 then begin
+              { Draw text at FTextCurY using bitmap font }
+              FCanvas.OutTextXY(FTextX1, FTextCurY,
+                Copy(Params, 3, Length(Params) - 2));
+              { Advance Y by font height (8 pixels for bitmap font) }
+              Inc(FTextCurY, 8);
+              { Clip to region bottom }
+              if FTextCurY > FTextY2 then FTextCurY := FTextY2;
+            end;
+          end;
+        end;
+        'E': begin { |1E — End Text: close text region }
+          FTextActive := False;
+        end;
         'I': CmdLoadIcon(Copy(Params, 2, Length(Params) - 1));
-        'G': CmdGetImage(Copy(Params, 2, Length(Params) - 1));
+        'W': begin { |1W — Write Icon: res:2 + filename }
+          { Write clipboard to ICN file (BGI putimage format) }
+          if FClipValid and (Length(Params) >= 4) then begin
+            S := Copy(Params, 4, Length(Params) - 3);
+            { Strip path for safety }
+            While Pos('..', S) > 0 Do Delete(S, Pos('..', S), 2);
+            While Pos('/', S) > 0 Do Delete(S, Pos('/', S), 1);
+            While Pos('\', S) > 0 Do Delete(S, Pos('\', S), 1);
+            If S <> '' Then Begin
+              { ICN format: 2 bytes width-1, 2 bytes height-1, 2 bytes reserved,
+                then 4 EGA bitplanes per row (blue, green, red, intensity) }
+              Assign(ICNFile, S);
+              {$I-} Rewrite(ICNFile, 1); {$I+}
+              If IOResult = 0 Then Begin
+                { Header: width-1, height-1, reserved }
+                ICNBuf[0] := (FClipW - 1) and $FF;
+                ICNBuf[1] := ((FClipW - 1) shr 8) and $FF;
+                ICNBuf[2] := (FClipH - 1) and $FF;
+                ICNBuf[3] := ((FClipH - 1) shr 8) and $FF;
+                ICNBuf[4] := 0; ICNBuf[5] := 0;
+                BlockWrite(ICNFile, ICNBuf, 6);
+                { Write pixel data — 4 bitplanes per row }
+                RowBytes := (FClipW + 7) div 8;
+                For I := 0 to FClipH - 1 Do Begin
+                  { 4 planes: blue(0), green(1), red(2), intensity(3) }
+                  For Plane := 0 to 3 Do Begin
+                    FillChar(ICNBuf, SizeOf(ICNBuf), 0);
+                    For J := 0 to FClipW - 1 Do Begin
+                      Pix := FClipData[J, I];
+                      { EGA index: bit3=intensity, bit2=red, bit1=green, bit0=blue }
+                      If (Pix and (1 shl Plane)) <> 0 Then
+                        ICNBuf[J div 8] := ICNBuf[J div 8] or (128 shr (J mod 8));
+                    End;
+                    BlockWrite(ICNFile, ICNBuf, RowBytes);
+                  End;
+                End;
+                Close(ICNFile);
+              End;
+            End;
+          end;
+        end;
+        'G': CmdCopyRegion(Copy(Params, 2, Length(Params) - 1));
         'C': CmdGetImage(Copy(Params, 2, Length(Params) - 1));
         'P': CmdPutImage(Copy(Params, 2, Length(Params) - 1));
-        'S': begin { |1S — Sound: play WAV/MID file. Stub for now. }
-          { TODO: integrate with wav/ sound system }
+        'D': begin { |1D — Define: flags:3 res:2 text }
+          { Parse: varname[,width]:?prompt?[default] }
+          if Length(Params) >= 6 then begin
+            { Skip prefix '1' + flags:3 + res:2 = 6 chars }
+            S := Copy(Params, 6, Length(Params) - 5);
+            { Extract variable name (up to comma or colon) }
+            VarName := '';
+            VarVal := '';
+            J := 1;
+            While (J <= Length(S)) and (S[J] <> ',') and (S[J] <> ':') and (S[J] <> '?') Do Begin
+              VarName := VarName + S[J];
+              Inc(J);
+            End;
+            { Skip to default value after last ? }
+            K := Length(S);
+            While (K > J) and (S[K] <> '?') Do Dec(K);
+            If K > J Then
+              VarVal := Copy(S, K + 1, Length(S) - K);
+            { Store variable }
+            If (VarName <> '') and (FVarCount < 32) Then Begin
+              { Check for existing var with same name }
+              Found := False;
+              For I := 0 to FVarCount - 1 Do
+                If FVarNames[I] = VarName Then Begin
+                  FVarValues[I] := VarVal;
+                  Found := True;
+                  Break;
+                End;
+              If Not Found Then Begin
+                FVarNames[FVarCount] := VarName;
+                FVarValues[FVarCount] := VarVal;
+                Inc(FVarCount);
+              End;
+            End;
+          end;
+        end;
+        'R': begin { |1R — Read Scene: res:2 hor:2 vert:2 res2:2 filename }
+          { Load and execute a local .RIP file }
+          if Length(Params) >= 10 then begin
+            S := Copy(Params, 10, Length(Params) - 9);
+            { Strip path separators for safety }
+            While Pos('..', S) > 0 Do Delete(S, Pos('..', S), 2);
+            While Pos('/', S) > 0 Do Delete(S, Pos('/', S), 1);
+            While Pos('\', S) > 0 Do Delete(S, Pos('\', S), 1);
+            { Only allow .RIP extension }
+            If (Length(S) > 4) and
+               (UpperCase(Copy(S, Length(S) - 3, 4)) = '.RIP') Then Begin
+              If FileExists(S) Then
+                ProcessFile(S);
+            End;
+          end;
+        end;
+        'F': begin { |1F — File Query: mode:2 res:2 filename }
+          { Check if file exists locally. In connected mode, would
+            send response back to BBS. For now just check and store
+            result in $FILEERR$ variable }
+          if Length(Params) >= 6 then begin
+            S := Copy(Params, 6, Length(Params) - 5);
+            { Strip path for safety }
+            While Pos('..', S) > 0 Do Delete(S, Pos('..', S), 2);
+            While Pos('/', S) > 0 Do Delete(S, Pos('/', S), 1);
+            While Pos('\', S) > 0 Do Delete(S, Pos('\', S), 1);
+            { Store result in $FILEERR$ — 0=exists, 1=not found }
+            If FileExists(S) Then VarVal := '0'
+            Else VarVal := '1';
+            { Set variable }
+            Found := False;
+            For I := 0 to FVarCount - 1 Do
+              If FVarNames[I] = 'FILEERR' Then Begin
+                FVarValues[I] := VarVal;
+                Found := True; Break;
+              End;
+            If (Not Found) and (FVarCount < 32) Then Begin
+              FVarNames[FVarCount] := 'FILEERR';
+              FVarValues[FVarCount] := VarVal;
+              Inc(FVarCount);
+            End;
+          end;
+        end;
+        'S': begin { |1S — Sound: res:2 filename (WAV/MID/MP3/OGG/MOD) }
+          if Length(Params) >= 4 then begin
+            S := Copy(Params, 4, Length(Params) - 3);
+            { Strip path for safety }
+            While Pos('..', S) > 0 Do Delete(S, Pos('..', S), 2);
+            While Pos('/', S) > 0 Do Delete(S, Pos('/', S), 1);
+            While Pos('\', S) > 0 Do Delete(S, Pos('\', S), 1);
+            If S <> '' Then SoundPlay(S);
+          end;
         end;
       end;
     end;
@@ -320,7 +520,15 @@ begin
 end;
 
 procedure TRIPParser.CmdLineStyle(const P: String);
-begin if Length(P) >= 2 then FState.LineStyle := ParseMegaNum(P, 1); end;
+{ |= — Line Style: style:2 user_pat:4 thick:2 (8 chars total) }
+begin
+  if Length(P) >= 2 then FState.LineStyle := ParseMegaNum(P, 1);
+  if Length(P) >= 6 then FState.UserPattern :=
+    ParseMegaNum(P, 3) * 36 * 36 + ParseMegaNum(P, 5);
+  if Length(P) >= 8 then FState.LineThick := ParseMegaNum(P, 7);
+  { Pass thickness to canvas }
+  FCanvas.SetLineStyle(FState.LineStyle);
+end;
 
 procedure TRIPParser.CmdWriteMode(const P: String);
 begin if Length(P) >= 2 then FState.WriteMode := ParseMegaNum(P, 1); end;
@@ -495,7 +703,17 @@ begin
   FMouseCount := 0;
 end;
 procedure TRIPParser.CmdBeginText(const P: String);
-begin { TODO: text block mode } end;
+{ |1T — Begin Text: x1:2 y1:2 x2:2 y2:2 res:2 (10 chars) }
+begin
+  if Length(P) >= 8 then begin
+    FTextX1 := ParseMegaNum(P, 1);
+    FTextY1 := ParseMegaNum(P, 3);
+    FTextX2 := ParseMegaNum(P, 5);
+    FTextY2 := ParseMegaNum(P, 7);
+    FTextCurY := FTextY1;
+    FTextActive := True;
+  end;
+end;
 procedure TRIPParser.CmdGetImage(const P: String);
 var X1, Y1, X2, Y2, W, H, R, C: Integer;
 begin
@@ -537,7 +755,67 @@ begin
   end;
 end;
 procedure TRIPParser.CmdFilledPolygon(const P: String);
-begin CmdPolyLine(P); { TODO: scanline fill } end;
+{ |p — Filled Polygon: count:2 then count pairs of x:2 y:2 }
+var
+  Count, I, J, Y, MinY, MaxY, Nodes, Swap: Integer;
+  PX, PY: array[0..49] of Integer;
+  NodeX: array[0..99] of Integer;
+begin
+  if Length(P) < 2 then Exit;
+  Count := ParseMegaNum(P, 1);
+  if Count < 3 then Exit;
+  if Count > 50 then Count := 50;
+  if Length(P) < 2 + Count * 4 then Exit;
+
+  { Parse vertex coordinates }
+  MinY := 9999; MaxY := -1;
+  for I := 0 to Count - 1 do begin
+    PX[I] := ParseMegaNum(P, 3 + I * 4);
+    PY[I] := ParseMegaNum(P, 5 + I * 4);
+    if PY[I] < MinY then MinY := PY[I];
+    if PY[I] > MaxY then MaxY := PY[I];
+  end;
+
+  { Scanline fill }
+  for Y := MinY to MaxY do begin
+    Nodes := 0;
+    J := Count - 1;
+    for I := 0 to Count - 1 do begin
+      if ((PY[I] < Y) and (PY[J] >= Y)) or
+         ((PY[J] < Y) and (PY[I] >= Y)) then begin
+        if Nodes < 100 then begin
+          NodeX[Nodes] := PX[I] +
+            (Y - PY[I]) * (PX[J] - PX[I]) div (PY[J] - PY[I]);
+          Inc(Nodes);
+        end;
+      end;
+      J := I;
+    end;
+
+    { Sort nodes }
+    I := 0;
+    while I < Nodes - 1 do begin
+      if NodeX[I] > NodeX[I + 1] then begin
+        Swap := NodeX[I];
+        NodeX[I] := NodeX[I + 1];
+        NodeX[I + 1] := Swap;
+        if I > 0 then Dec(I) else Inc(I);
+      end else
+        Inc(I);
+    end;
+
+    { Fill between pairs }
+    I := 0;
+    while I < Nodes - 1 do begin
+      for J := NodeX[I] to NodeX[I + 1] do
+        FCanvas.PutPixel(J, Y, FState.FillColor);
+      Inc(I, 2);
+    end;
+  end;
+
+  { Draw outline }
+  CmdPolyLine(P);
+end;
 procedure TRIPParser.CmdBezier(const P: String);
 { Bezier matched to JS: Floor() not Round(), explicit endpoint. Backport. }
 var
@@ -568,7 +846,43 @@ end;
 procedure TRIPParser.CmdQuery(const P: String);
 begin { terminal query — respond with capabilities } end;
 procedure TRIPParser.CmdCopyRegion(const P: String);
-begin CmdGetImage(P); end;
+{ |1G — Copy Region: x0:2 y0:2 x1:2 y1:2 res:2 dest_line:2 (12 chars) }
+var X0, Y0, X1, Y1, DestY, W, H, R, C: Integer;
+    Pixel: Byte;
+begin
+  if Length(P) >= 12 then begin
+    X0 := ParseMegaNum(P, 1);
+    Y0 := ParseMegaNum(P, 3);
+    X1 := ParseMegaNum(P, 5);
+    Y1 := ParseMegaNum(P, 7);
+    { P[9..10] is reserved }
+    DestY := ParseMegaNum(P, 11);
+    { Align X to 8-pixel boundaries per spec }
+    X0 := (X0 div 8) * 8;
+    X1 := ((X1 + 7) div 8) * 8 - 1;
+    W := X1 - X0 + 1;
+    H := Y1 - Y0 + 1;
+    if (W <= 0) or (H <= 0) then Exit;
+    { Check dest fits on screen }
+    if (DestY < 0) or (DestY + H > 350) then Exit;
+    { Copy — handle overlap by choosing direction }
+    if DestY < Y0 then begin
+      { Copy top-to-bottom }
+      for R := 0 to H - 1 do
+        for C := 0 to W - 1 do begin
+          Pixel := FCanvas.GetPixelRaw(X0 + C, Y0 + R);
+          FCanvas.PutPixelRaw(X0 + C, DestY + R, Pixel);
+        end;
+    end else begin
+      { Copy bottom-to-top }
+      for R := H - 1 downto 0 do
+        for C := 0 to W - 1 do begin
+          Pixel := FCanvas.GetPixelRaw(X0 + C, Y0 + R);
+          FCanvas.PutPixelRaw(X0 + C, DestY + R, Pixel);
+        end;
+    end;
+  end;
+end;
 procedure TRIPParser.CmdLoadIcon(const P: String);
 var X1, Y1: Integer; FileName: String;
     F: File; IconBuf: array[0..65535] of Byte;

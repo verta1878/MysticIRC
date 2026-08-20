@@ -47,8 +47,8 @@ Interface
 
 Const
   // Engine version
-  RIP_ENGINE_VERSION = '1.0.0';
-  RIP_ENGINE_DATE    = '2026-07-19';
+  RIP_ENGINE_VERSION = '1.0.1-irc';
+  RIP_ENGINE_DATE    = '2026-08-19';
 
   RIP_MAX_X       = 639;       // EGA/VGA 640x350 default
   RIP_MAX_Y       = 349;
@@ -453,6 +453,11 @@ Type
     Procedure GetImage      (X0, Y0, X1, Y1: SmallInt; Var Buf);
     Procedure PutImage      (X, Y: SmallInt; Var Buf; Mode: Byte);
     Function  ImageSize     (X0, Y0, X1, Y1: SmallInt) : LongInt;
+
+    // ---- Clipboard helpers ----
+    Function  ClipValid     : Boolean;
+    Function  SanitizePath  (S: String) : String;
+    Procedure WriteClipboardICN (FileName: String);
 
     // ---- Icon ----
     Function  LoadIcon      (FileName: String; X, Y: SmallInt; Mode: Byte) : Boolean;
@@ -1778,6 +1783,62 @@ End;
 // HIC: Highlight icon — same format as ICN, used for mouse-over/active states.
 //      LoadHotIcon(FileName, X, Y) — loads highlight variant, rendered when
 //        the associated mouse field is focused, clicked, or hotkey-activated.
+
+// ---- Helper: sanitize path for file operations ----
+Function TRIPEngine.SanitizePath (S: String) : String;
+Begin
+  While System.Pos('..', S) > 0 Do System.Delete(S, System.Pos('..', S), 2);
+  While System.Pos('/', S) > 0 Do System.Delete(S, System.Pos('/', S), 1);
+  While System.Pos('\', S) > 0 Do System.Delete(S, System.Pos('\', S), 1);
+  Result := S;
+End;
+
+// ---- Helper: check clipboard validity ----
+Function TRIPEngine.ClipValid : Boolean;
+Begin
+  Result := (Clipboard <> Nil) and (ClipSize > 0) and (ClipW > 0) and (ClipH > 0);
+End;
+
+// ---- Write clipboard to ICN file (EGA bitplane format) ----
+Procedure TRIPEngine.WriteClipboardICN (FileName: String);
+Var
+  F: File;
+  Hdr: Array[0..5] of Byte;
+  RowBuf: Array[0..79] of Byte;
+  RowBytes, Plane, X, Y: Integer;
+  Pix: Byte;
+Begin
+  If Not ClipValid Then Exit;
+
+  Assign(F, FileName);
+  {$I-} Rewrite(F, 1); {$I+}
+  If IOResult <> 0 Then Exit;
+
+  { Header: width-1, height-1, reserved }
+  Hdr[0] := (ClipW - 1) and $FF;
+  Hdr[1] := ((ClipW - 1) shr 8) and $FF;
+  Hdr[2] := (ClipH - 1) and $FF;
+  Hdr[3] := ((ClipH - 1) shr 8) and $FF;
+  Hdr[4] := 0; Hdr[5] := 0;
+  BlockWrite(F, Hdr, 6);
+
+  { Pixel data: 4 EGA bitplanes per row }
+  RowBytes := (ClipW + 7) div 8;
+
+  For Y := 0 to ClipH - 1 Do Begin
+    For Plane := 0 to 3 Do Begin
+      FillChar(RowBuf, SizeOf(RowBuf), 0);
+      For X := 0 to ClipW - 1 Do Begin
+        Pix := PByte(PtrUInt(Clipboard) + 4 + Y * ClipW + X)^;
+        If (Pix and (1 shl Plane)) <> 0 Then
+          RowBuf[X div 8] := RowBuf[X div 8] or (128 shr (X mod 8));
+      End;
+      BlockWrite(F, RowBuf, RowBytes);
+    End;
+  End;
+
+  Close(F);
+End;
 
 Function TRIPEngine.LoadIcon (FileName: String; X, Y: SmallInt; Mode: Byte) : Boolean;
 // ICN format per RIPscrip v1.54 spec:
@@ -3947,9 +4008,11 @@ Begin
     // RIP_WRITE_ICON: W  res(2) filename
     'W' : Begin
             MegaNum(Params, P, 2);  // reserved
-            // WriteIcon saves clipboard to file — for now, no-op
-            // (clipboard is in GetImage format, not directly saveable as ICN
-            //  without first PutImage'ing it back to screen)
+            If (P <= Length(Params)) and ClipValid Then Begin
+              FN := SanitizePath(Copy(Params, P, Length(Params)));
+              If FN <> '' Then
+                WriteClipboardICN(FN);
+            End;
           End;
 
     // RIP_LOAD_ICON: I  x(2) y(2) mode(2) clip(1) res(2) filename

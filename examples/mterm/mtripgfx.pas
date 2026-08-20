@@ -35,6 +35,7 @@ type
     FBtnBevSize: Byte;
     FBtnDFore, FBtnBright, FBtnDark, FBtnSurface, FBtnCorner: Byte;
     FCurX, FCurY: Integer; { current position for text }
+    FPalette: array[0..15] of TRGBColor; { live palette, modifiable by |a and |Q }
     procedure HLine(X1, X2, Y: Integer; Color: Byte);
     procedure VLine(X, Y1, Y2: Integer; Color: Byte);
     procedure DrawBitmapChar(Value: Byte; X0, Y0: Integer);
@@ -65,6 +66,7 @@ type
     procedure SetColor(Color: Byte);
     procedure SetFillStyle(Style, Color: Byte);
     procedure SetLineStyle(Style: Byte);
+    procedure SetPaletteEntry(Index: Byte; R2, G2, B2: Byte);
     procedure SetViewport(X1, Y1, X2, Y2: Integer);
     procedure EraseView;
     
@@ -193,6 +195,13 @@ begin
   FCurY := 0;
   FViewX1 := 0; FViewY1 := 0;
   FViewX2 := RIP_WIDTH - 1; FViewY2 := RIP_HEIGHT - 1;
+  { Init palette from EGA defaults }
+  for I := 0 to 15 do begin
+    FPalette[I].R := EGAPalette[I].R;
+    FPalette[I].G := EGAPalette[I].G;
+    FPalette[I].B := EGAPalette[I].B;
+  end;
+  FViewX2 := RIP_WIDTH - 1; FViewY2 := RIP_HEIGHT - 1;
   if not FontsInit then begin
     for I := 1 to 10 do CHRFonts[I] := nil;
     FontsInit := True;
@@ -268,6 +277,16 @@ begin FFillStyle := Style; FFillColor := Color; end;
 
 procedure TRIPCanvas.SetLineStyle(Style: Byte);
 begin FLineStyle := Style; end;
+
+procedure TRIPCanvas.SetPaletteEntry(Index: Byte; R2, G2, B2: Byte);
+{ R2/G2/B2 are 2-bit values (0-3). Convert to 8-bit: 0→0, 1→$55, 2→$AA, 3→$FF }
+const LUT: array[0..3] of Byte = ($00, $55, $AA, $FF);
+begin
+  if Index > 15 then Exit;
+  FPalette[Index].R := LUT[R2 and 3];
+  FPalette[Index].G := LUT[G2 and 3];
+  FPalette[Index].B := LUT[B2 and 3];
+end;
 
 procedure TRIPCanvas.Line(X1, Y1, X2, Y2: Integer);
 { JS-matched Bresenham (den/num/numadd) with line dash patterns. }
@@ -819,9 +838,9 @@ begin
     
     { Palette }
     for I := 0 to 15 do begin
-      Pal[I].R := EGAPalette[I].R;
-      Pal[I].G := EGAPalette[I].G;
-      Pal[I].B := EGAPalette[I].B;
+      Pal[I].R := FPalette[I].R;
+      Pal[I].G := FPalette[I].G;
+      Pal[I].B := FPalette[I].B;
       Pal[I].A := 0;
     end;
     F.Write(Pal, 64);
