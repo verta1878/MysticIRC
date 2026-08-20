@@ -43,7 +43,7 @@ mystic_mailer/           BINKP/FidoNet mailer
 mystic_ansiedit/         ANSI editor cfg
 mystic_texteditor/       Text editor standalone
 examples/
-  ripviewer/               RIPView v1.0.0 — evga's Pascal viewer (42/42 cmds)
+  ripview/                 RIPView v1.0.0 — evga's Pascal viewer (42/42 cmds)
     source/                  Pascal source (7 units, 1,656 lines)
     fonts/                   18 BGI + bitmap fonts
     icons/                   219 ICN/MSK/HIC files
