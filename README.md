@@ -40,9 +40,7 @@ mystic_spell/            Hunspell spell check binding + SETUP.md
 mystic_crypt/            CryptLib SSH/TLS example
 mystic_modem/            Modem/FOSSIL front-end
 mystic_mailer/           BINKP/FidoNet mailer
-mystic_misdos/           DOS MIS
-mystic_ansieditor/       ANSI editor standalone
-mystic_ansieditor2/      ANSI editor v2
+mystic_ansiedit/         ANSI editor cfg
 mystic_texteditor/       Text editor standalone
 examples/
   ripviewer/               RIPView v1.0.0 — evga's Pascal viewer (42/42 cmds)
