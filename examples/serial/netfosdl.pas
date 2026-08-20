@@ -160,13 +160,36 @@ begin
   WriteLn('  FOSSIL signature: $', HexStr(FOSSIL_SIGNATURE, 4));
   WriteLn('Going resident. Use "netfosdl /u" to unload.');
 
-  { Go resident. Keep(exitcode) is the 16-bit msdos RTL's TSR call.
-    It calls INT 21h/Fn 31h (terminate and stay resident).
-    HAZARD: everything after Keep never executes. The heap, stack,
-    and code segments remain in memory. The interrupt handler runs
-    whenever a BBS calls INT 14h.
-    The parameter to Keep is the exit code (0 = success). }
-  Keep(0);
+  { Go resident with the CORRECT resident size.
+
+    FPC's msdos Keep() reads the program's whole MCB size (es:[3]),
+    which in the huge memory model spans ALL allocated conventional
+    memory. That would keep ~640K resident and leave nothing for the
+    next program to load. Instead we compute the real resident size:
+    everything from the PSP up to the top of the stack segment, then
+    call INT 21h/Fn 31h directly with that paragraph count in DX.
+
+    Resident paragraphs = (SS + (SP+15)/16) - PSP + safety
+    We drop the heap entirely (the ISR path uses no heap — see the
+    HAZARD notes in Int14Handler). }
+  Flush(Output);   { flush banner before TSR — Keep() does not flush }
+  asm
+    mov  ax, ss
+    mov  bx, sp
+    add  bx, 15
+    shr  bx, 1
+    shr  bx, 1
+    shr  bx, 1
+    shr  bx, 1        { bx = (sp+15)/16 paragraphs of stack }
+    add  ax, bx       { ax = top of stack in paragraphs (absolute seg) }
+    mov  bx, PrefixSeg
+    sub  ax, bx       { ax = resident paragraphs from PSP }
+    add  ax, 16       { safety margin }
+    mov  dx, ax       { DX = resident size in paragraphs }
+    mov  ax, 3100h    { Fn 31h: TSR, AL=00 exit code }
+    int  21h
+  end;
+  { never reached }
 end;
 
 { ===========================================================================
