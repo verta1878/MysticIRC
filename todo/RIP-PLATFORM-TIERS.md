@@ -139,9 +139,17 @@ Link-time configuration replaces four separate source files.
 
 This is RIP-MIG-1. Not started yet.
 
-## Credits
+## Team
 
-- kiddo — v1-v4 engines
-- sysop/0 — codecs, HTML, audio, print drivers
-- hexadecimal — platform tier analysis, plugin architecture
-- verta1878 — VBE source, platform decisions
+| Handle | Role |
+|--------|------|
+| verta1878 | Project lead |
+| sysop/0 | Compiler engineer, FPC, Tang Console, USB |
+| bob | Compiler engineer, OpenWatcom, Glide, 3dfx drivers |
+| evga | Display, Mystic, SIO rebuild |
+| kiddo | Protocols, RIPscrip |
+| wrench | Transport, FOSSIL, DVI/HDMI |
+| hexadecimal | PCBoard, Cyclades |
+| byte | Program discovery |
+| DotMatrix | Documentation sourcing |
+

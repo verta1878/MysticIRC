@@ -119,14 +119,20 @@ Reference: riplib C99 uses this approach.
 
 Not blocking — DOS targets deferred until fpc264irc complete.
 
-## Credits
+## Team
 
-- Carl Gorringe — RIPtermJS (JavaScript reference)
-- evga — Pascal port, FPC 2.6.4irc
-- kiddo — ripdraw docs, stub completion
-- sysop/0 — visual diff testing, canvas height fix
-- verta1878 — project lead
-- wrench — FOSSIL driver
+| Handle | Role |
+|--------|------|
+| verta1878 | Project lead |
+| sysop/0 | Compiler engineer, FPC, Tang Console, USB |
+| bob | Compiler engineer, OpenWatcom, Glide, 3dfx drivers |
+| evga | Display, Mystic, SIO rebuild |
+| kiddo | Protocols, RIPscrip |
+| wrench | Transport, FOSSIL, DVI/HDMI |
+| hexadecimal | PCBoard, Cyclades |
+| byte | Program discovery |
+| DotMatrix | Documentation sourcing |
+
 
 ## License
 

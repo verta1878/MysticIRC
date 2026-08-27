@@ -204,10 +204,20 @@ Impossible to reconstruct after the merge. Must be done during.
 - v2 is DOS ceiling — v3+ dependencies won't compile for i8086
 - Row-pointers required for pixel buffer and flood fill visited buffer
 
-## Credits
+## Team
 
-- kiddo — v1-v4 engines, mtrip.pas, mterm, ansiedit, MDL units
-- sysop/0 — codecs, HTML renderer, print drivers, audio, scene utils,
+| Handle | Role |
+|--------|------|
+| verta1878 | Project lead |
+| sysop/0 | Compiler engineer, FPC, Tang Console, USB |
+| bob | Compiler engineer, OpenWatcom, Glide, 3dfx drivers |
+| evga | Display, Mystic, SIO rebuild |
+| kiddo | Protocols, RIPscrip |
+| wrench | Transport, FOSSIL, DVI/HDMI |
+| hexadecimal | PCBoard, Cyclades |
+| byte | Program discovery |
+| DotMatrix | Documentation sourcing |
+
   serial/UART, OS/2 guidance
 - evga — FPC 2.6.4irc, ripviewer engine
 - wrench — fossil.pas, netfosdl.pas FOSSIL driver

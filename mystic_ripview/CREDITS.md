@@ -5,15 +5,19 @@ RIPView — RIPscrip v1.54 File Viewer
 Part of Mystic BBS 1.11IRC
 License: GPLv3
 
-## The Crew
-| Handle       | Role                                              |
-|--------------|---------------------------------------------------|
-| verta1878    | Project lead, Ecstasy BBS FTN 1:152/158           |
-| sysop/0      | Architecture, serial layer, Phase 3 testing        |
-| evga         | Free Pascal Compiler 2.6.4irc, RIP engines         |
-| kiddo        | serial_irq.pas ISR, text rendering, MPL, ans2rip   |
-| wrench       | fossil.pas, netfosdl.pas FOSSIL driver              |
-| hexadecimal  | PCBoard 15.4 Revival                                |
+## Team
+
+| Handle | Role |
+|--------|------|
+| verta1878 | Project lead |
+| sysop/0 | Compiler engineer, FPC, Tang Console, USB |
+| bob | Compiler engineer, OpenWatcom, Glide, 3dfx drivers |
+| evga | Display, Mystic, SIO rebuild |
+| kiddo | Protocols, RIPscrip |
+| wrench | Transport, FOSSIL, DVI/HDMI |
+| hexadecimal | PCBoard, Cyclades |
+| byte | Program discovery |
+| DotMatrix | Documentation sourcing |
 
 ## Reference Implementation
 RIPtermJS by Carl Gorringe (https://github.com/cgorringe/RIPtermJS)

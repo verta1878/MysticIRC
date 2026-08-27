@@ -106,13 +106,20 @@ Reference source: docs/ripscrip/riplib-src/ (13K lines C99)
 SDL covers 5 platforms (SDL2 for 4 modern + SDL 1.2 for OS/2).
 DOS needs two backends (GO32V2 + i8086).
 
-## Credits
+## Team
 
-- verta1878 — project lead
-- sysop/0 — architecture, serial, OS/2 guidance
-- evga — FPC 2.6.4irc, RIP engines
-- kiddo — MDL migration, ANSI engine, UI
-- wrench — FOSSIL driver
+| Handle | Role |
+|--------|------|
+| verta1878 | Project lead |
+| sysop/0 | Compiler engineer, FPC, Tang Console, USB |
+| bob | Compiler engineer, OpenWatcom, Glide, 3dfx drivers |
+| evga | Display, Mystic, SIO rebuild |
+| kiddo | Protocols, RIPscrip |
+| wrench | Transport, FOSSIL, DVI/HDMI |
+| hexadecimal | PCBoard, Cyclades |
+| byte | Program discovery |
+| DotMatrix | Documentation sourcing |
+
 
 ## License
 

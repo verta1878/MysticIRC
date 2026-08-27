@@ -78,17 +78,20 @@ ICE and SAUCE are NOT config items.
 | BSD | /dev/ttyS* | External | Builds |
 | macOS | /dev/tty* | External | Builds |
 
-## Credits
+## Team
 
-- CiA / Strider — original CIADraw (1994-96)
-- James Coyle (g00r00) — Mystic BBS ansiedit
-- Curtis Wensley — PabloDraw (C# original)
-- sysop/0 — CIADraw FPC port, PabloDraw Pascal port, UART layer
-- evga — FPC 2.6.4irc, RIP engines, MDL
-- kiddo — ansiedit lead, serial_irq.pas, text rendering
-- wrench — fossil.pas, netfosdl.pas FOSSIL driver
-- hexadecimal — PCBoard integration docs, CIADraw preservation
-- verta1878 — project lead, Ecstasy BBS FTN 1:152/158
+| Handle | Role |
+|--------|------|
+| verta1878 | Project lead |
+| sysop/0 | Compiler engineer, FPC, Tang Console, USB |
+| bob | Compiler engineer, OpenWatcom, Glide, 3dfx drivers |
+| evga | Display, Mystic, SIO rebuild |
+| kiddo | Protocols, RIPscrip |
+| wrench | Transport, FOSSIL, DVI/HDMI |
+| hexadecimal | PCBoard, Cyclades |
+| byte | Program discovery |
+| DotMatrix | Documentation sourcing |
+
 
 ## License
 

@@ -1,6 +1,6 @@
 # Mystic BBS 1.11IRC — Community Fork
 
-> **GitHub:** https://github.com/verta1878/mystic-bbs-irc
+> **GitHub:** https://github.com/verta1878/mysticbbsirc
 >
 > **Release: 2026-08-20** — Version 1.11IRC A4.
 > RIPscrip v1.54 support (42/42 commands, pixel-perfect).
@@ -9,75 +9,77 @@
 Based on **Mystic BBS** GPL source by James Coyle (g00r00).
 Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
 
+## Directory Structure
 ## Team
 
 | Handle | Role |
 |--------|------|
-| verta1878 | Project lead, Ecstasy BBS FTN 1:152/158 |
-| sysop/0 | serial.pas UART layer, architecture |
-| evga | Free Pascal Compiler 2.6.4irc, RIP engines, MDL |
-| kiddo | serial_irq.pas ISR, text rendering, MPL, ans2rip |
-| wrench | fossil.pas, netfosdl.pas FOSSIL driver, netmodem2irc |
-| hexadecimal | PCBoard 15.4 Revival |
-
-## Directory Structure
+| verta1878 | Project lead |
+| sysop/0 | Compiler engineer, FPC, Tang Console, USB |
+| bob | Compiler engineer, OpenWatcom, Glide, 3dfx drivers |
+| evga | Display, Mystic, SIO rebuild |
+| kiddo | Protocols, RIPscrip |
+| wrench | Transport, FOSSIL, DVI/HDMI |
+| hexadecimal | PCBoard, Cyclades |
+| byte | Program discovery |
+| DotMatrix | Documentation sourcing |
 
 ```
-mdl/                     Mystic Development Library (67 units)
-  m_rip/                   Mystic Development for RIP (WIP)
-     v1/                      RIPscript v1.54 engine (evga/wrench)
-     v2/                      RIPscript v2.0 engine (evga/wrench)
-     v3/                      RIPscript v3.0 engine (evga/wrench)
-     v4/                      RIPscript v4.0 engine (evga/wrench)
-  ans2rip.pas              ANSI→RIP converter (pixel-perfect, -p flag)
-  ans2png.pas              ANSI→BMP renderer (pixel-perfect)
-  ripscrip-irc-whitepaper.htm  Our RIP implementation whitepaper
+mdl/                     Mystic Development Library (79 units)
+  m_rip/                   RIP engine + tools
+    v1/                      RIPscrip v1.54 engine (kiddo)
+    v2/                      RIPscrip v2.0 engine (kiddo)
+    v3/                      RIPscrip v3.0 engine (kiddo)
+    v4/                      RIPscrip v4.0 engine (kiddo)
+    rip_canvas.pas           Canvas/surface primitives
+    rip_render.pas           BMP/screen renderer
+    rip_surface.pas          Software raster backend
+    rip_term.pas             Terminal integration
+    rip_window.pas           Viewport management
+    ans2rip.pas              ANSI→RIP converter
+    ans2png.pas              ANSI→BMP renderer
+    ripmake.pas              RIP file builder
+    mkicons.pas              Icon generator
 mystic/                  BBS core (clean, no RIP)
 mystic_test/             BBS core + RIP integration + A4 fixes
   mdl/                     Local copy of MDL (self-contained build)
+mystic_ansiedit/         ANSI editor (ansiedit + PCBDraw support)
+mystic_mterm/            mterm terminal emulator (85 files)
+mystic_molms/            MOLMS offline mail system (36 files)
+mystic_ripview/          RIPView v1.0.0 — Pascal RIP viewer (12 source, 565 total)
 mystic_sdl/              SDL2 graphical terminal
-mystic_view/               RIPscript Browser
 mystic_spell/            Hunspell spell check binding + SETUP.md
 mystic_crypt/            CryptLib SSH/TLS example
 mystic_modem/            Modem/FOSSIL front-end
 mystic_mailer/           BINKP/FidoNet mailer
-mystic_ansiedit/         ANSI editor cfg
 mystic_texteditor/       Text editor standalone
-mystic_ripview/          RIPView v1.0.0 — evga's Pascal viewer (42/42 cmds)
-mystic_mterm/            mterm terminal + OpenOLMS (44 files)
+mystic_misdos/           MIS DOS version
+mystic_perl/             Perl DLL integration
 examples/
-    source/                  Pascal source (7 units, 1,656 lines)
-    fonts/                   18 BGI + bitmap fonts
-    icons/                   219 ICN/MSK/HIC files
-    rips/                    259 test RIP files
-    ripscrip-irc-whitepaper.htm  Our RIP implementation whitepaper
-  riptermJS/               RIPtermJS (Carl Gorringe, GPLv3) zip + v3.0 txt
-  serial/                  Serial v1.1 + FOSSIL driver (5 files)
-  door32/                  Door32 BBS Door Kit (g00r00, ONiX, SqZ) zip
+  ripart/                  RIP art, fonts, icons (single source of truth)
+    art/                     226 RIP files (16colo.rs corpus + test suite)
+    fonts/                   18 BGI + bitmap fonts (CHR/FNT)
+    icons/                   222 ICN/MSK/HIC icon files
+  serial/                  Serial v1.1 + FOSSIL driver (wrench)
+  riptermJS/               RIPtermJS (Carl Gorringe, GPLv3)
+  door32/                  Door32 BBS Door Kit (g00r00, ONiX, SqZ)
   utrayit/                 Console tray unit + mkicon ICO generator
   thdpro/                  THD ProScan (original + clean room remake)
-  trapgate/                TrapGate FTN Mailer (43 Pascal, ZLib128, 4 releases)
+  trapgate/                TrapGate FTN Mailer (Pascal, ZLib128)
   naplps/                  NAPLPS specs (NAP.txt, FIPS121 PDF)
   marc/                    MARC ZIP archiver + MP3/MP4 metadata
   hslink-src/              HS/Link protocol source
   ansilove-src/            Ansilove (VGA font source)
   rez2ans-next/            REZ to ANSI converter
   ciadraw/                 CIA Draw ANSI tool
-  libs/                    Runtime libs (hunspell, SDL2, cryptlib) per platform
-todo/                    Documentation
+  sdl_demo/                SDL2 demo programs
+  mpl/                     MPL script examples
+  shatranj/                Shatranj chess engine
+todo/                    Documentation + phase tracking
+  ripscrip/                RIP specs (v1.54-v3.2, riplib, historical)
 historical/
   ripterm154/              RIPterm 1.54 DOS binary (Carl Gorringe archive)
 attic/                   Retired code and archives
-  docs-a40/                AreaFix implementation checklist
-  docs-os2-linux-toolchain/  OS/2 cross-compile docs (sysop/0)
-  docs-patches/            Old patch notes
-  toolchain-src.zip        emxbind + binutils + ld64 source
-out-linux/               Linux build output
-out-win32/               Win32 build output
-out-dos/                 DOS build output
-out-os2/                 OS/2 build output
-out_darwin/              macOS build output
-out-bsd/                FreeBSD/OpenBSD/NetBSD build output
 ```
 
 ## BBS Binaries (18 Win32 PE32 i386)
@@ -107,11 +109,13 @@ out-bsd/                FreeBSD/OpenBSD/NetBSD build output
 
 - g00r00 1.10 A38 base with A39-A63 features ported
 - g00r00 1.11 A1-A3 items: VAR records, TimerMS, FormatDate, Searchlight menus
-- RIPscrip v1.54: 9 RIP engines, RIPView 42/42 commands pixel-perfect
+- RIPscrip v1.54: RIP engine v1-v4, RIPView 42/42 commands pixel-perfect
 - Password MD5 hashing with auto-upgrade (bbs_crypt.pas)
 - Hunspell spell check in FS editor
 - Serial v1.1 + FOSSIL driver + IRQ ring buffer
-- mterm terminal + OpenOLMS offline mail reader
+- mterm terminal emulator (ANSI engine + RIP v1.54 client parser)
+- MOLMS offline mail system (QWK/BlueWave/Hudson/JAM)
+- SDL_mixer audio (WAV/MID/MOD/MP3/OGG)
 - MIS 1.12 rebuild plan (tabbed UI, ASCII art header, ESC menu)
 - Stale node detection, MIS shutdown fix, ANSI editor fix
 - Zmodem >2GB file transfers (Int64)
@@ -130,6 +134,12 @@ git clone https://github.com/verta1878/fpc264irc
 
 # Cross-compile for Win32
 ./build-win32.sh
+
+# Build mterm
+cd mystic_mterm && fpc -Mdelphi -Fu../mdl -Fi../mdl mterm.pas
+
+# Build ansiedit
+cd mystic_ansiedit && fpc -Mdelphi -Fu../mdl -Fi../mdl ansiedit.pas
 ```
 
 ## Platforms

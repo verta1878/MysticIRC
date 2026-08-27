@@ -1,0 +1,183 @@
+RIPscrip v3.0 Server-Side Rendering Engine
+================================================================
+8,293 lines | 300 items | 69 commands | GPLv3
+Compiler: FPC 2.6.4irc r3.1+ (-Mdelphi, {$H-})
+Compile:  ppcx64 -Mdelphi -Fuimg -Fuwav -Fuprg -Fupasjpeg
+================================================================
+
+  COMPARISON            v1.0 (1.54)    v2.0.0         v3.0.0
+  ────────────────────────────────────────────────────────────
+  Lines                 4,041          5,160          8,293
+  Commands              51             67             69
+  Colors                16 (EGA)       256            16M (TrueColor)
+  Max Resolution        640x350        1280x1024      1280x1024+world
+  Pixel Formats         Indexed        Indexed        Indexed+RGB24+RGB32
+  Font Systems          CHR            CHR+RFF        CHR+RFF+MAF
+  Image Formats         PCX,BMP,ICN    +JPEG,BMH      +GIF,PNG,TGA,PBM,ICO
+  Graphics              Basic          3D xform       +gradients,shadows,
+                                                       bezier,texmap,clip
+  Audio                 Bell           WAV hooks      4-stream+MIDI+cue+
+                                                       streaming+13 codecs
+  Progressive           None           None           5 codecs (stream,
+                                                       binary,tile,layer,
+                                                       changed-region)
+  Tables/Forms          None           None           server/client split
+  Variable Scoping      Global         Global         local/session/persist
+  Tests                 97             102            592 (14 suites)
+
+================================================================
+v1.54 BASE (Complete — 51/51)
+================================================================
+
+Drawing, fonts, icons, images, buttons, screen management,
+text variables, mouse fields, write modes. See v1 features.txt.
+
+================================================================
+v2.0 EXTENSIONS (Complete — 16 new)
+================================================================
+
+256-color, configurable resolution, RFF fonts, JPEG, sprites,
+3D transforms, animation, Wu antialiasing, palette effects.
+See v2 features.txt.
+
+================================================================
+v3.0 EXTENSIONS (Complete — Phases 15-23)
+================================================================
+
+Phase 15: True Color Pixel Buffer
+  - 24-bit RGB + 32-bit TrueColor pixel buffers
+  - Indexed8, RGB24, RGB32 pixel formats with runtime switch
+  - All drawing primitives work across all pixel formats
+  - 24-bit native BMP export
+
+Phase 16: Resolution-Independent Coordinates
+  - World coordinate system (floating-point Real bounds)
+  - 14 W* drawing overloads (WLine, WBar, WCircle, etc)
+  - Aspect ratio preservation
+  - Scene file world coords
+
+Phase 17: Image Format Support
+  - JPEG loading (jpegdecraw.pas) + streaming (Init/Feed/Complete)
+  - GIF loading (gifdecraw.pas) + animated frames
+  - PNG loading (pngdecraw.pas) + alpha channel
+  - BlitRGB/RGBScaled/RGBAlpha/RGBMask rendering
+
+Phase 18: Scalable Font Rendering
+  - RFF v2.2 stroke fonts (8 fonts, 10 faces each)
+  - Font metrics: kerning, leading, tracking
+  - Text layout: DrawTextRFFBox (word wrap, alignment)
+  - MAF bitmap fonts (multi-resolution, multi-height)
+  - Extended CP437 (UTF8ToCP437, MapStringCP437)
+
+Phase 19: Polygon and Geometry
+  - 4096-vertex polygon support
+  - Vertex count validation and clamping
+
+Phase 20: Data Tables and Forms
+  - Server-side: TableCreate/AddCol/AddRow/SetCell/Render/Scroll
+  - Client-side: FormAddField/SetValue/GetValue/Validate/Render
+  - Variable binding: FormBindVar/SyncToVars/SyncFromVars
+  - 5 field types: text, dropdown, listbox, checkbox, label
+
+Phase 21: Text Variables v3.0
+  - $RESET(PAL)$ / $RESET(ALL)$ side-effect variables
+  - Extended: $PIXFMT$, $CANVASW$, $CANVASH$, $RFFFONT$, $MAFRES$
+  - Scoping: LOCAL (scene), SESSION (connection), PERSIST (disk)
+  - ClearScreen auto-clears local variables
+
+Phase 22: Advanced Multimedia
+  - 4-stream audio: AudioLoad/Play/Pause/Stop/SetVolume
+  - MIDI: MIDILoad/MIDIFree (host handles mididec.pas)
+  - Cue points: CueAdd/CueProcess (64 timed events)
+  - Background audio with crossfade transitions
+  - WAV streaming: WAVStreamStart/Feed/End
+
+Phase 23: Advanced Graphics
+  - Gradient fills: linear, radial, conical (grfill.pas)
+  - Drop shadows and outer glow (grfx.pas)
+  - Variable-width Bezier curves (grbezier.pas)
+  - Texture mapping on quads (grtexmap.pas)
+  - Alpha compositing (grfx.pas)
+  - Polygon clipping paths (grclip.pas)
+
+================================================================
+CODEC DIRECTORIES (117 files)
+================================================================
+
+img/ — 20 image, animation, and graphics codecs
+  jpegdecraw    gifdecraw     pngdecraw     pngcodec
+  bmpdec        pcxdec        tgadec        pbmdec
+  icodec        rffdecraw     gifanim       gifinterlace
+  jpegprog      pnginterlace  spriteanim
+  grfill        grfx          grbezier      grtexmap
+  grclip
+
+wav/ — 36 audio, MIDI synth, streaming, and utility codecs
+  wavdec        vocdec        mp3dec        flacdec
+  aiffdec       audec         adpcmdec      mididec
+  ansimusic     moddec        s3mdec        xmdec
+  mp3full       mp3huff       mp3imdct      mp3requant
+  mp3synth      pcmdecraw     pcmdec        pcmmix
+  wavplay       dosplay       fixedmath     lzmadecpas
+  dfm2lfm       wavstream     vocstream     modstream
+  audstream     asyncplay     netaudio      ringbuf
+
+prg/ — 6 progressive rendering codecs
+  ripdecraw     ripbindec     riptile
+  riplayerdec   ripchange     riprender
+
+pasjpeg/ — 58 JPEG library files (IJG port)
+
+================================================================
+ARCHITECTURE
+================================================================
+
+Server/client split — server owns data model and rendering,
+client handles user input. See CLIENTSERVER.md.
+
+Variable scoping — LOCAL (cleared on ClearScreen), SESSION
+(cleared on disconnect), PERSIST (saved to disk).
+
+Font priority — RFF > CHR > MAF > built-in bitmap.
+
+Uses {$H-} for ShortString mode (BUG-029 safe).
+All I/O uses Assign/Reset/BlockRead (no TStream/Classes).
+Standalone unit — no MDL or framework required.
+
+================================================================
+DEPENDENCIES: Zero. Pure Pascal. Compiles standalone.
+PLATFORMS:    All FPC 2.6.4irc targets (Win32, Linux, DOS,
+              FreeBSD, Darwin, OS/2)
+LICENSE:      GNU General Public License v3
+TESTS:        592/592 passing (14 test suites)
+================================================================
+mystic_rip/v3 — July 21, 2026
+Part of the Mystic BBS IRC Fork
+
+================================================================
+v4.0 DEFERRED
+================================================================
+
+- Full-Motion Video (FLI/AVI decoder)
+- Document Oriented Interface (page layout engine)
+- HTML Rendering (embedded HTML within RIPscrip)
+- MIDI Synthesis (currently parse-only, host plays)
+- Full Unicode (rip3unicode.pas companion unit)
+
+================================================================
+ENGINE STATS
+================================================================
+
+  Public methods:   304
+  Constants:        25+
+  Types:            30+
+  Codec units:      59 (+ 58 pasjpeg = 117 total)
+  Test suites:      14
+  Test files:       14
+  Test data files:  4
+  Root files:       19
+  Total files:      154
+
+  PRINT API: Available via mystic_rip/v4/prt/ (backport to all versions)
+  Drivers: ESC/P (Epson), PCL5 (LaserJet), PostScript, BMP, Raw
+  Call PrnRenderFrame with this engine's framebuffer pointer.

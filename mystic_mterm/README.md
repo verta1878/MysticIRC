@@ -134,14 +134,17 @@ Protocol code (m_prot_*.pas) copyright 1997-2013 James Coyle (g00r00),
 GPLv3. OpenOLMS clean-room reimplementation with Peter Rocca's
 permission.
 
-## Credits
+## Team
 
-| Who | What |
-|-----|------|
-| verta1878 | Project lead, architect |
-| sysop/0 | Terminal, connection, serial UART, compiler |
-| evga | Display, RIPView, Mystic monitor |
-| kiddo | Serial IRQ, ring buffer, protocols |
-| wrench | Network architecture, OpenOLMS |
-| g00r00 | Mystic BBS (GPLv3) |
-| Peter Rocca | Original OLMS (MCC, 1994-1998) |
+| Handle | Role |
+|--------|------|
+| verta1878 | Project lead |
+| sysop/0 | Compiler engineer, FPC, Tang Console, USB |
+| bob | Compiler engineer, OpenWatcom, Glide, 3dfx drivers |
+| evga | Display, Mystic, SIO rebuild |
+| kiddo | Protocols, RIPscrip |
+| wrench | Transport, FOSSIL, DVI/HDMI |
+| hexadecimal | PCBoard, Cyclades |
+| byte | Program discovery |
+| DotMatrix | Documentation sourcing |
+

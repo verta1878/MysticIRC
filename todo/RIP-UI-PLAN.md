@@ -130,8 +130,24 @@ sends these to the RIP terminal on menu entry:
 !|1B001400280050001EN New User|  ; Button "New User" hotkey N
 ```
 
-The BBS stores .mrp files alongside .ans files.
-Display priority: .mrp → .rip → .ans (existing)
+### Display File Priority
+
+When displaying a screen, Mystic checks for files in this order:
+
+| Extension | What | Capability |
+|-----------|------|------------|
+| .mrp | Mystic RIP Menu (buttons + mouse fields) | Full RIP GUI |
+| .rip | RIP display (graphics, no buttons) | RIP art |
+| .ans | ANSI display (text + color) | Fallback |
+
+### File Type Mapping (PCBoard → Mystic)
+
+| PCBoard | Mystic | What |
+|---------|--------|------|
+| .MNU | .mrp | Menu definition with clickable RIP buttons |
+| .ANS | .rip | Display screen (ANSI equivalent in RIP) |
+
+The BBS stores .mrp files alongside .ans files in the theme directory.
 
 ## Phase Plan
 
