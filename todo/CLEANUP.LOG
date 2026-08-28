@@ -85,3 +85,261 @@ Run after cleanup:
 === SUMMARY === 
 Cleaned: 65 file(s) 
 Errors: 0 
+ 
+============================================ 
+mysticbbsirc cleanup 
+Date: Fri 08/28/2026  2:01:02.96 
+============================================ 
+[1/8] Build artifacts... 
+CLEAN: No build artifacts found 
+[2/8] Compiled binaries... 
+CLEAN: No compiled binaries found 
+[3/8] Python cruft... 
+CLEAN: No Python cruft found 
+[4/8] Duplicate MDL files... 
+[5/8] Duplicate RIP assets... 
+CLEAN: No duplicate RIP assets found 
+[6/8] Misplaced and stale files... 
+OK: Deleted mdl\VGA8X16.FNT (correct copy in mdl\m_rip\
+OK: Deleted mdl\rip_font8x8.inc (correct copy in mdl\m_rip\
+OK: Deleted mystic_test\mdl\rip_font8x8.inc (correct copy in mdl\m_rip\
+[7/8] Stale mystic_test files... 
+CLEAN: No stale mystic_test files found 
+[8/8] Verification... 
+ 
+=== SHOULD NOT EXIST === 
+GONE: mystic_ansiedit\m_pdpcboard.pas 
+GONE: mdl\mdltest0 
+GONE: mdl\mdltest10 
+GONE: mdl\VGA8X16.FNT 
+GONE: mdl\rip_font8x8.inc 
+GONE: mystic_test\mdl\rip_font8x8.inc 
+GONE: mdl\m_rip\ans2img.py 
+GONE: mdl\m_rip\ripdoc 
+GONE: mystic_mterm\rips 
+GONE: mystic_mterm\icons 
+GONE: mystic_mterm\rip-icons 
+GONE: mystic_mterm\rip-fonts 
+ 
+=== BUILD CHECK === 
+Run after cleanup: 
+  cd mystic_mterm & fpc -Mdelphi -Fu..\mdl -Fi..\mdl mterm.pas 
+  cd mystic_ansiedit & fpc -Mdelphi -Fu..\mdl -Fi..\mdl ansiedit.pas 
+  cd mystic_test\mdl & fpc -Mdelphi -Fu..\..\mdl mdltest12.pas 
+ 
+=== SUMMARY === 
+Cleaned: 23 file(s
+Errors: 0 
+ 
+============================================ 
+mysticbbsirc cleanup 
+Date: Fri 08/28/2026  2:03:49.07 
+============================================ 
+[1/8] Build artifacts... 
+CLEAN: No build artifacts found 
+[2/8] Compiled binaries... 
+CLEAN: No compiled binaries found 
+[3/8] Python cruft... 
+CLEAN: No Python cruft found 
+[4/8] Duplicate MDL files... 
+[5/8] Duplicate RIP assets... 
+CLEAN: No duplicate RIP assets found 
+[6/8] Misplaced and stale files... 
+[7/8] Stale mystic_test files... 
+CLEAN: No stale mystic_test files found 
+[8/8] Verification... 
+ 
+=== SHOULD NOT EXIST === 
+GONE: mystic_ansiedit\m_pdpcboard.pas 
+GONE: mdl\mdltest0 
+GONE: mdl\mdltest10 
+GONE: mdl\VGA8X16.FNT 
+GONE: mdl\rip_font8x8.inc 
+GONE: mystic_test\mdl\rip_font8x8.inc 
+GONE: mdl\m_rip\ans2img.py 
+GONE: mdl\m_rip\ripdoc 
+GONE: mystic_mterm\rips 
+GONE: mystic_mterm\icons 
+GONE: mystic_mterm\rip-icons 
+GONE: mystic_mterm\rip-fonts 
+ 
+=== BUILD CHECK === 
+Run after cleanup: 
+  cd mystic_mterm & fpc -Mdelphi -Fu..\mdl -Fi..\mdl mterm.pas 
+  cd mystic_ansiedit & fpc -Mdelphi -Fu..\mdl -Fi..\mdl ansiedit.pas 
+  cd mystic_test\mdl & fpc -Mdelphi -Fu..\..\mdl mdltest12.pas 
+ 
+=== SUMMARY === 
+Cleaned: 23 file(s
+Errors: 0 
+ 
+============================================ 
+mysticbbsirc cleanup 
+Date: Fri 08/28/2026  2:05:46.31 
+============================================ 
+[1/8] Build artifacts... 
+CLEAN: No build artifacts found 
+[2/8] Compiled binaries... 
+CLEAN: No compiled binaries found 
+[3/8] Python cruft... 
+CLEAN: No Python cruft found 
+[4/8] Duplicate MDL files... 
+CLEAN: No duplicate MDL files found 
+[5/8] Duplicate RIP assets... 
+CLEAN: No duplicate RIP assets found 
+[6/8] Misplaced and stale files... 
+[7/8] Stale mystic_test files... 
+CLEAN: No stale mystic_test files found 
+[8/8] Verification... 
+ 
+=== SHOULD NOT EXIST === 
+GONE: mystic_ansiedit\m_pdpcboard.pas 
+GONE: mdl\mdltest0 
+GONE: mdl\mdltest10 
+GONE: mdl\VGA8X16.FNT 
+GONE: mdl\rip_font8x8.inc 
+GONE: mystic_test\mdl\rip_font8x8.inc 
+GONE: mdl\m_rip\ans2img.py 
+GONE: mdl\m_rip\ripdoc 
+GONE: mystic_mterm\rips 
+GONE: mystic_mterm\icons 
+GONE: mystic_mterm\rip-icons 
+GONE: mystic_mterm\rip-fonts 
+ 
+=== BUILD CHECK === 
+Run after cleanup: 
+  cd mystic_mterm and fpc -Mdelphi -Fu..\mdl -Fi..\mdl mterm.pas 
+  cd mystic_ansiedit and fpc -Mdelphi -Fu..\mdl -Fi..\mdl ansiedit.pas 
+  cd mystic_test\mdl and fpc -Mdelphi -Fu..\..\mdl mdltest12.pas 
+ 
+=== SUMMARY === 
+Cleaned: 3 file(s
+Errors: 0 
+ 
+============================================ 
+mysticbbsirc cleanup 
+Date: Fri 08/28/2026  2:06:00.69 
+============================================ 
+[1/8] Build artifacts... 
+CLEAN: No build artifacts found 
+[2/8] Compiled binaries... 
+CLEAN: No compiled binaries found 
+[3/8] Python cruft... 
+CLEAN: No Python cruft found 
+[4/8] Duplicate MDL files... 
+CLEAN: No duplicate MDL files found 
+[5/8] Duplicate RIP assets... 
+CLEAN: No duplicate RIP assets found 
+[6/8] Misplaced and stale files... 
+[7/8] Stale mystic_test files... 
+CLEAN: No stale mystic_test files found 
+[8/8] Verification... 
+ 
+=== SHOULD NOT EXIST === 
+GONE: mystic_ansiedit\m_pdpcboard.pas 
+GONE: mdl\mdltest0 
+GONE: mdl\mdltest10 
+GONE: mdl\VGA8X16.FNT 
+GONE: mdl\rip_font8x8.inc 
+GONE: mystic_test\mdl\rip_font8x8.inc 
+GONE: mdl\m_rip\ans2img.py 
+GONE: mdl\m_rip\ripdoc 
+GONE: mystic_mterm\rips 
+GONE: mystic_mterm\icons 
+GONE: mystic_mterm\rip-icons 
+GONE: mystic_mterm\rip-fonts 
+ 
+=== BUILD CHECK === 
+Run after cleanup: 
+  cd mystic_mterm and fpc -Mdelphi -Fu..\mdl -Fi..\mdl mterm.pas 
+  cd mystic_ansiedit and fpc -Mdelphi -Fu..\mdl -Fi..\mdl ansiedit.pas 
+  cd mystic_test\mdl and fpc -Mdelphi -Fu..\..\mdl mdltest12.pas 
+ 
+=== SUMMARY === 
+Cleaned: 3 file(s
+Errors: 0 
+ 
+============================================ 
+mysticbbsirc cleanup 
+Date: Fri 08/28/2026  2:11:28.74 
+============================================ 
+[1/8] Build artifacts... 
+CLEAN: No build artifacts found 
+[2/8] Compiled binaries... 
+CLEAN: No compiled binaries found 
+[3/8] Python cruft... 
+CLEAN: No Python cruft found 
+[4/8] Duplicate MDL files... 
+CLEAN: No duplicate MDL files found 
+[5/8] Duplicate RIP assets... 
+CLEAN: No duplicate RIP assets found 
+[6/8] Misplaced and stale files... 
+CLEAN: No misplaced or stale files found 
+[7/8] Stale mystic_test files... 
+CLEAN: No stale mystic_test files found 
+[8/8] Verification... 
+ 
+=== SHOULD NOT EXIST === 
+GONE: mystic_ansiedit\m_pdpcboard.pas 
+GONE: mdl\mdltest0 
+GONE: mdl\mdltest10 
+GONE: mdl\VGA8X16.FNT 
+GONE: mdl\rip_font8x8.inc 
+GONE: mystic_test\mdl\rip_font8x8.inc 
+GONE: mdl\m_rip\ans2img.py 
+GONE: mdl\m_rip\ripdoc 
+GONE: mystic_mterm\rips 
+GONE: mystic_mterm\icons 
+GONE: mystic_mterm\rip-icons 
+GONE: mystic_mterm\rip-fonts 
+ 
+=== SUMMARY === 
+Nothing to clean. Repo is already clean. 
+Errors: 0 
+ 
+============================================ 
+mysticbbsirc cleanup 
+Date: Fri 08/28/2026  2:17:15.77 
+============================================ 
+[1/8] Build artifacts... 
+CLEAN: No build artifacts found 
+[2/8] Compiled binaries... 
+OK: Deleted mystic 
+ 
+============================================ 
+mysticbbsirc cleanup 
+Date: Fri 08/28/2026  2:20:07.70 
+============================================ 
+[1/8] Build artifacts... 
+CLEAN: No build artifacts found 
+[2/8] Compiled binaries... 
+CLEAN: No compiled binaries found 
+[3/8] Python cruft... 
+CLEAN: No Python cruft found 
+[4/8] Duplicate MDL files... 
+CLEAN: No duplicate MDL files found 
+[5/8] Duplicate RIP assets... 
+CLEAN: No duplicate RIP assets found 
+[6/8] Misplaced and stale files... 
+CLEAN: No misplaced or stale files found 
+[7/8] Stale mystic_test files... 
+CLEAN: No stale mystic_test files found 
+[8/8] Verification... 
+ 
+=== SHOULD NOT EXIST === 
+GONE: mystic_ansiedit\m_pdpcboard.pas 
+GONE: mdl\mdltest0 
+GONE: mdl\mdltest10 
+GONE: mdl\VGA8X16.FNT 
+GONE: mdl\rip_font8x8.inc 
+GONE: mystic_test\mdl\rip_font8x8.inc 
+GONE: mdl\m_rip\ans2img.py 
+GONE: mdl\m_rip\ripdoc 
+GONE: mystic_mterm\rips 
+GONE: mystic_mterm\icons 
+GONE: mystic_mterm\rip-icons 
+GONE: mystic_mterm\rip-fonts 
+ 
+=== SUMMARY === 
+Nothing to clean. Repo is already clean. 
+Errors: 0 
