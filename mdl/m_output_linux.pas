@@ -27,6 +27,9 @@ Interface
 Uses
   TermIO,
   BaseUnix,
+  {$IFDEF USEGRAPH}
+  m_output_graph,
+  {$ENDIF}
   m_Types;
 
 Const
@@ -334,6 +337,9 @@ Begin
     If Active Then fpWrite (ConOut, OutBuffer[1], OutBufPos);
     OutBufPos := 0;
   End;
+  {$IFDEF USEGRAPH}
+  ShowBuffer;
+  {$ENDIF}
 End;
 
 Procedure TOutputLinux.BufAddStr (Str: String);
@@ -881,6 +887,9 @@ End;
 
 Procedure TOutputLinux.ShowBuffer;
 Begin
+  {$IFDEF USEGRAPH}
+  m_output_graph.GraphPaintBuffer(Buffer, ScreenSize, 80);
+  {$ENDIF}
 End;
 
 End.

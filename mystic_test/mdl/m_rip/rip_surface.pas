@@ -139,7 +139,7 @@ Type
 
 Implementation
 
-{$I font8x8.inc}   // FONT8X8: array[32..127, 0..7] of Byte
+{$I rip_font8x8.inc}   // FONT8X8: array[32..127, 0..7] of Byte
 
 Constructor TRipSurface.Create (AW, AH: Integer);
 Begin
@@ -482,7 +482,7 @@ Begin
     O := Ord('?');
 
   For Row := 0 to 7 Do Begin
-    Bits := FONT8X8[O][Row];
+    Bits := Font8x8[O * 8 + Row];
 
     For Col := 0 to 7 Do
       If (Bits And (128 Shr Col)) <> 0 Then

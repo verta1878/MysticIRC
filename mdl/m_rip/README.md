@@ -20,6 +20,8 @@ Engine units for RIPscrip rendering. Part of MDL.
 | rip_surface.pas | Software raster backend |
 | rip_term.pas | Terminal integration |
 | rip_window.pas | Viewport manager |
+| mripchr.pas | CHR stroked font parser |
+| mripui.pas | MRP widget renderer (boxes, windows, buttons, frames) |
 
 ## Tools
 

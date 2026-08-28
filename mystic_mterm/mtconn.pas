@@ -10,6 +10,7 @@ unit mtconn;
 interface
 
 uses Classes, SysUtils, Sockets
+  {$IFDEF UNIX}, BaseUnix{$ENDIF}
   {$IFDEF GO32V2}
   , serial, serial_irq, fossil
   {$ENDIF};
@@ -37,6 +38,7 @@ type
     function Receive(var Buf; Count: Integer): Integer;
     procedure SendByte(B: Byte);
     procedure SendBuf(const Buf; Count: Integer);
+    function DataAvailable: Boolean;
     property Connected: Boolean read FConnected;
     property ConnType: TConnType read FType;
   end;
@@ -68,8 +70,8 @@ begin
 
   FillChar(Addr, SizeOf(Addr), 0);
   Addr.sin_family := AF_INET;
-  Addr.sin_port := htons(Port);
-  Addr.sin_addr := StrToHostAddr(Host);
+  Addr.sin_port := ShortHostToNet(Port);
+  Addr.sin_addr.s_addr := HostToNet(LongWord(StrToHostAddr(Host).s_addr));
 
   if fpConnect(FSock, @Addr, SizeOf(Addr)) = 0 then begin
     FType := ctTelnet;
@@ -159,6 +161,18 @@ begin
     ctFossil: FossilWriteBlock(0, Buf, Count);
     {$ENDIF}
   end;
+end;
+
+function TConnection.DataAvailable: Boolean;
+var FDS: TFDSet; T: TTimeVal;
+begin
+  Result := False;
+  if (not FConnected) or (FType <> ctTelnet) then Exit;
+  fpFD_ZERO(FDS);
+  fpFD_SET(FSock, FDS);
+  T.tv_sec := 0;
+  T.tv_usec := 0;
+  Result := fpSelect(FSock + 1, @FDS, nil, nil, @T) > 0;
 end;
 
 end.

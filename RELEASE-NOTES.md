@@ -515,3 +515,60 @@ while sharing the engine, drawing, text, and BMP units.
 | DotMatrix | Documentation sourcing |
 
 Motto: the crew 4free
+
+---
+
+## Session 8 — August 28, 2026
+
+### mystic_makemenu — Menu and Text Editor (NEW)
+
+Created complete standalone menu/text editor example:
+
+- makemenu.pas — Menu editor with theme selector, -demo, -txt, -? modes
+- maketext.pas — 516 prompt stub generator from default.txt
+- mrpdata.pas — Standalone menu data (load/save .mnu binary + .mrp text)
+- rendermrp.pas — Pixel-perfect 640x350 EGA BMP renderer
+
+### MDL m_rip/ Updates
+
+- mripchr.pas (was m_rip_chrfont.pas) — CHR stroked font parser, 10 fonts
+- mripui.pas (was mripwiz.pas) — Built-in MRP widget renderer
+  6 widget types: Box, Window, Frame, Dialog, ButtonUp, ButtonDown
+  Widget concept inspired by JMedia v2.0 WIZ format (credited)
+- rip_surface.pas — Fixed font8x8.inc include and flat array access
+- All filenames 8.3 DOS compatible
+
+### RIPKit 1.20 Analysis
+
+- RIPKIT-PCB-HOWTO.md — 313 RIP screens, 30 PPL scripts, 8 menus
+- .mrp format documented in RIP-UI-PLAN.md (947 lines)
+- WIZ/J authoring merged into .mrp section
+- Screen modes (EGA 640x350, VGA 640x480) documented with FPC ptcgraph
+
+### Private Study (not released)
+
+- JDraw Pro v4.2, JMedia v2.0, JView v6.0 — RIP authoring tools
+- Easy Fonts v2.0 (registered to verta1878) — CHR font documentation
+- Tombstone Artist v2.0, ElyEdit v4.0, Empathy v1.00p
+- DOSBox-X environment with TP7, BP7, BC31, TC201, all study programs
+- JMedia .J scripting format and WIZ widget templates studied
+
+### Repo Cleanup
+
+- cleanup.bat updated with /Q flags, pure ASCII, append mode
+- RELEASENOTES.md merged into RELEASE-NOTES.md
+- mystic_editmrp/ renamed to mystic_makemenu/
+- All files renamed to 8.3 (mripchr, mripui, tchr, tui)
+- 37 programs compile, 0 failures
+
+### Compile Results
+
+37 PASS, 0 FAIL across all programs:
+- mdl/m_rip/: 9 units + 2 tests
+- mystic_ripview/: 10 tools + 12 source units
+- mystic_makemenu/: 4 programs
+- mystic_mterm/, mystic_ansiedit/, mystic_test/: all clean
+
+### Team (10 members)
+
+the crew 4free

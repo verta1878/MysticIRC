@@ -140,7 +140,7 @@ When displaying a screen, Mystic checks for files in this order:
 | .rip | RIP display (graphics, no buttons) | RIP art |
 | .ans | ANSI display (text + color) | Fallback |
 
-### File Type Mapping (PCBoard → Mystic)
+### File Type Mapping (PCBoard -> Mystic)
 
 | PCBoard | Mystic | What |
 |---------|--------|------|
@@ -148,6 +148,195 @@ When displaying a screen, Mystic checks for files in this order:
 | .ANS | .rip | Display screen (ANSI equivalent in RIP) |
 
 The BBS stores .mrp files alongside .ans files in the theme directory.
+
+### .mrp Authoring — WIZ Widget Templates
+
+Instead of hand-coding raw RIP escape sequences, .mrp files are built
+from reusable widget templates (.wiz files) and readable script commands.
+Based on study of JMedia v2.0 authoring system.
+
+#### WIZ Format
+
+A .wiz file is a text file with single-letter drawing commands and
+relative coordinate variables. The Wizard command substitutes x, y,
+x2, y2 at runtime, making each widget resizable and repositionable.
+
+Commands:
+
+| Cmd | Parameters | What |
+|-----|-----------|------|
+| c | color | Set drawing color |
+| S | style color | Set fill style + fill color |
+| B | x y x2 y2 | Filled bar (solid rectangle) |
+| R | x y x2 y2 | Rectangle outline |
+| L | x1 y1 x2 y2 | Line |
+| X | x y | Plot pixel in current draw color |
+| F | x y border | Flood fill stopping at border color |
+
+Variables: x, y, x2, y2 (from Wizard command), cx, cy (center).
+Arithmetic supported: x+1, y2-1, x+5, x2-5, etc.
+
+Example — BOX1.WIZ (3D raised box):
+
+```
+S 1 7                    ; fill solid, light gray
+B x+1 y+1 x2-1 y2-1     ; fill interior (inset 1px)
+c 15                     ; white
+R x y x2 y2              ; outer rectangle
+c 8                      ; dark gray
+L x y2 x2 y2             ; bottom shadow
+L x2 y x2 y2             ; right shadow
+```
+
+Usage: `Wizard 10 10 +90 +90 BOX1.WIZ`
+
+Example — METWIN.WIZ (metallic window with title bar):
+
+```
+S 1 7                    ; fill solid, light gray
+B x+1 y+1 x2-1 y2-1     ; fill interior
+c 15                     ; white
+R x y x2 y2              ; outer frame
+R x+5 y+20 x2-5 y2-4    ; inner content area
+c 8                      ; dark gray
+L x y2 x2 y2             ; bottom shadow
+L x2 y x2 y2             ; right shadow
+L x+5 y+20 x+5 y2-4     ; inner left shadow
+L x+5 y+20 x2-5 y+20    ; inner top shadow
+```
+
+Widget library (from JDraw/JMedia study): 54 .wiz files covering
+boxes (BOX1-3), windows (METWIN, MACWIN, WINWIN), buttons (BUT1-6,
+BUT1C-6C for pressed state), dialogs (DWIN1-11), utility windows
+(UWIN1-11), frames (FRAME1-5), viewer windows (VDWIN1-6).
+
+#### .mrp Script Commands
+
+Human-readable commands that compile to raw RIP. The + prefix on
+coordinates means relative (width/height) not absolute.
+
+| Command | Parameters | RIP Equivalent |
+|---------|-----------|----------------|
+| KillMouseFields | none | !&#124;1K |
+| ResetWindows | none | !&#124;# |
+| TextWindow | x y x2 y2 wrap font | !&#124;1w |
+| SetDimensions | oldW oldH newW newH | (virtual coord scaling) |
+| Color | name_or_number | !&#124;1c |
+| Bar | x y x2 y2 | !&#124;B |
+| Rectangle | x y x2 y2 | !&#124;R |
+| Line | x1 y1 x2 y2 | !&#124;L |
+| FillStyle | pattern color | !&#124;S |
+| FillPattern | 8_bytes color | !&#124;= |
+| FontStyle | font dir size | !&#124;Y |
+| TextXY | x y text | !&#124;T |
+| Wizard | x y x2 y2 filename | (WIZ macro expansion) |
+| Button | x y w h hotkey label cmd | !&#124;1B |
+| ButtonStyle.* | property value | !&#124;1D |
+| Mouse | x y w h hostcmd clientcmd | !&#124;1M |
+
+ButtonStyle properties: Mouse, UnderLine, HighLightKey, LeftJustify,
+Bevel, Recess, Chisel, Shadow, Sunken, Invertable, Width, Height,
+Bright, Dark, Surface, DFore, DBack, ULineCol. Apply with `ButtonStyle`
+(no suffix = commit).
+
+#### Example: Complete BBS Main Menu
+
+```
+'main_menu — Mystic BBS main menu
+KillMouseFields
+ResetWindows
+TextWindow 0 0 0 0 0 0
+
+'background
+FillPattern 194 180 150 145 168 162 165 203 LightBlue
+Bar 0 0 639 349
+SetDimensions 640 350 128 100
+
+'title
+Wizard 8 4 +110 +15 BOX1.WIZ
+FontStyle Triplex HorizDir 4
+Color Yellow
+TextXY 18 5 MYSTIC BBS
+
+'menu window
+Wizard 2 25 +124 +65 METWIN.WIZ
+FontStyle Default HorizDir 1
+Color Black
+TextXY 3 27 MAIN MENU
+
+'buttons
+ButtonStyle.Mouse ON
+ButtonStyle.UnderLine ON
+ButtonStyle.HighLightKey ON
+ButtonStyle.LeftJustify ON
+ButtonStyle.Width 190
+ButtonStyle.Height 20
+ButtonStyle
+
+Button 5 33 0 0 f <>File Areas<>f^M
+Button 5 41 0 0 m <>Message Areas<>m^M
+Button 5 49 0 0 e <>Email<>e^M
+Button 5 57 0 0 s <>Settings<>s^M
+Button 5 65 0 0 g <>Goodbye<>g^M
+```
+
+#### Sysop Workflow
+
+1. Sysop opens menu editor (mystic -cfg or mrpedit)
+2. Edits buttons, layout, colors visually or in readable script
+3. Hits save — editor compiles to .mrp automatically
+4. No manual command line step
+
+The compiler is trivial (JMedia's CODE.EXE is 6KB). The .mrp script
+format maps 1:1 to RIP commands — "compilation" is string substitution
++ base-36 encoding. The hard part is the editor UI, not compilation.
+
+| Component | What |
+|-----------|------|
+| .wiz files | Reusable widget templates (shipped with theme) |
+| .mrp source | Readable script (internal to editor) |
+| .mrp compiled | Raw RIP commands (sent to terminal) |
+| mrpedit | Visual editor (future) |
+
+### Screen Modes for RIP
+
+RIPscrip v1.54 runs in EGA 640x350x16. The editor needs to match.
+
+| Mode | Resolution | Colors | RIP Version |
+|------|-----------|--------|-------------|
+| EGA EGAHi | 640x350 | 16 | v1.54 (standard) |
+| VGA VGAMed | 640x350 | 16 | v1.54 (VGA card in EGA mode) |
+| VGA VGAHi | 640x480 | 16 | v2.0+ |
+
+#### FPC Graph Unit — Setting Screen Mode
+
+DOS (go32v2 target):
+```pascal
+uses Graph;
+var gd, gm: SmallInt;
+begin
+  gd := EGA; gm := EGAHi;     { 640x350x16 for RIP v1.54 }
+  InitGraph(gd, gm, '');
+end;
+```
+
+Linux/Win32 (FPC ptcgraph backend — opens a window at the right resolution):
+```pascal
+uses ptcgraph;                  { drop-in replacement for Graph }
+var gd, gm: SmallInt;
+begin
+  gd := VGA; gm := VGAMed;     { 640x350 via ptcgraph window }
+  InitGraph(gd, gm, '');
+end;
+```
+
+ptcgraph is BGI-compatible — same API as the DOS Graph unit.
+All BGI drawing calls work: SetColor, Rectangle, Bar, Line,
+OutTextXY, SetFillStyle, FloodFill, etc. CHR stroked fonts
+load with InstallUserFont or our m_rip_chrfont parser.
+
+Tested: FPC 3.2.2, ptcgraph compiles and links on Linux x86_64.
+Requires SDL 1.2 (libsdl1.2-dev).
 
 ## Phase Plan
 
@@ -756,3 +945,35 @@ Exact pixel diff numbers pending from sysop/0.
     serial_ext.pas added (6 serial functions)
     utrayit.pas bugfix deployed to all 4 locations
     MDL-OOP-ANALYSIS.md: 76% already OOP, 3-step migration plan
+
+### Linux Terminal Setup for Mystic BBS
+
+Before running Mystic in a Linux terminal, set CP437 codepage:
+
+```
+echo -e '\033(U'
+```
+
+This sends ESC(U which switches the Linux console to CP437 character
+set. Without it, high-ASCII characters (block drawing ░▒▓█▄▀│─)
+display as garbled UTF-8.
+
+Mystic 1.11IRC sends ESC(U automatically at startup, but the terminal
+must support it. Most Linux console terminals (xterm, rxvt, PuTTY)
+honor this sequence.
+
+For UTF-8 terminals, switch back with:
+```
+echo -e '\033(B'
+```
+
+ESC(B restores ISO 8859-1 / UTF-8 character set.
+
+Build commands:
+```
+# Text mode (standard)
+fpc -Mdelphi -Fu../mdl mystic.pas
+
+# Graphics mode (640x350 ptcgraph window)
+fpc -Mdelphi -dUSEGRAPH -Fu../mdl -Fu../mdl/m_rip mystic.pas
+```

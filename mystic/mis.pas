@@ -70,6 +70,10 @@ Const
   FocusEVENT  = 6;
   FocusMax    = 6;
 
+  { 1.12 console color attributes }
+  ATTR_HEADER_YEL = $1E;  { yellow on blue }
+  ATTR_PROMPT     = $1F;  { white on blue  }
+
 Var
   Keyboard     : TInput;
   TelnetServer : TServerManager;
@@ -327,7 +331,9 @@ Begin
     End;
 End;
 
-(*
+
+Procedure LocalLogin; Forward;
+
 Procedure ShowESCMenu;
 { 1.12: ESC opens popup menu instead of immediate shutdown }
 Var
@@ -395,6 +401,7 @@ Const
   BufferSize = 1024 * 4;
 Var
   Client : TIOSocket;
+  Term   : TTermAnsi;
   Res    : LongInt;
   Buffer : Array[1..BufferSize] of Char;
   Done   : Boolean;
@@ -470,7 +477,7 @@ Begin
 
   SwitchFocus;
 End;
-*)
+
 {$IFDEF UNIX}
 Procedure SetUserOwner;
 Var
@@ -847,7 +854,6 @@ Begin
         '+' : SwitchFocus; { + = cycle service focus }
 //        #13 : {$IFDEF UNIX}Snoop{$ENDIF};
         #27 : ShowESCMenu;
-        '+' : SwitchFocus; { + = cycle service focus }
       End;
 
     If ShutdownRequested Then Break;

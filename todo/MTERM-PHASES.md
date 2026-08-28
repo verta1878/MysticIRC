@@ -22,13 +22,14 @@ DOS-first design. MDL Console/Keyboard shell (Free Vision stripped).
 |-------|------|
 | MT-5 | Phonebook dialog | DONE |
 | MT-7 | SDL graphics backend (SDL2 Linux/Win32/macOS/BSD + SDL 1.2 OS/2) — deferred until fpc264irc complete |
-| MT-8 | Wire RIP engine into viewport |
-| MT-9 | DOS GO32V2 — FPC Graph unit (VESA/VGA) — deferred until fpc264irc complete |
-| MT-10 | DOS i8086 — BGI / INT 10h EGA 640x350 — deferred until fpc264irc complete |
+| MT-8a | FPC screen mode change (ptcgraph InitGraph 640x350) | PENDING |
+| MT-8 | Wire RIP engine into viewport — needs MT-8a first |
+| MT-9 | DOS i8086 real-mode — INT 10h/VBE, no DPMI, no extender (Tier 1) — deferred until fpc264irc |
+| MT-10 | DOS i8086 + DPMI extender — Tier 2 (should work with i8086, TBD) — deferred until fpc264irc |
 | MT-13 | Amiga font loading (SDL_ttf) — deferred until fpc264irc complete |
 | MT-14 | RIP v1.54 command completion | DONE |
 | MT-15 | ANSI baseline completion | DONE |
-| MT-16 | BGI stroked font parser (CHR files — 10 vector fonts) |
+| MT-16 | BGI stroked font parser (mripchr.pas — 10 vector fonts, all load) | DONE |
 | MT-17 | ICN icon file loader (EGA bitplane format) |
 | MT-18 | Flood fill accuracy (stack limits matching RIPterm) |
 | MT-19 | RIP auto-sense (ESC[! query/response, ESC[1!/ESC[2! toggle) |
@@ -155,3 +156,91 @@ Or consolidate engines first (MT-25).
 - Others in mystic/
 
 Target: one core RIP engine shared by mterm, ripviewer, and mystic.
+
+### mystic_makemenu Phases
+
+| Phase | What | Status |
+|-------|------|--------|
+| MRP-1 | mripui.pas — built-in MRP widgets (Box, Window, Frame, Dialog, ButtonUp, ButtonDown) | DONE |
+| MRP-2 | mripchr.pas — CHR stroked font parser (10 Borland fonts) | DONE |
+| MRP-3 | mrpdata.pas — load/save .mnu (binary) and .mrp (plain text) | DONE |
+| MRP-4 | makemenu — create sample .mnu + .mrp menu files | DONE |
+| MRP-5 | maketext — generate 516 prompt .mrp stubs from default.txt | DONE |
+| MRP-6 | Wire mripchr + mripui into makemenu graphics mode | PENDING |
+| MRP-7 | .mnu save auto-generates .mrp via mripui | PENDING |
+| MRP-8 | MRP widgets embedded in .mrp (no separate .wiz files) | PENDING |
+| MRP-9 | Load/save .mrp plain text files | PENDING |
+| MRP-10 | Graphics mode — 640x350 ptcgraph, visual editor | PENDING (needs MT-7) |
+| MRP-11 | Text mode — 80x25 MDL console editor | PENDING |
+| MRP-12 | Load/save .mnu binary — RecMenuInfo + RecMenuItem | PENDING |
+
+### mystic_makemenu Remaining Phases
+
+| Phase | What | Status |
+|-------|------|--------|
+| MRP-13 | ENTER on prompt string opens inline editor | PENDING |
+| MRP-14 | Script path support (.mps files in theme ScriptPath) | PENDING |
+| MRP-15 | Text file path support (display files in theme TextPath) | PENDING |
+| MRP-16 | Theme create/copy/delete (interactive, from theme selector) | PENDING |
+| MRP-17 | Menu flags editor (Description, Access, Fallback, MenuType) | PENDING |
+| MRP-18 | Command picker (101 menu commands from MenuCmds array) | PENDING |
+| MRP-19 | HotKey selector (single key, FIRSTCMD, EVERY, AFTER) | PENDING |
+| MRP-20 | Compile .txt to .thm on F5 (maketheme logic) | PENDING |
+
+### mystic_test Graphics Mode
+
+| Phase | What | Status |
+|-------|------|--------|
+| MT-8a | FPC ptcgraph 640x350 + ShowBuffer paint hook (Buffer -> pixels via Font8x8) | IN PROGRESS |
+
+### New User / Email Test Phases
+
+| Phase | What | Status |
+|-------|------|--------|
+| NU-1 | New user account creation flow test (from login "Create account?") | PENDING |
+| NU-2 | Email send to sysop function test (broken — needs fix) | PENDING |
+| NU-3 | User validation flow (new user → sysop validates) | PENDING |
+
+### UTF-8 Support Phases
+
+| Phase | What | Status |
+|-------|------|--------|
+| UTF-1 | Study Mystic 1.12 UTF-8 implementation (ESC(B charset switch) | PENDING |
+| UTF-2 | Extract UTF-8 display code from 1.12 source (if available) | PENDING |
+| UTF-3 | Add UTF-8 mode to TOutput — detect ESC(B, switch charset | PENDING |
+| UTF-4 | Font8x8 UTF-8 mapping table (CP437 ↔ Unicode) | PENDING |
+| UTF-5 | m_output_graph.pas — render UTF-8 chars through mapped font | PENDING |
+
+### IBM VGA Font
+
+| Phase | What | Status |
+|-------|------|--------|
+| FONT-1 | IBM VGA 8x8 font (256 CP437 chars, public domain) | DONE |
+| FONT-2 | Copied to all 15 locations (mdl, mystic, mystic_test, mterm, ripview, v1-v4) | DONE |
+| FONT-3 | Pascal comment fixes (apostrophe 0x27, curly braces 0x7B/0x7D) | DONE |
+
+### Email/Account Phases
+
+| Phase | What | Status |
+|-------|------|--------|
+| ACCT-1 | Create SysOp account (users.dat s255, time) | PENDING |
+| ACCT-2 | Test new user creation via login flow | PENDING |
+| ACCT-3 | Test email send to SysOp (known broken) | PENDING |
+| ACCT-4 | Fix email send to SysOp | PENDING |
+
+### UTF-8 Support
+
+| Phase | What | Status |
+|-------|------|--------|
+| UTF8-1 | Study Mystic 1.12 UTF-8 implementation | PENDING |
+| UTF8-2 | ESC(U (CP437) / ESC(B (UTF-8) switching in m_output | PENDING |
+| UTF8-3 | UTF-8 font rendering in m_output_graph (ShowBuffer) | PENDING |
+| UTF8-4 | UTF-8 terminal detection and auto-switch | PENDING |
+
+### Font
+
+| Phase | What | Status |
+|-------|------|--------|
+| FONT-1 | IBM VGA 8x8 font in rip_font8x8.inc (public domain, romfont) | DONE |
+| FONT-2 | IBM VGA 8x14 font for EGA text mode | PENDING |
+| FONT-3 | IBM VGA 8x16 font for VGA text mode | PENDING |

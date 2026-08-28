@@ -14,6 +14,7 @@ Uses
   SysUtils,
   m_Strings,
   m_DateTime,
+  mtconn,
   mtphone,
   {$IFDEF WINDOWS}
     m_Input_Windows,
@@ -41,6 +42,11 @@ Const
   TERM_COLS = 80;
   TERM_ROWS = 22;    { VIEW_Y2 - VIEW_Y1 + 1 }
   SCROLLBACK = 500;
+
+  { SGR color index → DOS/EGA attribute color index }
+  { SGR: 0=blk 1=red 2=grn 3=yel 4=blu 5=mag 6=cyn 7=wht }
+  { EGA: 0=blk 1=blu 2=grn 3=cyn 4=red 5=mag 6=brn 7=wht }
+  SGR_TO_EGA : Array[0..7] of Byte = (0, 4, 2, 6, 1, 5, 3, 7);
 
 Type
   TTermCell = Record
@@ -94,6 +100,14 @@ Var
   BytesIn    : LongInt;
   BytesOut   : LongInt;
 
+  { Connection object }
+  Conn       : TConnection;
+
+  { Receive buffer }
+  RecvBuf    : Array[0..4095] of Byte;
+  RecvN      : Integer;
+  RecvI      : Integer;
+
 { ====================================================================
   Drawing
   ==================================================================== }
@@ -145,6 +159,38 @@ Procedure DrawHelpBar;
 Begin
   Console.WriteXY(1, HELP_Y, $30,
     StrPadR(' ^B=Conn ^D=Disc ^P=Phone ^R=RIP ALT+A=ANSI ALT+C=Cap ALT+O=Cfg', TERM_W, ' '));
+End;
+
+Procedure DumpScreen;
+{ Dump full 80x25 screen to mterm_screen.bin: 2 bytes/cell (ch, attr) }
+{ Row 1 = menu bar, rows 2-23 = terminal, row 24 = status, row 25 = help }
+Var
+  F: File;
+  Y, X, BufLine: Integer;
+  B: Byte;
+Begin
+  Assign(F, 'mterm_screen.bin');
+  {$I-} ReWrite(F, 1); {$I+}
+  If IOResult <> 0 Then Exit;
+  For Y := 1 to 25 Do Begin
+    For X := 1 to 80 Do Begin
+      If (Y >= VIEW_Y1) And (Y <= VIEW_Y2) Then Begin
+        { Terminal area — read from internal Buffer }
+        BufLine := (BufTop + (Y - VIEW_Y1)) mod SCROLLBACK;
+        B := Ord(Buffer[BufLine, X - 1].Ch);
+        BlockWrite(F, B, 1);
+        B := Buffer[BufLine, X - 1].Attr;
+        BlockWrite(F, B, 1);
+      End Else Begin
+        { Menu/status bars — read from Console screen buffer }
+        B := Ord(Console.Buffer[Y][X].UnicodeChar);
+        BlockWrite(F, B, 1);
+        B := Console.Buffer[Y][X].Attributes;
+        BlockWrite(F, B, 1);
+      End;
+    End;
+  End;
+  Close(F);
 End;
 
 Procedure DrawTerminal;
@@ -324,8 +370,8 @@ Begin
           7: CurAttr := ((CurAttr and $0F) shl 4) or ((CurAttr and $F0) shr 4);
           22: CurAttr := CurAttr and $F7; { Normal intensity }
           25: CurAttr := CurAttr and $7F; { Blink off }
-          30..37: CurAttr := (CurAttr and $F8) or (N - 30);
-          40..47: CurAttr := (CurAttr and $8F) or ((N - 40) shl 4);
+          30..37: CurAttr := (CurAttr and $F8) or (SGR_TO_EGA[N - 30]);
+          40..47: CurAttr := (CurAttr and $8F) or (SGR_TO_EGA[N - 40] shl 4);
         End;
       End;
     End;
@@ -591,16 +637,19 @@ Begin
     End;
     If InputDialog('Connect', 'Port:', Port) Then Begin
       AddLine('Connecting to ' + Host + ':' + Port + '...');
-      { TODO: wire to mtconn TConnection }
-      ConnHost  := Host;
-      ConnPort  := StrToIntDef(Port, 23);
-      ConnType  := 'TCP';
-      ConnBaud  := 0;
-      ConnStart := TimerSeconds;
-      BytesIn   := 0;
-      BytesOut  := 0;
-      Connected := True;
-      AddLine('Connected to ' + Host + ':' + Port);
+      If Conn.ConnectTelnet(Host, StrToIntDef(Port, 23)) Then Begin
+        ConnHost  := Host;
+        ConnPort  := StrToIntDef(Port, 23);
+        ConnType  := 'TCP';
+        ConnBaud  := 0;
+        ConnStart := TimerSeconds;
+        BytesIn   := 0;
+        BytesOut  := 0;
+        Connected := True;
+        AddLine('Connected to ' + Host + ':' + Port);
+      End Else Begin
+        AddLine('Connection failed.');
+      End;
       DrawStatusBar;
     End;
   End;
@@ -654,9 +703,14 @@ Begin
     BytesIn   := 0;
     BytesOut  := 0;
     RIPMode   := PB.Entries[Idx].TermType = 1;
-    { TODO: actual TCP/serial connect }
-    Connected := True;
-    AddLine('Connected to ' + ConnHost + ':' + strI2S(ConnPort));
+    If ConnType = 'TCP' Then Begin
+      If Conn.ConnectTelnet(ConnHost, ConnPort) Then Begin
+        Connected := True;
+        AddLine('Connected to ' + ConnHost + ':' + strI2S(ConnPort));
+      End Else
+        AddLine('Connection failed.');
+    End Else
+      AddLine('Serial requires DOS.');
     DrawStatusBar;
   End;
 End;
@@ -818,6 +872,7 @@ Begin
         #60: ConnectDialog;      { F2 }
         #61: Begin               { F3 = Disconnect }
           If Connected Then Begin
+            Conn.Disconnect;
             Connected := False;
             AddLine('Disconnected.');
             DrawStatusBar;
@@ -843,10 +898,12 @@ Begin
         #30: ViewANSIDialog;     { ALT+A = View ANSI }
         #31: SendFileDialog;     { ALT+S = Send file }
         #19: RecvFileDialog;     { ALT+R = Recv file }
+        #32: DumpScreen;         { ALT+D = Dump screen }
       End;
     End;
     #2:  ConnectDialog;          { CTRL+B }
     #4:  Begin                   { CTRL+D = Disconnect }
+      If Connected Then Conn.Disconnect;
       Connected := False;
       AddLine('Disconnected.');
       DrawStatusBar;
@@ -861,7 +918,8 @@ Begin
   Else
     { Regular character — send to connection if connected }
     If Connected Then Begin
-      { TODO: send byte via connection }
+      Conn.SendByte(Byte(Ch));
+      Inc(BytesOut);
     End;
   End;
 End;
@@ -903,6 +961,7 @@ Begin
   {$ENDIF}
 
   Connected  := False;
+  Conn       := TConnection.Create;
   RIPMode    := False;
   Capturing  := False;
   Done       := False;
@@ -929,12 +988,29 @@ Begin
 
   Repeat
     Console.BufFlush;
+    { Poll connection for incoming data }
+    If Connected And Conn.DataAvailable Then Begin
+      RecvN := Conn.Receive(RecvBuf, SizeOf(RecvBuf));
+      If RecvN > 0 Then Begin
+        For RecvI := 0 to RecvN - 1 Do
+          TermProcessByte(RecvBuf[RecvI]);
+        Inc(BytesIn, RecvN);
+        DrawTerminal;
+      End Else If RecvN < 0 Then Begin
+        Conn.Disconnect;
+        Connected := False;
+        AddLine('Connection closed by remote.');
+        DrawStatusBar;
+      End;
+    End;
     If ActivePage = 0 Then
       ProcessKey
     Else
       ProcessSettingsKey;
   Until Done;
 
+  If Connected Then Conn.Disconnect;
+  Conn.Free;
   Console.TextAttr := 7;
   Console.ClearScreen;
   Console.BufFlush;

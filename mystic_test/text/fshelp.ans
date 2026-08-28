@@ -1,0 +1,23 @@
+[40m[2J[0;1;34mÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³[44m ° [37mFull Screen Editor Help                                                   [0;34m³
+[1mÀ[0;34mÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+[28C[1;32mMESSAGE EDITING COMMANDS
+
+[7C[30m[[36m^B[30m]  [0mReformat Paragraph[12C[1;30m[[36m^O[30m]  [0mShow this help file
+[7C[1;30m[[36m^I[30m]  [0mInsert tab space[14C[1;30m[[36m^Q[30m]  [0mEnter quote mode
+[7C[1;30m[[36m^K[30m]  [0mCut current line of text[6C[1;30m[[36m^V[30m]  [0mToggle insert/overwrite
+[7C[1;30m[[36m^U[30m]  [0mPaste previously cut text[5C[1;30m[[36m^Y[30m]  [0mDelete current line
+
+[24C[1;30m[[36m^T[30m]  [0mToggle ANSI Drawing Mode
+
+[28C[1;32mBASIC MOVEMENT COMMANDS
+
+[18C[0mUP[1;30m/[36m^E[7C[0mLEFT[1;30m/[36m^S[6C[0mPGUP[1;30m/[36m^R[6C[0mHOME[1;30m/[36m^F
+[16C[0mDOWN[1;30m/[36m^X[6C[0mRIGHT[1;30m/[36m^D[6C[0mPGDN[1;30m/[36m^C[7C[0mEND[1;30m/[36m^G
+
+
+[9C[32mEnter [36m/ [32mon a new line or press [37mCTRL-Z [32mfor additional commands
+
+[34mÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+|PA

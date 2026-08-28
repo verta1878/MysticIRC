@@ -37,7 +37,7 @@ Program TestPhase3;
 }
 
 Uses
-  SysUtils, DOS,
+  SysUtils,
   {$IFDEF EXPERIMENTAL_RIP}
   m_rip_graph,
   {$ELSE}
@@ -56,7 +56,7 @@ Const
   {$ENDIF}
 
 Var
-  SR       : SearchRec;
+  SR       : TSearchRec;
   F        : Text;
   Line     : String;
   InFile   : String;

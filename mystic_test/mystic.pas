@@ -28,6 +28,9 @@ Program Mystic;
 {$ENDIF}
 
 Uses
+  {$IFDEF UNIX}
+  cthreads,
+  {$ENDIF}
   {$IFDEF DEBUG}
     HeapTrc,
     LineInfo,
@@ -56,6 +59,10 @@ Uses
   BBS_NodeInfo,
   {$IFDEF TESTEDITOR}
     BBS_Edit_Ansi,
+  {$ENDIF}
+  {$IFDEF USEGRAPH}
+  ptcgraph,
+  ptccrt,
   {$ENDIF}
   BBS_Cfg_Main;
 
@@ -101,6 +108,9 @@ Var
 
 Procedure ExitHandle;
 Begin
+  {$IFDEF USEGRAPH}
+  CloseGraph;
+  {$ENDIF}
   Set_Node_Action('');
 
   Session.UpdateHistory;
@@ -528,7 +538,15 @@ Var
   ActiveNodes: Word;
   NodeCheck  : Word;
   TempChat   : ChatRec;
+  {$IFDEF USEGRAPH}
+  gd, gm     : SmallInt;
+  {$ENDIF}
 Begin
+  {$IFDEF USEGRAPH}
+  gd := VGA;
+  gm := VGAMed;  { 640x350 }
+  InitGraph(gd, gm, '');
+  {$ENDIF}
   {$IFDEF DEBUG}
     SetHeapTraceOutput('mystic.mem');
   {$ENDIF}
