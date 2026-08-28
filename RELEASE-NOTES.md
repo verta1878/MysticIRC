@@ -306,3 +306,212 @@ adds docs, includes install_data.mys only in FULL, and writes into
 Fork maintained by Antonio Rico (Reapern66). Base Mystic BBS (c) 1997–2013 by
 James Coyle. emx / emxbind (c) 1990–1998 Eberhard Mattes. FidoNet node 152/158,
 Ecstasy BBS (tnabbs.org).
+
+---
+
+
+## Session 6 — July 24-25, 2026
+
+### ripviewer v1.0.0 — Full RIPtermJS Command Parity
+
+**42/42 RIPscrip commands implemented** — all ported from RIPtermJS BGI.js.
+
+#### Bugs Fixed
+- **rcResetWindows (`!|#`) erased canvas** — was wiping pixel buffer right
+  before BMP output. Fixed to reset viewport/cursor only (matching JS).
+- **8×8 font instead of 8×16** — ans2rip outputs VGA 8×16 coordinates.
+  Added vgafont.inc (8×16 CP437 ROM) and switched to MSB-first bit order.
+- **EGA palette order vs CGA/ANSI order** — palette had indices 1=blue/4=red
+  (EGA order) but ans2rip outputs SGR indices 1=red/4=blue (CGA order).
+  Reordered palette constant to match ans2rip output.
+- **Duplicate rcGotoXY handler** — removed.
+- **'o' mapped to rcMove instead of rcFilledOval** — fixed parser.
+- **rcMove orphan in enum** — removed ('m' = rcGotoXY is the move command).
+- **Canvas height 350 too small** — increased to 1280 for multi-page ANSI
+  (80 rows × 16px = 1280px).
+
+#### Pixel-Perfect Verification
+- **100.0% pixel match** (819,200 pixels, 0 mismatches) between ans2png
+  reference and ripviewer output on sd-fluph test ANSI.
+
+#### Drawing Primitives Added (ported from BGI.js)
+- `DrawEllipse` — Bresenham ellipse outline
+- `FillEllipse` — Bresenham filled ellipse with scanline
+- `DrawArcLines` — trig-based arc with angle clipping (degree-by-degree)
+- `DrawSector` — pie slice: arc + wedge lines + floodfill interior
+- `FloodFill` — scanline stack-based flood fill
+- `DrawBezier` — cubic Bezier curve (Bernstein polynomial)
+- `FillPolyScanline` — scanline polygon fill (alienryderflex algorithm)
+- `DrawRect` — rectangle outline via DrawLine
+
+#### Command Handlers Added (26 new, 16 existing = 42 total)
+Drawing: Oval, FilledOval, Arc, OvalArc, PieSlice, OvalPieSlice,
+  Bezier, Polygon, FilledPolygon, PolyLine, Fill (FloodFill)
+Style: FillPattern, LineStyle, WriteMode
+Window: EraseView, EraseEOL, TextWindow, Viewport
+Image: GetImage, PutImage, LoadIcon (stubs — skip args correctly)
+Mouse: Mouse, KillMouseFields, Button, ButtonStyle (stubs)
+Palette: SetPalette (all 16 entries)
+
+#### Multi-char Command Parser
+Expanded '1' prefix handler for: 1K, 1C, 1P, 1I, 1M, 1U, 1B commands.
+
+#### Files Changed
+- `mystic_rip/ripviewer/source/ripview.pas` — 599→1107 lines
+- `mystic_rip/ripviewer/source/rip_font8x16.inc` — NEW (VGA 8×16 CP437 font)
+
+#### Build Status
+- ripviewer: 1107 lines, compiles clean (0 errors, 0 warnings)
+- ans2rip: compiles clean
+- All BBS binaries: compile clean
+
+### ripviewer CLI Features
+
+**File picker** — pass a directory to get an interactive numbered list:
+  `ripview /path/to/rips/` → pick by number
+  `ripview -l /path/to/rips/` → list only, no render
+
+**Baud rate emulation** — `-b RATE` throttles rendering at simulated bps.
+  Uses RIPtermJS formula: bytes/sec = baud/10 (8N1).
+  Sleep per byte = 10000000/baud microseconds.
+  Example: `-b 2400` renders 44KB file in ~183 seconds (real modem time).
+  Supported: 300 1200 2400 4800 9600 14400 19200 28800 38400 57600 115200.
+
+**Debug mode** — `-d` prints each command as it executes:
+  `[42] !|B0D0FN0O0FZ` (line number + raw command)
+  `  !|B0D0FN0O0FZ` (parsed command echo)
+  Shows timing stats at end: lines, commands, milliseconds.
+
+**Combo** — all flags work together: `ripview -d -b 9600 scene.rip out.bmp`
+
+**Files:** ripview.pas 1330 lines, compiles clean, 100% pixel match preserved.
+
+### ripviewer Free Vision GUI
+
+**Compile:** `fpc -Mdelphi -dFREEVISION -Fu<fv-path> ripview.pas -oripviewgui`
+
+Single source file, two targets:
+- `ripview` — CLI mode (default, no defines needed)
+- `ripviewgui` — Free Vision TUI (`-dFREEVISION`)
+
+**GUI features (Free Vision TUI):**
+- Menu bar: File (Open/Render/Stop/Quit), Baud, Debug
+- File > Open: FV TFileDialog with *.rip filter
+- Baud menu: Full Speed, 300-115200 bps
+- Debug > Toggle: enable/disable command logging
+- Debug > Clear: clear log
+- Status line: file name, baud rate, debug state, command count
+- F3=Open, F5=Debug, F9=Render, Alt-X=Quit
+
+**1602 lines, both modes compile clean, 100% pixel match.**
+
+### Modular Split
+
+ripview.pas split into 7 units (1656 total lines):
+
+**Shared (all versions):**
+- `ripengine.pas` (87 lines) — canvas, palette, PutPixel, globals
+- `ripdraw.pas` (286 lines) — line, rect, circle, ellipse, arc, bezier, floodfill, polygon
+- `riptext.pas` (91 lines) — VGA 8x16 font, DrawBitmapChar, OutTextXY
+- `ripbmp.pas` (70 lines) — BMP file output
+
+**v1.54-specific (in v1/ subdirectory):**
+- `v1/rip1parse.pas` (137 lines) — mega decoder, TRIPCommand enum, parser
+- `v1/rip1exec.pas` (426 lines) — 42-command Case dispatcher
+
+**Main program:**
+- `ripview.pas` (559 lines) — CLI + FV GUI, file picker, baud, debug
+
+Build: `fpc -Mdelphi -Fuv1 ripview.pas`
+
+v2/v3/v4 can add their own `v2/rip2parse.pas`, `v2/rip2exec.pas` etc.
+while sharing the engine, drawing, text, and BMP units.
+
+---
+
+## Session 7 — August 19-28, 2026
+
+### mterm Terminal Emulator (MT-1 through MT-5 DONE)
+- Stripped Free Vision, migrated to MDL Console/Keyboard
+- Menu hotkeys, status bar, virtual pages
+- ANSI terminal engine: 80x22 cell buffer, CSI parser, SGR, scroll regions,
+  device status reports, RIP auto-sense, line wrap mode
+- Phonebook dialog: scrollable list, Add/Delete/Edit, saved to mterm.phn
+
+### RIP v1.54 Engine — MT-14 DONE (all 53 commands)
+- Fixed 5 bugs: =/W swap, l=polyline, 1G=CopyRegion, 1D=Define, CmdLineStyle
+- Implemented 10 commands: E, V, i, g, m, >, W, =, a, Q
+- EGA64-to-RGB palette conversion, live modifiable FPalette
+- Text variable system, ProcessFile for recursive scene load
+- File Query with FILEERR variable, ICN writer (EGA bitplane encoding)
+- SDL_mixer audio (mtsound.pas): WAV/MID/MOD/MP3/OGG
+- All 53 v1.54 commands dispatched, zero stubs
+- 125/225 corpus test files pass x 3 runs
+
+### ANSI Engine — MT-15 DONE
+- 11 CSI + 5 ESC sequences added
+- Scroll region, line wrap, RIP auto-sense, device status responses
+
+### MT-16 — BGI CHR Stroked Font Parser
+- m_rip_chrfont.pas (340 lines) — standalone MDL unit
+- Built from Easy Fonts v2.0 docs by Pino Navato (registered to verta1878)
+- CHR format fully decoded: PK header, offset table, width table, stroke data
+- All 10 Borland CHR fonts load (BOLD, EURO, GOTH, LCOM, LITT, SANS, SCRI,
+  SIMP, TRIP, TSCR — 2169 to 7785 strokes each)
+
+### RIP API v1-v4 — All Updated
+- WriteIcon implemented across all 4 engines (was no-op)
+- ClipValid, SanitizePath, WriteClipboardICN helpers added
+- Versions: 1.0.1-irc, 2.0.1-irc, 3.0.1-irc, 3.1.0-irc
+- v1-v3 retired to attic/ with RETIRED headers
+
+### Architecture Decisions (with hexadecimal)
+- ONE server engine (m_rip.pas from v4) with plugin codec registration
+- mtrip.pas stays as lightweight client parser (946 lines)
+- Server vs client = different architectures, not size trade-off
+- Handler registration same mechanism as codecs (prnapi.pas pattern)
+- DOS i8086 real-mode confirmed, row-pointers from day one
+- SavedScreens 2.24MB issue identified, capped for DOS
+- Provenance markers required during engine merge
+- Four engine versions = four platform tiers (i8086 through 1995 multimedia PC)
+
+### PCBDraw — ansiedit PCBoard Support
+- m_door.pas in mdl/ (drop file reader, 309 lines, 29/29 tests pass)
+- m_pdpcboard.pas updated with LoadAtX/SaveAtX (@X format)
+- 9 PCBD phases documented
+- RIPKit 1.20 analyzed (313 RIP screens, 30 PPL scripts, 8 menus)
+- .mrp menu extension documented (8.3 compatible)
+
+### Bug Fixes
+- RecConfig one-byte drift: Reserved 552->553 (SizeOf=5282 PASS)
+- build-linux.sh libpthread/libdl probe adapted for glibc 2.34+
+
+### Repo Cleanup
+- Consolidated all RIP assets to examples/ripart/ (226 art, 222 icons, 18 fonts)
+- Removed all duplicate MDL units from mterm/ansiedit
+- Moved standalone programs from mdl/m_rip/ to mystic_ripview/tools/
+- Moved 345 RIP docs to attic/
+- Created mystic_mterm/ and mystic_molms/ as top-level directories
+- cleanup.bat: 8-section repo cleanup script (65 files cleaned, 0 errors)
+
+### New Phase Docs
+- todo/RIPKIT-PCB-HOWTO.md — RIPKit 1.20 analysis, PPL-to-MPS porting plan
+- todo/RIP-PLATFORM-TIERS.md — v1-v4 as platform tiers
+- todo/OPENOLMS-MOLMS-MIGRATION.md — 10 phases
+- todo/ANSIEDIT-MDL-MIGRATION.md — 9 phases
+
+### Team (10 members)
+
+| Handle | Role |
+|--------|------|
+| verta1878 | Project lead |
+| sysop/0 | Compiler engineer, FPC, Tang Console, USB |
+| bob | Compiler engineer, OpenWatcom, Glide, 3dfx drivers |
+| evga | Display, Mystic, SIO rebuild |
+| kiddo | Protocols, RIPscrip |
+| wrench | Transport, FOSSIL, DVI/HDMI |
+| hexadecimal | PCBoard, Cyclades |
+| byte | Program discovery |
+| DotMatrix | Documentation sourcing |
+
+Motto: the crew 4free
