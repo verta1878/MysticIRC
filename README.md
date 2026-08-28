@@ -2,7 +2,7 @@
 
 > **GitHub:** https://github.com/verta1878/mysticbbsirc
 >
-> **Release: 2026-08-20** — Version 1.11IRC A4.
+> **Release: 2026-08-27** — Version 1.11IRC A4.
 > RIPscrip v1.54 support (42/42 commands, pixel-perfect).
 > Built with **FPC 2.6.4irc r3.1+**. GPLv3.
 

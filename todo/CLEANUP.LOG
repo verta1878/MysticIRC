@@ -1,0 +1,87 @@
+mysticbbsirc cleanup 
+Date: Thu 08/27/2026 21:59:30.19 
+ 
+[1/8] Build artifacts... 
+OK: Deleted C:\Users\owner\Desktop\mysticbbsirc\mystic_test\mdl\m_strings.s 
+OK: Deleted C:\Users\owner\Desktop\mysticbbsirc\mystic_test\mdl\m_types.s 
+OK: Build artifacts cleaned 
+[2/8] Compiled binaries... 
+OK: Deleted mdl\mdltest0 
+OK: Deleted mdl\mdltest10 
+OK: Deleted mystic_mterm\mterm 
+OK: Deleted mystic_ansiedit\ansiedit 
+[3/8] Python cruft... 
+OK: Deleted mdl\m_rip\ans2img.py 
+[4/8] Duplicate MDL files... 
+OK: Deleted mystic_ansiedit\m_pdpcboard.pas (use mdl\ version
+[5/8] Duplicate RIP assets... 
+OK: Deleted mystic_mterm\fonts\BOLD.CHR (dupe of examples\ripart\fonts\
+OK: Deleted mystic_mterm\fonts\EURO.CHR (dupe of examples\ripart\fonts\
+OK: Deleted mystic_mterm\fonts\GOTH.CHR (dupe of examples\ripart\fonts\
+OK: Deleted mystic_mterm\fonts\LCOM.CHR (dupe of examples\ripart\fonts\
+OK: Deleted mystic_mterm\fonts\LITT.CHR (dupe of examples\ripart\fonts\
+OK: Deleted mystic_mterm\fonts\SANS.CHR (dupe of examples\ripart\fonts\
+OK: Deleted mystic_mterm\fonts\SCRI.CHR (dupe of examples\ripart\fonts\
+OK: Deleted mystic_mterm\fonts\SIMP.CHR (dupe of examples\ripart\fonts\
+OK: Deleted mystic_mterm\fonts\TRIP.CHR (dupe of examples\ripart\fonts\
+OK: Deleted mystic_mterm\fonts\TSCR.CHR (dupe of examples\ripart\fonts\
+OK: Deleted mystic_ripview\icons\ 
+OK: Deleted mystic_ripview\fonts\ 
+OK: Deleted mystic_ripview\rips\ 
+[6/8] Stale mdl\m_rip files... 
+OK: Deleted mdl\m_rip\HOWTO-RIPSCRIPT.md (in attic\rip-docs-mdl\
+OK: Deleted mdl\m_rip\RIPSCRIPT-REFERENCE.md (in attic\rip-docs-mdl\
+OK: Deleted mdl\m_rip\TOOLS.md (in attic\rip-docs-mdl\
+OK: Deleted mdl\m_rip\ripscrip-irc-whitepaper.htm (in attic\rip-docs-mdl\
+OK: Deleted mdl\m_rip\build-rip.sh (in attic\rip-docs-mdl\
+OK: Deleted mdl\m_rip\ans2png.pas (in mystic_ripview\tools\
+OK: Deleted mdl\m_rip\ans2rip.pas (in mystic_ripview\tools\
+OK: Deleted mdl\m_rip\chg2rip.pas (in mystic_ripview\tools\
+OK: Deleted mdl\m_rip\mkicons.pas (in mystic_ripview\tools\
+OK: Deleted mdl\m_rip\rip_sample.pas (in mystic_ripview\tools\
+OK: Deleted mdl\m_rip\rip_view.pas (in mystic_ripview\tools\
+OK: Deleted mdl\m_rip\ripmake.pas (in mystic_ripview\tools\
+OK: Deleted mdl\m_rip\test_ans2rip.pas (in mystic_ripview\tools\
+OK: Deleted mdl\m_rip\test_phase3.pas (in mystic_ripview\tools\
+OK: Deleted mdl\m_rip\test_rip_files.pas (in mystic_ripview\tools\
+OK: Deleted mdl\m_rip\font8x8.inc (in mystic_ripview\tools\
+OK: Deleted mdl\m_rip\vgafont.inc (in mystic_ripview\tools\
+OK: Deleted mdl\m_rip\ans2png (compiled binary
+OK: Deleted mdl\m_rip\test_phase3 (compiled binary
+OK: Deleted mdl\m_rip\ripdoc\ (in attic\rip-docs-mdl\ripdoc\
+[7/8] Stale mystic_test files... 
+OK: Deleted mystic_test\mdl\m_rip\ans2png.pas 
+OK: Deleted mystic_test\mdl\m_rip\ans2rip.pas 
+OK: Deleted mystic_test\mdl\m_rip\chg2rip.pas 
+OK: Deleted mystic_test\mdl\m_rip\mkicons.pas 
+OK: Deleted mystic_test\mdl\m_rip\rip_sample.pas 
+OK: Deleted mystic_test\mdl\m_rip\rip_view.pas 
+OK: Deleted mystic_test\mdl\m_rip\ripmake.pas 
+OK: Deleted mystic_test\mdl\m_rip\test_ans2rip.pas 
+OK: Deleted mystic_test\mdl\m_rip\test_phase3.pas 
+OK: Deleted mystic_test\mdl\m_rip\test_rip_files.pas 
+OK: Deleted mystic_test\mdl\m_rip\font8x8.inc 
+OK: Deleted mystic_test\mdl\m_rip\vgafont.inc 
+OK: Deleted mystic_test\mdl\m_rip\build-rip.sh 
+[8/8] Verification... 
+ 
+=== SHOULD NOT EXIST === 
+GONE: mystic_ansiedit\m_pdpcboard.pas 
+GONE: mdl\mdltest0 
+GONE: mdl\mdltest10 
+GONE: mdl\m_rip\ans2img.py 
+GONE: mdl\m_rip\ripdoc 
+GONE: mystic_mterm\rips 
+GONE: mystic_mterm\icons 
+GONE: mystic_mterm\rip-icons 
+GONE: mystic_mterm\rip-fonts 
+ 
+=== BUILD CHECK === 
+Run after cleanup: 
+  cd mystic_mterm & fpc -Mdelphi -Fu..\mdl -Fi..\mdl mterm.pas 
+  cd mystic_ansiedit & fpc -Mdelphi -Fu..\mdl -Fi..\mdl ansiedit.pas 
+  cd mystic_test\mdl & fpc -Mdelphi -Fu..\..\mdl mdltest12.pas 
+ 
+=== SUMMARY === 
+Cleaned: 65 file(s) 
+Errors: 0 
