@@ -43,8 +43,6 @@ Unit rip4api;
 
 Interface
 
-Uses SysUtils, Math;
-
 {$H-}  // Use ShortStrings — AnsiStrings cause stack overflow in FPC 2.6.4
 
 Const
@@ -472,7 +470,6 @@ Type
     FillColor      : TRIPColor;
     FillStyle      : Byte;
     FillPat        : TRIPFillPattern;
-    FillPats       : Array[0..11, 0..7] of Byte;  // predefined fill patterns
     LineStyle      : Byte;
     LineThick      : Byte;
     LinePattern    : Word;       // user line pattern
@@ -1346,14 +1343,14 @@ Procedure TRIPEngine.DrawFillPixel (X, Y: SmallInt);
 Var PatRow: Byte;
 Begin
   If Not InView(X, Y) Then Exit;
-  If FillStyle = 0 Then Begin Pixels^[Y, X] := GetBkColor; Exit; End;
+  If FillStyle = 0 Then Begin Pixels^[Y, X] := BGColor; Exit; End;
   If FillStyle = 1 Then Begin Pixels^[Y, X] := FillColor; Exit; End;
   If FillStyle <= 11 Then Begin
     PatRow := FillPats[FillStyle, Y And 7];
     If (PatRow Shr (7 - (X And 7))) And 1 = 1 Then
       Pixels^[Y, X] := FillColor
     Else
-      Pixels^[Y, X] := GetBkColor;
+      Pixels^[Y, X] := BGColor;
   End;
 End;
 
@@ -1413,7 +1410,43 @@ Procedure TRIPEngine.DrawBar (X0, Y0, X1, Y1: SmallInt);
 Var
   X, Y     : SmallInt;
   PatByte  : Byte;
+  FillPats : Array[0..11, 0..7] of Byte;
 Begin
+  // Built-in fill patterns (BGI compatible)
+  // EMPTY
+  FillChar(FillPats[0], 8, $00);
+  // SOLID
+  FillChar(FillPats[1], 8, $FF);
+  // LINE (horizontal lines)
+  FillPats[2][0] := $FF; FillPats[2][1] := $00; FillPats[2][2] := $00; FillPats[2][3] := $00;
+  FillPats[2][4] := $FF; FillPats[2][5] := $00; FillPats[2][6] := $00; FillPats[2][7] := $00;
+  // LTSLASH
+  FillPats[3][0] := $01; FillPats[3][1] := $02; FillPats[3][2] := $04; FillPats[3][3] := $08;
+  FillPats[3][4] := $10; FillPats[3][5] := $20; FillPats[3][6] := $40; FillPats[3][7] := $80;
+  // SLASH
+  FillPats[4][0] := $03; FillPats[4][1] := $06; FillPats[4][2] := $0C; FillPats[4][3] := $18;
+  FillPats[4][4] := $30; FillPats[4][5] := $60; FillPats[4][6] := $C0; FillPats[4][7] := $81;
+  // BKSLASH
+  FillPats[5][0] := $C0; FillPats[5][1] := $60; FillPats[5][2] := $30; FillPats[5][3] := $18;
+  FillPats[5][4] := $0C; FillPats[5][5] := $06; FillPats[5][6] := $03; FillPats[5][7] := $81;
+  // LTBKSLASH
+  FillPats[6][0] := $80; FillPats[6][1] := $40; FillPats[6][2] := $20; FillPats[6][3] := $10;
+  FillPats[6][4] := $08; FillPats[6][5] := $04; FillPats[6][6] := $02; FillPats[6][7] := $01;
+  // HATCH
+  FillPats[7][0] := $FF; FillPats[7][1] := $01; FillPats[7][2] := $01; FillPats[7][3] := $01;
+  FillPats[7][4] := $FF; FillPats[7][5] := $01; FillPats[7][6] := $01; FillPats[7][7] := $01;
+  // XHATCH
+  FillPats[8][0] := $FF; FillPats[8][1] := $81; FillPats[8][2] := $42; FillPats[8][3] := $24;
+  FillPats[8][4] := $FF; FillPats[8][5] := $24; FillPats[8][6] := $42; FillPats[8][7] := $81;
+  // INTERLEAVE
+  FillPats[9][0] := $AA; FillPats[9][1] := $55; FillPats[9][2] := $AA; FillPats[9][3] := $55;
+  FillPats[9][4] := $AA; FillPats[9][5] := $55; FillPats[9][6] := $AA; FillPats[9][7] := $55;
+  // WIDEDOT
+  FillPats[10][0] := $00; FillPats[10][1] := $00; FillPats[10][2] := $00; FillPats[10][3] := $00;
+  FillPats[10][4] := $01; FillPats[10][5] := $00; FillPats[10][6] := $00; FillPats[10][7] := $00;
+  // CLOSEDOT
+  FillPats[11][0] := $44; FillPats[11][1] := $00; FillPats[11][2] := $11; FillPats[11][3] := $00;
+  FillPats[11][4] := $44; FillPats[11][5] := $00; FillPats[11][6] := $11; FillPats[11][7] := $00;
 
   For Y := ClipY(Y0) to ClipY(Y1) Do Begin
     // Select pattern row
@@ -1976,27 +2009,6 @@ Begin
   JPEGStrmActive := False;
   JPEGStrmPtr := Nil;
   FillStyle  := RIP_FILL_SOLID;
-
-  // Init predefined fill patterns
-  FillChar(FillPats, SizeOf(FillPats), 0);
-  FillChar(FillPats[1], 8, $FF);
-  FillPats[2][0] := $FF; FillPats[2][4] := $FF;
-  FillPats[3][0] := $01; FillPats[3][1] := $02; FillPats[3][2] := $04; FillPats[3][3] := $08;
-  FillPats[3][4] := $10; FillPats[3][5] := $20; FillPats[3][6] := $40; FillPats[3][7] := $80;
-  FillPats[4][0] := $03; FillPats[4][1] := $06; FillPats[4][2] := $0C; FillPats[4][3] := $18;
-  FillPats[4][4] := $30; FillPats[4][5] := $60; FillPats[4][6] := $C0; FillPats[4][7] := $81;
-  FillPats[5][0] := $C0; FillPats[5][1] := $60; FillPats[5][2] := $30; FillPats[5][3] := $18;
-  FillPats[5][4] := $0C; FillPats[5][5] := $06; FillPats[5][6] := $03; FillPats[5][7] := $81;
-  FillPats[6][0] := $80; FillPats[6][1] := $40; FillPats[6][2] := $20; FillPats[6][3] := $10;
-  FillPats[6][4] := $08; FillPats[6][5] := $04; FillPats[6][6] := $02; FillPats[6][7] := $01;
-  FillPats[7][0] := $FF; FillPats[7][1] := $01; FillPats[7][2] := $01; FillPats[7][3] := $01;
-  FillPats[7][4] := $FF; FillPats[7][5] := $01; FillPats[7][6] := $01; FillPats[7][7] := $01;
-  FillPats[8][0] := $FF; FillPats[8][1] := $81; FillPats[8][2] := $42; FillPats[8][3] := $24;
-  FillPats[8][4] := $FF; FillPats[8][5] := $24; FillPats[8][6] := $42; FillPats[8][7] := $81;
-  FillPats[9][0] := $AA; FillPats[9][1] := $55; FillPats[9][2] := $AA; FillPats[9][3] := $55;
-  FillPats[9][4] := $AA; FillPats[9][5] := $55; FillPats[9][6] := $AA; FillPats[9][7] := $55;
-  FillPats[10][4] := $01;
-  FillPats[11][0] := $44; FillPats[11][2] := $11; FillPats[11][4] := $44; FillPats[11][6] := $11;
   LineStyle  := RIP_LINE_SOLID;
   LineThick  := 1;
   LinePattern := $FFFF;
@@ -2385,6 +2397,7 @@ Begin
 End;
 
 Procedure TRIPEngine.SetFillPattern (Var Pattern: TRIPFillPattern; Color: Byte);
+Begin
   Move(Pattern, FillPat, SizeOf(TRIPFillPattern));
   FillColor := Color;
   FillStyle := RIP_FILL_USER;
