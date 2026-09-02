@@ -107,3 +107,13 @@ No -Fumdl or -Fumystic needed. The unit is fully standalone.
 ## License
 
 GNU General Public License v3. Part of the Mystic BBS IRC Fork.
+
+## Shared Units (in parent mdl/m_rip/)
+
+These units are shared across all versions and programs (ripview, mystic, mterm):
+
+| Unit | What |
+|------|------|
+| rip_canvas.pas | Canvas abstraction |
+| rip_surface.pas | Software raster backend with RGB adapter callbacks |
+| rip_term.pas | Terminal integration (TTermRip class) |

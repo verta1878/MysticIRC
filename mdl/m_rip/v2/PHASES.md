@@ -89,3 +89,32 @@ Total: 227 done, 0 todo. ALL PHASES COMPLETE.
 - [x] MP3 decoder — mp3dec.pas in wav/ (mp3dec.pas — from v3 codecs)
 - [x] WAV streaming implementation (WAVStreamInit/Feed/Stop/IsPlaying — state tracking)
 - [x] Audio codec wiring — pcmdecraw/pcmmix/wavplay in wav/ (pcmdecraw/pcmmix/wavplay integration)
+
+## Session 9: TextWindow Port + Shared Engine Restructure (2026-09-01)
+
+- [x] TextWindow + ANSI processing folded into ripscr.pas from reconstructed source
+  - TTextWinState: rect, cursor, colors, font, wrap mode
+  - ANSI CSI escape processing (SGR colors with SGR→EGA, cursor movement, erase)
+  - Pixel-level scroll up/down
+  - Backend-agnostic via callback function pointers
+- [x] Command parsing/execution verified against binary, integrated into ripscr.pas
+  - Both ripview and mterm compile from same source
+  - Procedural stack callbacks wired in initialization section
+- [x] OOP stack (`rip_surface.pas`) — TextWindow + ICN wired
+  - RGB adapter callbacks (OOPGetPixel/SetPixel/FillRect/DrawChar)
+  - LoadIcon implemented (was stub) — ICN format: header + pixel bytes
+  - ResetWindows calls ResetTextWin
+- [x] MIS compiles (1543 lines) — ATTR constants, ShowESCMenu uncommented
+- [x] mterm TCP connect — ConnectTelnet via mtconn, byte-order fix, SGR→EGA colors
+- [x] DumpScreen (ALT+D) — full 25-row buffer dump for offline rendering
+- [x] Tests: 225/225 RIP art files pass, Phase 3 pixel test 3/3 OK
+
+### Still TODO from port:
+- [ ] ICN flip/checksum utilities
+- [ ] Mouse region multi-table
+- [ ] Dispatch stats (TCmdRecord)
+- [ ] v1 test suite (ripscr.pas) — 11 pre-existing errors in ripscr.pas
+
+### Remaining from JVIEW port:
+- [ ] ripres.pas — .RES resource container reader (JVIEW font bundles)
+- [ ] ripplay.pas — Slideshow/playback manager for mterm

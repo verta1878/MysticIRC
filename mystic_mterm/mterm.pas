@@ -16,6 +16,7 @@ Uses
   m_DateTime,
   mtconn,
   mtphone,
+  RIPEngine, RIP1Parse, RIP1Exec,
   {$IFDEF WINDOWS}
     m_Input_Windows,
     m_Output_Windows
@@ -107,6 +108,11 @@ Var
   RecvBuf    : Array[0..4095] of Byte;
   RecvN      : Integer;
   RecvI      : Integer;
+
+  { RIP engine — uses global Canvas from RIPEngine unit }
+  RIPInited  : Boolean;        { true after InitCanvas called }
+  RIPLineBuf : String;         { accumulate bytes until CR/LF }
+  RIPActive  : Boolean;      { true when inside a RIP command sequence }
 
 { ====================================================================
   Drawing
@@ -478,10 +484,76 @@ Begin
   End;
 End;
 
+Procedure RIPBlitToTerminal;
+{ Copy RIP engine pixel buffer to mterm's terminal Buffer.
+  Maps 640x176 pixels (top 22 rows × 8px) to 80×22 character cells.
+  Each cell becomes a block char (219) colored by the dominant pixel. }
+Var
+  Row, Col: Integer;
+  PIdx: Byte;
+  BufLine: Integer;
+Begin
+  If Not RIPInited Then Exit;
+  For Row := 0 To TERM_ROWS - 1 Do Begin
+    BufLine := (BufTop + Row) Mod SCROLLBACK;
+    For Col := 0 To TERM_COLS - 1 Do Begin
+      { Canvas.Pixels is [X, Y] }
+      PIdx := Canvas.Pixels^[Col * 8, Row * 8];
+      If PIdx > 15 Then PIdx := 0;
+      Buffer[BufLine, Col].Ch := Chr(219);
+      Buffer[BufLine, Col].Attr := PIdx;
+    End;
+  End;
+End;
+
+Procedure ProcessRIPLine(Const Line: String);
+Begin
+  If Not RIPInited Then Exit;
+  If Length(Line) < 2 Then Exit;
+  { Feed full line to procedural executor }
+  ExecuteRIP(Line);
+  RIPBlitToTerminal;
+  DrawTerminal;
+End;
+
+Procedure TermProcessByte(B: Byte); Forward;
+
+Procedure FlushRIPBuf;
+{ Non-RIP line accumulated in RIPLineBuf — replay through ANSI }
+Var I: Integer; Saved: String;
+Begin
+  Saved := RIPLineBuf;
+  RIPLineBuf := '';
+  RIPActive := True;
+  For I := 1 To Length(Saved) Do
+    TermProcessByte(Ord(Saved[I]));
+  RIPActive := False;
+End;
+
 Procedure TermProcessByte(B: Byte);
 Var Ch: Char;
 Begin
   Ch := Chr(B);
+
+  { RIP line accumulation when RIPMode is on and not replaying }
+  If RIPMode And (Not RIPActive) And (AnsiState = 0) Then Begin
+    If (Ch = #13) Or (Ch = #10) Then Begin
+      If (Length(RIPLineBuf) >= 2) And (RIPLineBuf[1] = '!') And (RIPLineBuf[2] = '|') Then Begin
+        ProcessRIPLine(RIPLineBuf);
+        RIPLineBuf := '';
+        Exit;
+      End;
+      { Not a RIP line — flush buffer through ANSI, then process CR/LF }
+      If Length(RIPLineBuf) > 0 Then Begin
+        RIPActive := True;
+        FlushRIPBuf;
+      End;
+      { Fall through to process the CR/LF normally }
+    End Else Begin
+      RIPLineBuf := RIPLineBuf + Ch;
+      Exit; { Keep accumulating }
+    End;
+  End;
 
   Case AnsiState of
     0: Begin { Normal }
@@ -962,6 +1034,9 @@ Begin
 
   Connected  := False;
   Conn       := TConnection.Create;
+  InitCanvas; RIPInited := True;
+  RIPLineBuf := '';
+  RIPActive  := False;
   RIPMode    := False;
   Capturing  := False;
   Done       := False;
@@ -1011,6 +1086,7 @@ Begin
 
   If Connected Then Conn.Disconnect;
   Conn.Free;
+  { Canvas is global, freed at unit finalization }
   Console.TextAttr := 7;
   Console.ClearScreen;
   Console.BufFlush;

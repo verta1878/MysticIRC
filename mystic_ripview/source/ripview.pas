@@ -223,6 +223,7 @@ End;
 Var
   F       : TextFile;
   Line    : String;
+  S       : String;
   FName   : String;
   OutFile : String;
   LCount  : Integer;
@@ -319,6 +320,13 @@ Begin
   While Not EOF(F) Do Begin
     ReadLn(F, Line);
     Inc(LCount);
+    { Handle backslash line continuation per RIPscrip spec }
+    While (Length(Line) > 0) And (Line[Length(Line)] = '\') And (Not EOF(F)) Do Begin
+      Line := Copy(Line, 1, Length(Line) - 1);
+      ReadLn(F, S);
+      Line := Line + S;
+      Inc(LCount);
+    End;
     If Pos('!|', Line) > 0 Then Begin
       If DebugMode Then Begin
         Write('[', CCount + 1, '] ', Copy(Line, 1, 40));
@@ -501,6 +509,7 @@ Procedure TRIPApp.DoRender;
 Var
   F       : TextFile;
   Line    : String;
+  S       : String;
   LCount  : Integer;
   OutFile : String;
 Begin
@@ -531,6 +540,13 @@ Begin
   While Not EOF(F) Do Begin
     ReadLn(F, Line);
     Inc(LCount);
+    { Handle backslash line continuation per RIPscrip spec }
+    While (Length(Line) > 0) And (Line[Length(Line)] = '\') And (Not EOF(F)) Do Begin
+      Line := Copy(Line, 1, Length(Line) - 1);
+      ReadLn(F, S);
+      Line := Line + S;
+      Inc(LCount);
+    End;
     If Pos('!|', Line) > 0 Then Begin
       ExecuteRIP(Line);
       Inc(CmdCount);

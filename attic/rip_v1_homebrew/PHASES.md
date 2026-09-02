@@ -108,16 +108,3 @@ Total: 20 done, 35 todo
 ### Remaining from JVIEW port:
 - [ ] ripres.pas — .RES resource container reader (JVIEW font bundles)
 - [ ] ripplay.pas — Slideshow/playback manager for mterm
-
-## VIPER: V1 Integration of Proper Engine Rendering (Planned)
-
-Branch: `viper` off `main` (session 9)
-
-- [ ] VIPER-1: m_output graphics pixel buffer mode (640×350, EGA indexed)
-- [ ] VIPER-2: ripview renders via m_output headless (no display, BMP export)
-- [ ] VIPER-3: mterm RIP rendering via m_output display driver
-- [ ] VIPER-4: mystic_test USEGRAPH replaced with m_output pixel mode
-- [ ] VIPER-5: v2-v4 inherit from v1 — no duplicated engine code
-- [ ] VIPER-6: Cleanup — archive m_output_graph.pas, remove USEGRAPH ifdefs, update docs
-
-Pre-VIPER code archived: `attic/rip_v1_homebrew/`

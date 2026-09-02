@@ -69,6 +69,7 @@ Type
     Y2      : Byte;
   End;
 
+
 Implementation
 
 End.

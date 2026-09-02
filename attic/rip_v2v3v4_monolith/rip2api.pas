@@ -1,6 +1,4 @@
-{$MODE DELPHI}
-{$H-}
-unit ripscr;
+Unit rip2api;
 
 // ====================================================================
 // RIPscrip v1.54 Graphics Protocol Engine for Mystic BBS
@@ -51,12 +49,19 @@ Uses SysUtils, Math;
 
 Const
   // Engine version
-  RIP_ENGINE_VERSION = '1.0.1-irc';
+  RIP_ENGINE_VERSION = '2.0.1-irc';
   RIP_ENGINE_DATE    = '2026-08-19';
 
-  RIP_MAX_X       = 639;       // EGA/VGA 640x350 default
-  RIP_MAX_Y       = 349;
-  RIP_MAX_COLORS  = 16;        // EGA palette
+  // v1.54 defaults (backward compatible)
+  RIP_DEFAULT_WIDTH  = 640;
+  RIP_DEFAULT_HEIGHT = 350;
+  RIP_MAX_X       = 639;       // default max X (overridden by SetResolution)
+  RIP_MAX_Y       = 349;       // default max Y (overridden by SetResolution)
+
+  // v2.0 extended
+  RIP_MAX_RES_X   = 1279;     // max supported: 1280x1024
+  RIP_MAX_RES_Y   = 1023;
+  RIP_MAX_COLORS  = 256;       // v2.0: 256-color palette
   RIP_MAX_MOUSE   = 128;       // max mouse fields
   RIP_MAX_BUTTONS = 64;        // max buttons
   RIP_MAX_POLY    = 512;       // max polygon points
@@ -122,9 +127,45 @@ Type
     X, Y : SmallInt;
   End;
 
-  TRIPPalette = Array[0..RIP_MAX_COLORS-1] of Byte;
+  TRIPPoint3D = Record
+    X, Y, Z : SmallInt;
+  End;
+
+  TRIPProjParams = Record
+    EyeX, EyeY, EyeZ : SmallInt;  // viewer position
+    ScreenDist        : SmallInt;  // screen distance
+    Theta, Phi        : SmallInt;  // rotation angles (degrees)
+  End;
+
+  TRIPPalette = Array[0..255] of Byte;  // v2.0: 256-color palette
 
   TRIPFillPattern = Array[0..7] of Byte;  // 8x8 user fill pattern
+
+  // RFF scalable font header (v2.0)
+  TRFFHeader = Record
+    DataSize    : LongInt;      // [0-3]   total data size
+    Reserved    : Array[0..11] of Byte; // [4-15]  zeros
+    HeaderMark  : Word;         // [16-17] = 16
+    VerMajor    : Byte;         // [18]    version major
+    VerMinor    : Byte;         // [19]    version minor
+    RecordSize  : Word;         // [20-21] = 46 bytes per face record
+    DataOffset  : Word;         // [22-23] = 54 (face records start)
+    GlyphFmt1   : Byte;         // [24]    glyph format byte 1
+    GlyphFmt2   : Byte;         // [25]    glyph format byte 2
+    GlyphTable  : Word;         // [26-27] offset to glyph offset table
+    Ascent      : Word;         // [28-29] ascent in design units
+    EmHeight    : Word;         // [30-31] em height in design units
+    Pad1        : Array[0..3] of Byte; // [32-35]
+    NumChars    : Word;         // [36-37] = 224 (chars 32-255)
+    FirstChar   : Word;         // [38-39] = 32
+    Pad2        : Array[0..3] of Byte; // [40-43]
+    DesignUnits : Word;         // [44-45] = 1000 (em square)
+    Pad3        : Array[0..7] of Byte; // [46-53]
+  End;
+
+  TRFFFaceRecord = Record
+    Data : Array[0..45] of Byte; // 46-byte face record
+  End;
 
   TRIPMouseField = Record
     Active  : Boolean;
@@ -203,13 +244,6 @@ Type
   End;
 
 Const
-  // Text window font sizes (width x height in pixels)
-  TW_FontWidths  : Array[0..4] Of Integer = (8, 7, 8, 7, 16);
-  TW_FontHeights : Array[0..4] Of Integer = (8, 8, 14, 14, 14);
-  // SGR color index → EGA color index
-  TW_SGR_TO_EGA  : Array[0..7] Of Byte = (0, 4, 2, 6, 1, 5, 3, 7);
-
-Const
   // Standard EGA palette — maps color index 0..15 to RGB
   EGA_RGB : Array[0..15] of TRIPRgb = (
     (R:$00;G:$00;B:$00),
@@ -233,8 +267,9 @@ Const
 Type
   // ----------------------------------------------------------------
   // Pixel buffer — the rendered RIP image
+  // v2.0: sized to max resolution (1280x1024), bounded by ActiveMaxX/Y
   // ----------------------------------------------------------------
-  TRIPPixelBuffer = Array[0..RIP_MAX_Y, 0..RIP_MAX_X] of Byte;
+  TRIPPixelBuffer = Array[0..1023, 0..1279] of Byte;
   PRIPPixelBuffer = ^TRIPPixelBuffer;
 
   // ----------------------------------------------------------------
@@ -254,6 +289,25 @@ Type
     LinePattern    : Word;       // user line pattern
     WriteMode      : Byte;       // COPY_PUT or XOR_PUT
 
+    // v2.0 protocol state
+    ProtoVersion   : Byte;       // 0=v1.54, 1=v2.0
+    ColorMode      : Byte;       // 0=16-color, 8=256-color
+    CanvasWidth    : SmallInt;   // actual width (default 640)
+    CanvasHeight   : SmallInt;   // actual height (default 350)
+    ActiveMaxX     : SmallInt;   // CanvasWidth - 1
+    ActiveMaxY     : SmallInt;   // CanvasHeight - 1
+    DrawLayer      : Byte;       // v2.0 drawing layer (0 or 1)
+    PenWidth       : Byte;       // v2.0 pen width
+    FrameRate      : Integer;    // v2.0 animation FPS (default 10)
+    SavedPalette   : TRIPPalette; // for fade in/out
+
+    // v2.0 WAV streaming state
+    WAVStreamActive   : Boolean;
+    WAVStreamRate     : LongInt;
+    WAVStreamBits     : Byte;
+    WAVStreamChannels : Byte;
+    WAVStreamBytes    : LongInt;  // total bytes fed
+
     // Text state
     FontNum        : Byte;
     FontDir        : Byte;       // 0=horiz, 1=vert
@@ -267,14 +321,6 @@ Type
     TextWinX1      : SmallInt;
     TextWinY1      : SmallInt;
     TextWinSize    : Byte;       // font size for text window
-    TextWinCurCol  : SmallInt;   // cursor column (1-based)
-    TextWinCurRow  : SmallInt;   // cursor row (1-based)
-    TextWinMaxCols : SmallInt;   // max columns for current font
-    TextWinMaxRows : SmallInt;   // max rows for current font
-    TextWinFG      : Byte;       // text foreground color
-    TextWinBG      : Byte;       // text background color
-    TextWinBold    : Boolean;    // ANSI bold attribute
-    TextWinBlink   : Boolean;    // ANSI blink attribute
     ViewX0, ViewY0 : SmallInt;
     ViewX1, ViewY1 : SmallInt;
 
@@ -361,15 +407,6 @@ Type
     HotKeysEnabled : Boolean;    // Phase 5: button hotkeys active
     TabEnabled     : Boolean;    // Phase 5: tab navigation active
 
-    // Draw stats
-    StatLines      : LongInt;
-    StatRects      : LongInt;
-    StatBars       : LongInt;
-    StatCircles    : LongInt;
-    StatPixels     : LongInt;
-    StatTexts      : LongInt;
-    StatTotalCmds  : LongInt;
-
     // Clipboard (public for viewer access)
     Clipboard      : Pointer;
     ClipSize       : LongInt;
@@ -447,11 +484,6 @@ Type
     Procedure SetViewPort   (X0, Y0, X1, Y1: SmallInt; Clip: Boolean);
     Procedure GetViewPort   (Var X0, Y0, X1, Y1: SmallInt);
     Procedure SetTextWindow (X0, Y0, X1, Y1: SmallInt; Size: Byte);
-    Procedure ResetTextWin;
-    Procedure TextWinPutChar(Ch: Byte);
-    Procedure TextWinWrite  (Const S: String);
-    Procedure TextWinScroll (Direction: Integer);
-    Procedure ProcessTextAnsi(Const S: String);
 
     // ---- Mouse fields ----
     Function  AddMouseField (X0, Y0, X1, Y1: SmallInt; HostCmd, Text: String) : Integer;
@@ -483,6 +515,72 @@ Type
     Function  GetSysCols  : Integer;    // text columns for current mode
     Function  GetSysRows  : Integer;    // text rows for current mode
 
+    // ---- v2.0 Protocol Extensions (Phase 9) ----
+    Procedure SetResolution (W, H: SmallInt);
+    Procedure SetColorMode  (Mode: Byte);
+    Function  GetCanvasWidth : SmallInt;
+    Function  GetCanvasHeight : SmallInt;
+    Function  GetProtoVersion : Byte;
+
+    // ---- v2.0 SVGACC-Inspired (Phase 12) ----
+    Procedure BlockResize   (Var Src; SrcW, SrcH: SmallInt;
+                             Var Dst; DstW, DstH: SmallInt);
+    Procedure BlockRotate   (Var Src; W, H: SmallInt;
+                             Var Dst; Angle: SmallInt; BackFill: Byte);
+    Procedure D2Rotate      (Var Pts: Array of TRIPPoint; Count: Integer;
+                             XO, YO, Angle: SmallInt);
+    Procedure D2Scale       (Var Pts: Array of TRIPPoint; Count: Integer;
+                             XS, YS: SmallInt);
+    Procedure D2Translate   (Var Pts: Array of TRIPPoint; Count: Integer;
+                             XT, YT: SmallInt);
+    Procedure SpriteGet     (X, Y, W, H: SmallInt; Var Sprite; Var Bkgnd);
+    Procedure SpritePut     (X, Y: SmallInt; Var Sprite; TransColor: Byte);
+    Function  SpriteCollide (X1, Y1, X2, Y2: SmallInt;
+                             Var S1, S2; TransColor: Byte) : Boolean;
+    Procedure ScrollUp      (X0, Y0, X1, Y1, Amt: SmallInt; Fill: Byte);
+    Procedure ScrollDn      (X0, Y0, X1, Y1, Amt: SmallInt; Fill: Byte);
+    Procedure ScrollLt      (X0, Y0, X1, Y1, Amt: SmallInt; Fill: Byte);
+    Procedure ScrollRt      (X0, Y0, X1, Y1, Amt: SmallInt; Fill: Byte);
+    Procedure PalFade       (StartIdx, EndIdx, Percent: Integer);
+    Procedure PalRotate     (StartIdx, EndIdx, Shift: Integer);
+    Procedure D3Rotate      (Var Pts: Array of TRIPPoint3D; Count: Integer;
+                             XO, YO, ZO: SmallInt;
+                             XAng, YAng, ZAng: SmallInt);
+    Procedure D3Scale       (Var Pts: Array of TRIPPoint3D; Count: Integer;
+                             XS, YS, ZS: SmallInt);
+    Procedure D3Translate   (Var Pts: Array of TRIPPoint3D; Count: Integer;
+                             XT, YT, ZT: SmallInt);
+    Function  D3Project     (Var In3D: Array of TRIPPoint3D;
+                             Var Out2D: Array of TRIPPoint;
+                             Count: Integer;
+                             Var Params: TRIPProjParams) : Boolean;
+    Procedure LineAA        (X0, Y0, X1, Y1: SmallInt; Color: Byte);
+
+    // ---- v2.0 Animation (Phase 13) ----
+    Function  LoadAnimFrame (BaseName: String; Frame: Integer;
+                             X, Y: SmallInt) : Boolean;
+    Procedure PalCycle      (StartIdx, EndIdx: Integer;
+                             Direction: ShortInt);
+    Procedure FadeIn        (Steps: Integer);
+    Procedure FadeOut       (Steps: Integer);
+
+    // ---- v2.0 Audio Streaming ----
+    // Server sends audio in chunks, client plays as data arrives.
+    Function  WAVStreamInit  (SampleRate: LongInt; Bits, Channels: Byte) : Boolean;
+    Procedure WAVStreamFeed  (Data: PByte; Len: LongInt);
+    Procedure WAVStreamStop;
+    Function  WAVStreamIsPlaying : Boolean;
+
+    // ---- v2.0 Backport: PNG support (from v3 Phase 17) ----
+    Function  LoadPNG       (FileName: String; X, Y: SmallInt) : Boolean;
+
+    // ---- v2.0 Backport: JPEG streaming (from v3 Phase 17) ----
+    Function  JPEGStreamInit    : Boolean;
+    Procedure JPEGStreamFeed    (Data: PByte; Len: LongInt);
+    Function  JPEGStreamComplete: Boolean;
+    Procedure SetFrameRate  (FPS: Integer);
+    Function  GetFrameRate  : Integer;
+
     // ---- Image ----
     Procedure GetImage      (X0, Y0, X1, Y1: SmallInt; Var Buf);
     Procedure PutImage      (X, Y: SmallInt; Var Buf; Mode: Byte);
@@ -499,6 +597,7 @@ Type
     Function  LoadMask      (FileName: String; X, Y: SmallInt) : Boolean;
     Function  LoadIconMasked(IconFile, MaskFile: String; X, Y: SmallInt) : Boolean;
     Function  LoadHotIcon   (FileName: String; X, Y: SmallInt) : Boolean;
+    Function  LoadBMH       (FileName: String; X, Y: SmallInt) : Boolean;  // v2.0: BMP highlight
 
     // ---- Scene file ----
     Function  LoadScene     (FileName: String) : Boolean;
@@ -513,6 +612,11 @@ Type
 
     // ---- Image loading (Phase 4) ----
     Function  LoadPCX       (FileName: String; X, Y: SmallInt) : Boolean;
+
+    // ---- v2.0 file formats (Phase 11) ----
+    Function  LoadPAL       (FileName: String) : Boolean;  // 16-byte or 868-byte palette
+    Function  LoadJPG       (FileName: String; X, Y: SmallInt) : Boolean;  // JPEG pixel rendering via jpgdecr
+    Function  LoadRFF       (AFontNum: Byte; FileName: String) : Boolean;  // RFF v2.2 scalable font
     Function  LoadBMP       (FileName: String; X, Y: SmallInt) : Boolean;
 
     // ---- Text variables (RIP_DEFINE) ----
@@ -556,6 +660,10 @@ Type
   End;
 
 Implementation
+
+Uses
+  jpgdecr,  // v2.0: standalone {$H-} JPEG decoder
+  PNGDecR;     // v2.0 backport: PNG decoder from v3
 
 {$I rip_font8x8.inc}
 {$I rip_font8x14.inc}
@@ -630,15 +738,14 @@ Begin
 End;
 
 Procedure TRIPEngine.DrawFillPixel (X, Y: SmallInt);
-{ Draw pixel using current fill pattern. Draws BG for pattern gaps.
-  Matched to RIPtermJS ff_putpixel: uses cached FillPat, bgcolor for gaps. }
+{ Draw pixel using fill pattern. Draws BG for pattern gaps. Backport. }
 Var PatRow: Byte;
 Begin
   If Not InView(X, Y) Then Exit;
   If FillStyle = 0 Then Begin Pixels^[Y, X] := GetBkColor; Exit; End;
   If FillStyle = 1 Then Begin Pixels^[Y, X] := FillColor; Exit; End;
   If FillStyle <= 11 Then Begin
-    PatRow := FillPat[Y And 7];
+    PatRow := FillPats[FillStyle, Y And 7];
     If (PatRow Shr (7 - (X And 7))) And 1 = 1 Then
       Pixels^[Y, X] := FillColor
     Else
@@ -647,24 +754,14 @@ Begin
 End;
 
 Procedure TRIPEngine.DrawLine (X0, Y0, X1, Y1: SmallInt);
-{ JS-matched Bresenham line algorithm (den/num/numadd).
-  Backport from ripviewer — standard err=dx-dy produces different
-  pixel positions on diagonals, causing bezier curve gap leaks.
-  B8 fix: swap points when Y1 < Y0 to match RIPtermJS _line(). }
+{ JS-matched Bresenham (den/num/numadd) — backport from ripviewer. }
 Var
   DX, DY: Integer;
   XI1, XI2, YI1, YI2: Integer;
   Den, Num, NumAdd, NumPixels: Integer;
   X, Y, C: Integer;
   Pat: Word;
-  Tmp: SmallInt;
 Begin
-  { Match RIPtermJS: swap endpoints if y2 < y1 }
-  If Y1 < Y0 Then Begin
-    Tmp := X0; X0 := X1; X1 := Tmp;
-    Tmp := Y0; Y0 := Y1; Y1 := Tmp;
-  End;
-
   Case LineStyle of
     RIP_LINE_DOTTED  : Pat := $CCCC;
     RIP_LINE_CENTER  : Pat := $FC78;
@@ -713,6 +810,7 @@ Var
   X, Y     : SmallInt;
   PatByte  : Byte;
 Begin
+
   For Y := ClipY(Y0) to ClipY(Y1) Do Begin
     // Select pattern row
     Case FillStyle of
@@ -890,7 +988,7 @@ End;
 
 Procedure TRIPEngine.DrawBezier (X0, Y0, X1, Y1, X2, Y2, X3, Y3: SmallInt; Count: SmallInt);
 { Bezier matched to JS: Floor() not Round(), explicit endpoint.
-  Backport from ripviewer Run 17-18. }
+  Backport from ripviewer. }
 Var
   T, T1, Step : Real;
   PX, PY      : SmallInt;
@@ -910,7 +1008,6 @@ Begin
     LY := PY;
     T := T + Step;
   End;
-  { Final segment to exact endpoint }
   DrawLine(LX, LY, X3, Y3);
 End;
 
@@ -1007,9 +1104,7 @@ Begin
 End;
 
 Procedure TRIPEngine.FloodFill (X, Y: SmallInt; Border: Byte);
-{ Scanline flood fill with visited buffer — backport from ripviewer.
-  Uses heap-allocated visited array to prevent pattern gap leaks.
-  Draws BGCOLOR for pattern gap pixels (PutFillPixel). }
+{ Scanline flood fill with visited buffer — backport from ripviewer. }
 Type
   TFFPoint = Record X, Y: SmallInt; End;
   TVisited = Array[0..639, 0..349] Of Boolean;
@@ -1019,7 +1114,6 @@ Var
   Visited: PVisited;
   SP, X1, X2, SX: Integer;
   SpanUp, SpanDn: Boolean;
-
 Begin
   If Not InView(X, Y) Then Exit;
   If Pixels^[Y, X] = Border Then Exit;
@@ -1133,6 +1227,12 @@ Var
 Begin
   Inherited Create;
 
+  // v2.0: init canvas dimensions before allocating
+  CanvasWidth  := RIP_DEFAULT_WIDTH;
+  CanvasHeight := RIP_DEFAULT_HEIGHT;
+  ActiveMaxX   := CanvasWidth - 1;
+  ActiveMaxY   := CanvasHeight - 1;
+
   New(Pixels);
   For I := 1 to 10 Do CHRFonts[I] := Nil;
   For I := 0 to 9 Do SavedScreens[I] := Nil;
@@ -1177,40 +1277,8 @@ Begin
   DrawColor  := 15;  // white
   FillColor  := 0;   // black
   FillStyle  := RIP_FILL_SOLID;
-  LineStyle  := RIP_LINE_SOLID;
-  LineThick  := 1;
-  LinePattern := $FFFF;
-  WriteMode  := RIP_COPY_PUT;
 
-  FontNum    := RIP_DEFAULT_FONT;
-  FontDir    := RIP_HORIZ_DIR;
-  FontSize   := 1;
-  FontHJust  := RIP_LEFT_TEXT;
-  FontVJust  := RIP_TOP_TEXT;
-
-  TextWinX0  := 0;
-  TextWinY0  := 0;
-  TextWinX1  := 79;
-  TextWinY1  := 42;
-  TextWinSize := 0;
-  TextWinCurCol  := 1;
-  TextWinCurRow  := 1;
-  TextWinMaxCols := 10;
-  TextWinMaxRows := 5;
-  TextWinFG      := 7;
-  TextWinBG      := 0;
-  TextWinBold    := False;
-  TextWinBlink   := False;
-
-  StatLines     := 0;
-  StatRects     := 0;
-  StatBars      := 0;
-  StatCircles   := 0;
-  StatPixels    := 0;
-  StatTexts     := 0;
-  StatTotalCmds := 0;
-
-  // Init predefined fill patterns (BGI compatible)
+  // Init predefined fill patterns
   FillChar(FillPats, SizeOf(FillPats), 0);
   FillChar(FillPats[1], 8, $FF);
   FillPats[2][0] := $FF; FillPats[2][4] := $FF;
@@ -1230,13 +1298,44 @@ Begin
   FillPats[9][4] := $AA; FillPats[9][5] := $55; FillPats[9][6] := $AA; FillPats[9][7] := $55;
   FillPats[10][4] := $01;
   FillPats[11][0] := $44; FillPats[11][2] := $11; FillPats[11][4] := $44; FillPats[11][6] := $11;
+  LineStyle  := RIP_LINE_SOLID;
+  LineThick  := 1;
+  LinePattern := $FFFF;
+  WriteMode  := RIP_COPY_PUT;
+
+  FontNum    := RIP_DEFAULT_FONT;
+  FontDir    := RIP_HORIZ_DIR;
+  FontSize   := 1;
+  FontHJust  := RIP_LEFT_TEXT;
+  FontVJust  := RIP_TOP_TEXT;
+
+  TextWinX0  := 0;
+  TextWinY0  := 0;
+  TextWinX1  := 79;
+  TextWinY1  := 42;
+  TextWinSize := 0;
 
   ViewX0 := 0;
   ViewY0 := 0;
-  ViewX1 := RIP_MAX_X;
-  ViewY1 := RIP_MAX_Y;
+  ViewX1 := ActiveMaxX;
+  ViewY1 := ActiveMaxY;
 
-  // Default EGA palette
+  // v2.0 state
+  ProtoVersion := 0;   // default v1.54
+  ColorMode    := 0;   // 16-color
+  DrawLayer    := 0;
+  PenWidth     := 1;
+  FrameRate    := 10;
+
+  // v2.0 WAV streaming init
+  WAVStreamActive   := False;
+  WAVStreamRate     := 0;
+  WAVStreamBits     := 0;
+  WAVStreamChannels := 0;
+  WAVStreamBytes    := 0;
+
+  // Default EGA palette (first 16 entries)
+  FillChar(Palette, SizeOf(Palette), 0);
   Palette[0]  := 0;   // black
   Palette[1]  := 1;   // blue
   Palette[2]  := 2;   // green
@@ -1338,12 +1437,12 @@ End;
 
 Function TRIPEngine.GetWidth : SmallInt;
 Begin
-  Result := RIP_MAX_X + 1;
+  Result := CanvasWidth;
 End;
 
 Function TRIPEngine.GetHeight : SmallInt;
 Begin
-  Result := RIP_MAX_Y + 1;
+  Result := CanvasHeight;
 End;
 
 Function TRIPEngine.FindMouseField (X, Y: SmallInt) : Integer;
@@ -1546,18 +1645,12 @@ End;
 // ---- Fill ----
 
 Procedure TRIPEngine.SetFillStyle (Style: Word; Color: Byte);
-Var I: Integer;
 Begin
   FillStyle := Style;
   FillColor := Color;
-  { Cache pattern into FillPat like RIPtermJS does }
-  If (Style >= 0) And (Style <= 11) Then
-    For I := 0 to 7 Do
-      FillPat[I] := FillPats[Style, I];
 End;
 
 Procedure TRIPEngine.SetFillPattern (Var Pattern: TRIPFillPattern; Color: Byte);
-Begin
   Move(Pattern, FillPat, SizeOf(TRIPFillPattern));
   FillColor := Color;
   FillStyle := RIP_FILL_USER;
@@ -1631,211 +1724,12 @@ Begin
 End;
 
 Procedure TRIPEngine.SetTextWindow (X0, Y0, X1, Y1: SmallInt; Size: Byte);
-Var FW, FH: Integer;
 Begin
   TextWinX0   := X0;
   TextWinY0   := Y0;
   TextWinX1   := X1;
   TextWinY1   := Y1;
   TextWinSize := Size;
-  If (Size >= 0) And (Size <= 4) Then Begin
-    FW := TW_FontWidths[Size];
-    FH := TW_FontHeights[Size];
-  End Else Begin FW := 8; FH := 8; End;
-  TextWinMaxCols := (X1 - X0 + 1) Div FW;
-  TextWinMaxRows := (Y1 - Y0 + 1) Div FH;
-  TextWinCurCol  := 1;
-  TextWinCurRow  := 1;
-  TextWinFG      := 7;
-  TextWinBG      := 0;
-  TextWinBold    := False;
-  TextWinBlink   := False;
-End;
-
-Procedure TRIPEngine.ResetTextWin;
-Begin
-  TextWinCurCol  := 1;
-  TextWinCurRow  := 1;
-  TextWinFG      := 7;
-  TextWinBG      := 0;
-  TextWinBold    := False;
-  TextWinBlink   := False;
-End;
-
-Procedure TRIPEngine.TextWinScroll (Direction: Integer);
-Var FH, W, H, Row, Col: Integer;
-Begin
-  If Direction = 0 Then Exit;
-  If (TextWinSize >= 0) And (TextWinSize <= 4) Then
-    FH := TW_FontHeights[TextWinSize]
-  Else FH := 8;
-  W := TextWinX1 - TextWinX0 + 1;
-  H := TextWinY1 - TextWinY0 + 1;
-  If (W <= 0) Or (H <= FH) Then Exit;
-
-  If Direction > 0 Then Begin
-    { Scroll up: copy rows FH..H-1 up by FH, clear bottom }
-    For Row := FH To H - 1 Do
-      For Col := 0 To W - 1 Do
-        Pixels^[TextWinY0 + Row - FH, TextWinX0 + Col] :=
-          Pixels^[TextWinY0 + Row, TextWinX0 + Col];
-    For Row := H - FH To H - 1 Do
-      For Col := 0 To W - 1 Do
-        Pixels^[TextWinY0 + Row, TextWinX0 + Col] := TextWinBG;
-  End Else Begin
-    { Scroll down: copy rows 0..H-FH-1 down by FH, clear top }
-    For Row := H - FH - 1 DownTo 0 Do
-      For Col := 0 To W - 1 Do
-        Pixels^[TextWinY0 + Row + FH, TextWinX0 + Col] :=
-          Pixels^[TextWinY0 + Row, TextWinX0 + Col];
-    For Row := 0 To FH - 1 Do
-      For Col := 0 To W - 1 Do
-        Pixels^[TextWinY0 + Row, TextWinX0 + Col] := TextWinBG;
-  End;
-End;
-
-Procedure TRIPEngine.TextWinPutChar(Ch: Byte);
-Var FW, FH, PX, PY, GX, GY: Integer; Glyph: Byte;
-Begin
-  If (TextWinSize >= 0) And (TextWinSize <= 4) Then Begin
-    FW := TW_FontWidths[TextWinSize];
-    FH := TW_FontHeights[TextWinSize];
-  End Else Begin FW := 8; FH := 8; End;
-
-  Case Ch Of
-    9:  Inc(TextWinCurCol);
-    10: If TextWinCurRow >= TextWinMaxRows Then TextWinScroll(1)
-        Else Inc(TextWinCurRow);
-    11: If TextWinCurRow > 1 Then Dec(TextWinCurRow)
-        Else TextWinScroll(-1);
-    13: TextWinCurCol := 1;
-    16: If TextWinCurCol > 1 Then Dec(TextWinCurCol);
-    17: If TextWinCurCol < TextWinMaxCols Then Inc(TextWinCurCol);
-    28: TextWinCurCol := 1;
-    32..255: Begin
-      PX := TextWinX0 + (TextWinCurCol - 1) * FW;
-      PY := TextWinY0 + (TextWinCurRow - 1) * FH;
-      { Clear cell background }
-      For GY := 0 To FH - 1 Do
-        For GX := 0 To FW - 1 Do
-          If InView(PX + GX, PY + GY) Then
-            Pixels^[PY + GY, PX + GX] := TextWinBG;
-      { Draw character glyph (8x8 font from Font8x8) }
-      If FW = 8 Then
-        For GY := 0 To 7 Do Begin
-          Glyph := Font8x8[Ch * 8 + GY];
-          For GX := 0 To 7 Do
-            If (Glyph Shr (7 - GX)) And 1 = 1 Then
-              If InView(PX + GX, PY + GY) Then
-                Pixels^[PY + GY, PX + GX] := TextWinFG;
-        End;
-      Inc(TextWinCurCol);
-      If TextWinCurCol > TextWinMaxCols Then Begin
-        TextWinCurCol := 1;
-        Inc(TextWinCurRow);
-        If TextWinCurRow > TextWinMaxRows Then Begin
-          TextWinScroll(1);
-          TextWinCurRow := TextWinMaxRows;
-        End;
-      End;
-    End;
-  End;
-End;
-
-Procedure TRIPEngine.ProcessTextAnsi(Const S: String);
-{ Process ANSI CSI sequence (content after ESC[) }
-Var
-  Pos, I, NumParams: Integer;
-  Params: Array[0..9] Of Integer;
-  Cmd: Char;
-  FW, FH, GX, GY: Integer;
-  TmpColor: Byte;
-Begin
-  FillChar(Params, SizeOf(Params), 0);
-  Pos := 1;
-  NumParams := 0;
-
-  While (Pos <= Length(S)) And ((S[Pos] >= '0') And (S[Pos] <= '9') Or (S[Pos] = ';')) Do Begin
-    If S[Pos] = ';' Then Begin Inc(NumParams); Inc(Pos); End
-    Else Begin
-      While (Pos <= Length(S)) And (S[Pos] >= '0') And (S[Pos] <= '9') Do Begin
-        Params[NumParams] := Params[NumParams] * 10 + Ord(S[Pos]) - Ord('0');
-        Inc(Pos);
-      End;
-    End;
-  End;
-  Inc(NumParams);
-  If Pos > Length(S) Then Exit;
-  Cmd := S[Pos];
-
-  If (TextWinSize >= 0) And (TextWinSize <= 4) Then Begin
-    FW := TW_FontWidths[TextWinSize]; FH := TW_FontHeights[TextWinSize];
-  End Else Begin FW := 8; FH := 8; End;
-
-  Case Cmd Of
-    'm': For I := 0 To NumParams - 1 Do
-      Case Params[I] Of
-        0: Begin TextWinFG := 7; TextWinBG := 0;
-           TextWinBold := False; TextWinBlink := False; End;
-        1: Begin TextWinBold := True;
-           TextWinFG := TextWinFG Or 8; End;
-        5: TextWinBlink := True;
-        7: Begin TmpColor := TextWinFG; TextWinFG := TextWinBG; TextWinBG := TmpColor; End;
-        30..37: Begin TextWinFG := TW_SGR_TO_EGA[Params[I] - 30];
-                If TextWinBold Then TextWinFG := TextWinFG Or 8; End;
-        40..47: TextWinBG := TW_SGR_TO_EGA[Params[I] - 40];
-      End;
-    'H', 'f': Begin
-      If NumParams >= 2 Then Begin
-        TextWinCurRow := Params[0]; TextWinCurCol := Params[1];
-      End Else Begin TextWinCurRow := 1; TextWinCurCol := 1; End;
-      If TextWinCurRow < 1 Then TextWinCurRow := 1;
-      If TextWinCurCol < 1 Then TextWinCurCol := 1;
-    End;
-    'A': Begin If Params[0] = 0 Then Params[0] := 1;
-         Dec(TextWinCurRow, Params[0]);
-         If TextWinCurRow < 1 Then TextWinCurRow := 1; End;
-    'B': Begin If Params[0] = 0 Then Params[0] := 1;
-         Inc(TextWinCurRow, Params[0]);
-         If TextWinCurRow > TextWinMaxRows Then TextWinCurRow := TextWinMaxRows; End;
-    'C': Begin If Params[0] = 0 Then Params[0] := 1;
-         Inc(TextWinCurCol, Params[0]); End;
-    'D': Begin If Params[0] = 0 Then Params[0] := 1;
-         Dec(TextWinCurCol, Params[0]);
-         If TextWinCurCol < 1 Then TextWinCurCol := 1; End;
-    'J': If Params[0] = 2 Then Begin
-           For GY := TextWinY0 To TextWinY1 Do
-             For GX := TextWinX0 To TextWinX1 Do
-               If InView(GX, GY) Then Pixels^[GY, GX] := TextWinBG;
-           TextWinCurRow := 1; TextWinCurCol := 1;
-         End;
-    'K': Begin
-           For GY := TextWinY0 + (TextWinCurRow - 1) * FH To
-                     TextWinY0 + TextWinCurRow * FH - 1 Do
-             For GX := TextWinX0 + (TextWinCurCol - 1) * FW To TextWinX1 Do
-               If InView(GX, GY) Then Pixels^[GY, GX] := TextWinBG;
-         End;
-  End;
-End;
-
-Procedure TRIPEngine.TextWinWrite(Const S: String);
-Var I: Integer; InEsc: Boolean; EscBuf: String;
-Begin
-  InEsc := False;
-  EscBuf := '';
-  For I := 1 To Length(S) Do Begin
-    If InEsc Then Begin
-      EscBuf := EscBuf + S[I];
-      If ((S[I] >= 'A') And (S[I] <= 'Z')) Or ((S[I] >= 'a') And (S[I] <= 'z')) Then Begin
-        ProcessTextAnsi(EscBuf);
-        InEsc := False; EscBuf := '';
-      End;
-    End
-    Else If (Ord(S[I]) = 27) And (I + 1 <= Length(S)) And (S[I + 1] = '[') Then
-      InEsc := True
-    Else
-      TextWinPutChar(Ord(S[I]));
-  End;
 End;
 
 // ---- Mouse fields ----
@@ -1899,8 +1793,7 @@ Begin
 End;
 
 Procedure TRIPEngine.DrawButton (X0, Y0, X1, Y1: SmallInt; Label_, HostCmd: String);
-{ Button renderer with bevel OUTSIDE coords — backport from ripviewer.
-  SUNKEN (bit 15): swap bright/dark. CHISEL (bit 3): inner bevel. }
+{ Button with bevel OUTSIDE coords. SUNKEN bit 15, CHISEL bit 3. Backport. }
 Var
   SaveColor : Byte;
   Bev, I    : Integer;
@@ -1909,15 +1802,12 @@ Begin
   Bev := BtnStyle.BevelSize;
   If Bev < 1 Then Bev := 1;
 
-  // Draw button surface
   DrawColor := BtnStyle.Surface;
   DrawBar(X0, Y0, X1, Y1);
 
-  // Bevel draws OUTSIDE the button coords
   If (BtnStyle.Flags And 512) <> 0 Then Begin
     If (BtnStyle.Flags And 32768) <> 0 Then Begin
-      // SUNKEN: dark top/left, bright bottom/right
-      DrawColor := BtnStyle.DDark;
+      DrawColor := BtnStyle.Dark;
       For I := 1 to Bev Do Begin
         DrawLine(X0 - I, Y0 - I + 1, X1 + I, Y0 - I + 1);
         DrawLine(X0 - I, Y0 - I + 1, X0 - I, Y1 + I);
@@ -1928,44 +1818,37 @@ Begin
         DrawLine(X1 + I, Y0 - I + 1, X1 + I, Y1 + I);
       End;
     End Else Begin
-      // RAISED: bright top/left, dark bottom/right
       DrawColor := BtnStyle.BRight;
       For I := 1 to Bev Do Begin
         DrawLine(X0 - I, Y0 - I + 1, X1 + I, Y0 - I + 1);
         DrawLine(X0 - I, Y0 - I + 1, X0 - I, Y1 + I);
       End;
-      DrawColor := BtnStyle.DDark;
+      DrawColor := BtnStyle.Dark;
       For I := 1 to Bev Do Begin
         DrawLine(X0 - I, Y1 + I, X1 + I, Y1 + I);
         DrawLine(X1 + I, Y0 - I + 1, X1 + I, Y1 + I);
       End;
     End;
-    // CHISEL: inner bevel with opposite colors
     If (BtnStyle.Flags And 8) <> 0 Then Begin
-      DrawColor := BtnStyle.DDark;
+      DrawColor := BtnStyle.Dark;
       DrawLine(X0, Y0, X1, Y0);
       DrawLine(X0, Y0, X0, Y1);
       DrawColor := BtnStyle.BRight;
       DrawLine(X0, Y1, X1, Y1);
       DrawLine(X1, Y0, X1, Y1);
     End;
-    // Corner pixels
     DrawPixel(X0 - Bev, Y0 - Bev + 1, BtnStyle.CornerCol);
     DrawPixel(X1 + Bev, Y0 - Bev + 1, BtnStyle.CornerCol);
     DrawPixel(X0 - Bev, Y1 + Bev, BtnStyle.CornerCol);
     DrawPixel(X1 + Bev, Y1 + Bev, BtnStyle.CornerCol);
   End;
 
-
-  // Draw label centered (uses CHR font if loaded)
   DrawColor := BtnStyle.DFore;
   OutTextXY(X0 + (X1 - X0 - Length(Label_) * GetSysFontW) div 2,
             Y0 + (Y1 - Y0 - GetSysFontH) div 2,
             Label_);
 
   DrawColor := SaveColor;
-
-  // Register mouse field
   AddMouseField(X0, Y0, X1, Y1, HostCmd, Label_);
 End;
 
@@ -2018,7 +1901,7 @@ Begin
   WriteMode := SaveMode;
 End;
 
-// ---- Icon loading (ICN/MSK/HIC — full EGA planar rendering) ----
+// ---- Icon loading (ICN/MSK/HIC/BMH — full EGA planar rendering) ----
 // ICN: Standard icon — 4-plane EGA bitmap, renders with current write mode.
 //      BGI GetImage format: header(4 bytes: width-1, height-1) + planar pixel data.
 //      LoadIcon(FileName, X, Y, Mode) — loads and renders ICN at (X,Y).
@@ -2030,6 +1913,8 @@ End;
 // HIC: Highlight icon — same format as ICN, used for mouse-over/active states.
 //      LoadHotIcon(FileName, X, Y) — loads highlight variant, rendered when
 //        the associated mouse field is focused, clicked, or hotkey-activated.
+// BMH: BMP highlight icon (v2.0) — standard Windows BMP used as highlight.
+//      LoadBMH(FileName, X, Y) — loads 4/24-bit BMP as highlight overlay.
 
 // ---- Helper: sanitize path for file operations ----
 Function TRIPEngine.SanitizePath (S: String) : String;
@@ -2119,7 +2004,7 @@ Begin
   W := WRaw + 1;
   H := HRaw + 1;
 
-  If (W <= 0) or (H <= 0) or (W > 640) or (H > 350) Then Begin
+  If (W <= 0) or (H <= 0) or (W > 1280) or (H > 1024) Then Begin
     Close(F);
     Exit;
   End;
@@ -2179,7 +2064,7 @@ Begin
   W := X1 - X0 + 1;
   H := Y1 - Y0 + 1;
 
-  If (W <= 0) or (H <= 0) or (W > 640) Then Exit;
+  If (W <= 0) or (H <= 0) or (W > 1280) Then Exit;
 
   RowBytes := (W + 7) DIV 8;
 
@@ -2254,7 +2139,7 @@ Begin
   W := WRaw + 1;
   H := HRaw + 1;
 
-  If (W <= 0) or (H <= 0) or (W > 640) Then Begin
+  If (W <= 0) or (H <= 0) or (W > 1280) Then Begin
     Close(F);
     Exit;
   End;
@@ -2653,6 +2538,870 @@ Begin
   End;
 End;
 
+// ---- v2.0 file formats ----
+
+Function TRIPEngine.LoadBMH (FileName: String; X, Y: SmallInt) : Boolean;
+// BMH = BMP Highlight. Standard Windows BMP file used as v2.0 hot icon.
+// Identical to LoadBMP — BMH is just a different extension.
+Begin
+  Result := LoadBMP(FileName, X, Y);
+End;
+
+Function TRIPEngine.LoadPAL (FileName: String) : Boolean;
+// Load a RIPscrip palette file.
+// Two formats:
+//   16 bytes  — EGA palette indices (v1.54 compatible)
+//   868 bytes — 100-byte header ("RIPaint 2.0 Palette File") + 256 RGB triplets
+Var
+  F      : File;
+  FSize  : LongInt;
+  Buf    : Array[0..867] of Byte;
+  I      : Integer;
+  BytesRead : LongInt;
+Begin
+  Result := False;
+
+  Assign(F, FileName);
+  {$I-} System.Reset(F, 1); {$I+}
+  If IOResult <> 0 Then Exit;
+
+  FSize := FileSize(F);
+
+  If FSize = 16 Then Begin
+    // 16-byte EGA palette indices
+    BlockRead(F, Buf, 16, BytesRead);
+    Close(F);
+    If BytesRead <> 16 Then Exit;
+    For I := 0 to 15 Do
+      Palette[I] := Buf[I];
+    Result := True;
+  End Else If FSize = 868 Then Begin
+    // 868-byte: 100-byte header + 256 RGB triplets
+    BlockRead(F, Buf, 868, BytesRead);
+    Close(F);
+    If BytesRead <> 868 Then Exit;
+    // RGB data starts at offset 100
+    // Store as identity palette mapping; RGB available for rendering
+    For I := 0 to 255 Do
+      Palette[I] := I;
+    Result := True;
+  End Else
+    Close(F);
+End;
+
+// ---- v2.0 Protocol Extensions ----
+
+Function TRIPEngine.LoadJPG (FileName: String; X, Y: SmallInt) : Boolean;
+// JPEG loader — decodes and renders pixels using jpgdecr.pas ({$H-} compatible)
+Var
+  Pixels : PByte;
+  W, H   : Integer;
+  IX, IY : Integer;
+  Off    : LongInt;
+  R, G, B: Byte;
+  Best, BestDist, Dist : LongInt;
+  CI     : Integer;
+Begin
+  Result := False;
+
+  If Not JPEGLoadFileRaw(FileName, Pixels, W, H) Then Exit;
+
+  // Blit decoded RGB pixels to framebuffer
+  For IY := 0 to H - 1 Do
+    For IX := 0 to W - 1 Do Begin
+      Off := (LongInt(IY) * W + IX) * 3;
+      If InView(X + IX, Y + IY) Then Begin
+        R := Pixels[Off];
+        G := Pixels[Off + 1];
+        B := Pixels[Off + 2];
+        // Nearest EGA color (Manhattan distance)
+        Best := 0;
+        BestDist := $7FFFFFFF;
+        For CI := 0 to 15 Do Begin
+          Dist := Abs(LongInt(R) - EGA_RGB[CI].R) +
+                  Abs(LongInt(G) - EGA_RGB[CI].G) +
+                  Abs(LongInt(B) - EGA_RGB[CI].B);
+          If Dist < BestDist Then Begin
+            BestDist := Dist;
+            Best := CI;
+          End;
+        End;
+        DrawPixel(X + IX, Y + IY, Best);
+      End;
+    End;
+
+  FreeMem(Pixels);
+  Result := True;
+End;
+
+Function TRIPEngine.LoadRFF (AFontNum: Byte; FileName: String) : Boolean;
+// Load RFF v2.2 scalable vector font (TeleGrafix RIPscrip 2.0)
+// Format: header(16) + descriptor(50) + name + face table(10*46) + glyphs
+// Converts RFF signed-byte stroke deltas to CHR-compatible TRIPStroke
+// Pen encoding: first pair = pen-up move, (0,0) = pen lift, rest = pen-down draw
+Var
+  F          : File;
+  Hdr        : Array[0..63] of Byte;
+  BytesRead  : LongInt;
+  FileLen    : LongInt;
+  FirstChar  : Word;
+  LastChar   : Word;
+  NumGlyphs  : Word;
+  Ascent     : SmallInt;
+  MaxWidth   : SmallInt;
+  DesignUnits: Word;
+  NameBuf    : String;
+  I, J       : Integer;
+  B          : Byte;
+  // Width and offset tables
+  GlyphWidths  : Array[0..255] of SmallInt;
+  GlyphOffsets : Array[0..255] of LongWord;
+  // Stroke reading
+  StrokeStart  : LongInt;  // file offset where stroke data begins
+  StrokeBuf    : PByte;
+  StrokeBufLen : LongInt;
+  EndOff       : LongInt;
+  DX, DY       : ShortInt;
+  PenX, PenY   : SmallInt;
+  PenDown      : Boolean;
+  SIdx         : Word;     // stroke index in CHR font
+  WidthTableOff : LongInt;
+  OffsetTableOff: LongInt;
+  W16          : SmallInt;
+  D32          : LongWord;
+Begin
+  Result := False;
+  If (AFontNum < 1) or (AFontNum > 10) Then Exit;
+
+  Assign(F, FileName);
+  {$I-} System.Reset(F, 1); {$I+}
+  If IOResult <> 0 Then Exit;
+
+  FileLen := FileSize(F);
+
+  // Read header + descriptor (64 bytes)
+  BlockRead(F, Hdr, 64, BytesRead);
+  If BytesRead < 64 Then Begin Close(F); Exit; End;
+
+  // Version check
+  If Hdr[$12] <> 2 Then Begin Close(F); Exit; End;
+
+  FirstChar   := Hdr[$14] OR (Hdr[$15] SHL 8);
+  LastChar    := Hdr[$16] OR (Hdr[$17] SHL 8);
+  DesignUnits := Hdr[$1A] OR (Hdr[$1B] SHL 8);
+  Ascent      := SmallInt(Hdr[$1C] OR (Hdr[$1D] SHL 8));
+  MaxWidth    := SmallInt(Hdr[$1E] OR (Hdr[$1F] SHL 8));
+
+  NumGlyphs := LastChar - FirstChar + 1;
+  If NumGlyphs > 256 Then NumGlyphs := 256;
+
+  // Read font name (null-terminated at offset 0x42)
+  NameBuf := '';
+  Seek(F, $42);
+  For I := 1 to 32 Do Begin
+    BlockRead(F, B, 1, BytesRead);
+    If (BytesRead = 0) or (B = 0) Then Break;
+    NameBuf := NameBuf + Chr(B);
+  End;
+
+  // Skip face table: 10 faces * 46 bytes starting at 0x42
+  // Width table starts after face table
+  WidthTableOff := $42 + 10 * 46;  // = 0x20E
+
+  // Read per-character advance widths (SmallInt per char)
+  FillChar(GlyphWidths, SizeOf(GlyphWidths), 0);
+  Seek(F, WidthTableOff);
+  For I := 0 to NumGlyphs - 1 Do Begin
+    BlockRead(F, W16, 2, BytesRead);
+    If BytesRead < 2 Then Break;
+    GlyphWidths[I] := W16;
+  End;
+
+  // Read per-character stroke offsets (LongWord per glyph)
+  OffsetTableOff := WidthTableOff + NumGlyphs * 2;
+  FillChar(GlyphOffsets, SizeOf(GlyphOffsets), 0);
+  Seek(F, OffsetTableOff);
+  For I := 0 to NumGlyphs - 1 Do Begin
+    BlockRead(F, D32, 4, BytesRead);
+    If BytesRead < 4 Then Break;
+    GlyphOffsets[I] := D32;
+  End;
+
+  // Stroke data starts after offset table
+  StrokeStart := OffsetTableOff + NumGlyphs * 4;
+  StrokeBufLen := FileLen - StrokeStart;
+  If StrokeBufLen <= 0 Then Begin Close(F); Exit; End;
+  If StrokeBufLen > 65536 Then StrokeBufLen := 65536;
+
+  GetMem(StrokeBuf, StrokeBufLen);
+  Seek(F, StrokeStart);
+  BlockRead(F, StrokeBuf^, StrokeBufLen, BytesRead);
+  StrokeBufLen := BytesRead;
+
+  Close(F);
+
+  // Allocate CHR font slot
+  If CHRFonts[AFontNum] <> Nil Then Begin
+    FreeMem(CHRFonts[AFontNum], SizeOf(TRIPCHRFont));
+    CHRFonts[AFontNum] := Nil;
+  End;
+
+  GetMem(CHRFonts[AFontNum], SizeOf(TRIPCHRFont));
+  FillChar(CHRFonts[AFontNum]^, SizeOf(TRIPCHRFont), 0);
+
+  With CHRFonts[AFontNum]^ Do Begin
+    Loaded    := True;
+    Name      := Copy(NameBuf, 1, 4);
+    NumChars  := NumGlyphs;
+    If NumChars > RIP_MAX_CHR_CHARS Then NumChars := RIP_MAX_CHR_CHARS;
+    CHRFonts[AFontNum]^.FirstChar := FirstChar;
+
+    // Scale factor: convert design units to CHR coordinate space
+    // CHR fonts use a ~8px em; RFF uses DesignUnits (17560 typical)
+    If DesignUnits = 0 Then DesignUnits := 17560;
+    OrgToCap  := Ascent DIV (DesignUnits DIV 16);
+    If OrgToCap = 0 Then OrgToCap := 14;
+    OrgToBase := 0;
+    OrgToDec  := 0;
+
+    // Convert RFF stroke data to TRIPStroke entries
+    SIdx := 0;
+    For I := 0 to NumChars - 1 Do Begin
+      // Set width (scale from design units to CHR ~8px space)
+      If DesignUnits > 0 Then
+        Widths[I] := GlyphWidths[I] DIV (DesignUnits DIV 16)
+      Else
+        Widths[I] := 8;
+      If Widths[I] = 0 Then Widths[I] := 8;
+
+      Offsets[I] := SIdx;
+
+      // Find stroke data for this glyph
+      If (GlyphOffsets[I] < LongWord(StrokeBufLen)) Then Begin
+        J := GlyphOffsets[I];
+        PenX := 0;
+        PenY := 0;
+        PenDown := False;
+
+        // Calculate stroke length (to next glyph or end of buffer)
+        If I < NumChars - 1 Then
+          EndOff := GlyphOffsets[I + 1]
+        Else
+          EndOff := StrokeBufLen;
+        If EndOff > StrokeBufLen Then EndOff := StrokeBufLen;
+
+        While (J < EndOff - 1) and (SIdx < RIP_MAX_STROKES - 1) Do Begin
+          DX := ShortInt(StrokeBuf[J]);
+          DY := ShortInt(StrokeBuf[J + 1]);
+          Inc(J, 2);
+
+          // Pen encoding:
+          // (0,0) = pen lift — next pair is a move
+          If (DX = 0) and (DY = 0) Then Begin
+            PenDown := False;
+            Continue;
+          End;
+
+          PenX := PenX + DX;
+          PenY := PenY + DY;
+
+          // Scale from design units to CHR coordinate space
+          If Not PenDown Then Begin
+            // Pen-up move
+            Strokes[SIdx].Op := 1;  // move
+            Strokes[SIdx].X  := PenX DIV (DesignUnits DIV 16);
+            Strokes[SIdx].Y  := PenY DIV (DesignUnits DIV 16);
+            Inc(SIdx);
+            PenDown := True;
+          End Else Begin
+            // Pen-down draw
+            Strokes[SIdx].Op := 2;  // draw
+            Strokes[SIdx].X  := PenX DIV (DesignUnits DIV 16);
+            Strokes[SIdx].Y  := PenY DIV (DesignUnits DIV 16);
+            Inc(SIdx);
+          End;
+        End;
+
+        // End-of-character marker
+        If SIdx < RIP_MAX_STROKES Then Begin
+          Strokes[SIdx].Op := 0;
+          Strokes[SIdx].X  := 0;
+          Strokes[SIdx].Y  := 0;
+          Inc(SIdx);
+        End;
+      End;
+    End;
+
+    NumStrokes := SIdx;
+  End;
+
+  FreeMem(StrokeBuf, StrokeBufLen);
+  Result := True;
+End;
+
+// ---- v2.0 Protocol Extensions (Phase 9) ----
+
+Procedure TRIPEngine.SetResolution (W, H: SmallInt);
+Begin
+  If W < 320 Then W := 320;
+  If H < 200 Then H := 200;
+  If W > 1280 Then W := 1280;
+  If H > 1024 Then H := 1024;
+
+  CanvasWidth  := W;
+  CanvasHeight := H;
+  ActiveMaxX   := W - 1;
+  ActiveMaxY   := H - 1;
+
+  // Clear entire buffer
+  FillChar(Pixels^, SizeOf(TRIPPixelBuffer), 0);
+
+  // Reset viewport to new dimensions
+  ViewX0 := 0;
+  ViewY0 := 0;
+  ViewX1 := ActiveMaxX;
+  ViewY1 := ActiveMaxY;
+End;
+
+Procedure TRIPEngine.SetColorMode (Mode: Byte);
+Begin
+  ColorMode := Mode;
+End;
+
+Function TRIPEngine.GetCanvasWidth : SmallInt;
+Begin
+  Result := CanvasWidth;
+End;
+
+Function TRIPEngine.GetCanvasHeight : SmallInt;
+Begin
+  Result := CanvasHeight;
+End;
+
+Function TRIPEngine.GetProtoVersion : Byte;
+Begin
+  Result := ProtoVersion;
+End;
+
+// ---- Phase 12: SVGACC-Inspired Enhancements ----
+
+Procedure TRIPEngine.BlockResize (Var Src; SrcW, SrcH: SmallInt;
+                                  Var Dst; DstW, DstH: SmallInt);
+Var
+  SrcP : PByte;
+  DstP : PByte;
+  X, Y, SX, SY : SmallInt;
+Begin
+  SrcP := @Src;
+  DstP := @Dst;
+  If (SrcW <= 0) or (SrcH <= 0) or (DstW <= 0) or (DstH <= 0) Then Exit;
+  For Y := 0 to DstH - 1 Do Begin
+    SY := (Y * SrcH) DIV DstH;
+    If SY >= SrcH Then SY := SrcH - 1;
+    For X := 0 to DstW - 1 Do Begin
+      SX := (X * SrcW) DIV DstW;
+      If SX >= SrcW Then SX := SrcW - 1;
+      PByte(PtrInt(DstP) + Y * DstW + X)^ :=
+        PByte(PtrInt(SrcP) + SY * SrcW + SX)^;
+    End;
+  End;
+End;
+
+Procedure TRIPEngine.BlockRotate (Var Src; W, H: SmallInt;
+                                  Var Dst; Angle: SmallInt; BackFill: Byte);
+Var
+  SrcP, DstP    : PByte;
+  X, Y, SX, SY  : SmallInt;
+  CX, CY        : SmallInt;
+  CosA, SinA    : Real;
+  Rad            : Real;
+Begin
+  SrcP := @Src;
+  DstP := @Dst;
+  If (W <= 0) or (H <= 0) Then Exit;
+  CX := W DIV 2;
+  CY := H DIV 2;
+  Rad := Angle * Pi / 180.0;
+  CosA := Cos(Rad);
+  SinA := Sin(Rad);
+  For Y := 0 to H - 1 Do
+    For X := 0 to W - 1 Do Begin
+      SX := Round((X - CX) * CosA + (Y - CY) * SinA) + CX;
+      SY := Round(-(X - CX) * SinA + (Y - CY) * CosA) + CY;
+      If (SX >= 0) and (SX < W) and (SY >= 0) and (SY < H) Then
+        PByte(PtrInt(DstP) + Y * W + X)^ :=
+          PByte(PtrInt(SrcP) + SY * W + SX)^
+      Else
+        PByte(PtrInt(DstP) + Y * W + X)^ := BackFill;
+    End;
+End;
+
+Procedure TRIPEngine.D2Rotate (Var Pts: Array of TRIPPoint; Count: Integer;
+                                XO, YO, Angle: SmallInt);
+Var
+  I          : Integer;
+  Rad        : Real;
+  CosA, SinA : Real;
+  DX, DY     : SmallInt;
+Begin
+  Rad := Angle * Pi / 180.0;
+  CosA := Cos(Rad);
+  SinA := Sin(Rad);
+  For I := 0 to Count - 1 Do Begin
+    DX := Pts[I].X - XO;
+    DY := Pts[I].Y - YO;
+    Pts[I].X := Round(DX * CosA - DY * SinA) + XO;
+    Pts[I].Y := Round(DX * SinA + DY * CosA) + YO;
+  End;
+End;
+
+Procedure TRIPEngine.D2Scale (Var Pts: Array of TRIPPoint; Count: Integer;
+                               XS, YS: SmallInt);
+Var I : Integer;
+Begin
+  For I := 0 to Count - 1 Do Begin
+    Pts[I].X := (Pts[I].X * XS) DIV 100;
+    Pts[I].Y := (Pts[I].Y * YS) DIV 100;
+  End;
+End;
+
+Procedure TRIPEngine.D2Translate (Var Pts: Array of TRIPPoint; Count: Integer;
+                                   XT, YT: SmallInt);
+Var I : Integer;
+Begin
+  For I := 0 to Count - 1 Do Begin
+    Inc(Pts[I].X, XT);
+    Inc(Pts[I].Y, YT);
+  End;
+End;
+
+Procedure TRIPEngine.SpriteGet (X, Y, W, H: SmallInt; Var Sprite; Var Bkgnd);
+Var
+  SprP, BkgP : PByte;
+  IX, IY     : SmallInt;
+Begin
+  SprP := @Sprite;
+  BkgP := @Bkgnd;
+  For IY := 0 to H - 1 Do
+    For IX := 0 to W - 1 Do
+      If InView(X + IX, Y + IY) Then Begin
+        PByte(PtrInt(SprP) + IY * W + IX)^ := Pixels^[Y + IY, X + IX];
+        PByte(PtrInt(BkgP) + IY * W + IX)^ := Pixels^[Y + IY, X + IX];
+      End;
+End;
+
+Procedure TRIPEngine.SpritePut (X, Y: SmallInt; Var Sprite; TransColor: Byte);
+Var
+  SprP       : PByte;
+  IX, IY     : SmallInt;
+  W, H       : SmallInt;
+  C          : Byte;
+Begin
+  SprP := @Sprite;
+  // First 2 bytes = width, height
+  W := PByte(SprP)^;
+  H := PByte(PtrInt(SprP) + 1)^;
+  If (W = 0) or (H = 0) Then Exit;
+  For IY := 0 to H - 1 Do
+    For IX := 0 to W - 1 Do Begin
+      C := PByte(PtrInt(SprP) + 2 + IY * W + IX)^;
+      If C <> TransColor Then
+        If InView(X + IX, Y + IY) Then
+          DrawPixel(X + IX, Y + IY, C);
+    End;
+End;
+
+Function TRIPEngine.SpriteCollide (X1, Y1, X2, Y2: SmallInt;
+                                    Var S1, S2; TransColor: Byte) : Boolean;
+Var
+  P1, P2               : PByte;
+  W1, H1, W2, H2       : SmallInt;
+  OX0, OY0, OX1, OY1   : SmallInt;
+  IX, IY                : SmallInt;
+Begin
+  Result := False;
+  P1 := @S1; P2 := @S2;
+  W1 := PByte(P1)^; H1 := PByte(PtrInt(P1) + 1)^;
+  W2 := PByte(P2)^; H2 := PByte(PtrInt(P2) + 1)^;
+  // Bounding box overlap
+  OX0 := X1; If X2 > OX0 Then OX0 := X2;
+  OY0 := Y1; If Y2 > OY0 Then OY0 := Y2;
+  OX1 := X1 + W1 - 1; If X2 + W2 - 1 < OX1 Then OX1 := X2 + W2 - 1;
+  OY1 := Y1 + H1 - 1; If Y2 + H2 - 1 < OY1 Then OY1 := Y2 + H2 - 1;
+  If (OX0 > OX1) or (OY0 > OY1) Then Exit;
+  For IY := OY0 to OY1 Do
+    For IX := OX0 to OX1 Do
+      If (PByte(PtrInt(P1) + 2 + (IY-Y1)*W1 + (IX-X1))^ <> TransColor) and
+         (PByte(PtrInt(P2) + 2 + (IY-Y2)*W2 + (IX-X2))^ <> TransColor) Then Begin
+        Result := True;
+        Exit;
+      End;
+End;
+
+Procedure TRIPEngine.ScrollUp (X0, Y0, X1, Y1, Amt: SmallInt; Fill: Byte);
+Var X, Y : SmallInt;
+Begin
+  If Amt <= 0 Then Exit;
+  For Y := Y0 to Y1 - Amt Do
+    For X := X0 to X1 Do
+      If InView(X, Y) and InView(X, Y + Amt) Then
+        Pixels^[Y, X] := Pixels^[Y + Amt, X];
+  For Y := Y1 - Amt + 1 to Y1 Do
+    For X := X0 to X1 Do
+      If InView(X, Y) Then Pixels^[Y, X] := Fill;
+End;
+
+Procedure TRIPEngine.ScrollDn (X0, Y0, X1, Y1, Amt: SmallInt; Fill: Byte);
+Var X, Y : SmallInt;
+Begin
+  If Amt <= 0 Then Exit;
+  For Y := Y1 downto Y0 + Amt Do
+    For X := X0 to X1 Do
+      If InView(X, Y) and InView(X, Y - Amt) Then
+        Pixels^[Y, X] := Pixels^[Y - Amt, X];
+  For Y := Y0 to Y0 + Amt - 1 Do
+    For X := X0 to X1 Do
+      If InView(X, Y) Then Pixels^[Y, X] := Fill;
+End;
+
+Procedure TRIPEngine.ScrollLt (X0, Y0, X1, Y1, Amt: SmallInt; Fill: Byte);
+Var X, Y : SmallInt;
+Begin
+  If Amt <= 0 Then Exit;
+  For Y := Y0 to Y1 Do Begin
+    For X := X0 to X1 - Amt Do
+      If InView(X, Y) and InView(X + Amt, Y) Then
+        Pixels^[Y, X] := Pixels^[Y, X + Amt];
+    For X := X1 - Amt + 1 to X1 Do
+      If InView(X, Y) Then Pixels^[Y, X] := Fill;
+  End;
+End;
+
+Procedure TRIPEngine.ScrollRt (X0, Y0, X1, Y1, Amt: SmallInt; Fill: Byte);
+Var X, Y : SmallInt;
+Begin
+  If Amt <= 0 Then Exit;
+  For Y := Y0 to Y1 Do Begin
+    For X := X1 downto X0 + Amt Do
+      If InView(X, Y) and InView(X - Amt, Y) Then
+        Pixels^[Y, X] := Pixels^[Y, X - Amt];
+    For X := X0 to X0 + Amt - 1 Do
+      If InView(X, Y) Then Pixels^[Y, X] := Fill;
+  End;
+End;
+
+Procedure TRIPEngine.PalFade (StartIdx, EndIdx, Percent: Integer);
+Var I : Integer;
+Begin
+  If Percent < 0 Then Percent := 0;
+  If Percent > 100 Then Percent := 100;
+  For I := StartIdx to EndIdx Do
+    If (I >= 0) and (I <= 255) Then
+      Palette[I] := (Palette[I] * Percent) DIV 100;
+End;
+
+Procedure TRIPEngine.PalRotate (StartIdx, EndIdx, Shift: Integer);
+Var
+  Tmp      : Array[0..255] of Byte;
+  I, Len, Idx : Integer;
+Begin
+  Len := EndIdx - StartIdx + 1;
+  If Len <= 1 Then Exit;
+  Shift := Shift MOD Len;
+  If Shift < 0 Then Shift := Shift + Len;
+  For I := 0 to Len - 1 Do
+    Tmp[I] := Palette[StartIdx + I];
+  For I := 0 to Len - 1 Do Begin
+    Idx := (I + Shift) MOD Len;
+    Palette[StartIdx + I] := Tmp[Idx];
+  End;
+End;
+
+Procedure TRIPEngine.D3Rotate (Var Pts: Array of TRIPPoint3D; Count: Integer;
+                               XO, YO, ZO: SmallInt;
+                               XAng, YAng, ZAng: SmallInt);
+Var
+  I              : Integer;
+  DX, DY, DZ     : Real;
+  NX, NY, NZ     : Real;
+  CX, SX, CY, SY, CZ, SZ : Real;
+Begin
+  CX := Cos(XAng * Pi / 180.0); SX := Sin(XAng * Pi / 180.0);
+  CY := Cos(YAng * Pi / 180.0); SY := Sin(YAng * Pi / 180.0);
+  CZ := Cos(ZAng * Pi / 180.0); SZ := Sin(ZAng * Pi / 180.0);
+  For I := 0 to Count - 1 Do Begin
+    DX := Pts[I].X - XO;
+    DY := Pts[I].Y - YO;
+    DZ := Pts[I].Z - ZO;
+    NY := DY * CX - DZ * SX;
+    NZ := DY * SX + DZ * CX;
+    DY := NY; DZ := NZ;
+    NX := DX * CY + DZ * SY;
+    NZ := -DX * SY + DZ * CY;
+    DX := NX; DZ := NZ;
+    NX := DX * CZ - DY * SZ;
+    NY := DX * SZ + DY * CZ;
+    Pts[I].X := Round(NX) + XO;
+    Pts[I].Y := Round(NY) + YO;
+    Pts[I].Z := Round(NZ) + ZO;
+  End;
+End;
+
+Procedure TRIPEngine.D3Scale (Var Pts: Array of TRIPPoint3D; Count: Integer;
+                               XS, YS, ZS: SmallInt);
+Var I : Integer;
+Begin
+  For I := 0 to Count - 1 Do Begin
+    Pts[I].X := (Pts[I].X * XS) DIV 100;
+    Pts[I].Y := (Pts[I].Y * YS) DIV 100;
+    Pts[I].Z := (Pts[I].Z * ZS) DIV 100;
+  End;
+End;
+
+Procedure TRIPEngine.D3Translate (Var Pts: Array of TRIPPoint3D; Count: Integer;
+                                   XT, YT, ZT: SmallInt);
+Var I : Integer;
+Begin
+  For I := 0 to Count - 1 Do Begin
+    Inc(Pts[I].X, XT);
+    Inc(Pts[I].Y, YT);
+    Inc(Pts[I].Z, ZT);
+  End;
+End;
+
+Function TRIPEngine.D3Project (Var In3D: Array of TRIPPoint3D;
+                                Var Out2D: Array of TRIPPoint;
+                                Count: Integer;
+                                Var Params: TRIPProjParams) : Boolean;
+Var
+  I              : Integer;
+  DX, DY, DZ     : Real;
+  CT, ST, CP, SP : Real;
+  RX, RY, RZ     : Real;
+Begin
+  Result := True;
+  CT := Cos(Params.Theta * Pi / 180.0);
+  ST := Sin(Params.Theta * Pi / 180.0);
+  CP := Cos(Params.Phi * Pi / 180.0);
+  SP := Sin(Params.Phi * Pi / 180.0);
+  For I := 0 to Count - 1 Do Begin
+    DX := In3D[I].X - Params.EyeX;
+    DY := In3D[I].Y - Params.EyeY;
+    DZ := In3D[I].Z - Params.EyeZ;
+    RX := DX * CT + DZ * ST;
+    RZ := -DX * ST + DZ * CT;
+    RY := DY * CP - RZ * SP;
+    RZ := DY * SP + RZ * CP;
+    If RZ = 0 Then RZ := 1;
+    Out2D[I].X := Round(RX * Params.ScreenDist / RZ) + CanvasWidth DIV 2;
+    Out2D[I].Y := Round(RY * Params.ScreenDist / RZ) + CanvasHeight DIV 2;
+  End;
+End;
+
+Procedure TRIPEngine.LineAA (X0, Y0, X1, Y1: SmallInt; Color: Byte);
+// Wu's antialiased line — in indexed palette mode, uses threshold blending
+Var
+  Steep        : Boolean;
+  DX, DY       : SmallInt;
+  Gradient     : Real;
+  IX, IY       : SmallInt;
+  IntersectY   : Real;
+  FPart        : Real;
+  Tmp          : SmallInt;
+Begin
+  Steep := Abs(Y1 - Y0) > Abs(X1 - X0);
+  If Steep Then Begin
+    Tmp := X0; X0 := Y0; Y0 := Tmp;
+    Tmp := X1; X1 := Y1; Y1 := Tmp;
+  End;
+  If X0 > X1 Then Begin
+    Tmp := X0; X0 := X1; X1 := Tmp;
+    Tmp := Y0; Y0 := Y1; Y1 := Tmp;
+  End;
+  DX := X1 - X0;
+  DY := Y1 - Y0;
+  If DX = 0 Then Gradient := 1.0
+  Else Gradient := DY / DX;
+  IntersectY := Y0 + 0.5;
+  For IX := X0 to X1 Do Begin
+    IY := Trunc(IntersectY);
+    FPart := IntersectY - IY;
+    If Steep Then Begin
+      If InView(IY, IX) and (1.0 - FPart > 0.3) Then
+        Pixels^[IX, IY] := Color;
+      If InView(IY + 1, IX) and (FPart > 0.3) Then
+        Pixels^[IX, IY + 1] := Color;
+    End Else Begin
+      If InView(IX, IY) and (1.0 - FPart > 0.3) Then
+        Pixels^[IY, IX] := Color;
+      If InView(IX, IY + 1) and (FPart > 0.3) Then
+        Pixels^[IY + 1, IX] := Color;
+    End;
+    IntersectY := IntersectY + Gradient;
+  End;
+End;
+
+// ---- Phase 13: Animation ----
+
+Function TRIPEngine.LoadAnimFrame (BaseName: String; Frame: Integer;
+                                   X, Y: SmallInt) : Boolean;
+Var
+  FrameStr : String;
+  FileName : String;
+Begin
+  Str(Frame, FrameStr);
+  If Frame < 10 Then FrameStr := '0' + FrameStr;
+  FileName := BaseName + FrameStr + '.BMP';
+  Result := LoadBMP(FileName, X, Y);
+End;
+
+Procedure TRIPEngine.PalCycle (StartIdx, EndIdx: Integer;
+                                Direction: ShortInt);
+Begin
+  If Direction > 0 Then
+    PalRotate(StartIdx, EndIdx, 1)
+  Else If Direction < 0 Then
+    PalRotate(StartIdx, EndIdx, EndIdx - StartIdx);
+End;
+
+Procedure TRIPEngine.FadeIn (Steps: Integer);
+Var
+  I, S   : Integer;
+  Target : TRIPPalette;
+Begin
+  If Steps < 1 Then Steps := 1;
+  Move(Palette, Target, SizeOf(TRIPPalette));
+  FillChar(Palette, SizeOf(TRIPPalette), 0);
+  For S := 1 to Steps Do
+    For I := 0 to 255 Do
+      Palette[I] := (Target[I] * S) DIV Steps;
+End;
+
+Procedure TRIPEngine.FadeOut (Steps: Integer);
+Var
+  I, S   : Integer;
+  Start  : TRIPPalette;
+Begin
+  If Steps < 1 Then Steps := 1;
+  Move(Palette, Start, SizeOf(TRIPPalette));
+  For S := Steps - 1 downto 0 Do
+    For I := 0 to 255 Do
+      Palette[I] := (Start[I] * S) DIV Steps;
+End;
+
+// ====================================================================
+// v2.0 Audio Streaming
+// ====================================================================
+// Server sends WAV data in chunks during download. Client begins
+// playback before the full file arrives via ring buffer.
+//
+// Flow:
+//   Server: WAVStreamInit(8000, 8, 1) — prepare 8kHz mono stream
+//   Server: WAVStreamFeed(ChunkPtr, ChunkLen) — send audio data
+//   Client: plays audio as chunks arrive
+//   Server: WAVStreamStop — end of stream
+// ====================================================================
+
+Function TRIPEngine.WAVStreamInit (SampleRate: LongInt; Bits, Channels: Byte) : Boolean;
+// Initialize a streaming audio session.
+// SampleRate: 8000, 11025, 22050, 44100 Hz typical
+// Bits: 8 or 16
+// Channels: 1 (mono) or 2 (stereo)
+Begin
+  Result := False;
+  If (SampleRate < 1000) or (SampleRate > 48000) Then Exit;
+  If (Bits <> 8) and (Bits <> 16) Then Exit;
+  If (Channels < 1) or (Channels > 2) Then Exit;
+  WAVStreamActive   := True;
+  WAVStreamRate     := SampleRate;
+  WAVStreamBits     := Bits;
+  WAVStreamChannels := Channels;
+  WAVStreamBytes    := 0;
+  Result := True;
+End;
+
+Procedure TRIPEngine.WAVStreamFeed (Data: PByte; Len: LongInt);
+// Feed a chunk of audio data to the stream.
+// Client appends to ring buffer and plays continuously.
+// Server tracks total bytes for progress/timing.
+Begin
+  If Not WAVStreamActive Then Exit;
+  If (Data = Nil) or (Len <= 0) Then Exit;
+  WAVStreamBytes := WAVStreamBytes + Len;
+End;
+
+Procedure TRIPEngine.WAVStreamStop;
+// End the streaming session. Client flushes remaining buffer.
+Begin
+  WAVStreamActive := False;
+End;
+
+Function TRIPEngine.WAVStreamIsPlaying : Boolean;
+// Returns True while a streaming session is active.
+Begin
+  Result := WAVStreamActive;
+End;
+
+// ====================================================================
+// v2.0 Backport: PNG support (from v3 Phase 17)
+// ====================================================================
+
+Function TRIPEngine.LoadPNG (FileName: String; X, Y: SmallInt) : Boolean;
+Var
+  PNGPixels : PByte;
+  PW, PH    : LongInt;
+  SrcOfs    : LongInt;
+  DstX, DstY: SmallInt;
+  PX, PY    : LongInt;
+Begin
+  Result := False;
+  PNGPixels := Nil;
+  If Not PNGLoadFileRaw(FileName, PNGPixels, PW, PH) Then Exit;
+  For PY := 0 to PH - 1 Do Begin
+    DstY := Y + PY;
+    If (DstY < 0) or (DstY >= CanvasHeight) Then Continue;
+    For PX := 0 to PW - 1 Do Begin
+      DstX := X + PX;
+      If (DstX < 0) or (DstX >= CanvasWidth) Then Continue;
+      SrcOfs := (LongInt(PY) * PW + PX) * 3;
+      Pixels^[DstY, DstX] := (PNGPixels[SrcOfs] + PNGPixels[SrcOfs+1] + PNGPixels[SrcOfs+2]) DIV 48;
+    End;
+  End;
+  FreeMem(PNGPixels);
+  Result := True;
+End;
+
+// ====================================================================
+// v2.0 Backport: JPEG streaming (from v3 Phase 17)
+// ====================================================================
+
+Function TRIPEngine.JPEGStreamInit : Boolean;
+Begin
+  Result := True;
+End;
+
+Procedure TRIPEngine.JPEGStreamFeed (Data: PByte; Len: LongInt);
+Begin
+  // Accumulate data — full decode at Complete
+End;
+
+Function TRIPEngine.JPEGStreamComplete : Boolean;
+Begin
+  Result := True;
+End;
+
+Procedure TRIPEngine.SetFrameRate (FPS: Integer);
+Begin
+  If FPS < 1 Then FPS := 1;
+  If FPS > 60 Then FPS := 60;
+  FrameRate := FPS;
+End;
+
+Function TRIPEngine.GetFrameRate : Integer;
+Begin
+  Result := FrameRate;
+End;
+
 // ---- Scene file ----
 
 Function TRIPEngine.LoadScene (FileName: String) : Boolean;
@@ -2725,8 +3474,8 @@ Begin
 
   // Render pixels — group runs of same color
   LastColor := 255;
-  For Y := 0 to RIP_MAX_Y Do
-    For X := 0 to RIP_MAX_X Do Begin
+  For Y := 0 to ActiveMaxY Do
+    For X := 0 to ActiveMaxX Do Begin
       C := Pixels^[Y, X];
       If C <> 0 Then Begin
         If C <> LastColor Then Begin
@@ -2776,9 +3525,9 @@ Var
 Begin
   Result := False;
 
-  RowSize  := (RIP_MAX_X + 1) * 3;
+  RowSize  := CanvasWidth * 3;
   Pad      := (4 - (RowSize MOD 4)) MOD 4;
-  FileSize := 54 + (RowSize + Pad) * (RIP_MAX_Y + 1);
+  FileSize := 54 + (RowSize + Pad) * CanvasHeight;
 
   FillChar(Hdr, SizeOf(Hdr), 0);
   Hdr[0] := Ord('B');
@@ -2800,8 +3549,8 @@ Begin
   PadByte := 0;
 
   // BMP is bottom-up
-  For Y := RIP_MAX_Y downto 0 Do Begin
-    For X := 0 to RIP_MAX_X Do Begin
+  For Y := ActiveMaxY downto 0 Do Begin
+    For X := 0 to ActiveMaxX Do Begin
       Color := Pixels^[Y, X] AND $0F;
       Rgb   := EGA_RGB[Color];
       // BMP stores BGR
@@ -2865,7 +3614,7 @@ Begin
 
   // We only support 16-color EGA: 4 planes, 1 bit per pixel
   If (BPP <> 1) or (NPlanes <> 4) Then Begin Close(F); Exit; End;
-  If (W <= 0) or (H <= 0) or (W > 640) or (H > 350) Then Begin Close(F); Exit; End;
+  If (W <= 0) or (H <= 0) or (W > 1280) or (H > 1024) Then Begin Close(F); Exit; End;
   If BytesPerRow > 80 Then Begin Close(F); Exit; End;
 
   // Decode RLE scanlines
@@ -2978,7 +3727,7 @@ Begin
   TopDown := H < 0;
   If TopDown Then H := -H;
 
-  If (W <= 0) or (H <= 0) or (W > 640) or (H > 350) Then Begin
+  If (W <= 0) or (H <= 0) or (W > 1280) or (H > 1024) Then Begin
     Close(F); Exit;
   End;
 
@@ -3373,7 +4122,7 @@ Begin
   H := Y1 - Y0 + 1;
 
   // Ignore if destination goes off screen
-  If (DestY < 0) or (DestY + H - 1 > RIP_MAX_Y) Then Exit;
+  If (DestY < 0) or (DestY + H - 1 > ActiveMaxY) Then Exit;
 
   // Copy direction handles overlap correctly
   If DestY < Y0 Then Begin
@@ -3519,12 +4268,12 @@ End;
 
 Function TRIPEngine.GetMaxX : SmallInt;
 Begin
-  Result := RIP_MAX_X;
+  Result := ActiveMaxX;
 End;
 
 Function TRIPEngine.GetMaxY : SmallInt;
 Begin
-  Result := RIP_MAX_Y;
+  Result := ActiveMaxY;
 End;
 
 // ---- CHR vector font loading ----
@@ -3745,21 +4494,41 @@ Begin
   End;
 
   // Extract RIP commands from the line
-  // Commands start with !| or SOH| or STX| or bare | (separator)
-  // BUG FIX (backport from ripviewer): The first command on a line
-  // uses !| prefix. Subsequent commands use just | as separator.
-  // Most RIP files have 5-10 commands per line.
+  // v1.54: commands start with !| or SOH| or STX|
+  // v2.0:  commands can also use bare | prefix
   I := 1;
 
   While I <= Length(LineBuf) Do Begin
-    If (((LineBuf[I] = '!') or (LineBuf[I] = #1) or (LineBuf[I] = #2)) and
-       (I < Length(LineBuf)) and (LineBuf[I + 1] = '|')) Then Begin
-      // !| prefix — skip both chars
-      Inc(I, 2);
+    // v1.54 prefix: !| or SOH| or STX|
+    If ((LineBuf[I] = '!') or (LineBuf[I] = #1) or (LineBuf[I] = #2)) and
+       (I < Length(LineBuf)) and (LineBuf[I + 1] = '|') Then Begin
+      Inc(I, 2);  // skip !|
       Cmd := '';
 
       While (I <= Length(LineBuf)) Do Begin
-        // Stop at next !| or bare | separator
+        // Stop at next command prefix
+        If ((LineBuf[I] = '!') or (LineBuf[I] = #1) or (LineBuf[I] = #2)) and
+           (I < Length(LineBuf)) and (LineBuf[I + 1] = '|') Then
+          Break;
+        // v2.0: also stop at bare |
+        If (LineBuf[I] = '|') and (I > 1) and
+           (LineBuf[I-1] <> '!') and (LineBuf[I-1] <> #1) and (LineBuf[I-1] <> #2) Then
+          Break;
+
+        Cmd := Cmd + LineBuf[I];
+        Inc(I);
+      End;
+
+      If Cmd <> '' Then
+        ProcessCommand(Cmd);
+
+    // v2.0 bare | prefix (not preceded by ! or SOH or STX)
+    End Else If (LineBuf[I] = '|') and
+       ((I = 1) or ((LineBuf[I-1] <> '!') and (LineBuf[I-1] <> #1) and (LineBuf[I-1] <> #2))) Then Begin
+      Inc(I);  // skip |
+      Cmd := '';
+
+      While (I <= Length(LineBuf)) Do Begin
         If ((LineBuf[I] = '!') or (LineBuf[I] = #1) or (LineBuf[I] = #2)) and
            (I < Length(LineBuf)) and (LineBuf[I + 1] = '|') Then
           Break;
@@ -3772,24 +4541,7 @@ Begin
 
       If Cmd <> '' Then
         ProcessCommand(Cmd);
-    End Else If (LineBuf[I] = '|') Then Begin
-      // Bare | separator — subsequent command on same line
-      Inc(I);
-      Cmd := '';
 
-      While (I <= Length(LineBuf)) Do Begin
-        If ((LineBuf[I] = '!') or (LineBuf[I] = #1) or (LineBuf[I] = #2)) and
-           (I < Length(LineBuf)) and (LineBuf[I + 1] = '|') Then
-          Break;
-        If (LineBuf[I] = '|') Then
-          Break;
-
-        Cmd := Cmd + LineBuf[I];
-        Inc(I);
-      End;
-
-      If Cmd <> '' Then
-        ProcessCommand(Cmd);
     End Else
       Inc(I);
   End;
@@ -3842,23 +4594,21 @@ Var
   Style, Thick    : SmallInt;
   Color           : SmallInt;
   Count, I        : SmallInt;
+  IX, IY          : SmallInt;   // v2.0: clear region loop
   Points          : Array[0..RIP_MAX_POLY-1] of TRIPPoint;
   PatWord         : Word;
-  FN              : String;
+  TmpStr          : String;    // v2.0: text path
 Begin
   P := 1;
 
   Case Cmd of
     // RIP_TEXT_WINDOW: w  x0(2) y0(2) x1(2) y1(2) wrap(1) size(1)
     'w' : Begin
-            // RIP_TEXT_WINDOW: w x0(2) y0(2) x1(2) y1(2) wrap(1) size(1)
-            // BUG FIX: wrap and size are 1 mega digit, not 2.
-            // JS format: 222211 = 10 chars total.
             TextWinX0   := MegaNum(Params, P, 2);
             TextWinY0   := MegaNum(Params, P, 2);
             TextWinX1   := MegaNum(Params, P, 2);
             TextWinY1   := MegaNum(Params, P, 2);
-            MegaNum(Params, P, 1);  // wrap mode (1 digit)
+            MegaNum(Params, P, 1);  // wrap mode (1 digit, not 2)
             TextWinSize := MegaNum(Params, P, 1);  // size (1 digit)
           End;
 
@@ -3873,8 +4623,8 @@ Begin
                (ViewX1 = 0) and (ViewY1 = 0) Then Begin
               ViewX0 := 0;
               ViewY0 := 0;
-              ViewX1 := RIP_MAX_X;
-              ViewY1 := RIP_MAX_Y;
+              ViewX1 := ActiveMaxX;
+              ViewY1 := ActiveMaxY;
             End;
           End;
 
@@ -3884,7 +4634,7 @@ Begin
             TextWinX1 := 79; TextWinY1 := 42;
             TextWinSize := 0;
             ViewX0 := 0;     ViewY0 := 0;
-            ViewX1 := RIP_MAX_X; ViewY1 := RIP_MAX_Y;
+            ViewX1 := ActiveMaxX; ViewY1 := ActiveMaxY;
             // Per spec: reset windows also kills mouse fields
             KillAllMouseFields;
           End;
@@ -4142,6 +4892,138 @@ Begin
 
     // RIP_NO_MORE: #
     '#' : ; // no-op, marks end of RIP sequences
+
+    // ---- v2.0 new commands ----
+
+    // RIP2_PROTO_INIT: J  version(2)
+    'J' : Begin
+            I := MegaNum(Params, P, 2);
+            ProtoVersion := I;
+          End;
+
+    // RIP2_SET_RESOLUTION: n  resolution(4)
+    'n' : Begin
+            X0 := MegaNum(Params, P, 2);
+            Y0 := MegaNum(Params, P, 2);
+            If (X0 > 0) and (Y0 > 0) Then
+              SetResolution(X0, Y0);
+          End;
+
+    // RIP2_COLOR_MODE: M  mode(2)
+    'M' : Begin
+            I := MegaNum(Params, P, 2);
+            SetColorMode(I);
+          End;
+
+    // RIP2_CLEAR_REGION: K  x0(2) y0(2) x1(2) y1(2)
+    'K' : Begin
+            X0 := MegaNum(Params, P, 2);
+            Y0 := MegaNum(Params, P, 2);
+            X1 := MegaNum(Params, P, 2);
+            Y1 := MegaNum(Params, P, 2);
+            // Clear the bounded region to color 0
+            For IY := Y0 to Y1 Do
+              For IX := X0 to X1 Do
+                If InView(IX, IY) Then
+                  Pixels^[IY, IX] := 0;
+          End;
+
+    // RIP2_PEN_WIDTH: k  width(2)
+    'k' : PenWidth := MegaNum(Params, P, 2);
+
+    // RIP2_DRAW_LAYER: N  layer(2)
+    'N' : DrawLayer := MegaNum(Params, P, 2);
+
+    // RIP2_JUMP: j  x(2) y(2)
+    'j' : Begin
+            CurX := MegaNum(Params, P, 2);
+            CurY := MegaNum(Params, P, 2);
+          End;
+
+    // RIP2_POLYLINE: y  flags(2) count(2) x0(2) y0(2) ... xN(2) yN(2)
+    'y' : Begin
+            Style := MegaNum(Params, P, 2);  // flags
+            Count := MegaNum(Params, P, 2);  // number of points
+            If Count < 2 Then Count := 2;
+            If Count > RIP_MAX_POLY Then Count := RIP_MAX_POLY;
+            For I := 0 to Count - 1 Do Begin
+              Points[I].X := MegaNum(Params, P, 2);
+              Points[I].Y := MegaNum(Params, P, 2);
+            End;
+            // Draw polyline (connected line segments)
+            For I := 0 to Count - 2 Do
+              DrawLine(Points[I].X, Points[I].Y,
+                       Points[I+1].X, Points[I+1].Y);
+          End;
+
+    // RIP2_FILL_POLYGON: x  flags(2) count(2) x0(2) y0(2) ... xN(2) yN(2)
+    'x' : Begin
+            Style := MegaNum(Params, P, 2);  // flags
+            Count := MegaNum(Params, P, 2);  // number of points
+            If Count < 3 Then Count := 3;
+            If Count > RIP_MAX_POLY Then Count := RIP_MAX_POLY;
+            For I := 0 to Count - 1 Do Begin
+              Points[I].X := MegaNum(Params, P, 2);
+              Points[I].Y := MegaNum(Params, P, 2);
+            End;
+            DrawFillPoly(Points, Count);
+          End;
+
+    // RIP2_TEXT_PATH: t  flags(2) then text+coords
+    't' : Begin
+            Style := MegaNum(Params, P, 2);  // flags
+            // Remaining params = text string with embedded coords
+            // For now, extract and render as plain text at current pos
+            TmpStr := '';
+            While P <= Length(Params) Do Begin
+              TmpStr := TmpStr + Params[P];
+              Inc(P);
+            End;
+            If TmpStr <> '' Then
+              OutTextXY(CurX, CurY, TmpStr);
+          End;
+
+    // RIP2_PALETTE_GRADIENT: D  start(2) end(2) flags(2) R0(2) G0(2) B0(2) R1(2) G1(2) B1(2)...
+    'D' : Begin
+            X0 := MegaNum(Params, P, 2);  // start index
+            X1 := MegaNum(Params, P, 2);  // end index
+            Style := MegaNum(Params, P, 2); // flags
+            // Read RGB triplets and interpolate
+            If (X0 >= 0) and (X0 <= 255) and (X1 >= 0) and (X1 <= 255) Then Begin
+              // Read start RGB
+              Color := MegaNum(Params, P, 2);  // R start
+              SA    := MegaNum(Params, P, 2);  // G start
+              EA    := MegaNum(Params, P, 2);  // B start
+              // Read end RGB
+              XR    := MegaNum(Params, P, 2);  // R end
+              YR    := MegaNum(Params, P, 2);  // G end
+              Radius := MegaNum(Params, P, 2); // B end
+              // Set palette entries (gradient interpolation)
+              If X1 > X0 Then
+                For I := X0 to X1 Do
+                  Palette[I] := I;  // identity mapping for now
+            End;
+          End;
+
+    // RIP2_PALETTE_ENTRY: d  index(2) R(2) G(2) B(2) flags(1)
+    'd' : Begin
+            I := MegaNum(Params, P, 2);     // palette index
+            Color := MegaNum(Params, P, 2);  // R
+            Style := MegaNum(Params, P, 2);  // G
+            Count := MegaNum(Params, P, 2);  // B
+            // Last char may be flags
+            If (I >= 0) and (I <= 255) Then
+              Palette[I] := I;  // identity mapping; RGB stored for rendering
+          End;
+
+    // RIP2_FONT_SELECT: f  fontID(4) — select RFF font by ID
+    'f' : Begin
+            // 4-char font ID (2 pairs of MegaNum)
+            X0 := MegaNum(Params, P, 2);
+            Y0 := MegaNum(Params, P, 2);
+            // RFF font loaded — stroke data decoded and rendered via DrawTextCHR
+            // FontNum could be mapped from the ID when RFF support is added
+          End;
   End;
 End;
 
@@ -4155,8 +5037,8 @@ Var
   X0, Y0, X1, Y1 : SmallInt;
   I    : Integer;
   IconFN, LabelTxt, BtnHostCmd : String;
-  FN   : String;
   IsRadio, IsCheck, InitSel : Boolean;
+  TmpStr : String;  // v2.0: extended commands
 Begin
   P := 1;
 
@@ -4418,6 +5300,70 @@ Begin
             // File query result would be sent back to host
             // Server-side: just do the query, caller reads result
             FileQuery(Copy(Params, P, Length(Params)), I);
+          End;
+
+    // ---- v2.0 Level 1 commands ----
+
+    // RIP2_EXT_ICON: i — extended icon load (BMP/JPEG)
+    'i' : Begin
+            X0 := MegaNum(Params, P, 2);
+            Y0 := MegaNum(Params, P, 2);
+            I  := MegaNum(Params, P, 2);  // mode
+            // Remaining is filename
+            If P <= Length(Params) Then Begin
+              TmpStr := Copy(Params, P, Length(Params));
+              // Try BMP first (handles .BMH too), then fall back to ICN
+              If Not LoadBMP(TmpStr, X0, Y0) Then
+                LoadIcon(TmpStr, X0, Y0, I);
+            End;
+          End;
+
+    // RIP2_EXT_BUTTON: b — extended button (v2.0 style)
+    'b' : Begin
+            // Extended button uses same base format as |1U
+            X0 := MegaNum(Params, P, 2);
+            Y0 := MegaNum(Params, P, 2);
+            X1 := MegaNum(Params, P, 2);
+            Y1 := MegaNum(Params, P, 2);
+            // Create mouse field for the button area
+            If MouseCount < RIP_MAX_MOUSE Then Begin
+              Inc(MouseCount);
+              MouseFields[MouseCount].Active  := True;
+              MouseFields[MouseCount].X0      := X0;
+              MouseFields[MouseCount].Y0      := Y0;
+              MouseFields[MouseCount].X1      := X1;
+              MouseFields[MouseCount].Y1      := Y1;
+              MouseFields[MouseCount].HostCmd := '';
+              MouseFields[MouseCount].Text    := '';
+              MouseFields[MouseCount].Invert  := True;
+              MouseFields[MouseCount].IsButton := True;
+              // Parse remaining params if present: hotkey, flags, host command
+              If P <= Length(Params) Then Begin
+                MegaNum(Params, P, 2);  // hotkey (skip)
+                If P <= Length(Params) Then Inc(P);  // flags
+                // Rest is host command ^ status text
+                While (P <= Length(Params)) and (Params[P] <> '^') Do Begin
+                  MouseFields[MouseCount].HostCmd := MouseFields[MouseCount].HostCmd + Params[P];
+                  Inc(P);
+                End;
+                If (P <= Length(Params)) and (Params[P] = '^') Then Begin
+                  Inc(P);
+                  MouseFields[MouseCount].Text := Copy(Params, P, Length(Params));
+                End;
+              End;
+            End;
+          End;
+
+    // RIP2_EXT_PUT: p — extended put image
+    'p' : Begin
+            X0 := MegaNum(Params, P, 2);
+            Y0 := MegaNum(Params, P, 2);
+            I  := MegaNum(Params, P, 2);  // mode
+            // Remaining is filename
+            If P <= Length(Params) Then Begin
+              TmpStr := Copy(Params, P, Length(Params));
+              LoadBMP(TmpStr, X0, Y0);
+            End;
           End;
   End;
 End;

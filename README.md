@@ -2,8 +2,9 @@
 
 > **GitHub:** https://github.com/verta1878/mysticbbsirc
 >
-> **Release: 2026-08-28** — Version 1.11IRC A4.
-> RIPscrip v1.54 support (42/42 commands, pixel-perfect).
+> **Release: 2026-09-01** — Version 1.11IRC A4.
+> RIPscrip v1.54 support (42+ commands, pixel-perfect, 225/225 RIP art tested).
+> MIS compiles. mterm TCP connects to Mystic. TextWindow + ANSI processing.
 > Built with **FPC 2.6.4irc r3.1+**. GPLv3.
 
 Based on **Mystic BBS** GPL source by James Coyle (g00r00).
@@ -26,8 +27,12 @@ Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
 
 ```
 mdl/                     Mystic Development Library (79 units)
-  m_rip/                   RIP engine + tools
-    v1/                      RIPscrip v1.54 engine (kiddo)
+  m_rip/                   RIP engine + tools (shared by ripview, mystic, mterm)
+    v1/                      RIPscrip v1.54 engine (ripscr.pas)
+    rip_canvas.pas           Canvas abstraction
+    rip_surface.pas          Software raster backend
+    rip_term.pas             Terminal integration (TTermRip)
+    v1/ - v4/                Version-specific engines and tests
     v2/                      RIPscrip v2.0 engine (kiddo)
     v3/                      RIPscrip v3.0 engine (kiddo)
     v4/                      RIPscrip v4.0 engine (kiddo)
