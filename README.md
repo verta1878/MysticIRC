@@ -2,9 +2,9 @@
 
 > **GitHub:** https://github.com/verta1878/mysticbbsirc
 >
-> **Release: 2026-09-01** — Version 1.11IRC A4.
-> RIPscrip v1.54 support (42+ commands, pixel-perfect, 225/225 RIP art tested).
-> MIS compiles. mterm TCP connects to Mystic. TextWindow + ANSI processing.
+> **Release: 2026-09-06** — Version 1.11IRC A4.
+> VIPER complete — shared rendering stack (mdl/m_rip/), v2-v4 slim extensions.
+> MIS compiles. mterm TCP + RIP mode. Theme flags fixed. cleanup.bat.
 > Built with **FPC 2.6.4irc r3.1+**. GPLv3.
 
 Based on **Mystic BBS** GPL source by James Coyle (g00r00).
