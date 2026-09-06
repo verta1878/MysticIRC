@@ -66,6 +66,9 @@ rem ============================================================================
 rem  4. DUPLICATE MDL FILES — mterm should use -Fu../mdl
 rem ============================================================================
 echo [4/8] Duplicate MDL files... >> %LOGFILE%
+rem mystic_test\mdl\ should only have m_rip\ subfolder, not .pas copies
+for %%F in (mystic_test\mdl\*.pas) do call :delbin %%F
+call :delbin mystic_test\data\chat1.dat
 for %%F in (m_crc.pas m_prot_base.pas m_prot_zmodem.pas m_protocol_kermit.pas m_protocol_queue.pas m_protocol_xmodem.pas m_protocol_ymodem.pas) do call :delbin mystic_mterm\%%F
 echo OK >> %LOGFILE%
 
