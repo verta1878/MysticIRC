@@ -6,28 +6,48 @@ for all three in one place.
 
 Reference: `todo/RIPSCRIP.md` — how Mystic serves RIP content
 
-## Programs
+## MPL Testing Scripts (Do First)
 
-| Program | Role | Display |
-|---------|------|---------|
-| mystic_test | BBS server — serves RIP content to callers, sysop preview | FPC Graph on DOS, text console on Linux |
-| mterm | Terminal — connects to BBS, renders RIP graphics for caller | FPC Graph on DOS, text console on Linux |
-| ripview | Viewer — renders .RIP files offline | FPC Graph on DOS, BMP export on Linux |
+MPL scripts for automated testing — must work before RIP/VGA phases.
+Replaces Python pty hacks.
 
-## Shared Infrastructure
+| Phase | What |
+|-------|------|
+| MPL-0 | Setup: create mystic.dat, theme.dat, security.dat, users.dat via config scripts |
+| MPL-1 | Login test script — automate SysOp login (ACCT-1) |
+| MPL-2 | New user creation test (ACCT-2) |
+| MPL-3 | Email to SysOp test (ACCT-4) |
+| MPL-4 | RIP detection test — !|1Q query + R response |
+| MPL-5 | RIP menu test — .rip file sent and rendered |
 
-All three use:
-- `mdl/m_rip/ripengine.pas` — pixel buffer, canvas state, PutPixel/GetPixel
-- `mdl/m_rip/ripdraw.pas` — drawing primitives (line, circle, bar, fill, etc.)
-- `mdl/m_rip/riptext.pas` — text rendering, CHR fonts
-- `mdl/m_rip/ripbmp.pas` — BMP export (debug/headless)
-- `mdl/m_rip/v1/rip1parse.pas` — v1.54 command parser
-- `mdl/m_rip/v1/rip1exec.pas` — v1.54 command executor
-- `mdl/m_rip/rip_font8x8.inc` — IBM VGA ROM 8x8 font
-- `mdl/m_rip/rip_font8x14.inc` — IBM VGA ROM 8x14 font
-- `mdl/m_rip/rip_font8x16.inc` — IBM VGA ROM 8x16 font
+## Phase 0: Replace Homebrew Primitives with FPC Graph (VIPER-FIX)
 
----
+The core issue: `ripdraw.pas` uses homebrew Bresenham/midpoint/scanline
+code instead of FPC's `Graph` unit. JVIEW (the byte-for-byte reference)
+uses `uses Graph` (BGI) for all rendering — Line, Circle, Bar, FloodFill,
+etc. Our output doesn't match because we reimplemented these instead of
+using the same API.
+
+`m_output_graph.pas` (archived in `attic/rip_v1_homebrew/`) was the right
+concept — an mdl unit providing the graphics drawing API. It needs to be
+resurrected, stripped of ptcgraph/X11, and rewired:
+- `{$IFDEF DOS}`: FPC `Graph` unit (= BGI, pixel-perfect)
+- `{$ELSE}`: pixel buffer in memory (headless, BMP export)
+
+Then `ripdraw.pas` calls through this unit instead of homebrew primitives.
+Same API as JVIEW's RIPCMD.PAS → same pixel output.
+
+This is Phase 0 because everything else (RIP-M, VGA, SDL) depends on
+correct rendering. Must be done first.
+
+| Phase | What |
+|-------|------|
+| FIX-1 | Resurrect m_output_graph.pas from attic, strip ptcgraph |
+| FIX-2 | Add {$IFDEF DOS} path using FPC Graph unit |
+| FIX-3 | Add {$ELSE} path using pixel buffer (headless/Linux) |
+| FIX-4 | Replace ripdraw.pas homebrew calls with m_output_graph calls |
+| FIX-5 | Verify: ripview renders BILL.RIP + GOD-CTH.RIP — compare against JVIEW |
+| FIX-6 | Verify: all three programs compile clean (Linux + DOS cross-compile) |
 
 ## Phase 1: Setup (RIP-M1 — RIP-M4)
 
@@ -80,6 +100,29 @@ If Linux/Windows screen display is needed beyond DOS/DOSBox.
 | SDL-4 | Render to SDL surface under `{$IFDEF SDL}` | mystic_test |
 | SDL-5 | Test on Linux — native SDL window, no DOSBox | all |
 
+## Programs
+
+| Program | Role | Display |
+|---------|------|---------|
+| mystic_test | BBS server — serves RIP content to callers, sysop preview | FPC Graph on DOS, text console on Linux |
+| mterm | Terminal — connects to BBS, renders RIP graphics for caller | FPC Graph on DOS, text console on Linux |
+| ripview | Viewer — renders .RIP files offline | FPC Graph on DOS, BMP export on Linux |
+
+## Shared Infrastructure
+
+All three use:
+- `mdl/m_rip/ripengine.pas` — pixel buffer, canvas state, PutPixel/GetPixel
+- `mdl/m_rip/ripdraw.pas` — drawing primitives (line, circle, bar, fill, etc.)
+- `mdl/m_rip/riptext.pas` — text rendering, CHR fonts
+- `mdl/m_rip/ripbmp.pas` — BMP export (debug/headless)
+- `mdl/m_rip/v1/rip1parse.pas` — v1.54 command parser
+- `mdl/m_rip/v1/rip1exec.pas` — v1.54 command executor
+- `mdl/m_rip/rip_font8x8.inc` — IBM VGA ROM 8x8 font
+- `mdl/m_rip/rip_font8x14.inc` — IBM VGA ROM 8x14 font
+- `mdl/m_rip/rip_font8x16.inc` — IBM VGA ROM 8x16 font
+
+---
+
 ## Build Commands
 
 ```
@@ -94,6 +137,19 @@ fpc264irc -Mdelphi -dDOS -Fu../mdl -Fu../mdl/m_rip mterm.pas → mterm.exe
 fpc264irc -Mdelphi -dDOS -Fu../../mdl/m_rip ripview.pas → ripview.exe
 ```
 
+
+## UTF-8 Terminal Support
+
+Code exists in Mystic 1.12 (bbs_io.pas {$DEFINE USEUTF8}, UTF8Encode,
+CodePage field on RecUser). Needs wiring and testing.
+
+| Phase | What |
+|-------|------|
+| UTF8-1 | Study Mystic 1.12 UTF-8 implementation in bbs_io.pas |
+| UTF8-2 | ESC(U (CP437) / ESC(B (UTF-8) switching in m_output |
+| UTF8-3 | UTF-8 font rendering in graphics mode |
+| UTF8-4 | UTF-8 terminal auto-detection |
+
 ## Platform Summary
 
 | Platform | Display | RIP Rendering | Build |
@@ -101,32 +157,3 @@ fpc264irc -Mdelphi -dDOS -Fu../../mdl/m_rip ripview.pas → ripview.exe
 | DOS (DOSBox) | FPC Graph → VGA Mode 10h | Direct to VGA framebuffer | fpc264irc |
 | Linux | Text console (mterm), BMP file (ripview) | Pixel buffer in memory | fpc native |
 | Linux + SDL (future) | SDL 1.2 window | Pixel buffer → SDL surface | fpc native + SDL |
-
-## Phase 0: Replace Homebrew Primitives with FPC Graph (VIPER-FIX)
-
-The core issue: `ripdraw.pas` uses homebrew Bresenham/midpoint/scanline
-code instead of FPC's `Graph` unit. JVIEW (the byte-for-byte reference)
-uses `uses Graph` (BGI) for all rendering — Line, Circle, Bar, FloodFill,
-etc. Our output doesn't match because we reimplemented these instead of
-using the same API.
-
-`m_output_graph.pas` (archived in `attic/rip_v1_homebrew/`) was the right
-concept — an mdl unit providing the graphics drawing API. It needs to be
-resurrected, stripped of ptcgraph/X11, and rewired:
-- `{$IFDEF DOS}`: FPC `Graph` unit (= BGI, pixel-perfect)
-- `{$ELSE}`: pixel buffer in memory (headless, BMP export)
-
-Then `ripdraw.pas` calls through this unit instead of homebrew primitives.
-Same API as JVIEW's RIPCMD.PAS → same pixel output.
-
-This is Phase 0 because everything else (RIP-M, VGA, SDL) depends on
-correct rendering. Must be done first.
-
-| Phase | What |
-|-------|------|
-| FIX-1 | Resurrect m_output_graph.pas from attic, strip ptcgraph |
-| FIX-2 | Add {$IFDEF DOS} path using FPC Graph unit |
-| FIX-3 | Add {$ELSE} path using pixel buffer (headless/Linux) |
-| FIX-4 | Replace ripdraw.pas homebrew calls with m_output_graph calls |
-| FIX-5 | Verify: ripview renders BILL.RIP + GOD-CTH.RIP — compare against JVIEW |
-| FIX-6 | Verify: all three programs compile clean (Linux + DOS cross-compile) |

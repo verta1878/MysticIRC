@@ -12,6 +12,13 @@ if not exist LICENSE (
 )
 
 set LOGFILE=CLEANUP.LOG
+
+rem Merge old log if it exists
+if exist todo\CLEANUP1.LOG (
+    type todo\CLEANUP1.LOG >> %LOGFILE%
+    del todo\CLEANUP1.LOG
+    echo Merged todo\CLEANUP1.LOG into %LOGFILE%
+)
 set CLEANED=0
 set ERRORS=0
 
@@ -56,14 +63,10 @@ for /R %%F in (*.pyc) do del "%%F" 2>nul
 echo OK >> %LOGFILE%
 
 rem ============================================================================
-rem  4. DUPLICATE MDL FILES — programs should use -Fu../mdl
+rem  4. DUPLICATE MDL FILES — mterm should use -Fu../mdl
 rem ============================================================================
 echo [4/8] Duplicate MDL files... >> %LOGFILE%
 for %%F in (m_crc.pas m_prot_base.pas m_prot_zmodem.pas m_protocol_kermit.pas m_protocol_queue.pas m_protocol_xmodem.pas m_protocol_ymodem.pas) do call :delbin mystic_mterm\%%F
-if exist mystic_test\mdl (
-    echo WARN: mystic_test\mdl\ exists — delete it, use ../mdl via -Fu >> %LOGFILE%
-    set /a ERRORS+=1
-)
 echo OK >> %LOGFILE%
 
 rem ============================================================================
@@ -73,13 +76,14 @@ echo [5/8] Archive stale files to attic... >> %LOGFILE%
 
 if not exist attic\rip_v1_homebrew mkdir attic\rip_v1_homebrew
 if not exist attic\rip_v2v3v4_monolith mkdir attic\rip_v2v3v4_monolith
+if not exist attic\experimental mkdir attic\experimental
 
-rem Old OOP stack → attic
+rem Old OOP stack
 call :archive mdl\m_output_graph.pas attic\rip_v1_homebrew\m_output_graph.pas
 call :archive mdl\m_rip\rip_surface.pas attic\rip_v1_homebrew\rip_surface.pas
 call :archive mdl\m_rip\rip_canvas.pas attic\rip_v1_homebrew\rip_canvas.pas
 
-rem v2-v4 monoliths → attic
+rem v2-v4 monoliths
 call :archive mdl\m_rip\v2\rip2api.pas attic\rip_v2v3v4_monolith\rip2api.pas
 call :archive mdl\m_rip\v3\rip3api.pas attic\rip_v2v3v4_monolith\rip3api.pas
 call :archive mdl\m_rip\v3\rip3client.pas attic\rip_v2v3v4_monolith\rip3client.pas
@@ -87,6 +91,31 @@ call :archive mdl\m_rip\v3\rip3server.pas attic\rip_v2v3v4_monolith\rip3server.p
 call :archive mdl\m_rip\v4\rip4api.pas attic\rip_v2v3v4_monolith\rip4api.pas
 call :archive mdl\m_rip\v4\rip4client.pas attic\rip_v2v3v4_monolith\rip4client.pas
 call :archive mdl\m_rip\v4\rip4server.pas attic\rip_v2v3v4_monolith\rip4server.pas
+
+rem Experimental
+call :archive mystic_test\experimental\bmpcompare attic\experimental\bmpcompare
+call :archive mystic_test\experimental\bmpcompare.pas attic\experimental\bmpcompare.pas
+call :archive mystic_test\experimental\m_rip_graph.pas attic\experimental\m_rip_graph.pas
+if exist mystic_test\experimental rmdir mystic_test\experimental 2>nul
+
+rem data_bak
+if exist mystic_test\data_bak (
+    rmdir /S /Q mystic_test\data_bak
+    echo   OK: Deleted mystic_test\data_bak\ >> %LOGFILE%
+    set /a CLEANED+=1
+)
+
+rem Stray font .inc copies — canonical is mdl\m_rip\ and program\mdl\m_rip\
+for %%F in (rip_font8x8.inc rip_font8x14.inc rip_font8x16.inc) do (
+    call :delbin mdl\%%F
+    call :delbin mystic_mterm\%%F
+    call :delbin mystic_ripview\source\%%F
+    call :delbin mystic\%%F
+    call :delbin mdl\m_rip\v1\%%F
+    call :delbin mdl\m_rip\v2\%%F
+    call :delbin mdl\m_rip\v3\%%F
+    call :delbin mdl\m_rip\v4\%%F
+)
 
 echo OK >> %LOGFILE%
 
@@ -120,12 +149,19 @@ echo [8/8] Verify... >> %LOGFILE%
 echo. >> %LOGFILE%
 echo === BUILD CHECK === >> %LOGFILE%
 echo   cd mystic_ripview\source >> %LOGFILE%
-echo   fpc -Mdelphi -Fu..\..\mdl\m_rip -Fu..\..\mdl\m_rip\v1 ripview.pas >> %LOGFILE%
+echo   fpc -Mdelphi -Fu..\..\mdl\m_rip -Fu..\..\mdl\m_rip\v1 -Fi..\..\mdl\m_rip ripview.pas >> %LOGFILE%
 echo   cd mystic_mterm >> %LOGFILE%
-echo   fpc -Mdelphi -Fu..\mdl -Fu..\mdl\m_rip -Fu..\mdl\m_rip\v1 -Fi..\mdl mterm.pas >> %LOGFILE%
+echo   fpc -Mdelphi -Fu..\mdl -Fu..\mdl\m_rip -Fu..\mdl\m_rip\v1 -Fi..\mdl -Fi..\mdl\m_rip mterm.pas >> %LOGFILE%
 echo   cd mystic_test >> %LOGFILE%
 echo   fpc -Mdelphi -Fu..\mdl -Fi..\mdl mystic.pas >> %LOGFILE%
 echo   fpc -Mdelphi -Fu..\mdl -Fi..\mdl mis.pas >> %LOGFILE%
+echo. >> %LOGFILE%
+echo === FONT LOCATIONS (canonical) === >> %LOGFILE%
+echo   mdl\m_rip\rip_font8x8.inc (master) >> %LOGFILE%
+echo   mdl\m_rip\rip_font8x14.inc (master) >> %LOGFILE%
+echo   mdl\m_rip\rip_font8x16.inc (master) >> %LOGFILE%
+echo   mystic_test\mdl\m_rip\ (copy) >> %LOGFILE%
+echo   mystic\mdl\m_rip\ (copy) >> %LOGFILE%
 echo. >> %LOGFILE%
 echo === SUMMARY === >> %LOGFILE%
 echo Cleaned: %CLEANED% file(s). Errors: %ERRORS% >> %LOGFILE%

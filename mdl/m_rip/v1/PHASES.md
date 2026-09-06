@@ -36,27 +36,17 @@
 - ACCT-1: SysOp account — record layout correct (1536 bytes), checkuser reads it, but FindUser fails at runtime (OPEN — debug next session)
 - ACCT-3: "Selected theme not available" — setup issue, theme Flags fixed (AllowASCII|AllowANSI), CLOSED
 - Theme.dat regenerated with correct RecTheme layout (Flags field at offset 0)
+- FONT-2/3: IBM VGA 8x14 and 8x16 fonts from ROM dumps (CLOSED)
 
 ## OPEN
 
-| Phase | What | Status |
-|-------|------|--------|
-| ACCT-1 | SysOp account — FindUser can't locate it at runtime despite correct record | Debug: add WriteLn trace to FindUser, check Reset/IOResult/Eof |
-| ACCT-2 | Test new user creation via login flow | Blocked by ACCT-1 |
-| ACCT-4 | Email send to SysOp | Test with MPL script |
-| SETUP | Recreate mkconfig/mktheme/mksec/mkuser — lost during repo switch | Setup should create all data files so mystic boots clean |
-| MPL-1 | Write MPL login test script (.mps) | Replaces Python pty testing |
-| UTF8-1 | Study Mystic 1.12 UTF-8 implementation | |
-| UTF8-2/3/4 | ESC(U/ESC(B switching, UTF-8 font rendering, auto-detection | |
-| FONT-2/3 | IBM VGA 8x14 and 8x16 fonts | |
-| FlushRIPBuf | Works for ANSI fallback — untested with actual !| RIP commands | Need RIP-enabled menu screen |
+All open phases tracked in `RIP-GRAPHICS-PHASES.md`.
 
 ## ARCHIVED
 
 Pre-VIPER code in attic/:
 - attic/rip_v1_homebrew/ — ripscr.pas, rip_surface.pas, rip_canvas.pas, m_output_graph.pas, m_output_rip.pas
 - attic/rip_v2v3v4_monolith/ — rip2api.pas (5381), rip3api.pas (8358), rip4api.pas (8633)
-
 
 ## RIP Graphics Phases
 
