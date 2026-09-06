@@ -1,0 +1,16 @@
+RIPscrip v3.0 Server-Side Rendering Engine
+Version: 3.0.24
+Status:  ALL PHASES COMPLETE (15-24)
+Lines:   8294 (rip3api.pas)
+
+Phases complete: 1-24 (300 items, 0 todo)
+
+Codec directories:
+  img/ — 20 image/animation/graphics codecs
+  wav/ — 39 audio + 3 ASM fast-paths/streaming/MP3/compression codecs
+  prg/ — 6 progressive rendering codecs
+  pasjpeg/ — 58 JPEG library files
+
+Total codec files: 125 (67 units + 58 pasjpeg)
+Tests: 592/592 (14 suites)
+License: GPLv3

@@ -1,0 +1,18 @@
+  RIPscrip v1.54 Server-Side Rendering Engine
+  ============================================
+  Mystic BBS IRC Fork — ripscr.pas
+  4,041 lines | 51 commands | 132 methods
+  16-color EGA | 640x350 | CHR vector fonts
+
+  Full RIPscrip v1.54 implementation:
+  36 Level 0 + 15 Level 1 commands
+  Drawing, fonts, icons, buttons, mouse
+  fields, text variables, screen save/
+  restore, PCX/BMP/ICN image loading.
+
+  Pure Pascal | Zero dependencies
+  FPC 2.6.4irc | All platforms | GPLv3
+  Tests: 97/97 (2 suites)
+
+  Part of the Mystic BBS IRC Fork
+  July 2026
