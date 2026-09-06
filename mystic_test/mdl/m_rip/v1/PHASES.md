@@ -50,5 +50,5 @@ Pre-VIPER code in attic/:
 
 ## RIP Graphics Phases
 
-See `mdl/m_rip/RIP-GRAPHICS-PHASES.md` for all RIP display phases
+See `RIP-GRAPHICS-PHASES.md` (repo root) for all RIP display phases
 covering mystic_test, mterm, and ripview in one document.

@@ -8,7 +8,7 @@ rem ============================================================================
 if not exist LICENSE (
     echo ERROR: Run this from the mysticbbsirc repo root.
     pause
-    goto :EOF
+    exit /b
 )
 
 set LOGFILE=CLEANUP.LOG
@@ -172,7 +172,7 @@ echo.
 echo  mysticbbsirc cleanup complete. Cleaned: %CLEANED%. Errors: %ERRORS%.
 echo  See %LOGFILE%.
 echo.
-goto :EOF
+exit /b 0
 
 :delbin
 if exist %1 (
@@ -180,7 +180,7 @@ if exist %1 (
     echo   OK: Deleted %1 >> %LOGFILE%
     set /a CLEANED+=1
 )
-goto :EOF
+exit /b
 
 :archive
 if exist %1 (
@@ -194,4 +194,4 @@ if exist %1 (
         set /a CLEANED+=1
     )
 )
-goto :EOF
+exit /b
