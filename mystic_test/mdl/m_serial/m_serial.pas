@@ -16,7 +16,7 @@
 //   OS/2               — DosOpen / DosDevIOCtl ASYNC
 //
 // DEPENDENCY:
-//   serial_irq.pas — DOS only, IRQ-driven ring buffer (kiddo)
+//   m_serial_irq.pas — DOS only, IRQ-driven ring buffer (kiddo)
 //
 // WIRING INTO MYSTIC:
 //   m_io_fossil.pas (TIOBase adapter)
@@ -25,7 +25,7 @@
 //
 // CREDITS:
 //   sysop/0  — DOS UART implementation, cross-platform port
-//   kiddo    — serial_irq.pas ring buffer
+//   kiddo    — m_serial_irq.pas ring buffer
 //   evga     — FOSSIL abstraction, SIO rebuild
 //   wrench   — transport, FOSSIL, DVI/HDMI
 // ====================================================================
@@ -46,10 +46,10 @@ Uses Windows;
 Uses DosCalls;
 {$ENDIF}
 {$IFDEF GO32V2}
-Uses Ports, serial_irq;
+Uses Ports, m_serial_irq;
 {$ENDIF}
 {$IFDEF MSDOS}
-Uses serial_irq;
+Uses m_serial_irq;
 {$ENDIF}
 
 Type

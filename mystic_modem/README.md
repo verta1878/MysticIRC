@@ -17,10 +17,6 @@ is planned (see below).
 | mdm_fossil.pas | 306 | FOSSIL driver — dual backend: serial + INT 14h |
 | mdm_wfc.pas | 174 | WFC screen drawing |
 | mdm_miswfc.pas | 133 | MIS WFC screen integration |
-| fossil_dos.pas | 110 | INT 14h FOSSIL interface (DOS) |
-| mystfoss.pas | 92 | i8086 real-mode FOSSIL driver |
-| netmodem.pas | 153 | Network modem (needs Watt-32 DOS TCP/IP) |
-| netmodem_fossil.pas | 232 | FOSSIL network modem bridge |
 | squish_example.pas | 106 | Squish message base example |
 
 ## Other Files
@@ -56,11 +52,7 @@ Requires: `../mystic/mdl/` (MDL units), `../mystic/` (BBS_Records etc).
 | mdm_fossil | ✅ |
 | mdm_wfc | ✅ |
 | mdm_miswfc | ✅ |
-| fossil_dos | ✅ |
-| mystfoss | ✅ |
-| netmodem_fossil | ✅ |
 | squish_example | ✅ |
-| netmodem | ❌ needs Watt-32 DOS TCP/IP library |
 
 ## Dependencies
 

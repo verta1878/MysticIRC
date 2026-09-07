@@ -1,5 +1,5 @@
 { ===========================================================================
-  serial_irq — interrupt-driven receive ring buffer for DOS UART
+  m_serial_irq — interrupt-driven receive ring buffer for DOS UART
   Copyright (C) 2025-2026 Antonio Rico (Reapern66 / verta1878)
   GPLv3 — see LICENSE
   ---------------------------------------------------------------------------
@@ -11,11 +11,14 @@
 
 {$MODE OBJFPC}{$H+}
 
-unit serial_irq;
+unit m_serial_irq;
 
 interface
 
-uses serial;
+Type
+  TSerialHandle = LongInt;
+
+{ was: uses serial; — type now declared locally }
 
 procedure SerEnableIRQ(Handle: TSerialHandle);
 procedure SerDisableIRQ(Handle: TSerialHandle);
