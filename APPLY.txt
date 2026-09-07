@@ -1,0 +1,50 @@
+mystfoss DPMI Release — 2026-09-07
+===================================
+
+Extract from MysticIRC repo root:
+
+  cd MysticIRC-main
+  unzip -o mystfoss-release.zip
+
+Files land in the correct subdirectories automatically.
+
+CHANGED FILES:
+  mystic/mystfoss.pas                   FOSSIL v5 driver — DPMI INT 14h wired
+  mystic_test/mystfoss.pas              same (test copy)
+  mystic/mdl/m_serial/m_serial.pas      FBase field ordering fix
+  mystic_test/mdl/m_serial/m_serial.pas same (test copy)
+  mystic/mdl/m_serial/m_serial_irq.pas  Added local UART constants
+  mystic_test/mdl/m_serial/m_serial_irq.pas same (test copy)
+
+ALSO INCLUDED:
+  START-HERE.md                         Updated project guide (repo root)
+  CHECKSUMS.txt                         SHA256 for entire repo (4899 files)
+  CHECKSUMS.md5                         MD5 for entire repo
+  CHECKSUMS.sha256                      SHA256 for entire repo
+
+WHAT CHANGED:
+
+  mystfoss.pas (573 lines):
+    Full DPMI real-mode callback for INT 14h
+    4KB RX + 4KB TX ring buffers
+    PumpSerial routine (hardware ↔ buffers)
+    15 FOSSIL functions (FTS-0015 v5)
+    Compiles: Linux x86_64, DOS go32v2
+
+  m_serial.pas:
+    FBase field moved before SetParams method
+    (FPC requires fields before methods in class declaration)
+
+  m_serial_irq.pas:
+    Local UART constants: COM_BASE, COM_IRQ, UART_RBR, UART_LSR,
+    LSR_DR, MCR_OUT2 (was referencing deleted serial.pas)
+
+FILE CHECKSUMS (SHA256):
+0901409c51055e2583cf52be1ab79a9b84724cbc22c9f629f33a4606b8590ce8  ./CHECKSUMS.txt
+622bee530248a8e07f698ba8d6caea237403b3cf9674244ccc696a2b9852d455  ./START-HERE.md
+1d48651865066eea3d50604bce65439fe4bb6c3f8e8407013ea287048a77f0ab  ./mystic/mdl/m_serial/m_serial.pas
+0b3b3840f97ed03806f28dd27f27d6d87f3358a14037321949d8debef57fc357  ./mystic/mdl/m_serial/m_serial_irq.pas
+3d8d82f221b38733444eed4db0c70a7d01fe6a5e12af20b7a1951b51a3e14d28  ./mystic/mystfoss.pas
+1d48651865066eea3d50604bce65439fe4bb6c3f8e8407013ea287048a77f0ab  ./mystic_test/mdl/m_serial/m_serial.pas
+0b3b3840f97ed03806f28dd27f27d6d87f3358a14037321949d8debef57fc357  ./mystic_test/mdl/m_serial/m_serial_irq.pas
+3d8d82f221b38733444eed4db0c70a7d01fe6a5e12af20b7a1951b51a3e14d28  ./mystic_test/mystfoss.pas

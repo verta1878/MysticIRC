@@ -62,11 +62,11 @@ Type
     FIsOpen   : Boolean;
     FDevice   : String;
     FBaud     : LongInt;
-    Procedure SetParams(Baud: LongInt; DataBits: Integer;
-                Parity: TSerialParity; StopBits: Integer; HWFlow: Boolean);
     {$IFDEF GO32V2}
     FBase     : Word;
     {$ENDIF}
+    Procedure SetParams(Baud: LongInt; DataBits: Integer;
+                Parity: TSerialParity; StopBits: Integer; HWFlow: Boolean);
   Public
     Constructor Create;
     Destructor  Destroy; Override;

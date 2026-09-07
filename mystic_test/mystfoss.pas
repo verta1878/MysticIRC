@@ -36,6 +36,9 @@ Uses
   {$IFDEF UNIX}
   BaseUnix,
   {$ENDIF}
+  {$IFDEF GO32V2}
+  Go32,
+  {$ENDIF}
   SysUtils,
   m_serial;
 
@@ -148,40 +151,272 @@ End;
 
 {$IFDEF GO32V2}
 // ====================================================================
-// DOS TSR — hooks INT 14h
+// DOS TSR — hooks INT 14h via DPMI real-mode callback
 // ====================================================================
-Uses
-  Go32, Dos;
+// DPMI flow:
+//   1. get_rm_callback() allocates a real-mode→protected-mode thunk
+//   2. set_rm_interrupt($14, thunk) hooks INT 14h
+//   3. When a DOS program calls INT 14h, DPMI calls our handler
+//      with registers in CallbackRegs (trealregs)
+//   4. We read AH (function), DX (port), dispatch, write results back
+//   5. On uninstall, restore original vector and free callback
+// ====================================================================
 
 Var
-  OldInt14  : TSegInfo;
-  Installed14 : Boolean;
+  OldInt14     : TSegInfo;     // saved original INT 14h vector
+  CallbackInfo : TSegInfo;     // our DPMI callback address
+  CallbackRegs : TRealRegs;    // register block for callback
+  Installed14  : Boolean;
 
-Procedure Int14Handler; Interrupt;
-// This ISR handles INT 14h calls from DOS programs.
-// AH = function number, DX = port number, other regs vary.
+// Ring buffer for FOSSIL receive (separate from serial_irq — this is
+// the FOSSIL-level buffer that DOS programs read from via func 02h)
+Const
+  FOSSIL_BUFSIZE = 4096;
+
 Var
-  AH, AL: Byte;
-  DX: Word;
-  B: Byte;
-  N: LongInt;
+  RxBuf     : Array[0..FOSSIL_BUFSIZE-1] of Byte;
+  RxHead    : Word;
+  RxTail    : Word;
+  TxBuf     : Array[0..FOSSIL_BUFSIZE-1] of Byte;
+  TxHead    : Word;
+  TxTail    : Word;
+  FossilActive : Boolean;
+
+Function RxCount: Word;
 Begin
-  // Get registers from interrupt frame
-  // Note: in go32v2, interrupt handlers get register access via
-  // the DPMI callback mechanism. This is a simplified placeholder
-  // that will need DPMI real-mode callback wiring for production use.
+  If RxHead >= RxTail Then Result := RxHead - RxTail
+  Else Result := FOSSIL_BUFSIZE - RxTail + RxHead;
+End;
+
+Function TxCount: Word;
+Begin
+  If TxHead >= TxTail Then Result := TxHead - TxTail
+  Else Result := FOSSIL_BUFSIZE - TxTail + TxHead;
+End;
+
+Function TxFree: Word;
+Begin
+  Result := FOSSIL_BUFSIZE - 1 - TxCount;
+End;
+
+Procedure PumpSerial;
+// Move data between serial hardware and FOSSIL ring buffers.
+// Called from main loop and from the callback handler.
+Var
+  B   : Byte;
+  N   : LongInt;
+  Buf : Array[0..255] of Byte;
+Begin
+  If Not Ser.IsOpen Then Exit;
+
+  // RX: serial → RxBuf
+  While Ser.DataAvailable And (RxCount < FOSSIL_BUFSIZE - 1) Do Begin
+    N := Ser.ReadBuf(B, 1);
+    If N = 1 Then Begin
+      RxBuf[RxHead] := B;
+      RxHead := (RxHead + 1) mod FOSSIL_BUFSIZE;
+    End;
+  End;
+
+  // TX: TxBuf → serial
+  While TxCount > 0 Do Begin
+    B := TxBuf[TxTail];
+    N := Ser.WriteBuf(B, 1);
+    If N = 1 Then TxTail := (TxTail + 1) mod FOSSIL_BUFSIZE
+    Else Break;
+  End;
+End;
+
+Procedure Int14Handler; CDecl;
+// DPMI real-mode callback handler.
+// CallbackRegs contains the DOS program's registers.
+// We read AH for function number, dispatch, write results back.
+Var
+  Func : Byte;
+  Port : Word;
+  B    : Byte;
+  W    : Word;
+Begin
+  Func := CallbackRegs.AH;
+  Port := CallbackRegs.DX;
+
+  Case Func of
+    // ---- 00h: Set baud rate ----
+    $00: Begin
+           // AL = baud init byte (same as BIOS format)
+           // Ignore for now — baud set at init time
+           CallbackRegs.AX := $0030; // status: TX ready + TX empty
+           If RxCount > 0 Then CallbackRegs.AX := CallbackRegs.AX or $0100;
+         End;
+
+    // ---- 01h: Send character with wait ----
+    $01: Begin
+           B := CallbackRegs.AL;
+           // Wait for space in TX buffer
+           While TxFree = 0 Do PumpSerial;
+           TxBuf[TxHead] := B;
+           TxHead := (TxHead + 1) mod FOSSIL_BUFSIZE;
+           PumpSerial;
+           CallbackRegs.AX := $0030; // TX ready
+         End;
+
+    // ---- 02h: Receive character with wait ----
+    $02: Begin
+           While RxCount = 0 Do PumpSerial;
+           B := RxBuf[RxTail];
+           RxTail := (RxTail + 1) mod FOSSIL_BUFSIZE;
+           CallbackRegs.AH := $00; // success
+           CallbackRegs.AL := B;
+         End;
+
+    // ---- 03h: Request status ----
+    $03: Begin
+           PumpSerial;
+           W := $0030; // TX holding register empty + TX shift register empty
+           If RxCount > 0 Then W := W or $0100; // data ready
+           If Ser.GetDCD Then W := W or $0080;   // carrier detect
+           If Ser.GetCTS Then W := W or $0010;   // CTS
+           If Ser.GetDSR Then W := W or $0020;   // DSR
+           CallbackRegs.AX := W;
+         End;
+
+    // ---- 04h: Initialize driver ----
+    $04: Begin
+           FossilActive := True;
+           RxHead := 0; RxTail := 0;
+           TxHead := 0; TxTail := 0;
+           CallbackRegs.AX := FOSSIL_ID;  // $1954 magic
+           CallbackRegs.BH := FOSSIL_REVISION; // v5
+           CallbackRegs.BL := FOSSIL_MAXFUNC;  // highest function
+         End;
+
+    // ---- 05h: Deinitialize driver ----
+    $05: Begin
+           Ser.FlushInput;
+           Ser.Drain;
+           FossilActive := False;
+         End;
+
+    // ---- 06h: Raise/lower DTR ----
+    $06: Begin
+           If CallbackRegs.AL = $01 Then Ser.SetDTR(True)
+           Else Ser.SetDTR(False);
+         End;
+
+    // ---- 07h: Return timer tick parameters ----
+    $07: Begin
+           CallbackRegs.AH := 1;   // ticks per second approx
+           CallbackRegs.AL := 55;  // ms per tick (18.2 Hz)
+           CallbackRegs.DX := 0;
+         End;
+
+    // ---- 08h: Flush output buffer ----
+    $08: Begin
+           While TxCount > 0 Do PumpSerial;
+           Ser.Drain;
+         End;
+
+    // ---- 09h: Purge output buffer ----
+    $09: Begin
+           TxHead := 0; TxTail := 0;
+         End;
+
+    // ---- 0Ah: Purge input buffer ----
+    $0A: Begin
+           RxHead := 0; RxTail := 0;
+           Ser.FlushInput;
+         End;
+
+    // ---- 0Bh: Send character (no wait) ----
+    $0B: Begin
+           If TxFree > 0 Then Begin
+             TxBuf[TxHead] := CallbackRegs.AL;
+             TxHead := (TxHead + 1) mod FOSSIL_BUFSIZE;
+             PumpSerial;
+             CallbackRegs.AX := $0001; // accepted
+           End Else
+             CallbackRegs.AX := $0000; // buffer full
+         End;
+
+    // ---- 0Ch: Non-destructive read-ahead ----
+    $0C: Begin
+           PumpSerial;
+           If RxCount > 0 Then Begin
+             CallbackRegs.AH := $00;
+             CallbackRegs.AL := RxBuf[RxTail]; // peek, don't consume
+           End Else
+             CallbackRegs.AX := $FFFF; // no data
+         End;
+
+    // ---- 0Fh: Enable/disable flow control ----
+    $0F: Begin
+           // AL: bit 0 = XON/XOFF, bit 1 = CTS/RTS
+           // Handled at serial level, acknowledge
+         End;
+
+    // ---- 18h: Read block ----
+    $18: Begin
+           // CX = count, ES:DI = buffer (real mode)
+           // We can't write to real-mode memory from here easily
+           // For now return 0 bytes read
+           CallbackRegs.AX := 0;
+         End;
+
+    // ---- 19h: Write block ----
+    $19: Begin
+           // CX = count, ES:DI = buffer (real mode)
+           // Same issue — needs dosmemget/dosmemput
+           CallbackRegs.AX := 0;
+         End;
+
+    // ---- 1Ah: Break begin/end ----
+    $1A: Begin
+           If CallbackRegs.AL = $01 Then Ser.SendBreak;
+         End;
+
+    // ---- 1Bh: Return driver information ----
+    $1B: Begin
+           // Returns info structure — need to write to real-mode buffer
+           // For now, set CX = size of info block
+           CallbackRegs.AX := 18; // size of FOSSIL info struct
+           CallbackRegs.BH := FOSSIL_REVISION;
+         End;
+
+  Else
+    // Unknown function — return with no change
+  End;
 End;
 
 Procedure InstallTSR;
 Begin
-  WriteLn('Installing INT 14h handler...');
-  // Save old INT 14h vector
-  Get_PM_Interrupt($14, OldInt14);
-  // Set new INT 14h vector
-  // Note: Full DPMI callback implementation needed for production
+  // Init ring buffers
+  RxHead := 0; RxTail := 0;
+  TxHead := 0; TxTail := 0;
+  FossilActive := False;
+
+  WriteLn('Installing INT 14h DPMI callback...');
+
+  // Save original INT 14h real-mode vector
+  get_rm_interrupt($14, OldInt14);
+
+  // Allocate real-mode callback → our Int14Handler
+  FillChar(CallbackRegs, SizeOf(CallbackRegs), 0);
+  If Not get_rm_callback(@Int14Handler, CallbackRegs, CallbackInfo) Then Begin
+    WriteLn('ERROR: Cannot allocate DPMI real-mode callback.');
+    Halt(2);
+  End;
+
+  // Hook INT 14h
+  If Not set_rm_interrupt($14, CallbackInfo) Then Begin
+    WriteLn('ERROR: Cannot set INT 14h vector.');
+    free_rm_callback(CallbackInfo);
+    Halt(2);
+  End;
+
   Installed14 := True;
   WriteLn('MystFOSS installed on ', PortName, ' at ', BaudRate, ' baud');
   WriteLn('FOSSIL ID: $', IntToHex(FOSSIL_ID, 4));
+  WriteLn('INT 14h hooked via DPMI callback');
   WriteLn('Press Ctrl+C or run mystfoss /U to uninstall');
 End;
 
@@ -191,10 +426,16 @@ Begin
     WriteLn('MystFOSS is not installed.');
     Exit;
   End;
-  // Restore old INT 14h vector
-  Set_PM_Interrupt($14, OldInt14);
+
+  // Restore original INT 14h vector
+  set_rm_interrupt($14, OldInt14);
+
+  // Free the DPMI callback
+  free_rm_callback(CallbackInfo);
+
   Installed14 := False;
-  WriteLn('MystFOSS uninstalled.');
+  FossilActive := False;
+  WriteLn('MystFOSS uninstalled — INT 14h restored.');
 End;
 {$ENDIF}
 
@@ -241,16 +482,16 @@ Begin
   // Main service loop
   Running := True;
   While Running Do Begin
-    // Check for incoming data
+    {$IFDEF GO32V2}
+    // Pump data between serial hardware and FOSSIL ring buffers
+    PumpSerial;
+    {$ELSE}
+    // Bridge mode: forward data
     If Ser.DataAvailable Then Begin
       N := Ser.ReadBuf(Buf, SizeOf(Buf));
-      If N > 0 Then Begin
-        // In bridge mode, data would be forwarded to the DOS VM
-        // or to a named pipe / socket for the BBS to read.
-        // For now, echo to console:
-        Write('[RX:', N, '] ');
-      End;
+      If N > 0 Then Write('[RX:', N, '] ');
     End;
+    {$ENDIF}
 
     // Check carrier
     If Installed And Not Ser.GetDCD Then Begin

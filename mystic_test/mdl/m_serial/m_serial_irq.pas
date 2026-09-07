@@ -18,6 +18,14 @@ interface
 Type
   TSerialHandle = LongInt;
 
+Const
+  COM_BASE: Array[0..3] of Word = ($3F8, $2F8, $3E8, $2E8);
+  COM_IRQ:  Array[0..3] of Byte = (4, 3, 4, 3);
+  UART_RBR = 0; UART_THR = 0; UART_IER = 1;
+  UART_LSR = 5; UART_MCR = 4;
+  LSR_DR = $01;
+  MCR_OUT2 = $08;
+
 { was: uses serial; — type now declared locally }
 
 procedure SerEnableIRQ(Handle: TSerialHandle);
@@ -104,7 +112,7 @@ var
 begin
   if (Handle < 0) or (Handle > 3) then Exit;
   if IRQState[Handle].Active then Exit;
-  Base := SerGetBase(Handle);
+  Base := COM_BASE[Handle];
   if Base = 0 then Exit;
   IRQ := COM_IRQ[Handle];
 
