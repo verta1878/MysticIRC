@@ -1,6 +1,6 @@
 mysticbbsirc checksums
-Date: Mon Sep  7 15:26:50 UTC 2026
-Files: 4899
+Date: Mon Sep  7 17:27:55 UTC 2026
+Files: 4902
 
 41a506f7f7ebe8df96476775a8fbc438bc977f5c622a53e54984c3bceae5d385  ./.gitattributes
 295485daba6f8a487c73af0168b6e55ed19c8af69b70b140bcfaa0312b913de9  ./.gitignore
@@ -690,15 +690,16 @@ c7e4ac0542760ed7dfc02f9ff303113a0c93a629e811209ac8ac40b7bcf8dfc4  ./attic/rip_v2
 4f2bd7d3492b9efeff1ed2c764acdd84b0313e777b8e5eaa97650e6d8fbdab40  ./attic/ripview_mystic_rip/README.md
 daa831ce43b89e0bfbadb1fdb4fedf1755946fae08c03224c076ebeb030c1304  ./attic/toolchain-src.zip
 11c58d032e80ddb063cf7cc05de5d80a7e1abc03317954163a2a925aeeb7e777  ./attic/uforkpty_RETIRED.pas
-c4231cc63a75e373ee04cd8e175898fc1465db16a89ea91e6d5dae3eb4ce7b51  ./build-darwin.sh
-5647d04b8a0abe80eb83f3a852e5f576f4cd99581430ee672e7034957ec7c6a7  ./build-dos.sh
+b319da3bbf41eff645f758bc40b892dd65baa26699104ac67af8d465eb36622f  ./build-darwin.sh
+6e46eede843f96430ba4f33120dfe4b9f995c54469e16cedb3f6bf43d0dc28e9  ./build-dos.sh
 c60cc23d25655f99915a545e23b1e1044f166690e426bfab05cfe3230ba98fa5  ./build-ld64-toolchain.sh
 181fecd00b92646e9ab9628a21fb5559f61c019dbd6cec79d98ab3d6f5e40bc8  ./build-linux.sh
-19ce02922f0d6aac39297ba0b4a9c5073e2be78f3d9bbc1093c24f58bb97f9e2  ./build-os2.sh
-e640b4f122c0dc2b63b65ea76a158ff5a11b36de951371723f5aec0c982c9ff1  ./build-win32.bat
-764f581537070160e363ba15abf40a82f4fbb026b2eb285fbdfaa13e39f3128d  ./build-win32.sh
-1dce54487eba254db515cb528d648b88fbcfb06d9cac9f2b68e9f9598d537391  ./build.sh
+07a4aaeec07c6bf2e0a2d54ed23ea81a77e2eb30b87888609e3bd35fc606d6e9  ./build-os2.sh
+211b312d1ba334390d6050202eb9e10a5a600351e86e6136d968ff4121954377  ./build-win32.bat
+de7edc9fe1e5806f9ffc94e7f0ade136a32ff2ae53bfa0929583cd31448585f1  ./build-win32.sh
+f093416fe9bd26af8c030cba93bff198418850172c8abbb6c1f2ba6bb179d2dd  ./build.sh
 118c2913c4e0c5d8d0ef22eda90f919e0d7763d1c439535cc46b628de5199285  ./cleanup.bat
+7901387ce56efddb0fbf486f8c7d0e160c1877f73f5106fc639f9ebe1121ff80  ./docs/MDL-COMPILER.md
 78f762567607935982e9a6b856986bab04de91e7e642a475e3e6f59dc0abc3aa  ./examples/ansilove-src/BUILD.md
 cbaaea4fdb8d4a82d5985fad961100f04e3b3dc2c2e8c259131dfaf613dff888  ./examples/ansilove-src/FPC264IRC-INTEGRATION.md
 d74ca0d008e354444ed735f7643f4be467007c9e7769adaec006d692c6fbafa6  ./examples/ansilove-src/ansilove/CMakeLists.txt
@@ -2722,6 +2723,7 @@ edbaf5b0f282899bb27b1075f8ee96e7640373818af4707346a73da3d49e10e4  ./mystic/marc.
 fd7a09421e8c11519690c4c4cf88999614836dc23615b098d087e62f435d2801  ./mystic/mbbsutil.pas
 f899d4fc7413d6b0e9d1f362af4e4285027bfbbf8524e6bbd2e73bcb6ba3adb3  ./mystic/mdl/m_archive.pas
 c52b93104ad77a1d352606b2185744a8b7e9eb25fff65449f5e05f859904f593  ./mystic/mdl/m_bits.pas
+c158c6fa3efca928a4e454ecd8bacc07b56ec786bf93da7caee52a41fc643c6c  ./mystic/mdl/m_compiler.pas
 c1305dd666ed2270f84fdbe6040338ca9be2f4abc1926b3d9c297a21db7ae244  ./mystic/mdl/m_crc.pas
 00b202508feda08221e62d2c5921f958cdd8ef58d4e58a98e7ec1fc188ae0b18  ./mystic/mdl/m_crypt.pas
 7b326207147273f6c40a9bc3b494d1a5d59c316029f6035fe8e89f684d6c4d8a  ./mystic/mdl/m_datetime.pas
@@ -3870,6 +3872,7 @@ edbaf5b0f282899bb27b1075f8ee96e7640373818af4707346a73da3d49e10e4  ./mystic_test/
 eafefed472c0f203132d272230ce211f47c054bb30c9b313937286701cb2a5bc  ./mystic_test/mbbsutil.pas
 f899d4fc7413d6b0e9d1f362af4e4285027bfbbf8524e6bbd2e73bcb6ba3adb3  ./mystic_test/mdl/m_archive.pas
 c52b93104ad77a1d352606b2185744a8b7e9eb25fff65449f5e05f859904f593  ./mystic_test/mdl/m_bits.pas
+c158c6fa3efca928a4e454ecd8bacc07b56ec786bf93da7caee52a41fc643c6c  ./mystic_test/mdl/m_compiler.pas
 c1305dd666ed2270f84fdbe6040338ca9be2f4abc1926b3d9c297a21db7ae244  ./mystic_test/mdl/m_crc.pas
 00b202508feda08221e62d2c5921f958cdd8ef58d4e58a98e7ec1fc188ae0b18  ./mystic_test/mdl/m_crypt.pas
 7b326207147273f6c40a9bc3b494d1a5d59c316029f6035fe8e89f684d6c4d8a  ./mystic_test/mdl/m_datetime.pas

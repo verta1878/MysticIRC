@@ -36,7 +36,7 @@ MARCOPTS=(-Mobjfpc -Fumystic -Fimystic -FU"$UNITS" -FE"$BIN")
 [ -n "$HASHSRC" ] && MARCOPTS+=(-Fu"$HASHSRC")
 
 ALL=(mystic mis mutil mplc mide mbbsutil fidopoll nodespy qwkpoll \
-     mystpack install install_make maketheme 109to110 marc)
+     mystpack install install_make maketheme 109to110 marc mystfoss)
 TARGETS=("$@"); [ ${#TARGETS[@]} -eq 0 ] && TARGETS=("${ALL[@]}")
 
 clean() { find . -name '*.ppu' -delete 2>/dev/null; find . -name '*.o' -delete 2>/dev/null; }

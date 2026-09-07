@@ -1,70 +1,77 @@
 #!/usr/bin/env bash
+# ============================================================
+#  Mystic 1.11IRC — Linux build (i386 or x86_64)
+#
+#  Usage:
+#    ./build-linux.sh              i386 stable (default)
+#    ./build-linux.sh x64          x86_64 stable
+#    ./build-linux.sh test         i386 test (mystic_test/)
+#    ./build-linux.sh x64 test     x86_64 test
+#    ./build-linux.sh x64 mutil    x86_64 single target
+# ============================================================
 set -u
 ROOT="$(cd "$(dirname "$0")" && pwd)"; cd "$ROOT"
+
+ARCH="i386"
+BRANCH="stable"
+TARGETS=()
+for arg in "$@"; do
+  case "$arg" in
+    x64|X64|x86_64) ARCH="x86_64" ;;
+    test|TEST)      BRANCH="test" ;;
+    *) TARGETS+=("$arg") ;;
+  esac
+done
+
+if [ "$BRANCH" = "test" ]; then
+  SRCDIR="mystic_test"
+  MDLDIR="mystic_test/mdl"
+else
+  SRCDIR="mystic"
+  MDLDIR="mystic/mdl"
+fi
+
+if [ "$ARCH" = "x86_64" ]; then
+  FPC="${FPC:-../fpc264irc/bin/ppcx64}"
+  FPCROOT="${FPCROOT:-../fpc264irc}"
+  XTOOLS="$FPCROOT/bin/tools/x86_64-linux"
+  XUNITS="$FPCROOT/bin/units/x86_64-linux"
+  LIBDIR="/usr/lib/x86_64-linux-gnu"
+  LINKFLAGS=(-k--no-as-needed -k-ldl -k-lc)
+else
+  FPC="${FPC:-../fpc264irc/bin/ppc386}"
+  FPCROOT="${FPCROOT:-../fpc264irc}"
+  XTOOLS="$FPCROOT/bin/tools/i386-linux"
+  XUNITS="$FPCROOT/bin/units/i386-linux"
+  LIBDIR="/usr/lib/i386-linux-gnu"
+  LINKFLAGS=(-k--no-as-needed -k-ldl -k-lc)
+fi
+
 BIN="$ROOT/out-linux/bin"; UNITS="$ROOT/out-linux/units"
 mkdir -p "$BIN" "$UNITS"
-FPC="${FPC:-../fpc264irc-clean/bin/ppc386}"
-FPCROOT="${FPCROOT:-../fpc264irc-clean}"
-XTOOLS="$FPCROOT/bin/tools/i386-linux"
-XUNITS="$FPCROOT/bin/units/i386-linux"
-FPCOPTS=(-Tlinux -Mdelphi -Fumdl -Fumdl/m_serial -Fumystic -Fimdl -Fimdl/m_serial -Fimystic -Fomdl
-         -FU"$UNITS" -FE"$BIN" -Fl/usr/lib/i386-linux-gnu
-         -FD"$XTOOLS" -Fu"$XUNITS")
-MARCOPTS=(-Tlinux -Mobjfpc -Fumystic -Fimystic
-          -FU"$UNITS" -FE"$BIN" -Fl/usr/lib/i386-linux-gnu
-          -FD"$XTOOLS" -Fu"$XUNITS")
+
+FPCOPTS=(-Tlinux -Mdelphi
+         -Fu"$MDLDIR" -Fu"$MDLDIR/m_serial" -Fu"$SRCDIR"
+         -Fi"$MDLDIR" -Fi"$MDLDIR/m_serial" -Fi"$SRCDIR"
+         -Fo"$MDLDIR"
+         -FU"$UNITS" -FE"$BIN" -Fl"$LIBDIR"
+         -FD"$XTOOLS" -Fu"$XUNITS" "${LINKFLAGS[@]}")
+MARCOPTS=(-Tlinux -Mobjfpc
+          -Fu"$MDLDIR" -Fu"$MDLDIR/m_serial" -Fu"$SRCDIR"
+          -Fi"$MDLDIR" -Fi"$MDLDIR/m_serial" -Fi"$SRCDIR"
+          -FU"$UNITS" -FE"$BIN" -Fl"$LIBDIR"
+          -FD"$XTOOLS" -Fu"$XUNITS" "${LINKFLAGS[@]}")
 PASS=0; FAIL=0
 
 # ============================================================
-# Pre-flight: check for i386 multilib (required for linking)
+# Pre-flight: check for multilib (i386 only)
 # ============================================================
 check_multilib() {
-    local missing=""
-    # libc is always required
+    [ "$ARCH" = "x86_64" ] && return 0
     if ! find /usr/lib/i386-linux-gnu /usr/lib32 /lib/i386-linux-gnu \
              -name "libc.so*" 2>/dev/null | grep -q .; then
-        missing="$missing libc.so"
-    fi
-    # glibc 2.34+: libpthread and libdl merged into libc.
-    # Check for standalone .so first; if absent, check if libc is new enough.
-    for lib in libpthread.so libdl.so; do
-        if ! find /usr/lib/i386-linux-gnu /usr/lib32 /lib/i386-linux-gnu \
-                 /usr/lib/x86_64-linux-gnu /usr/lib \
-                 -name "$lib" 2>/dev/null | grep -q .; then
-            # Not found as separate lib — check if glibc >= 2.34 (merged)
-            local glibcver
-            glibcver=$(ldd --version 2>/dev/null | head -1 | grep -oE '[0-9]+\.[0-9]+$')
-            if [ -n "$glibcver" ]; then
-                local major minor
-                major=$(echo "$glibcver" | cut -d. -f1)
-                minor=$(echo "$glibcver" | cut -d. -f2)
-                if [ "$major" -gt 2 ] || { [ "$major" -eq 2 ] && [ "$minor" -ge 34 ]; }; then
-                    continue  # glibc 2.34+ — already in libc, skip
-                fi
-            fi
-            missing="$missing $lib"
-        fi
-    done
-    if [ -n "$missing" ]; then
-        echo "╔══════════════════════════════════════════════════════════╗"
-        echo "║  ERROR: 32-bit libraries not found                      ║"
-        echo "║                                                         ║"
-        echo "║  Missing:$missing"
-        echo "║                                                         ║"
-        echo "║  This build produces i386 (32-bit) Linux binaries.      ║"
-        echo "║  Your system needs the i386 multilib packages:          ║"
-        echo "║                                                         ║"
-        echo "║  Debian/Ubuntu:                                         ║"
-        echo "║    sudo dpkg --add-architecture i386                    ║"
-        echo "║    sudo apt-get update                                  ║"
-        echo "║    sudo apt-get install libc6-dev:i386                  ║"
-        echo "║                                                         ║"
-        echo "║  Fedora/RHEL:                                           ║"
-        echo "║    sudo dnf install glibc-devel.i686                    ║"
-        echo "║                                                         ║"
-        echo "║  Arch:                                                  ║"
-        echo "║    sudo pacman -S lib32-glibc                           ║"
-        echo "╚══════════════════════════════════════════════════════════╝"
+        echo "ERROR: 32-bit libc not found. Install libc6-dev:i386"
+        echo "  sudo dpkg --add-architecture i386 && sudo apt install libc6-dev:i386"
         exit 1
     fi
 }
@@ -72,7 +79,7 @@ check_multilib
 
 build () {
     local t="$1" mode="${2:-delphi}"
-    local src="mystic/${t}.pas" log="out-linux/${t}.build.log"
+    local src="$SRCDIR/${t}.pas" log="out-linux/${t}.build.log"
     [ ! -f "$src" ] && { echo "  SKIP  $t (not found)"; return; }
     if [ "$mode" = "objfpc" ]; then
         "$FPC" "${MARCOPTS[@]}" "$src" >"$log" 2>&1
@@ -88,15 +95,26 @@ build () {
         FAIL=$((FAIL+1))
     fi
 }
-echo "Mystic BBS Linux build ($(date))"
+
+echo "Mystic BBS Linux build — $ARCH $BRANCH ($(date))"
 echo "Compiler: $FPC"
+echo "Source:   $SRCDIR/"
 echo ""
+
 chmod +x "$XTOOLS"/* "$FPC" 2>/dev/null
-for t in mystic mis mutil mplc mide mbbsutil fidopoll nodespy \
-         qwkpoll mystpack install install_make maketheme 109to110; do
-    build "$t"
+
+ALL=(mystic mis mutil mplc mide mbbsutil fidopoll nodespy
+     qwkpoll mystpack install install_make maketheme 109to110 mystfoss)
+[ ${#TARGETS[@]} -eq 0 ] && TARGETS=("${ALL[@]}" marc)
+
+for t in "${TARGETS[@]}"; do
+    if [ "$t" = "marc" ]; then
+        build marc objfpc
+    else
+        build "$t"
+    fi
 done
-build marc objfpc
+
 echo ""
 echo "Passed: $PASS  Failed: $FAIL"
 [ $FAIL -eq 0 ] && echo "ALL LINUX BUILDS PASSED"

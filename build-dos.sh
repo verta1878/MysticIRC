@@ -57,5 +57,6 @@ for t in mystic mplc maketheme mbbsutil mystpack install install_make 109to110; 
     build "$t"
 done
 build marc objfpc
+build mystfoss delphi
 echo ""
 echo "Passed: $PASS  Failed: $FAIL"

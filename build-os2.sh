@@ -58,5 +58,6 @@ for t in mystic mis mutil mplc mide mbbsutil fidopoll nodespy \
     build "$t"
 done
 build marc objfpc
+build mystfoss delphi
 echo ""
 echo "Passed: $PASS  Failed: $FAIL"

@@ -15,7 +15,7 @@ if not exist outwin\bin   mkdir outwin\bin
 if not exist outwin\units mkdir outwin\units
 
 if "%1"=="" (
-  for %%T in (mystic mis mutil mplc mide mbbsutil fidopoll nodespy qwkpoll mystpack install install_make maketheme 109to110) do call :build %%T
+  for %%T in (mystic mis mutil mplc mide mbbsutil fidopoll nodespy qwkpoll mystpack install install_make maketheme 109to110 marc mystfoss) do call :build %%T
 ) else (
   call :build %1
 )

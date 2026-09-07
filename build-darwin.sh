@@ -136,7 +136,7 @@ else
 fi
 
 ALL="mystic mis mutil mplc mide mbbsutil fidopoll nodespy qwkpoll \
-     mystpack install install_make maketheme 109to110"
+     mystpack install install_make maketheme 109to110 marc mystfoss"
 TARGETS="$*"; [ -z "$TARGETS" ] && TARGETS="$ALL"
 
 clean() { find . -name '*.ppu' -delete 2>/dev/null; find . -name '*.o' -delete 2>/dev/null; }

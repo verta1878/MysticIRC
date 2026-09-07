@@ -77,6 +77,7 @@ for t in mystic mis mutil mplc mide mbbsutil fidopoll nodespy \
     build "$t"
 done
 build marc objfpc
+build mystfoss delphi
 echo ""
 echo "Passed: $PASS  Failed: $FAIL"
 [ $FAIL -eq 0 ] && echo "ALL WIN32 BUILDS PASSED"
