@@ -58,7 +58,11 @@ mystic_crypt/            CryptLib SSH/TLS example
 mystic_modem/            Modem/FOSSIL front-end
 mystic_mailer/           BINKP/FidoNet mailer
 mystic_texteditor/       Text editor standalone
-mystic_misdos/           MIS DOS version
+mystic_misdos/           DOS Waiting-For-Caller example (modem/BinkP/local login)
+  misdos.pas               WFC main loop — clock, modem watch, BinkP sniff
+  misdos_commands.pas      Hot-key handlers (U/S/P/E/X/D/Q editors, answer, quit)
+  misdos_screen.pas        ANSI screen loader + live clock/node fields
+  wfc.ans                  80×25 CP437 WFC screen (classic 1.06 reconstruction)
 mystic_perl/             Perl DLL integration
 examples/
   ripart/                  RIP art, fonts, icons (single source of truth)

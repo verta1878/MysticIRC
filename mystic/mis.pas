@@ -70,9 +70,26 @@ Const
   FocusEVENT  = 6;
   FocusMax    = 6;
 
+  { 1.12 view tabs }
+  TAB_MESSAGES    = 0;
+  TAB_CONNECTIONS = 1;
+  TAB_EVENTS      = 2;
+  TAB_STATS       = 3;
+  TAB_LOGS        = 4;
+
+  { 1.12 content area row positions }
+  MIS_CONTENT_TOP = 8;
+  MIS_CONTENT_BOT = 24;
+  TAB_COUNT       = 5;
+
   { 1.12 console color attributes }
   ATTR_HEADER_YEL = $1E;  { yellow on blue }
   ATTR_PROMPT     = $1F;  { white on blue  }
+  ATTR_TIMESTAMP  = $03;  { cyan on blue   }
+  ATTR_SERVICE    = $0E;  { yellow on blue  }
+  ATTR_CONTENT    = $07;  { gray on blue    }
+  ATTR_CONTENT_HI = $0F;  { white on blue   }
+  ATTR_ERROR      = $0C;  { red on blue     }
 
 Var
   Keyboard     : TInput;
@@ -95,6 +112,38 @@ Var
   ShutdownRequested : Boolean = False;
 
 {$I MIS_ANSIWFC.PAS}
+
+{$I mis_imagedata.inc}
+
+Procedure DrawTabScreen(Tab: Byte);
+Begin
+  Case Tab of
+    TAB_MESSAGES    : Console.LoadScreenImage(IMG_STATUS1, IMG_STATUS1_LENGTH, IMG_STATUS1_WIDTH, 1, 1);
+    TAB_CONNECTIONS : Console.LoadScreenImage(IMG_STATUS2, IMG_STATUS2_LENGTH, IMG_STATUS2_WIDTH, 1, 1);
+    TAB_EVENTS      : Console.LoadScreenImage(IMG_EVENTS, IMG_EVENTS_LENGTH, IMG_EVENTS_WIDTH, 1, 1);
+    TAB_STATS       : Console.LoadScreenImage(IMG_STATS, IMG_STATS_LENGTH, IMG_STATS_WIDTH, 1, 1);
+    TAB_LOGS        : Console.LoadScreenImage(IMG_STATUS1, IMG_STATUS1_LENGTH, IMG_STATUS1_WIDTH, 1, 1);
+  End;
+End;
+
+Procedure DrawHelpScreen;
+Begin
+  Console.LoadScreenImage(IMG_HELP, IMG_HELP_LENGTH, IMG_HELP_WIDTH, 1, 1);
+  Keyboard.ReadKey;
+  DrawTabScreen(ActiveTab);
+End;
+
+Procedure DrawPollScreen;
+Begin
+  Console.LoadScreenImage(IMG_POLL, IMG_POLL_LENGTH, IMG_POLL_WIDTH, 1, 1);
+End;
+
+Procedure ClearContentArea;
+Var Y: Integer;
+Begin
+  For Y := MIS_CONTENT_TOP to MIS_CONTENT_BOT Do
+    Console.WriteXY(2, Y, $07, strRep(' ', 77));
+End;
 
 Procedure ReadConfiguration;
 Begin
@@ -363,7 +412,7 @@ Begin
         'L': Begin
           MenuDone := True;
           LocalLogin;
-          DrawStatusScreen;
+          DrawTabScreen(TAB_MESSAGES);
           ActiveTab := TAB_MESSAGES;
         End;
         'K': Begin
@@ -472,7 +521,7 @@ Begin
 
   FocusCurrent := FocusMax;
 
-  DrawStatusScreen;
+  DrawTabScreen(TAB_MESSAGES);
   ActiveTab := TAB_MESSAGES;
 
   SwitchFocus;
@@ -679,7 +728,7 @@ Begin
 
     FocusCurrent := FocusMax;
 
-    DrawStatusScreen;
+    DrawTabScreen(TAB_MESSAGES);
   ActiveTab := TAB_MESSAGES;
 
     SwitchFocus;
@@ -780,7 +829,7 @@ Begin
 
   Count := 0;
 
-  DrawStatusScreen;
+  DrawTabScreen(TAB_MESSAGES);
   ActiveTab := TAB_MESSAGES;
 
   { 1.12: BBS name in console title }

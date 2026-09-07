@@ -13,7 +13,7 @@ find "$HERE" -name '*.o'   -delete 2>/dev/null
 
 # absolute -FU/-FE (see mystic_rip/build-rip.sh note on the FPC 2.6.2
 # relative-output link quirk); pull in the two add-on module dirs.
-OPTS="-B -Mobjfpc -O2 -Fu../mdl -Fi../mdl -Fu../mystic_modem -Fu../mystic_mailer -FU$HERE/out -FE$HERE/bin"
+OPTS="-B -Mobjfpc -O2 -Fu../mystic/mdl -Fu../mystic/mdl/m_serial -Fi../mystic/mdl -Fi../mystic/mdl/m_serial -Fu../mystic -Fi../mystic -Fu../mystic_modem -Fu../mystic_mailer -FU$HERE/out -FE$HERE/bin"
 
 case "$1" in
   win32)  echo "Building mystic_misdos for Win32...";  T="-Twin32" ;;

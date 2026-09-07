@@ -65,6 +65,10 @@ Uses
 
 {$I MUTIL_ANSI.PAS}
 
+Var
+  RunMode : Boolean;
+  RunList : String;
+
 Function CheckProcess (pName: String) : Boolean;
 Begin
   { 1.12: -RUN mode overrides INI settings }
@@ -251,8 +255,6 @@ Begin
 End;
 
 Var
-  RunMode      : Boolean;
-  RunList      : String;
   RunIdx       : Integer;
   DoImportNA   : Boolean;
   DoFilesBBS   : Boolean;

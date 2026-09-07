@@ -12,13 +12,13 @@
 // ====================================================================
 
 // ====================================================================
-// mdltest11 — m_serial + m_io_fossil COM port test
+// mdltest11 — m_serial + m_fossil_io COM port test
 // Tests FOSSIL abstraction layer without real hardware
 // ====================================================================
 Program mdltest11;
 
 Uses
-  m_io_fossil;
+  m_fossil_io;
 
 Var
   Foss : TFossil;
@@ -40,7 +40,7 @@ End;
 Begin
   Pass := 0;
   Fail := 0;
-  WriteLn('mdltest11 — m_serial + m_io_fossil test');
+  WriteLn('mdltest11 — m_serial + m_fossil_io test');
   WriteLn;
 
   WriteLn('--- TFossil Object ---');

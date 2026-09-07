@@ -10,7 +10,7 @@ REM  its bin\ppc386, or leave as 'fpc' to use whatever is on PATH.
 REM ============================================================
 setlocal
 set FPC=fpc
-set OPTS=-Mdelphi -Fumdl -Fumystic -Fimdl -Fimystic -FUoutwin\units -FEoutwin\bin
+set OPTS=-Mdelphi -Fumdl -Fumdl\m_serial -Fumystic -Fimdl -Fimdl\m_serial -Fimystic -FUoutwin\units -FEoutwin\bin
 if not exist outwin\bin   mkdir outwin\bin
 if not exist outwin\units mkdir outwin\units
 

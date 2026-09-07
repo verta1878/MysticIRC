@@ -49,10 +49,14 @@ type
     function  GetText: TStringList;
     function  LineCount: Integer;
     function  GetLine(N: Integer): String;
+    procedure SetLine(N: Integer; const S: String);
+    procedure DeleteLine(N: Integer);
+    procedure InsertLineAt(N: Integer; const S: String);
     property  Modified: Boolean read FModified;
     property  Subject: String read FSubject write FSubject;
     property  CurLine: Integer read FCurLine write FCurLine;
     property  CurCol: Integer read FCurCol write FCurCol;
+    property  Lines: TStringList read FLines;
 
     { Spell check }
     function  SpellCheckAll: Integer;
@@ -226,6 +230,31 @@ end;
 function TOLEditor.SpellAvailable: Boolean;
 begin
   Result := FSpell.Loaded;
+end;
+
+procedure TOLEditor.SetLine(N: Integer; const S: String);
+begin
+  if (N >= 0) and (N < FLines.Count) then begin
+    FLines[N] := S;
+    FModified := True;
+  end;
+end;
+
+procedure TOLEditor.DeleteLine(N: Integer);
+begin
+  if (N >= 0) and (N < FLines.Count) then begin
+    FLines.Delete(N);
+    FModified := True;
+  end;
+end;
+
+procedure TOLEditor.InsertLineAt(N: Integer; const S: String);
+begin
+  if N >= FLines.Count then
+    FLines.Add(S)
+  else
+    FLines.Insert(N, S);
+  FModified := True;
 end;
 
 end.

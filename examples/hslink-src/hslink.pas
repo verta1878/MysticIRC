@@ -149,6 +149,7 @@ Begin
           Close(ListFile);
         End Else Begin
           WriteLn('Warning: list file not found: ', Copy(S, 2, Length(S)));
+        End;
       End Else Begin
         Inc(FileCount);
         FileList[FileCount] := S;

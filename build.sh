@@ -21,7 +21,7 @@ FPC="${FPC:-fpc}"     # override with FPC=/path/to/fpc264irc/bin/ppc386
 #   FCLNET=<fpc>/src/packages/fcl-net/src  FCLBASE=<fpc>/src/packages/fcl-base/src
 FCLNET="${FCLNET:-}"
 FCLBASE="${FCLBASE:-}"
-FPCOPTS=(-Mdelphi -Fumdl -Fumystic -Fimdl -Fimystic -Fomdl -FU"$UNITS" -FE"$BIN")
+FPCOPTS=(-Mdelphi -Fumdl -Fumdl/m_serial -Fumystic -Fimdl -Fimdl/m_serial -Fimystic -Fomdl -FU"$UNITS" -FE"$BIN")
 [ -n "$FCLNET" ]  && FPCOPTS+=(-Fu"$FCLNET")
 [ -n "$FCLBASE" ] && FPCOPTS+=(-Fu"$FCLBASE")
 

@@ -1,30 +1,46 @@
 #!/bin/sh
 # Build the mystic_modem dialup/serial add-on.
-# Usage: ./build-modem.sh          (builds wfcdemo for linux i386)
-#        ./build-modem.sh win32    (cross note: needs FPC win32 with serial.ppu)
+# Usage: ./build-modem.sh              (linux, default)
+#        ./build-modem.sh win32        (Win32 cross-compile)
+#        ./build-modem.sh dos          (DOS go32v2 cross-compile)
+#        ./build-modem.sh os2          (OS/2 cross-compile)
 #
-# The module depends on Mystic's mdl/ units (m_IniReader, m_FileIO) and on
-# FPC's standard cross-platform Serial unit.
+# Requires FPC 2.6.4irc in PATH or set FPC=path/to/compiler
 
 FPC=${FPC:-ppc386}
-MDL=../mdl
-OUT=out
-BIN=bin
+HERE=$(cd "$(dirname "$0")" && pwd)
+MDL="$HERE/../mystic/mdl"
+MSERIAL="$MDL/m_serial"
+MYSTIC="$HERE/../mystic"
+OUT="$HERE/out"
+BIN="$HERE/bin"
 mkdir -p "$OUT" "$BIN"
 
-# clean stale artifacts
-find . -name '*.ppu' -delete 2>/dev/null
-find . -name '*.o'   -delete 2>/dev/null
+find "$HERE" -name '*.ppu' -delete 2>/dev/null
+find "$HERE" -name '*.o'   -delete 2>/dev/null
 
-if [ "$1" = "win32" ]; then
-  echo "Building mystic_modem for Win32..."
-  # On a full FPC 2.6.2 Windows install, the Serial unit ships in the RTL.
-  $FPC -Twin32 -Mobjfpc -O2 -Fu"$MDL" -Fi"$MDL" -FU"$OUT" -FE"$BIN" wfcdemo.pas
-  $FPC -Twin32 -Mobjfpc -O2 -Fu"$MDL" -Fi"$MDL" -FU"$OUT" -FE"$BIN" modemcfg.pas
-else
-  echo "Building mystic_modem for Linux (i386)..."
-  $FPC -Tlinux -Mobjfpc -O2 -Fu"$MDL" -Fi"$MDL" -FU"$OUT" -FE"$BIN" wfcdemo.pas
-  $FPC -Tlinux -Mobjfpc -O2 -Fu"$MDL" -Fi"$MDL" -FU"$OUT" -FE"$BIN" modemcfg.pas
-fi
+COMMON="-B -Mobjfpc -O2 -Fu$MDL -Fu$MSERIAL -Fu$MYSTIC -Fi$MDL -Fi$MSERIAL -Fi$MYSTIC -Fu$HERE -Fi$HERE -FU$OUT -FE$BIN"
 
-echo "Done.  Executable in $BIN/"
+case "$1" in
+  win32)  echo "Building for Win32...";  T="-Twin32" ;;
+  dos)    echo "Building for DOS...";    T="-Tgo32v2 -s" ;;
+  os2)    echo "Building for OS/2...";   T="-Tos2 -s" ;;
+  darwin) echo "Building for Darwin..."; T="-Tdarwin" ;;
+  *)      echo "Building for Linux...";  T="-Tlinux" ;;
+esac
+
+PASS=0; FAIL=0
+for src in modemcfg.pas wfcdemo.pas squish_example.pas; do
+  [ -f "$HERE/$src" ] || continue
+  name=$(basename "$src" .pas)
+  if $FPC $T $COMMON "$HERE/$src" > "$OUT/$name.build.log" 2>&1; then
+    echo "  OK    $name"
+    PASS=$((PASS+1))
+  else
+    echo "  FAIL  $name"
+    grep -iE 'Error|Fatal' "$OUT/$name.build.log" | head -2 | sed 's/^/    /'
+    FAIL=$((FAIL+1))
+  fi
+done
+
+echo "Done. $PASS built, $FAIL failed. Binaries in $BIN/"

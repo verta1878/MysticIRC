@@ -7,7 +7,7 @@ FPC="${FPC:-../fpc264irc-clean/bin/ppc386}"
 FPCROOT="${FPCROOT:-../fpc264irc-clean}"
 XTOOLS="$FPCROOT/bin/tools/i386-linux"
 XUNITS="$FPCROOT/bin/units/i386-linux"
-FPCOPTS=(-Tlinux -Mdelphi -Fumdl -Fumystic -Fimdl -Fimystic -Fomdl
+FPCOPTS=(-Tlinux -Mdelphi -Fumdl -Fumdl/m_serial -Fumystic -Fimdl -Fimdl/m_serial -Fimystic -Fomdl
          -FU"$UNITS" -FE"$BIN" -Fl/usr/lib/i386-linux-gnu
          -FD"$XTOOLS" -Fu"$XUNITS")
 MARCOPTS=(-Tlinux -Mobjfpc -Fumystic -Fimystic
