@@ -10,19 +10,12 @@
 // Caller screen (misdos_screen + wfc.ans), then loops:
 //
 //   * ticks the clock live,
-//   * watches the modem for RING (via mystic_modem) and, on CONNECT,
-//     sniffs the line: a BinkP caller is handed to the mystic_mailer
-//     BinkP seam; a human caller gets a local-style session; EMSI/others
-//     are reported,
-//   * dispatches every WFC hot-key through misdos_commands (editors,
-//     answer, drop-to-DOS, quit, and SPACE = local login).
+//   * watches the serial port for RING via m_serial (MDL),
+//   * on CONNECT, hands off to a local session placeholder,
+//   * dispatches every WFC hot-key through misdos_commands.
 //
-// So this single example REFERENCES BOTH add-ons - the modem code
-// (mystic_modem) and the binkp/mailer code (mystic_mailer) - exactly as
-// the sysop asked, and every option on the WFC screen is functional.
-//
-// It is intentionally SEPARATE from the shipping MIS server in mystic/
-// (mis.pas): this is the DOS-MIS teaching example, not the telnet daemon.
+// Uses Mystic's own m_serial (MDL) directly — no FPC Serial unit
+// dependency.  Compiles for x86_64, i386, go32v2, and i8086.
 //
 //   Build:  ./build-misdos.sh          (see that script)
 //   Run:    bin/misdos                 (uses modem.ini if present; else
@@ -37,19 +30,97 @@ Uses
   SysUtils,
   Crt,
   mdm_Config,
-  mdm_Serial,
-  mdm_Modem,
-  mlr_Binkp,
+  m_serial,
   misdos_Screen,
   misdos_Commands;
 
 Var
-  Cfg   : TModemConfig;
-  Ser   : TModemSerial;
-  Mdm   : TModem;
-  Quit  : Boolean;
+  Cfg      : TModemConfig;
+  Ser      : TModemSerial;
+  Quit     : Boolean;
+  LastResp : String;
 
-// Repaint the whole screen and re-seed the live fields.
+// ---- AT command helpers (inline, no mdm_modem dependency) -----------
+
+Function SendAT (Const Cmd: String; TimeoutMS: LongInt): String;
+Var
+  Elapsed : LongInt;
+  Chunk   : String;
+Begin
+  Result  := '';
+  Ser.Flush;
+  Ser.WriteStr(Cmd + #13);
+  Elapsed := 0;
+  While Elapsed < TimeoutMS Do Begin
+    Chunk := Ser.ReadAvail;
+    If Chunk <> '' Then Begin
+      Result := Result + Chunk;
+      If (Pos('OK', Result) > 0) or (Pos('ERROR', Result) > 0) or
+         (Pos('CONNECT', Result) > 0) or (Pos('NO CARRIER', Result) > 0) or
+         (Pos('RING', Result) > 0) or (Pos('BUSY', Result) > 0) Then
+        Exit;
+    End;
+    Delay(50);
+    Inc(Elapsed, 50);
+  End;
+End;
+
+Function ModemInit (Const InitString: String): Boolean;
+Var
+  R : String;
+Begin
+  Result := False;
+  If Not Ser.IsOpen Then Exit;
+  Ser.SetDTR(True);
+  Delay(250);
+  R := SendAT('ATZ', 2000);
+  If Pos('OK', R) = 0 Then
+    R := SendAT('ATZ', 2000);
+  If Pos('OK', R) = 0 Then Exit;
+  SendAT('ATE0V1', 1500);
+  If (InitString <> '') and (UpperCase(InitString) <> 'ATZ') Then
+    SendAT(InitString, 2000);
+  Result := True;
+End;
+
+Function IsRinging: Boolean;
+Var
+  Chunk : String;
+Begin
+  Result := False;
+  If Not Ser.IsOpen Then Exit;
+  If Ser.GetRI Then Begin Result := True; Exit; End;
+  Chunk := Ser.ReadAvail;
+  If Chunk <> '' Then Begin
+    LastResp := Chunk;
+    If Pos('RING', UpperCase(Chunk)) > 0 Then Result := True;
+  End;
+End;
+
+Function AnswerCall (TimeoutMS: LongInt): Boolean;
+Var
+  R : String;
+Begin
+  Result := False;
+  If Not Ser.IsOpen Then Exit;
+  R := SendAT(Cfg.AnswerStr, TimeoutMS);
+  Result := Pos('CONNECT', UpperCase(R)) > 0;
+End;
+
+Procedure HangUp;
+Begin
+  If Not Ser.IsOpen Then Exit;
+  Ser.DropDTR;
+  Delay(500);
+  Ser.SetDTR(True);
+  Delay(1100);
+  Ser.WriteStr('+++');
+  Delay(1100);
+  SendAT('ATH0', 2000);
+End;
+
+// ---- Screen / session -----------------------------------------------
+
 Procedure Repaint;
 Begin
   If Not DrawWfcScreen Then Begin
@@ -57,22 +128,16 @@ Begin
     Writeln('  wfc.ans not found next to the executable.');
     Writeln('  (Copy mystic_misdos/wfc.ans beside the binary.)');
   End;
-
-  // Overwrite only the genuinely-dynamic fields; the ANSI already carries
-  // sensible static labels (Node/OS/Overlay/Next Event).  Give OS the real
-  // build target so the example is honest about where it's running.
   SetStatus ('1',
-             {$IFDEF WINDOWS}'Win'{$ELSE}{$IFDEF OS2}'OS/2'{$ELSE}{$IFDEF DARWIN}'macOS'{$ELSE}'Unix'{$ENDIF}{$ENDIF}{$ENDIF},
+             {$IFDEF WINDOWS}'Win'{$ELSE}{$IFDEF OS2}'OS/2'{$ELSE}{$IFDEF GO32V2}'DOS'{$ELSE}{$IFDEF MSDOS}'DOS'{$ELSE}{$IFDEF DARWIN}'macOS'{$ELSE}'Unix'{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF}{$ENDIF},
              'Disk', 'None');
   If Cfg.LocalMode Then
     SetModem ('(local mode - no modem)')
   Else
     SetModem (Cfg.Device + ' @ ' + IntToStr(Cfg.Baud));
-  SetNode   (1, '(waiting)', 'Idle');
+  SetNode (1, '(waiting)', 'Idle');
 End;
 
-// A minimal local session placeholder - a real integration launches a
-// Mystic node here (bound to the console, or to Ser on a real connect).
 Procedure LocalSession;
 Begin
   Window (1, 1, 80, 25); TextAttr := 7; ClrScr;
@@ -83,48 +148,35 @@ Begin
   ReadKey;
 End;
 
-// Handle a CONNECT: sniff, then route to binkp or a human session.
 Procedure OnConnect;
-Var
-  Sniff : String;
-  BD    : TBinkpDetect;
 Begin
   SetNode (1, 'CONNECT', 'Answering');
-
-  Delay (1200);                                // brief listen
-  Sniff := Ser.ReadAvail;
-
-  If TBinkpSeam.LooksLikeBinkp(Sniff, BD) Then Begin
-    SetNode (1, 'BinkP node', 'Mail xfer');
-    With TBinkpSeam.Create(Ser) Do
-    Try
-      RunSessionStub('WFC-example');
-    Finally
-      Free;
-    End;
-  End Else Begin
-    SetNode (1, 'Human caller', 'Online');
-    Ser.WriteStr(#13#10'Mystic WFC example - human session.'#13#10);
-    // hand to a node here in a real build
-  End;
-
+  Delay (1200);
+  SetNode (1, 'Caller', 'Online');
+  Ser.WriteStr(#13#10'Mystic WFC example — caller session.'#13#10);
+  // hand to a Mystic node here in a real build
+  Delay (3000);
+  HangUp;
   SetNode (1, '(waiting)', 'Idle');
 End;
+
+// ---- Main -----------------------------------------------------------
 
 Var
   Act      : TWfcAction;
   LastTick : TDateTime;
 Begin
-  Cfg := LoadModemConfig('modem.ini');         // absent -> sensible defaults
+  Cfg := LoadModemConfig('modem.ini');
   If Not FileExists('modem.ini') Then
-    Cfg.LocalMode := True;                       // no config => local WFC
+    Cfg.LocalMode := True;
 
-  Ser := TModemSerial.Create;
-  Mdm := TModem.Create(Ser);
+  Ser      := TModemSerial.Create;
+  LastResp := '';
 
-  If (Not Cfg.LocalMode) and Ser.Open(Cfg.Device, Cfg.Baud, Cfg.HardwareFlow) Then
-    Mdm.Initialise(Cfg.InitString)
-  Else
+  If (Not Cfg.LocalMode) and Ser.Open(Cfg.Device, Cfg.Baud, Cfg.HardwareFlow) Then Begin
+    If Not ModemInit(Cfg.InitString) Then
+      Cfg.LocalMode := True;
+  End Else
     Cfg.LocalMode := True;
 
   Repaint;
@@ -132,29 +184,24 @@ Begin
   Quit     := False;
 
   While Not Quit Do Begin
-    // live clock tick (once a second)
     If (Now - LastTick) > (1/86400) Then Begin
       SetClock (FormatDateTime('hh:nnampm', Now), FormatDateTime('mm/dd/yy', Now));
       LastTick := Now;
     End;
 
-    // modem ring?
-    If (Not Cfg.LocalMode) and Mdm.IsRinging Then Begin
-      If Mdm.Answer Then OnConnect;
+    If (Not Cfg.LocalMode) and IsRinging Then Begin
+      If AnswerCall(60000) Then OnConnect;
       Repaint;
     End;
 
-    // keyboard?
     If KeyPressed Then Begin
       Act := HandleKey(ReadKey);
-
       Case Act of
         waQuit       : Quit := True;
         waLocalLogin : Begin LocalSession; Repaint; End;
         waAnswer     : Begin
-                         If Not Cfg.LocalMode Then Begin
-                           If Mdm.Answer Then OnConnect;
-                         End;
+                         If Not Cfg.LocalMode Then
+                           If AnswerCall(60000) Then OnConnect;
                          Repaint;
                        End;
         waRedraw     : Repaint;
@@ -167,7 +214,6 @@ Begin
   End;
 
   If Not Cfg.LocalMode Then Ser.Close;
-  Mdm.Free;
   Ser.Free;
 
   Window (1, 1, 80, 25); TextAttr := 7; GotoXY (1, 25);

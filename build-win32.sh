@@ -11,7 +11,7 @@ FPC="${FPC:-../fpc264irc-clean/bin/ppc386}"
 FPCROOT="${FPCROOT:-../fpc264irc-clean}"
 XTOOLS="$FPCROOT/bin/tools/i386-win32"
 XUNITS="$FPCROOT/bin/units/i386-win32"
-FPCOPTS=(-Twin32 -Mdelphi -Fumdl -Fumdl/m_serial -Fumystic -Fimdl -Fimdl/m_serial -Fimystic -Fomdl
+FPCOPTS=(-Twin32 -Mdelphi -Fumystic/mdl -Fumystic/mdl/m_serial -Fumystic -Fimystic/mdl -Fimystic/mdl/m_serial -Fimystic -Fomystic/mdl
          -FU"$UNITS" -FE"$BIN"
          -XPi386-win32- -FD"$XTOOLS" -Fu"$XUNITS")
 MARCOPTS=(-Twin32 -Mobjfpc -Fumystic -Fimystic

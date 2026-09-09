@@ -555,8 +555,8 @@ Begin
   Else fpioctl(FHandle, TIOCMBIC, @Bits);
   {$ENDIF}
   {$IFDEF WINDOWS}
-  If State Then EscapeCommFunction(THandle(FHandle), SETDTR)
-  Else EscapeCommFunction(THandle(FHandle), CLRDTR);
+  If State Then EscapeCommFunction(THandle(FHandle), Windows.SETDTR)
+  Else EscapeCommFunction(THandle(FHandle), Windows.CLRDTR);
   {$ENDIF}
   {$IFDEF OS2}
   If State Then Begin MC.OnMask:=$01; MC.OffMask:=$FF; End
@@ -589,8 +589,8 @@ Begin
   Else fpioctl(FHandle, TIOCMBIC, @Bits);
   {$ENDIF}
   {$IFDEF WINDOWS}
-  If State Then EscapeCommFunction(THandle(FHandle), SETRTS)
-  Else EscapeCommFunction(THandle(FHandle), CLRRTS);
+  If State Then EscapeCommFunction(THandle(FHandle), Windows.SETRTS)
+  Else EscapeCommFunction(THandle(FHandle), Windows.CLRRTS);
   {$ENDIF}
   {$IFDEF OS2}
   If State Then Begin MC.OnMask:=$02; MC.OffMask:=$FF; End

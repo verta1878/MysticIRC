@@ -7,7 +7,7 @@ FPC="${FPC:-../fpc264irc-clean/bin/ppc386}"
 FPCROOT="${FPCROOT:-../fpc264irc-clean}"
 XTOOLS="$FPCROOT/bin/tools/i386-go32v2"
 XUNITS="$FPCROOT/bin/units/i386-go32v2"
-FPCOPTS=(-Tgo32v2 -Mdelphi -Fumdl -Fumdl/m_serial -Fumystic -Fimdl -Fimdl/m_serial -Fimystic -Fomdl
+FPCOPTS=(-Tgo32v2 -Mdelphi -Fumystic/mdl -Fumystic/mdl/m_serial -Fumystic -Fimystic/mdl -Fimystic/mdl/m_serial -Fimystic -Fomystic/mdl
          -FU"$UNITS" -FE"$BIN"
          -XPi386-go32v2- -FD"$XTOOLS" -Fu"$XUNITS")
 MARCOPTS=(-Tgo32v2 -Mobjfpc -Fumystic -Fimystic

@@ -118,7 +118,7 @@ check_darwin_tools() {
 check_darwin_tools
 
 
-FPCOPTS="-Tdarwin -Mdelphi -Fumdl -Fumdl/m_serial -Fumystic -Fimdl -Fimdl/m_serial -Fimystic -Fomdl"
+FPCOPTS="-Tdarwin -Mdelphi -Fumystic/mdl -Fumystic/mdl/m_serial -Fumystic -Fimystic/mdl -Fimystic/mdl/m_serial -Fimystic -Fomystic/mdl"
 FPCOPTS="$FPCOPTS -FU$UNITS -FE$BIN"
 [ -n "$DARWINUNITS" ] && FPCOPTS="$FPCOPTS $DARWINUNITS"
 

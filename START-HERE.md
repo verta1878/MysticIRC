@@ -1,6 +1,6 @@
 # Start Here
 
-Welcome to **Mystic BBS 1.11IRC A3** — the community fork.
+Welcome to **Mystic BBS 1.11IRC A4** — the community fork.
 
 ## Quick Start
 
@@ -16,7 +16,7 @@ Welcome to **Mystic BBS 1.11IRC A3** — the community fork.
 | `mystic_test/` | BBS core + RIP + crypto + spellcheck (unstable branch) |
 | `mystic/mdl/` | Mystic Development Library — shared units |
 | `mystic/mdl/m_serial/` | Serial I/O stack (4 files, 6 platforms) |
-| `mystic_modem/` | Modem/FOSSIL driver support (9 files) |
+| `mystic_modem/` | Modem config + WFC support (7 files) |
 | `mystic_misdos/` | DOS Waiting-For-Caller example |
 | `mystic_ansiedit/` | ANSI art editor |
 | `mystic_texteditor/` | Text editor |
@@ -98,7 +98,7 @@ cleanup.bat          # Windows (writes cleanup.log)
 
 ## Compiler
 
-FPC 2.6.4irc r311 — 5 patches (defutil, nopt, symdef, fppu, dl/dynlibs).
+FPC 2.6.4irc r311 — 6 patches (defutil, nopt, symdef, fppu, dl/dynlibs, MZ linker source recovery).
 https://github.com/verta1878/fpc264irc
 
 ## Team
