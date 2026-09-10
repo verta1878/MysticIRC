@@ -192,7 +192,7 @@ Begin
   If Not FActive Then Exit;
   Case FBackend of
     fbSerial : FSer.Close;
-    fbInt14  : {$IFDEF FOSSIL_INT14} Begin Int14($05, $00, FPort); End; {$ENDIF}
+    fbInt14  : {$IFDEF FOSSIL_INT14} Int14($05, $00, FPort); {$ENDIF} ;
   End;
   FActive := False;
 End;
@@ -224,7 +224,7 @@ Begin
   Case FBackend of
     fbSerial : Begin C := Chr(B); Result := FSer.WriteBuf(C, 1) = 1; End;
     fbInt14  : {$IFDEF FOSSIL_INT14} Begin Int14($01, B, FPort); Result := True; End;
-               {$ELSE} Begin Result := False; End; {$ENDIF}
+               {$ELSE} Result := False; {$ENDIF}
   End;
 End;
 
@@ -255,8 +255,8 @@ Begin
   If Not FActive Then Exit;
   Case FBackend of
     fbSerial : Result := FSer.GetDSR;   // proxy: data path is live
-    fbInt14  : {$IFDEF FOSSIL_INT14} Begin Result := (Int14($03, $00, FPort) and $0100) <> 0; End;
-               {$ELSE} Begin Result := False; End; {$ENDIF}
+    fbInt14  : {$IFDEF FOSSIL_INT14} Result := (Int14($03, $00, FPort) and $0100) <> 0;
+               {$ELSE} Result := False; {$ENDIF}
   End;
 End;
 
@@ -271,8 +271,8 @@ Begin
                  Result := FSer.GetDCD;
                  If Not Result Then Result := FSer.GetDSR;
                End;
-    fbInt14  : {$IFDEF FOSSIL_INT14} Begin Result := (Int14($03, $00, FPort) and $0080) <> 0; End;
-               {$ELSE} Begin Result := False; End; {$ENDIF}
+    fbInt14  : {$IFDEF FOSSIL_INT14} Result := (Int14($03, $00, FPort) and $0080) <> 0;
+               {$ELSE} Result := False; {$ENDIF}
   End;
 End;
 
@@ -281,8 +281,8 @@ Begin
   If Not FActive Then Exit;
   Case FBackend of
     fbSerial : FSer.SetDTR(OnOff);
-    fbInt14  : {$IFDEF FOSSIL_INT14} Begin If OnOff Then Int14($06, $01, FPort)
-                                     Else Int14($06, $00, FPort); End; {$ENDIF}
+    fbInt14  : {$IFDEF FOSSIL_INT14} If OnOff Then Int14($06, $01, FPort)
+                                     Else Int14($06, $00, FPort); {$ENDIF} ;
   End;
 End;
 
@@ -291,7 +291,7 @@ Begin
   If Not FActive Then Exit;
   Case FBackend of
     fbSerial : FSer.Flush;
-    fbInt14  : {$IFDEF FOSSIL_INT14} Begin Int14($08, $00, FPort); End; {$ENDIF}
+    fbInt14  : {$IFDEF FOSSIL_INT14} Int14($08, $00, FPort); {$ENDIF} ;
   End;
 End;
 
@@ -300,7 +300,7 @@ Begin
   If Not FActive Then Exit;
   Case FBackend of
     fbSerial : FSer.ReadAvail;   // drain and discard
-    fbInt14  : {$IFDEF FOSSIL_INT14} Begin Int14($0A, $00, FPort); End; {$ENDIF}
+    fbInt14  : {$IFDEF FOSSIL_INT14} Int14($0A, $00, FPort); {$ENDIF} ;
   End;
 End;
 
@@ -336,7 +336,7 @@ Begin
   If Not FActive Then Exit;
   Case FBackend of
     fbSerial : FSer.FlushOutput;
-    fbInt14  : {$IFDEF FOSSIL_INT14} Begin Int14($09, $00, FPort); End; {$ENDIF}
+    fbInt14  : {$IFDEF FOSSIL_INT14} Int14($09, $00, FPort); {$ENDIF} ;
   End;
 End;
 
@@ -352,8 +352,8 @@ Begin
                  If FSer.GetCTS Then Result := Result or $0010; { CTS }
                  If FSer.GetDSR Then Result := Result or $0020; { DSR }
                End;
-    fbInt14  : {$IFDEF FOSSIL_INT14} Begin Result := Int14($03, $00, FPort); End;
-               {$ELSE} Begin Result := 0; End; {$ENDIF}
+    fbInt14  : {$IFDEF FOSSIL_INT14} Result := Int14($03, $00, FPort);
+               {$ELSE} Result := 0; {$ENDIF}
   End;
 End;
 
@@ -362,7 +362,7 @@ Begin
   If Not FActive Then Exit;
   Case FBackend of
     fbSerial : ; { baud set at Init time — no runtime change via byte code }
-    fbInt14  : {$IFDEF FOSSIL_INT14} Begin Int14($00, BaudInit, FPort); End; {$ENDIF}
+    fbInt14  : {$IFDEF FOSSIL_INT14} Int14($00, BaudInit, FPort); {$ENDIF} ;
   End;
 End;
 

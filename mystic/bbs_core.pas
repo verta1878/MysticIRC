@@ -56,7 +56,7 @@ Type
 
 Type
   TBBSCore = Class
-    {$IF DEFINED(WINDOWS) OR DEFINED(GO32V2)}
+    {$IFDEF WINDOWS}
       Client      : TIOBase;
     {$ENDIF}
     User           : TBBSUser;
@@ -204,9 +204,6 @@ Begin
     Client := TIOSocket.Create;
     TIOSocket(Client).FTelnetServer := True;
   {$ENDIF}
-  {$IFDEF GO32V2}
-    Client := nil;  { FOSSIL sets this in mystic.pas if -FOSSIL flag used }
-  {$ENDIF}
 
   User     := TBBSUser.Create(Pointer(Self));
   IO       := TBBSIO.Create(Pointer(Self));
@@ -227,7 +224,7 @@ Begin
   User.Free;
   IO.Free;
 
-  {$IF DEFINED(WINDOWS) OR DEFINED(GO32V2)}
+  {$IFDEF WINDOWS}
     Client.Free;
   {$ENDIF}
 

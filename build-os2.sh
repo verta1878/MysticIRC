@@ -54,10 +54,9 @@ echo "Mystic BBS OS/2 (EMX) cross-build ($(date))"
 echo ""
 chmod +x "$XTOOLS"/* "$FPC" 2>/dev/null
 for t in mystic mis mutil mplc mide mbbsutil fidopoll nodespy \
-         qwkpoll mystpack install install_make maketheme 109to110; do
+         qwkpoll mystpack mystfoss install install_make maketheme 109to110; do
     build "$t"
 done
 build marc objfpc
-build mystfoss delphi
 echo ""
 echo "Passed: $PASS  Failed: $FAIL"

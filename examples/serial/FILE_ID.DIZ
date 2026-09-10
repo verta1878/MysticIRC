@@ -1,0 +1,10 @@
+netfosdl v0.1 - DOS FOSSIL Driver
+GPLv3 real-mode FOSSIL for MS-DOS.
+Drop-in for X00, BNU, ADF, NetFoss.
+INT 14h, FSC-0015 r5 + FSC-0072.
+Real 8250/16550 UART, X00 cmdline.
+TSR with proper resident sizing.
+Verified: AX=1954h in DOSBox-X.
+Built with fpc264irc i8086 (huge).
+Based on Dedrick Allen NetModem/32.
+FPC264IRC crew - 2026 - 4free

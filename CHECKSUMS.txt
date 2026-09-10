@@ -1,5 +1,3 @@
-MysticIRC 1.11IRC A4 — Repository Checksums
-Generated: 2026-09-09
-
-Files: 4896
-Size:  234M
+mysticbbsirc checksums
+Date: Sun Sep  6 05:13:43 UTC 2026
+Files: 5427

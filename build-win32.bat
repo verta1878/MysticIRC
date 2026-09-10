@@ -10,12 +10,12 @@ REM  its bin\ppc386, or leave as 'fpc' to use whatever is on PATH.
 REM ============================================================
 setlocal
 set FPC=fpc
-set OPTS=-Mdelphi -Fumdl -Fumdl\m_serial -Fumystic -Fimdl -Fimdl\m_serial -Fimystic -FUoutwin\units -FEoutwin\bin
+set OPTS=-Mdelphi -Fumystic\mdl -Fumystic\mdl\m_serial -Fumystic -Fimystic\mdl -Fimystic\mdl\m_serial -Fimystic -FUoutwin\units -FEoutwin\bin
 if not exist outwin\bin   mkdir outwin\bin
 if not exist outwin\units mkdir outwin\units
 
 if "%1"=="" (
-  for %%T in (mystic mis mutil mplc mide mbbsutil fidopoll nodespy qwkpoll mystpack install install_make maketheme 109to110 marc mystfoss) do call :build %%T
+  for %%T in (mystic mis mutil mplc mide mbbsutil fidopoll nodespy qwkpoll mystpack mystfoss install install_make maketheme 109to110) do call :build %%T
 ) else (
   call :build %1
 )

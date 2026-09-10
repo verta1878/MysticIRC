@@ -41,6 +41,7 @@ Uses
   BBS_User,
   BBS_FileBase,
   BBS_Menus,
+  BBS_Hunspell,
   MPL_Execute;
 
 Const
@@ -56,7 +57,7 @@ Type
 
 Type
   TBBSCore = Class
-    {$IF DEFINED(WINDOWS) OR DEFINED(GO32V2)}
+    {$IFDEF WINDOWS}
       Client      : TIOBase;
     {$ENDIF}
     User           : TBBSUser;
@@ -64,6 +65,7 @@ Type
     FileBase       : TFileBase;
     Menu           : TMenuEngine;
     IO             : TBBSIO;
+    SpellCheck     : THunSpell;
     Pipe           : TPipe;
     EventFile      : File of RecEvent;
     ThemeFile      : File of RecTheme;
@@ -204,15 +206,13 @@ Begin
     Client := TIOSocket.Create;
     TIOSocket(Client).FTelnetServer := True;
   {$ENDIF}
-  {$IFDEF GO32V2}
-    Client := nil;  { FOSSIL sets this in mystic.pas if -FOSSIL flag used }
-  {$ENDIF}
 
-  User     := TBBSUser.Create(Pointer(Self));
-  IO       := TBBSIO.Create(Pointer(Self));
-  Msgs     := TMsgBase.Create(Pointer(Self));
-  FileBase := TFileBase.Create(Pointer(Self));
-  Menu     := TMenuEngine.Create(Pointer(Self));
+  User       := TBBSUser.Create(Pointer(Self));
+  IO         := TBBSIO.Create(Pointer(Self));
+  Msgs       := TMsgBase.Create(Pointer(Self));
+  FileBase   := TFileBase.Create(Pointer(Self));
+  Menu       := TMenuEngine.Create(Pointer(Self));
+  SpellCheck := THunSpell.Create(bbsCfg.DataPath);
 End;
 
 Destructor TBBSCore.Destroy;
@@ -224,10 +224,11 @@ Begin
   Msgs.Free;
   FileBase.Free;
   Menu.Free;
+  SpellCheck.Free;
   User.Free;
   IO.Free;
 
-  {$IF DEFINED(WINDOWS) OR DEFINED(GO32V2)}
+  {$IFDEF WINDOWS}
     Client.Free;
   {$ENDIF}
 

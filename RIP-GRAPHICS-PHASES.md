@@ -2,6 +2,60 @@
 
 Session 10 — 2026-09-06
 
+## Recreate with Permission
+
+Jeff Reeder and Mark Hayton (original TeleGrafix creators) have given
+their blessing to recreate with permission the full RIPscrip software
+suite as open source.
+
+Target programs:
+- RIPterm (DOS terminal — v1.54, v2.0/2.2)
+- RIPtel (Visual Telnet — v3.1, Windows)
+- RIPtel Visual for Windows
+- RIPaint (graphics editor — v1.52, v2.1)
+
+All recreations are faithful to the original work, built from our own
+spec docs and protocol implementation (v1 through v4+), open source
+under GPLv3.
+
+### Technical Notes from Jeff Reeder
+
+Flood fill: BGI had integer overflow bugs and a fixed 16-bit path
+backup stack. Never 100% perfect. Anti-aliasing in modern vector APIs
+(GDI) causes pixel gaps across resolutions. Flood fill was removed
+in RIPscrip v2.0 for these reasons.
+
+Fonts: non-BGI font systems are near impossible to replicate perfectly.
+BGI CHR fonts are fine — anything beyond is tricky.
+
+### v3.09 Source Code (Pending Release)
+
+Jeff and Mark are willing to release the RIPscrip v3.09 source as it
+existed in 2000 when TeleGrafix closed. Pure decoder, fully type-safe,
+modern OOP. Has RIP generation hooks (like the old RIP-2-C library).
+Groundwork laid but generation side not fully wrapped up.
+Waiting on their timeline — both are on a new project under deadline.
+
+Some third-party components may have licensing restrictions. Those
+companies are likely all defunct. Clean room implementation is the
+right approach for anything that cannot be published directly.
+
+### Full v3 Specification (450 Pages)
+
+The complete RIPscrip v3 specification exists as a 450-page document,
+originally under NDA (Patrick Clawson era). Makes the v1.54 spec look
+like child's play. Half of it covers text variables and the TV query
+language — matches our audit finding that the entire text variable
+system is missing from ripview (Section 9).
+
+### The Crew
+
+Team: verta1878 (lead), sysop/0, bob, evga, kiddo, wrench,
+hexadecimal, byte, DotMatrix — "the crew 4free"
+
+The whole team is on board for the recreation. First step: byte-exact
+RIPterm 1.54.
+
 ## 1. Whitepaper Identity Problem
 
 The project has three levels of whitepaper:
@@ -716,3 +770,61 @@ v1 (ripui.pas) → v2 (rip2ext.pas) → v3 (rip3ext.pas) → v4 (rip4ext.pas)
 | UTF8-2 | ESC(U (CP437) / ESC(B (UTF-8) switching in m_output |
 | UTF8-3 | UTF-8 font rendering in graphics mode |
 | UTF8-4 | UTF-8 terminal auto-detection |
+
+## Font and VGA Resources
+
+### rip_font*.inc — Compile-Time Font Data
+
+IBM VGA BIOS ROM font data compiled as Pascal typed constants. Used by
+riptext.pas to render text characters in the 640x350 pixel buffer.
+Source: spacerace/romfont ROM dumps.
+
+| File              | Size    | Glyph | Glyphs | Charset |
+|-------------------|---------|-------|--------|---------|
+| rip_font8x8.inc   | 2048 B  | 8x8   | 256    | CP437   |
+| rip_font8x14.inc  | 3584 B  | 8x14  | 256    | CP437   |
+| rip_font8x16.inc  | 4096 B  | 8x16  | 256    | CP437   |
+
+Canonical location: mystic/mdl/m_rip/ and mystic_test/mdl/m_rip/
+
+Verification keys:
+- char 219 (block) = all $FF (solid block)
+- char 65 (A) = $30,$78,$CC,$CC,$FC,$CC,$CC,$00 (8x8)
+
+These are included at compile time via {$I rip_font8x8.inc} in riptext.pas.
+No runtime file loading needed — the font data is baked into the binary.
+
+### VGA8X16.FNT — Runtime Font File
+
+Same IBM VGA 8x16 font data as rip_font8x16.inc but as a standalone
+binary file (raw 4096 bytes, no Pascal wrapper). Loaded at runtime by
+mystic_sdl and m_output for console screen rendering.
+
+Canonical location: mystic/mdl/m_rip/VGA8X16.FNT and
+mystic_test/mdl/m_rip/VGA8X16.FNT
+
+Stray copies in mystic/mdl/ and mystic_test/mdl/ (outside m_rip/)
+are removed by cleanup.bat.
+
+### Why Both Exist
+
+The .inc files serve the RIP engine (compile-time, no file I/O needed,
+works on headless Linux and DOS). The .FNT file serves the display system
+(runtime, loaded by SDL and console output drivers that need the font
+independently of the RIP engine).
+
+Both come from the same ROM dump. Same bytes, different packaging.
+
+## Repositories and Build
+
+- Source: https://github.com/verta1878/MysticIRC
+- Compiler: https://github.com/verta1878/fpc264irc (required, sibling directory)
+
+### Linux Build
+
+Drop build-linux.sh in repo root, chmod +x, then:
+
+    ./build-linux.sh x64 test    <- mystic_test 16/16
+    ./build-linux.sh x64         <- mystic stable 16/16
+
+Compiler expected at ../fpc264irc/bin/ppcx64 (x86_64) or ../fpc264irc/bin/ppc386 (i386).

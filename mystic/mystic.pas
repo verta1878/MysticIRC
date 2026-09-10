@@ -31,9 +31,9 @@ Uses
   {$IFDEF WINDOWS}
     m_io_Base,
     m_io_Sockets,
-  {$ENDIF}
-  {$IFDEF GO32V2}
-    m_fossil_io,
+    {$IFDEF GO32V2}
+    m_io_Fossil,
+    {$ENDIF}
   {$ENDIF}
   {$IFDEF UNIX}
     BaseUnix,

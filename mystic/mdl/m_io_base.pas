@@ -40,8 +40,8 @@ Type
 
     Constructor Create; Virtual;
     Destructor  Destroy; Override;
-    Procedure   PurgeInputData  (DrainWait: LongInt); Virtual;
-    Procedure   PurgeOutputData; Virtual;
+    Procedure   PurgeInputData  (DrainWait: LongInt);
+    Procedure   PurgeOutputData;
     Function    DataWaiting     : Boolean; Virtual;
     Function    WriteBuf        (Var Buf; Len: LongInt) : LongInt; Virtual;
     Function    ReadBuf         (Var Buf; Len: LongInt) : LongInt; Virtual;

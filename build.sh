@@ -21,7 +21,7 @@ FPC="${FPC:-fpc}"     # override with FPC=/path/to/fpc264irc/bin/ppc386
 #   FCLNET=<fpc>/src/packages/fcl-net/src  FCLBASE=<fpc>/src/packages/fcl-base/src
 FCLNET="${FCLNET:-}"
 FCLBASE="${FCLBASE:-}"
-FPCOPTS=(-Mdelphi -Fumystic/mdl -Fumystic/mdl/m_serial -Fumystic -Fimystic/mdl -Fimystic/mdl/m_serial -Fimystic -Fomystic/mdl -FU"$UNITS" -FE"$BIN")
+FPCOPTS=(-Mdelphi -Fumdl -Fumdl/m_serial -Fumystic -Fimdl -Fimdl/m_serial -Fimystic -Fomdl -FU"$UNITS" -FE"$BIN")
 [ -n "$FCLNET" ]  && FPCOPTS+=(-Fu"$FCLNET")
 [ -n "$FCLBASE" ] && FPCOPTS+=(-Fu"$FCLBASE")
 
@@ -36,7 +36,7 @@ MARCOPTS=(-Mobjfpc -Fumystic -Fimystic -FU"$UNITS" -FE"$BIN")
 [ -n "$HASHSRC" ] && MARCOPTS+=(-Fu"$HASHSRC")
 
 ALL=(mystic mis mutil mplc mide mbbsutil fidopoll nodespy qwkpoll \
-     mystpack install install_make maketheme 109to110 marc mystfoss)
+     mystpack install install_make maketheme 109to110 marc)
 TARGETS=("$@"); [ ${#TARGETS[@]} -eq 0 ] && TARGETS=("${ALL[@]}")
 
 clean() { find . -name '*.ppu' -delete 2>/dev/null; find . -name '*.o' -delete 2>/dev/null; }

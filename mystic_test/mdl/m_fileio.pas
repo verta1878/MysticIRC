@@ -84,11 +84,7 @@ Const
 { STREAMING CLASS OPTIONS }
 
 Const
-  {$IFDEF CPU16}
-  MaxFileBufferSize = 16 * 1024;   { 16 KB — fits in a 64 KB segment }
-  {$ELSE}
   MaxFileBufferSize = 128 * 1024;
-  {$ENDIF}
 
 Type
   TFileBufferOpenType = (
@@ -526,11 +522,7 @@ Begin
       {$IFDEF GO32V2}
         Result := System.GetProcessID;  // DOS/go32v2: FPC RTL (System unit)
       {$ELSE}
-        {$IFDEF CPU16}
-        Result := 1;                    // i8086 real-mode DOS: single process
-        {$ELSE}
         Result := fpGetPID;
-        {$ENDIF}
       {$ENDIF}
     {$ENDIF}
   {$ENDIF}

@@ -24,8 +24,7 @@ Program MIS;
 {$I M_OPS.PAS}
 
 {$IFDEF WINDOWS}
-  { TODO: Create mystic.rc + mystic.res for Win32 build }
-  { $R mystic.res}
+  {$R mystic.res}
 {$ENDIF}
 
 Uses

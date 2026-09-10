@@ -53,10 +53,9 @@ build () {
 echo "Mystic BBS DOS (go32v2) cross-build ($(date))"
 echo ""
 chmod +x "$XTOOLS"/* "$FPC" 2>/dev/null
-for t in mystic mplc maketheme mbbsutil mystpack install install_make 109to110; do
+for t in mystic mplc maketheme mbbsutil mystpack mystfoss install install_make 109to110; do
     build "$t"
 done
 build marc objfpc
-build mystfoss delphi
 echo ""
 echo "Passed: $PASS  Failed: $FAIL"
