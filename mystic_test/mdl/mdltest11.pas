@@ -12,13 +12,13 @@
 // ====================================================================
 
 // ====================================================================
-// mdltest11 — m_serial + m_io_fossil COM port test
+// mdltest11 — m_serial + m_fossil COM port test
 // Tests FOSSIL abstraction layer without real hardware
 // ====================================================================
 Program mdltest11;
 
 Uses
-  m_io_fossil;
+  m_Fossil;
 
 Var
   Foss : TFossil;
@@ -40,18 +40,15 @@ End;
 Begin
   Pass := 0;
   Fail := 0;
-  WriteLn('mdltest11 — m_serial + m_io_fossil test');
+  WriteLn('mdltest11 — m_serial + m_fossil test');
   WriteLn;
 
   WriteLn('--- TFossil Object ---');
-  Foss := TFossil.Create;
+  Foss := TFossil.CreateSerial(NIL);
 
-  Check('Create OK', Foss <> NIL);
+  Check('CreateSerial OK', Foss <> NIL);
   Check('Backend serial', Foss.Backend = fbSerial);
   Check('Not connected', Not Foss.CarrierDetect);
-
-  // Init with invalid port — should fail gracefully
-  // Init bad port test skipped — Serial unit raises unhandled exception
 
   // GetInfo without init
   Info := Foss.GetInfo;
@@ -68,6 +65,9 @@ Begin
   Foss.PurgeInput;
   Check('PurgeInput OK', True);
 
+  Foss.PurgeOutput;
+  Check('PurgeOutput OK', True);
+
   // RecvReady without connection
   Check('RecvReady false', Not Foss.RecvReady);
 
@@ -78,15 +78,22 @@ Begin
   Foss.SetDTR(False);
   Check('SetDTR off OK', True);
 
+  // Status without connection
+  Check('Status zero', Foss.Status = 0);
+
   Foss.Free;
   Check('Free OK', True);
 
   WriteLn;
+  WriteLn('--- TFossilInfo Record ---');
+  Check('Info size > 0', SizeOf(TFossilInfo) > 0);
+
+  WriteLn;
   WriteLn('--- Backend Selection ---');
-  Foss := TFossil.Create;
+  Foss := TFossil.CreateSerial(NIL);
 
   {$IFDEF GO32V2}
-  Check('DOS: backend Int14', Foss.Backend = fbInt14);
+  WriteLn('  (DOS target — CreateInt14 would use fbInt14)');
   {$ELSE}
   Check('Non-DOS: backend serial', Foss.Backend = fbSerial);
   {$ENDIF}

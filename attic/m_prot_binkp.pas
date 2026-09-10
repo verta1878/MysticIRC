@@ -20,13 +20,11 @@
 // ====================================================================
 Program BinkPoll;
 
-// Need to include point and multi zones (same with tosser)
-
 {$I M_OPS.PAS}
 
 Uses
   DOS,
-  m_Crypt,
+  m_crypt,
   m_DateTime,
   m_FileIO,
   m_Strings,
@@ -44,7 +42,6 @@ End;
 
 Var
   bbsConfig : RecConfig;
-  TempPath  : String;
 
 Const
   M_NUL  = 0;
@@ -115,7 +112,6 @@ Type
     SetPassword  : String;
     SetBlockSize : Word;
     SetTimeOut   : Word;
-    SetOutPath   : String;
 
     Client       : TIOSocket;
     IsClient     : Boolean;
@@ -137,7 +133,6 @@ Type
     Constructor Create (Var C: TIOSocket; Var FL: TProtocolQueue; IsCli: Boolean; TOV: Word);
     Destructor  Destroy; Override;
 
-    Procedure   RemoveFilesFromFLO (FN: String);
     Function    GetDataStr : String;
     Procedure   SendFrame     (CmdType: Byte; CmdData: String);
     Procedure   SendDataFrame (Var Buf; BufSize: Word);
@@ -189,60 +184,6 @@ End;
 Destructor TBinkP.Destroy;
 Begin
   Inherited Destroy;
-End;
-
-Procedure TBinkP.RemoveFilesFromFLO (FN: String);
-Var
-  Str      : String;
-  DirInfo  : SearchRec;
-  OrigFile : Text;
-  NewFile  : Text;
-  Matched  : Boolean;
-Begin
-  // Scan all FLO files in outbound directory, and PRUNE them all.
-
-  FindFirst (SetOutPath + '*.?lo', AnyFile, DirInfo);
-
-  While DosError = 0 Do Begin
-    FileRename (SetOutPath + DirInfo.Name, TempPath + DirInfo.Name);
-
-    Assign  (NewFile, SetOutPath + DirInfo.Name);
-    ReWrite (NewFile);
-    Append  (NewFile);
-
-    Assign  (OrigFile, TempPath + DirInfo.Name);
-    Reset   (OrigFile);
-
-    While Not Eof (OrigFile) Do Begin
-      ReadLn (OrigFile, Str);
-
-      If (Str = '') or (Str[1] = '!') Then
-        WriteLn (NewFile, Str)
-      Else Begin
-        Case Str[1] of
-          '~',
-          '#',
-          '^'  : Matched := strUpper(FN) = strUpper(Copy(Str, 2, 255));
-        Else
-          Matched := (strUpper(FN) = strUpper(Str));
-        End;
-
-        If Not Matched Then
-          WriteLn (NewFile, Str);
-      End;
-    End;
-
-    Close (NewFile);
-    Close (OrigFile);
-    Erase (OrigFile);
-
-    If FileByteSize(SetOutPath + DirInfo.Name) = 0 Then
-      FileErase(SetOutPath + DirInfo.Name);
-
-    FindNext (DirInfo);
-  End;
-
-  FindClose (DirInfo);
 End;
 
 Function TBinkP.GetDataStr : String;
@@ -375,7 +316,7 @@ Begin
                         SendFrame (M_NUL, 'SYS ' + bbsConfig.BBSName);
                         SendFrame (M_NUL, 'ZYZ ' + bbsConfig.SysopName);
 //                        SendFrame (M_NUL, 'LOC Philadelphia, PA');
-                        SendFrame (M_NUL, 'VER Mystic/' + Copy(mysVersion, 1, 4) + ' binkp/1.0');
+                        SendFrame (M_NUL, 'VER Mystic/1.10 binkp/1.0');
 
                         If IsClient Then
                           AuthState := SendAddress
@@ -443,7 +384,6 @@ Var
   InFile  : File;
   OutFile : File;
   OutSize : LongInt;
-  ActualFileTime : LongInt;
   OutBuf  : Array[1..BinkPMaxBufferSize] of Byte;
   Str     : String;
   InFN    : String;
@@ -451,6 +391,7 @@ Var
   InPos   : Cardinal;
   InTime  : Cardinal;
   FSize   : Cardinal;
+  ActualFileTime : LongInt;
 Begin
   //WriteLn ('Begin File Transfers');
 
@@ -496,11 +437,11 @@ Begin
                          // fix timestamp and escape filen
 
                          If FSize >= InSize Then Begin
-                           SendFrame (M_SKIP, InFN + ' ' + strI2S(FSize) + ' ' + strI2S(InTime));
+                           SendFrame (M_SKIP, InFN + ' ' + strI2S(FSize) + ' ' + strI2S(TempFileTime));
 
                            Continue;
                          End Else Begin
-                           SendFrame (M_GET, InFN + ' ' + strI2S(FSize) + ' ' + strI2S(InTime));
+                           SendFrame (M_GET, InFN + ' ' + strI2S(FSize) + ' ' + strI2S(TempFileTime));
 
                            InPos := FSize;
                          End;
@@ -529,11 +470,15 @@ Begin
                      HaveHeader := False;
                      NeedHeader := True;
 
+                     // A48: reset timeout on active data receipt to prevent
+                     // random timeouts during large file transfers.
+                     TimeOut := TimerSet(SetTimeOut);
+
                      If InPos = InSize Then Begin
                        // fix time, escape filename
 
                        Close     (InFile);
-                       SendFrame (M_GOT, InFN + ' ' + strI2S(InSize) + ' ' + strI2S(InTime));
+                       SendFrame (M_GOT, InFN + ' ' + strI2S(InSize) + ' ' + strI2S(TempFileTime));
 
                        RxState := RxWaitFile;
                      End;
@@ -546,11 +491,6 @@ Begin
       TxGetEOF   : Begin
                      If HaveHeader Then
                        If RxCommand = M_GOT Then Begin
-                         FileList.QData[FileList.QPos].Status := QueueSuccess;
-
-                         FileErase          (FileList.QData[FileList.QPos].FilePath + FileList.QData[FileList.QPos].FileName);
-                         RemoveFilesFromFLO (FileList.QData[FileList.QPos].FilePath + FileList.QData[FileList.QPos].FileName);
-
                          HaveHeader := False;
                          NeedHeader := True;
                          TxState    := TxNextFile;
@@ -581,7 +521,7 @@ Begin
                        Seek (OutFile, strS2I(Str));
 
                        // fix file time and escape filename
-                       SendFrame (M_FILE, FileList.QData[FileList.QPos].FileName + ' ' + Str + ' ' + strI2S(TempFileTime) + ' 0');
+                       SendFrame (M_FILE, FileList.QData[FileList.QPos].FileName + ' ' + Str + ' 0 0');
 
                        HaveHeader := False;
                        NeedHeader := True;
@@ -591,6 +531,9 @@ Begin
 
                      BlockRead     (OutFile, OutBuf, SizeOf(OutBuf), OutSize);
                      SendDataFrame (OutBuf, OutSize);
+
+                     // A48: reset timeout on active data send
+                     TimeOut := TimerSet(SetTimeOut);
 
                      If OutSize < SizeOf(OutBuf) Then Begin
                        Close (OutFile);
@@ -604,35 +547,6 @@ Begin
   Until ((RxState = RxDone) and (TxState = TxDone)) or (Not Client.Connected) or (TimerUp(TimeOut));
 
   If Client.Connected Then Client.BufFlush;
-End;
-
-Function IsFTNPrimary (EchoNode: RecEchoMailNode) : Boolean;
-Var
-  Count : Byte;
-Begin
-  For Count := 1 to 30 Do
-    If (strUpper(EchoNode.Domain) = strUpper(bbsConfig.NetDomain[Count])) and
-       (EchoNode.Address.Zone = bbsConfig.NetAddress[Count].Zone) and
-       (bbsConfig.NetPrimary[Count]) Then Begin
-         Result := True;
-
-         Exit;
-    End;
-
-  Result := False;
-End;
-
-Function GetFTNOutPath (EchoNode: RecEchoMailNode) : String;
-Begin;
-  If IsFTNPrimary(EchoNode) Then
-    Result := bbsConfig.OutboundPath
-  Else
-    Result := DirLast(bbsConfig.OutboundPath) + strLower(EchoNode.Domain + '.' + strPadL(strI2H(EchoNode.Address.Zone, 3), 3, '0')) + PathChar;
-End;
-
-Function GetFTNFlowName (Dest: RecEchoMailAddr) : String;
-Begin
-  Result := strI2H((Dest.Net SHL 16) OR Dest.Node, 8);
 End;
 
 Procedure PollNode (Var Queue: TProtocolQueue; Var EchoNode: RecEchoMailNode);
@@ -664,7 +578,6 @@ Begin
 
   BinkP := TBinkP.Create(Client, Queue, True, EchoNode.binkTimeOut * 100);
 
-  BinkP.SetOutPath   := GetFTNOutPath(EchoNode);
   BinkP.SetPassword  := EchoNode.binkPass;
   BinkP.SetBlockSize := EchoNode.binkBlock;
   BinkP.UseMD5       := EchoNode.binkMD5 > 0;
@@ -679,18 +592,27 @@ Begin
   Client.Free;
 End;
 
-Procedure QueueByNode (Var Queue: TProtocolQueue; EchoNode: RecEchoMailNode);
-Var
-  DirInfo : SearchRec;
-  FLOFile : Text;
-  Str     : String;
-  FN      : String;
-  Path    : String;
-  OutPath : String;
+Function GetFTNFlowName (Dest: RecEchoMailAddr) : String;
 Begin
-  OutPath := GetFTNOutPath(EchoNode);
+  Result := strI2H((Dest.Net SHL 16) OR Dest.Node, 8);
+End;
 
-  FindFirst (OutPath + '*.?lo', AnyFile, DirInfo);
+Procedure ScanOutbound;
+Var
+  DirInfo  : SearchRec;
+  FLOFile  : Text;
+  EchoFile : File of RecEchoMailNode;
+  EchoNode : RecEchoMailNode;
+  Queue    : TProtocolQueue;
+  Str      : String;
+  FN       : String;
+  Path     : String;
+  Matched  : Boolean;
+Begin
+  WriteLn ('Scanning configured Echomail nodes...');
+  WriteLn;
+
+  FindFirst (bbsConfig.OutboundPath + '*.?lo', AnyFile, DirInfo);
 
   While DosError = 0 Do Begin
     Write ('- Found ', DirInfo.Name, ' -> Send Type: ');
@@ -709,13 +631,38 @@ Begin
       WriteLn ('Normal');
     End;
 
-    If Not ((strUpper(JustFileName(DirInfo.Name)) = strUpper(GetFTNFlowName(EchoNode.Address))) and EchoNode.Active and (EchoNode.ProtType = 0)) Then Begin
+    Matched := False;
+
+    Assign (EchoFile, bbsConfig.DataPath + 'echonode.dat');
+    {$I-} Reset (EchoFile); {$I+}
+
+    If IoResult <> 0 Then Begin
+      WriteLn ('- Unable to match .FLO with configured Echomail node');
+
       FindNext (DirInfo);
 
       Continue;
     End;
 
-    Assign (FLOFile, OutPath + DirInfo.Name);
+    While Not Eof(EchoFile) And Not Matched Do Begin
+      Read (EchoFile, EchoNode);
+
+      Matched := (strUpper(JustFileName(DirInfo.Name)) = strUpper(GetFTNFlowName(EchoNode.Address))) and EchoNode.Active and (EchoNode.ProtType = 0);
+    End;
+
+    Close (EchoFile);
+
+    If Not Matched Then Begin
+      WriteLn ('- Unable to match .FLO with configured Echomail node');
+
+      FindNext (DirInfo);
+
+      Continue;
+    End;
+
+    Queue := TProtocolQueue.Create;
+
+    Assign (FLOFile, bbsConfig.OutboundPath + DirInfo.Name);
     Reset  (FLOFile);
 
     While Not Eof(FLOFile) Do Begin
@@ -734,71 +681,29 @@ Begin
 
     WriteLn('- Queued ', Queue.QSize, ' files (', Queue.QFSize, ' bytes) to ', strAddr2Str(EchoNode.Address));
 
+    If Queue.QSize > 0 Then
+      PollNode(Queue, Echonode);
+
+    Queue.Free;
+
     FindNext (DirInfo);
   End;
-End;
 
-Procedure PollAll (OnlyNew: Boolean);
-Var
-  Queue    : TProtocolQueue;
-  EchoFile : File of RecEchoMailNode;
-  EchoNode : RecEchoMailNode;
-  Total    : LongInt;
-Begin
-  WriteLn ('Polling BINKP nodes...');
-  WriteLn;
-
-  Total := 0;
-  Queue := TProtocolQueue.Create;
-
-  Assign (EchoFile, bbsConfig.DataPath + 'echonode.dat');
-  {$I-} Reset (EchoFile); {$I+}
-
-  If IoResult <> 0 Then Exit;
-
-  While Not Eof(EchoFile) Do Begin
-    Read (EchoFile, EchoNode);
-
-    If Not (EchoNode.Active and (EchoNode.ProtType = 0)) Then Continue;
-
-    Queue.Clear;
-
-    QueueByNode (Queue, EchoNode);
-
-    If OnlyNew and (Queue.QSize = 0) Then Continue;
-
-    Inc (Total);
-
-    WriteLn  ('- Polling node ' + strAddr2Str(EchoNode.Address) + ' (Queued ', Queue.QSize, ' files, ', Queue.QFSize, ' bytes)');
-    PollNode (Queue, EchoNode);
-  End;
-
-  Close (EchoFile);
-
-  Queue.Free;
-
-  If Total > 0 Then WriteLn;
-
-  WriteLn ('Polled ', Total, ' nodes');
-End;
-
-Procedure DoServer;
-Begin
+  FindClose (DirInfo);
 End;
 
 Var
-  CF  : File of RecConfig;
-  Str : String;
+  CF : File of RecConfig;
 Begin
-  FileMode := 66;
-
   WriteLn;
   WriteLn ('BINKPOLL Version ' + mysVersion);
   WriteLn;
 
-  Assign (CF, 'mystic.dat');
+  Assign (CF, '\s7\mystic.dat');
 
-  If Not ioReset (CF, SizeOf(RecConfig), fmRWDN) Then Begin
+  {$I-} Reset(CF); {$I+}
+
+  If IoResult <> 0 Then Begin
     WriteLn ('Unable to read MYSTIC.DAT');
     Halt(1);
   End;
@@ -811,29 +716,5 @@ Begin
     Halt(1);
   End;
 
-  If ParamCount = 0 Then Begin
-    WriteLn ('BINKPOLL SEND   - Only send/poll if node has new outbound messages');
-    WriteLn ('BINKPOLL FORCED - Poll/send to all configured/active BINKP nodes');
-    WriteLn ('BINKPOLL SERVER - Start in BINKP server mode (not implmented yet)');
-
-    Halt(1);
-  End;
-
-  TempPath := bbsConfig.SystemPath + 'tempftn' + PathChar;
-
-  {$I-}
-  MkDir (TempPath);
-  {$I+}
-
-  If IoResult <> 0 Then;
-
-  Str := strUpper(strStripB(ParamStr(1), ' '));
-
-  If (Str = 'SEND') or (Str = 'FORCED') Then
-    PollAll (Str = 'SEND')
-  Else
-  If (Str = 'SERVER') Then
-    DoServer
-  Else
-    WriteLn ('Invalid command line');
+  ScanOutbound;
 End.

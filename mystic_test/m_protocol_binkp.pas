@@ -356,8 +356,14 @@ Begin
       Str   := GetDataStr;
       Count := Pos('MD5-', Str);
 
-      If Count > 0 Then
+      If Count > 0 Then Begin
         MD5Challenge := Copy(Str, Count + 4, 255);
+
+        // A42: ARGUS sends a null terminator at the end of the CRAM-MD5
+        // challenge string which changes the hash value.  Strip it.
+        While (Length(MD5Challenge) > 0) and (MD5Challenge[Length(MD5Challenge)] = #0) Do
+          Dec (MD5Challenge[0]);
+      End;
     End;
 
 //    WriteLn ('AuthState: ', GetStateStr(AuthState), ', HasHeader: ', HaveHeader, ' Data: ', GetDataStr);
@@ -437,6 +443,7 @@ Var
   InFile  : File;
   OutFile : File;
   OutSize : LongInt;
+  ActualFileTime : LongInt;
   OutBuf  : Array[1..BinkPMaxBufferSize] of Byte;
   Str     : String;
   InFN    : String;
@@ -555,8 +562,11 @@ Begin
 
                      If IoResult <> 0 Then Continue;
 
-                     // need to escape filename here and fix file time
-                     SendFrame (M_FILE, FileList.QData[FileList.QPos].FileName + ' ' + strI2S(FileList.QData[FileList.QPos].FileSize) + ' ' + strI2S(TempFileTime) + ' 0');
+                     // A44: send actual file date. Use GetFTime (DOS unit) since
+                     // this standalone program doesn't use SysUtils.
+                     GetFTime (OutFile, ActualFileTime);
+
+                     SendFrame (M_FILE, FileList.QData[FileList.QPos].FileName + ' ' + strI2S(FileList.QData[FileList.QPos].FileSize) + ' ' + strI2S(ActualFileTime) + ' 0');
 
                      TxState := TxSendData;
                    End Else Begin
