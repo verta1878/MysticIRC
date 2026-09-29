@@ -107,3 +107,47 @@
 - 640x350 fixed EGA resolution
 - No pointer truncation issues (no LongInt pointer casts)
 - All I/O uses Assign/Reset/BlockRead
+
+---
+
+## C Source Verification (2026-09-29)
+
+Cross-referenced against RIPterm v1.54 reconstructed C source
+(ripterm154-gplv3-source.zip, sysop/0's byte-exact decompilation).
+
+### Command Count Correction
+
+Original audit said 51 commands (36 L0 + 15 L1).
+C source RIPPARSE.C shows: 29 L0 + 13 L1 = 42 dispatched commands.
+The discrepancy is because some L0 "commands" are state-setters
+(setcolor, setfillstyle, etc.) not separate dispatch entries.
+
+### Corrections
+
+1. Bar3D — listed as "dead code" in session 10 audit. WRONG.
+   Bar3D IS dispatched as Level 1 command 'O' (RIPPARSE.C line 1366).
+   ripview needs DrawBar3D.
+
+2. DrawPoly — unfilled polygon outline is GENUINELY MISSING from ripview.
+   rip_draw_polygon() calls drawpoly() for outlines.
+   ripview only has FillPolyScanline (filled polygons).
+
+3. PieSlice vs Sector — SEPARATE functions in C source:
+   pieslice(x,y,sa,ea,r) single radius
+   sector(x,y,sa,ea,xr,yr) separate x/y radii
+   ripview maps both to DrawSector — needs param verification.
+
+### Functions Missing from ripview (verified from C source)
+
+Total: ~45 functions across 12 C files.
+See RIP-GRAPHICS-PHASES.md (repo root) for full tables.
+
+Key gaps:
+- Drawing: DrawPolygon, DrawBar3D, rip_end_scene (3)
+- State: 15 missing wrapper functions (direct Canvas access)
+- Mouse/Buttons: entire interactive layer (12)
+- Icons: full management system from ICONLOAD.C (11)
+- Scenes: save/restore/cache/clip/copy (10)
+- Text: window output, colors, attributed render (5)
+- Viewport: coord transform, clip line, point test (5)
+- UI widgets: 21 of 24 BGI_WRAP.C widgets not in ripui.pas

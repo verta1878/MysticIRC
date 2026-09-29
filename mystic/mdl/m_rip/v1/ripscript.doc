@@ -213,6 +213,15 @@ Zeros only the pixels within the current viewport rectangle.
 
 3.4  Drawing Primitives
 
+NOTE: ripscript.doc uses BGI-style names for the API. The actual ripview
+code uses different names. Mapping (doc → code):
+  Line → DrawLine, Rectangle → DrawRect, Bar → FillRect,
+  Circle → DrawCircle, Ellipse → DrawEllipse, Arc → DrawArcLines,
+  PieSlice/Sector → DrawSector, DrawPoly → DrawPolygon (MISSING),
+  FillPoly → FillPolyScanline, FloodFill → FloodFill,
+  Bar3D → DrawBar3D (MISSING — L1 cmd 'O')
+Verified against RIPterm v1.54 C source (RIP_DRAW.C) 2026-09-29.
+
 Procedure PutPixel (X, Y: SmallInt; Color: Byte)
 Set a single pixel. Respects viewport clipping and write mode.
 RIP command: !|X

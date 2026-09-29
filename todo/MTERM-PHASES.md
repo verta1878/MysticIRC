@@ -242,5 +242,23 @@ Target: one core RIP engine shared by mterm, ripviewer, and mystic.
 | Phase | What | Status |
 |-------|------|--------|
 | FONT-1 | IBM VGA 8x8 font in rip_font8x8.inc (public domain, romfont) | DONE |
-| FONT-2 | IBM VGA 8x14 font for EGA text mode | PENDING |
-| FONT-3 | IBM VGA 8x16 font for VGA text mode | PENDING |
+| FONT-2 | IBM VGA 8x14 font for EGA text mode | DONE |
+| FONT-3 | IBM VGA 8x16 font for VGA text mode | DONE |
+
+### Session 9-10 Updates
+
+| Phase | What | Status |
+|-------|------|--------|
+| MTERM-CONN | Full TCP wiring — HostToNet, DataAvailable via fpSelect, receive polling, SendByte | DONE |
+| SGR→EGA | SGR color mapping in ANSI terminal | DONE |
+| DumpScreen | ALT+D dumps full 25-row buffer | DONE |
+| FlushRIPBuf | RIPActive=True during replay fix | DONE |
+| Live test | mterm → socat:23 → mystic — login screen works in ANSI and RIP modes | DONE |
+
+### VIPEngine Integration (from RIP-GRAPHICS-PHASES.md)
+
+mterm needs the following from the C source verification:
+- rip_check_mouse_click — click→command for button regions
+- rip_handle_mouse_move — hover tracking
+- rip_viewport_push/pop — already in ripui.pas
+- Full L0/L1 command parser matching RIPPARSE.C dispatch

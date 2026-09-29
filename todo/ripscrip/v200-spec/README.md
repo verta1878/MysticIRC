@@ -49,3 +49,8 @@ Content-creator documentation for the 2.x generation. Chapter numbers align with
   - **[9.2 Version Identification Reference](9.2-versions.md)** - all known 2.x identification strings (`RIPSCRIP020000` across every shipping engine) with per-binary provenance
   - **[9.3 Host Command & Control Character Reference](9.3-host-command-reference.md)** - consolidated terminal→host reference: control characters, host-bound responses, host-side ANSI control
 - **[Errata](errata.md)** - where the ALPHA 4 draft and the shipping RIPterm engine disagree, the evidence, and how each chapter above resolves it
+
+---
+VERIFICATION STATUS (2026-09-29): NOT YET CHECKED against RIPterm C
+source or original RIPV2.TXT/v3 specs. Command dispatch tables verified
+in RIP-GRAPHICS-PHASES.md Section 2 — this spec may have discrepancies.

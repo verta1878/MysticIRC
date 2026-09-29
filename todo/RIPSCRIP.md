@@ -220,3 +220,14 @@ Define, ReadScene, and FileQuery.
 - PabloDraw (MIT): reference for RipWriter encoding patterns
 - BGI fonts (.CHR): originally Borland International, freely available
 - Carl Gorringe / RIPtermJS (GPLv3): studied as reference (no code copied)
+
+---
+
+## Verification Note (2026-09-29)
+
+RIPterm v1.54 C source (RIPPARSE.C) confirms:
+- Level 0 commands: 29 dispatched
+- Level 1 commands: 13 dispatched (including Bar3D as 'O')
+- Total: 42 dispatched commands
+- 6 L1 commands are stubs in the original (M, E, A, P, S, W)
+- Full dispatch tables in RIP-GRAPHICS-PHASES.md Section 2

@@ -273,13 +273,26 @@ Our v3.0 table and form system (Phase 20) provides structured
 data presentation. A general-purpose document layout engine is
 deferred to v4.0.</p>
 
-<h3>3.10 HTML Rendering (Whitepaper §4.7)</h3>
+<h3>3.10 HTML Rendering (Whitepaper §4.7) — IMPLEMENTED v4.0</h3>
 
-<p class="defer">DEFERRED TO v4.0</p>
+<p class="done">IMPLEMENTED IN v4.0 IRC FORK</p>
 
-<p>TeleGrafix planned to embed HTML rendering within RIPscrip 3.0.
-Modern BBS clients (SyncTERM, NetRunner) handle HTML separately.
-HTML rendering within the engine is deferred to v4.0.</p>
+<p>HTML 1.0 rendering implemented as a 5-unit stack:</p>
+<ul>
+<li><b>htmlpars.pas</b> — HTML tokenizer/parser</li>
+<li><b>htmltree.pas</b> — DOM tree builder</li>
+<li><b>htmllayo.pas</b> — Box model layout engine (CSS-style)</li>
+<li><b>htmlrip.pas</b> — HTML-to-RIP command converter</li>
+<li><b>htmlrend.pas</b> — Final pixel renderer</li>
+</ul>
+<p>API entry points:</p>
+<ul>
+<li><b>HTMLRenderPage(Source, Len)</b> — parse HTML and render to pixel buffer</li>
+<li><b>HTMLRenderToRIP(Source, Len)</b> — convert HTML to RIP commands</li>
+</ul>
+<p>Document Oriented Interface via htmllayo.pas box model.
+Reference implementation: Arachne DOS browser (GPL v2, C source in
+historical/arachne-browser-source.zip) for HTML 4.0/CSS 1.0 patterns.</p>
 
 <h3>3.11 MIDI Synthesis</h3>
 

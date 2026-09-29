@@ -41,3 +41,8 @@ _Content-creator reference; binary layouts and parser edge cases live in the com
   - **[9.1 Text Variable Reference](9.1-text-variable-reference.md)** - every text variable with format and availability
   - **[9.2 Version Identification Reference](9.2-versions.md)** - all known 1.5x identification strings (auto-sense replies and `$RIPVER$`), with provenance
   - **[9.3 Host Command & Control Character Reference](9.3-host-command-reference.md)** - consolidated terminal→host reference: control characters and host-bound sequences
+
+---
+VERIFICATION STATUS (2026-09-29): NOT YET CHECKED against RIPterm C
+source or original RIPV2.TXT/v3 specs. Command dispatch tables verified
+in RIP-GRAPHICS-PHASES.md Section 2 — this spec may have discrepancies.

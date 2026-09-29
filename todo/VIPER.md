@@ -95,7 +95,7 @@ No X11 dependency. No ptcgraph. Works headless (ripview) and with display
 - Test: mystic in USEGRAPH mode with RIP-enabled menu
 
 #### VIPER-5: v2-v4 inheritance
-- v2/rip2api.pas inherits from v1's TRIPEngine, adds v2 extensions
+- v2/rip2api.pas inherits from v1's VIPEngine, adds v2 extensions
 - v3/rip3api.pas inherits from v2, adds v3 extensions (forms, tables, RFF)
 - v4/rip4api.pas inherits from v3, adds v4 extensions (JPEG, print, HTML)
 - No more duplicated base engine code

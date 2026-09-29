@@ -1,6 +1,6 @@
 # ripview API Audit
 
-Session 10 — 2026-09-06
+Session 10 — 2026-09-06 (updated 2026-09-29 from RIPterm C source)
 
 ## Recreate with Permission
 
@@ -87,33 +87,73 @@ But the v4irc whitepaper still says in section 3.10:
 - MIDI synthesis API (midisynth.pas)
 - Any other v4-specific APIs not in v3
 
-## 2. Drawing — Name Mismatches
+## 2. Drawing — Name Mismatches and Missing Commands
 
-ripscript.doc (the v1 API reference) uses BGI-style names. The actual
-ripview code uses different names.
+Verified against RIPterm v1.54 C source (RIP_DRAW.C, RIPPARSE.C).
+ripscript.doc uses BGI-style names. The actual ripview code uses
+different names. Three corrections from C source marked with **.
 
-| ripscript.doc name  | actual ripview code name  | Unit          |
-|---------------------|---------------------------|---------------|
-| Line                | DrawLine                  | ripdraw.pas   |
-| Rectangle           | DrawRect                  | ripdraw.pas   |
-| Bar                 | FillRect                  | ripdraw.pas   |
-| Bar3D               | N/A (dead code, never dispatched) | —      |
-| Circle              | DrawCircle                | ripdraw.pas   |
-| Ellipse             | DrawEllipse               | ripdraw.pas   |
-| FillEllipse         | FillEllipse               | ripdraw.pas   |
-| Arc                 | DrawArcLines              | ripdraw.pas   |
-| PieSlice            | DrawSector                | ripdraw.pas   |
-| Sector              | DrawSector                | ripdraw.pas   |
-| DrawPoly            | FillPolyScanline          | ripdraw.pas   |
-| FillPoly            | FillPolyScanline          | ripdraw.pas   |
-| DrawBezier          | DrawBezier                | ripdraw.pas   |
-| FloodFill           | FloodFill                 | ripdraw.pas   |
-| PutPixel            | PutPixel                  | ripengine.pas |
-| GetPixel            | GetPixel                  | ripengine.pas |
+### Level 0 Commands (|x)
 
-The code names (DrawLine, DrawRect, etc.) are more descriptive and match
-the naming pattern used in v2-v4. Recommend updating ripscript.doc to
-match the actual code names.
+| RIPterm C function     | BGI call       | ripview equivalent       | Status    |
+|------------------------|----------------|--------------------------|-----------|
+| rip_draw_line          | line()         | DrawLine (ripdraw)       | OK        |
+| rip_draw_rectangle     | rectangle()    | DrawRect (ripdraw)       | OK        |
+| rip_draw_bar           | bar()          | FillRect (ripdraw)       | OK        |
+| rip_draw_circle        | circle()       | DrawCircle (ripdraw)     | OK        |
+| rip_draw_oval          | ellipse()      | DrawEllipse (ripdraw)    | OK        |
+| rip_fill_oval          | fillellipse()  | FillEllipse (ripdraw)    | OK        |
+| rip_draw_arc           | arc()          | DrawArcLines (ripdraw)   | OK        |
+| rip_draw_pieslice      | pieslice()     | DrawSector (ripdraw)     | **CHECK** |
+| rip_draw_sector        | sector()       | DrawSector (ripdraw)     | **CHECK** |
+| rip_flood_fill         | floodfill()    | FloodFill (ripdraw)      | OK        |
+| rip_draw_polygon       | drawpoly()     | **MISSING**              | **NEED**  |
+| rip_fill_polygon       | fillpoly()     | FillPolyScanline (ripdraw)| OK       |
+| rip_draw_bezier        | line() loop    | DrawBezier (ripdraw)     | OK        |
+| rip_put_pixel          | putpixel()     | PutPixel (ripengine)     | OK        |
+| rip_get_pixel          | getpixel()     | GetPixel (ripengine)     | OK        |
+| rip_text_xy            | outtextxy()    | OutTextXY (riptext)      | OK        |
+| rip_move_to            | moveto()       | Canvas.CurX/Y direct     | WRAPPER   |
+| rip_set_color          | setcolor()     | Canvas.FG direct         | WRAPPER   |
+| rip_set_palette        | setpalette()   | SetPalette (ripdraw)     | OK        |
+| rip_set_write_mode     | setwritemode() | SetWriteMode (ripdraw)   | OK        |
+| rip_set_line_style     | setlinestyle() | SetLineStyle (ripdraw)   | OK        |
+| rip_set_fill_style     | setfillstyle() | Canvas fields direct     | WRAPPER   |
+| rip_set_fill_pattern   | setfillpattern()| inline rip1exec         | WRAPPER   |
+| rip_set_font_style     | settextstyle() | SetTextStyle (riptext)   | OK        |
+| rip_set_text_justify   | settextjustify()| inline rip1exec         | WRAPPER   |
+| rip_set_window         | setviewport()  | SetViewport (ripdraw)    | OK        |
+| rip_reset_window       | setviewport(full)| SetViewport(0,0,639,349)| OK       |
+| rip_erase_window       | clearviewport()| rcEraseView (rip1exec)   | OK        |
+| rip_text_window        | (custom)       | partial in rip1exec      | PARTIAL   |
+| rip_end_scene          | (custom)       | **MISSING**              | **NEED**  |
+
+### Level 1 Commands (|1x)
+
+| RIPterm dispatch       | Cmd  | ripview equivalent         | Status    |
+|------------------------|------|----------------------------|-----------|
+| rip_cmd_define_button  | 'B'  | rcButton (rip1exec)        | OK        |
+| rip_kill_all_buttons   | 'K'  | rcKillMouseFields          | OK        |
+| rip_cmd_define_mouse   | 'U'  | rcMouse (rip1exec)         | OK        |
+| (mouse click mode)     | 'M'  | **MISSING** (stub in ripstd)| STUB     |
+| (enter block mode)     | 'E'  | **MISSING** (stub in ripstd)| STUB     |
+| rip_parse_textwindow   | 'T'  | partial in rip1exec        | PARTIAL   |
+| (text window attribute)| 'A'  | **MISSING** (stub in ripstd)| STUB     |
+| **rip_parse_bar3d**    | 'O'  | **MISSING** — IS a real cmd| **NEED**  |
+| rip_set_all_palette    | 'C'  | rcSetPalette (rip1exec)    | OK        |
+| (put image)            | 'P'  | **MISSING** (stub in ripstd)| STUB     |
+| (set clipboard)        | 'S'  | **MISSING** (stub in ripstd)| STUB     |
+| (write icon)           | 'W'  | rcWriteIcon (rip1exec)     | OK        |
+| rip_cmd_font_select    | 't'  | LoadCHRFont (riptext)      | OK        |
+
+**CORRECTIONS from C source:**
+1. Bar3D was listed as "dead code, never dispatched" — WRONG. It IS
+   dispatched as L1 command 'O' (rip_parse_bar3d, RIPPARSE.C line 1366)
+2. DrawPoly (unfilled outline) is genuinely MISSING — not just renamed.
+   rip_draw_polygon calls drawpoly(); ripview only has FillPolyScanline
+3. PieSlice and Sector are SEPARATE functions with different params:
+   pieslice(x,y,sa,ea,r) vs sector(x,y,sa,ea,xr,yr). ripview maps
+   both to DrawSector — needs verification that params handle both
 
 ## 3. State — Mapping and Missing Wrappers
 
@@ -177,44 +217,54 @@ matches the docs, and makes the v2-v4 port straightforward.
 
 ## 4. Mouse / Buttons
 
-All present in ripview under different names from ripscript.doc.
+Verified against RIPBTN.C and RIPHANDS.C from RIPterm C source.
 
-| ripscript.doc name              | ripview name                     | Unit          |
+| RIPterm C function              | ripview equivalent               | Status        |
 |---------------------------------|----------------------------------|---------------|
-| AddMouseField(X0,Y0,X1,Y1,...) | rcMouse dispatch                 | rip1exec.pas  |
-| KillMouseField(Index)           | rcKillMouseFields dispatch       | rip1exec.pas  |
-| KillAllMouseFields              | rcKillMouseFields dispatch       | rip1exec.pas  |
-| FindMouseField(X, Y)            | not exposed as function          | —             |
-| GetMouseCount                   | not exposed as function          | —             |
-| GetMouseField(Index)            | not exposed as function          | —             |
-| SetButtonStyle(Style)           | rcButtonStyle — BtnStyle record  | rip1exec.pas  |
-| DrawButton(X0,Y0,X1,Y1,...)    | rcButton — full bevel renderer   | rip1exec.pas  |
-| DrawButtonEx                    | not implemented                  | —             |
-| ClickButton(Index)              | not implemented                  | —             |
-| FindButtonByHotkey(Key)         | not implemented                  | —             |
-| GetNextTabField                 | not implemented                  | —             |
-| GetPrevTabField                 | not implemented                  | —             |
-| FocusField(Index)               | not implemented                  | —             |
-| UnfocusField                    | not implemented                  | —             |
-| GetFocusedField                 | not implemented                  | —             |
-| InvertRegion(X0,Y0,X1,Y1)      | not implemented                  | —             |
+| rip_define_button               | rcButton (rip1exec)              | OK            |
+| rip_define_mouse_region         | rcMouse (rip1exec)               | OK            |
+| rip_kill_button                 | rcKillMouseFields                | OK            |
+| rip_kill_all_buttons            | rcKillMouseFields                | OK            |
+| rip_check_mouse_click           | **MISSING** — click→command      | **NEED**      |
+| rip_check_hotkey                | **MISSING** — key→button         | **NEED**      |
+| sort_buttons_zorder             | **MISSING** — z-order sorting    | **NEED**      |
+| point_in_button                 | **MISSING** — hit test           | **NEED**      |
+| rip_count_buttons               | **MISSING** — button counter     | **NEED**      |
+| rip_count_mouse_fields          | **MISSING** — field counter      | **NEED**      |
+| rip_handle_mouse_click          | **MISSING** — high-level handler | **NEED**      |
+| rip_handle_mouse_move           | **MISSING** — hover tracking     | **NEED**      |
+| rip_activate_button             | **MISSING** — visual feedback    | **NEED**      |
+| rip_highlight_button            | **MISSING** — visual feedback    | **NEED**      |
+| rip_check_button_hit            | **MISSING** — hit+activate       | **NEED**      |
+| rip_set_mouse_cursor            | **MISSING** — cursor style       | **NEED**      |
 
-Core mouse fields and button rendering work. Missing: query functions
-(FindMouseField, GetMouseCount, GetMouseField), interactive button
-functions (ClickButton, FindButtonByHotkey, tab navigation, focus),
-DrawButtonEx, and InvertRegion.
+Core button definition and mouse region storage work. Missing: the
+entire interactive layer — click handling, hotkeys, z-order, hover
+tracking, visual feedback, cursor style. These are needed for mterm
+and any interactive RIP client.
 
 ## 5. Icons
 
-| ripscript.doc name               | ripview name                  | Unit          |
-|----------------------------------|-------------------------------|---------------|
-| LoadIcon(File, X, Y, Mode)       | rcLoadIcon dispatch           | rip1exec.pas  |
-| SaveIcon(File, X0, Y0, X1, Y1)  | rcWriteIcon dispatch          | rip1exec.pas  |
-| LoadMask(File, X, Y)             | not implemented               | —             |
-| LoadIconMasked(Icon, Mask, X, Y) | not implemented               | —             |
-| LoadHotIcon(File, X, Y)          | not implemented               | —             |
+Verified against RIPIMAGE.C and ICONLOAD.C from RIPterm C source.
 
-Basic icon load/save works. Missing: mask and hot-icon operations.
+| RIPterm C function            | ripview equivalent               | Status        |
+|-------------------------------|----------------------------------|---------------|
+| rip_load_icon                 | rcLoadIcon (rip1exec)            | OK            |
+| rip_save_icon                 | rcWriteIcon (rip1exec)           | OK            |
+| rip_stamp_icon (with mode)    | **MISSING** — XOR/AND modes      | **NEED**      |
+| rip_get_icon_size             | **MISSING** — icon dimensions    | **NEED**      |
+| rip_load_pcx                  | **MISSING** — PCX file loading   | **NEED**      |
+| icon_load_from_file           | **MISSING** — indexed loading    | **NEED**      |
+| icon_display                  | **MISSING** — display by index   | **NEED**      |
+| icon_display_xor              | **MISSING** — XOR display        | **NEED**      |
+| icon_mask_check               | **MISSING** — mask existence     | **NEED**      |
+| icon_chr_scan                 | **MISSING** — CHR font scan      | **NEED**      |
+| icon_get_count                | **MISSING** — loaded count       | **NEED**      |
+| icon_get_width/height         | **MISSING** — dimensions by idx  | **NEED**      |
+| icon_free_all                 | **MISSING** — cleanup            | **NEED**      |
+
+Basic load/save works. Missing: the full icon management system from
+ICONLOAD.C (indexed storage, XOR display, mask checking, PCX loading).
 
 ## 6. Image Operations
 
@@ -230,64 +280,88 @@ Basic icon load/save works. Missing: mask and hot-icon operations.
 GetImage/PutImage work but use a fixed CapturedImage record instead of
 the BGI-style dynamic buffer. CopyRegion is missing.
 
-## 7. Scene / Export
+## 7. Scene / State Management
 
-| ripscript.doc name               | ripview name                  | Unit          |
-|----------------------------------|-------------------------------|---------------|
-| SaveBMP(FileName)                | SaveBMP                       | ripbmp.pas    |
-| LoadScene(FileName)              | not exposed as function       | —             |
-| SaveScene(FileName)              | not exposed as function       | —             |
-| LoadPCX(File, X, Y)              | not implemented               | —             |
-| LoadBMP(File, X, Y)              | not implemented               | —             |
+Verified against RIPSCENE.C from RIPterm C source.
+
+| RIPterm C function            | ripview equivalent           | Status        |
+|-------------------------------|------------------------------|---------------|
+| SaveBMP(FileName)             | SaveBMP (ripbmp)             | OK            |
+| rip_scene_save                | **MISSING** — full state     | **NEED**      |
+| rip_scene_restore             | **MISSING** — full state     | **NEED**      |
+| rip_scene_free                | **MISSING** — cleanup        | **NEED**      |
+| rip_set_clip                  | **MISSING** — clip region    | **NEED**      |
+| rip_clear_clip                | **MISSING** — clear clip     | **NEED**      |
+| rip_copy_region               | **MISSING** — region copy    | **NEED**      |
+| rip_polygon_clip              | **MISSING** — clipped poly   | **NEED**      |
+| rip_bar3d (in RIPSCENE)       | **MISSING** — 3D bar         | **NEED**      |
+| rip_hline                     | **MISSING** — optimized H    | **NEED**      |
+| rip_vline                     | **MISSING** — optimized V    | **NEED**      |
+| rip_set_active_page           | N/A — BGI only               | N/A           |
+| rip_set_visual_page           | N/A — BGI only               | N/A           |
+| scene_is_cached               | **MISSING** — scene cache    | **NEED**      |
+| scene_cache_add               | **MISSING** — scene cache    | **NEED**      |
+| scene_cache_clear             | **MISSING** — scene cache    | **NEED**      |
+| check_and_play_rip            | **MISSING** — file playback  | **NEED**      |
 
 ## 8. Screen State Save/Restore
 
-| ripscript.doc name     | ripview name      | Notes              |
-|------------------------|-------------------|--------------------|
-| SaveScreen(Slot)       | not implemented   |                    |
-| RestoreScreen(Slot)    | not implemented   |                    |
-| SaveTextWin            | not implemented   |                    |
-| RestoreTextWin         | not implemented   |                    |
-| SaveMouseAll           | not implemented   |                    |
-| RestoreMouseAll        | not implemented   |                    |
-| SaveClip               | not implemented   | PushViewport covers this |
-| RestoreClip            | not implemented   | PopViewport covers this  |
-| SaveAll                | not implemented   |                    |
-| RestoreAll             | not implemented   |                    |
+| ripscript.doc name     | RIPterm C equivalent   | ripview         | Status        |
+|------------------------|------------------------|-----------------|---------------|
+| SaveScreen(Slot)       | rip_scene_save         | **MISSING**     | **NEED**      |
+| RestoreScreen(Slot)    | rip_scene_restore      | **MISSING**     | **NEED**      |
+| SaveTextWin            | (in scene_save)        | **MISSING**     | **NEED**      |
+| RestoreTextWin         | (in scene_restore)     | **MISSING**     | **NEED**      |
+| SaveMouseAll           | (in scene_save)        | **MISSING**     | **NEED**      |
+| RestoreMouseAll        | (in scene_restore)     | **MISSING**     | **NEED**      |
+| SaveClip               | rip_set_clip           | PushViewport    | PARTIAL       |
+| RestoreClip            | rip_clear_clip         | PopViewport     | PARTIAL       |
+| SaveAll                | rip_scene_save         | **MISSING**     | **NEED**      |
+| RestoreAll             | rip_scene_restore      | **MISSING**     | **NEED**      |
 
-None of the save/restore functions exist. The PushViewport/PopViewport
-extension (section 12) partially covers SaveClip/RestoreClip.
+Scene save/restore in RIPterm is a single operation that captures the
+entire graphics state. PushViewport/PopViewport covers clip only.
 
 ## 9. Text Variables
 
-| ripscript.doc name     | ripview name      | Notes              |
-|------------------------|-------------------|--------------------|
-| DefineVar              | not implemented   |                    |
-| GetVar                 | not implemented   |                    |
-| SetVar                 | not implemented   |                    |
-| FindVar                | not implemented   |                    |
-| KillAllVars            | not implemented   |                    |
-| SaveVars               | not implemented   |                    |
-| LoadVars               | not implemented   |                    |
-| ResolveVar             | not implemented   |                    |
-| ExpandVars             | not implemented   |                    |
+Verified against RIPSCENE.C — rip_set_text_var is in the C source.
 
-Entire text variable system is missing from ripview. ripscript.doc
-documents 43 pre-defined variables and full persistence.
+| ripscript.doc name     | RIPterm C equivalent   | ripview         | Status        |
+|------------------------|------------------------|-----------------|---------------|
+| SetVar                 | rip_set_text_var       | **MISSING**     | **NEED**      |
+| DefineVar              | (implied by set)       | **MISSING**     | **NEED**      |
+| GetVar                 | (implied by set)       | **MISSING**     | **NEED**      |
+| FindVar                | not in C source        | **MISSING**     | **NEED**      |
+| KillAllVars            | not in C source        | **MISSING**     | **NEED**      |
+| SaveVars               | not in C source        | **MISSING**     | **NEED**      |
+| LoadVars               | not in C source        | **MISSING**     | **NEED**      |
+| ResolveVar             | not in C source        | **MISSING**     | **NEED**      |
+| ExpandVars             | not in C source        | **MISSING**     | **NEED**      |
+
+rip_set_text_var confirms the variable system exists in the original.
+Most of the API is in the v3.09 source Jeff will release (the 450-page
+spec says half is text variables). The C source has only the setter.
 
 ## 10. Text / Font
 
-| ripscript.doc name            | ripview name                | Unit          |
+Verified against RIPTXT.C and BGI_FONT.C from RIPterm C source.
+
+| RIPterm C function            | ripview equivalent          | Status        |
 |-------------------------------|-----------------------------|---------------|
-| OutTextXY(X, Y, S)           | OutTextXY(X, Y, S)          | riptext.pas   |
-| OutText(S)                    | OutText(S)                  | riptext.pas   |
-| DrawTextCHR(X, Y, S, F, Sz)  | DrawCHRChar (per-char only) | riptext.pas   |
-| TextWidth(S)                  | TextWidth(S)                | riptext.pas   |
-| TextHeight                    | TextHeight                  | riptext.pas   |
-| LoadCHR(Num, File)            | LoadCHRFont(Num)            | riptext.pas   |
-| GetSysFontW                   | not exposed as function     | —             |
-| GetSysFontH                   | not exposed as function     | —             |
-| GetSysCols                    | not exposed as function     | —             |
+| rip_text_xy                   | OutTextXY (riptext)         | OK            |
+| rip_text_window_puts          | **MISSING** — win output    | **NEED**      |
+| rip_text_window_putch         | **MISSING** — win char      | **NEED**      |
+| rip_text_window_set           | partial in rip1exec         | PARTIAL       |
+| rip_render_text               | OutText (riptext)           | OK            |
+| rip_text_size                 | TextWidth/TextHeight        | OK            |
+| rip_text_colors               | **MISSING** — fg/bg for text| **NEED**      |
+| rip_bmp_char                  | DrawBitmapChar (riptext)    | OK            |
+| rip_load_chr_font             | LoadCHRFont (riptext)       | DIFF API      |
+| rip_set_font                  | SetTextStyle (riptext)      | OK            |
+| rip_set_char_size(mx,dx,my,dy)| FontScales[] (riptext)      | DIFF APPROACH |
+| render_char_8x8               | in riptext (8x8 font)       | OK            |
+| render_char_8x14              | in riptext (8x14 font)      | OK            |
+| render_string_attr            | **MISSING** — attributed    | **NEED**      |
 | GetSysRows                    | not exposed as function     | —             |
 
 Text output works. CHR font loading has different API (no filename param,
@@ -483,6 +557,68 @@ Initialization
 End.
 ```
 
+## 12a. BGI_WRAP.C UI Widgets (from C source)
+
+Verified against BGI_WRAP.C — these are viewer UI functions in the
+original RIPterm. Our ripui.pas extensions cover some of these.
+
+| RIPterm C function     | ripui.pas equivalent  | Status           |
+|------------------------|-----------------------|------------------|
+| bgi_frame              | DrawBox               | MATCH            |
+| bgi_gradient_v         | FillGradient          | MATCH            |
+| bgi_progress_bar       | DrawProgress          | MATCH            |
+| bgi_rounded_rect       | **MISSING**           | **NEED**         |
+| bgi_raised_box         | **MISSING**           | **NEED**         |
+| bgi_sunken_box         | **MISSING**           | **NEED**         |
+| bgi_dashed_line        | **MISSING**           | **NEED**         |
+| bgi_crosshair          | **MISSING**           | **NEED**         |
+| bgi_xor_fill           | **MISSING**           | **NEED**         |
+| bgi_text_centered      | **MISSING**           | **NEED**         |
+| bgi_arrow              | **MISSING**           | **NEED**         |
+| bgi_checkbox           | **MISSING**           | **NEED**         |
+| bgi_radio_button       | **MISSING**           | **NEED**         |
+| bgi_scrollbar_h        | **MISSING**           | **NEED**         |
+| bgi_scrollbar_v        | **MISSING**           | **NEED**         |
+| bgi_panel_raised       | **MISSING**           | **NEED**         |
+| bgi_panel_sunken       | **MISSING**           | **NEED**         |
+| bgi_separator_h        | **MISSING**           | **NEED**         |
+| bgi_separator_v        | **MISSING**           | **NEED**         |
+| bgi_tab                | **MISSING**           | **NEED**         |
+| bgi_tooltip            | **MISSING**           | **NEED**         |
+| bgi_dotted_rect        | **MISSING**           | **NEED**         |
+| bgi_round_rect         | **MISSING**           | **NEED**         |
+| bgi_window             | **MISSING**           | **NEED**         |
+
+ripui.pas covers 3 of 24 BGI_WRAP.C widgets. The remaining 21 are
+form controls, panels, separators, tabs, tooltips, and window chrome
+needed for RIPterm's interactive UI.
+
+## 12b. Viewport System (RIPVIEW.C from C source)
+
+| RIPterm C function     | ripview equivalent     | Status           |
+|------------------------|------------------------|------------------|
+| rip_viewport_push      | PushViewport (ripui)   | MATCH            |
+| rip_viewport_pop       | PopViewport (ripui)    | MATCH            |
+| rip_set_viewport       | SetViewport (ripdraw)  | OK               |
+| rip_get_viewport       | **MISSING**            | **NEED**         |
+| rip_to_screen          | **MISSING** — coord xform | **NEED**      |
+| rip_from_screen        | **MISSING** — coord xform | **NEED**      |
+| rip_clip_line          | **MISSING** — Cohen-Sutherland | **NEED** |
+| rip_point_in_viewport  | **MISSING** — point test | **NEED**       |
+| rip_reset_state        | **MISSING** — full reset | **NEED**       |
+
+## 12c. Core Handlers (RIPCORE.C from C source)
+
+| RIPterm C function          | ripview equivalent     | Status      |
+|-----------------------------|------------------------|-------------|
+| send_rip_query_response     | **MISSING** (mterm job)| mterm       |
+| rip_enter_graphics          | **MISSING**            | **NEED**    |
+| rip_exit_graphics           | **MISSING**            | **NEED**    |
+| rip_query_palette           | **MISSING**            | **NEED**    |
+| rip_get_text_row/col        | **MISSING**            | **NEED**    |
+| rip_set_text_pos            | **MISSING**            | **NEED**    |
+| rip_set_mode                | **MISSING**            | **NEED**    |
+
 ## 13. Extra ripview Units (no ripstd equivalent)
 
 These are scene codec units for progressive rendering.
@@ -592,28 +728,52 @@ The VIPEngine wraps both units:
 evga is also working on this integration path (SIO driver, Mystic
 monitor, RIPView engine). Coordinate before making changes.
 
-## TODO Summary
+## TODO Summary (Updated from C source verification)
 
-| # | Item                                              | Priority |
-|---|---------------------------------------------------|----------|
-| 1 | Update v4irc whitepaper with HTML1 API            | HIGH     |
-| 2 | Fix drawing name mismatches in ripscript.doc      | HIGH     |
-| 3 | Add 15 missing state wrapper functions            | HIGH     |
-| 4 | Add missing mouse query/interactive functions     | MEDIUM   |
-| 5 | Add missing icon mask/hot-icon functions          | MEDIUM   |
-| 6 | Add CopyRegion                                    | MEDIUM   |
-| 7 | Add save/restore system (screen, textwin, mouse)  | MEDIUM   |
-| 8 | Add text variable system                          | MEDIUM   |
-| 9 | Add ripui.pas extensions to ripscript.doc 3.29    | MEDIUM   |
-| 10| Add extensions brief to IRC-WHITEPAPER.md         | MEDIUM   |
-| 11| Add system font metric functions                  | LOW      |
-| 12| Add scene load/save, PCX/BMP loading              | LOW      |
-| 13| Port v1 extensions to v2-v4                       | AFTER v1 |
+~45 functions missing total (was ~30 before C source check).
+
+| # | Item                                                | Priority | Count |
+|---|-----------------------------------------------------|----------|-------|
+| 1 | Update v4irc whitepaper with HTML1 API              | HIGH     | —     |
+| 2 | Fix drawing name mismatches in ripscript.doc        | HIGH     | —     |
+| 3 | Add 15 missing state wrapper functions              | HIGH     | 15    |
+| 4 | Add DrawPolygon (unfilled outline)                  | HIGH     | 1     |
+| 5 | Add Bar3D (L1 cmd 'O') — was wrongly listed as dead | HIGH     | 1     |
+| 6 | Add mouse interactive layer (click, hotkey, z-order) | HIGH    | 12    |
+| 7 | Add full icon management system (ICONLOAD.C)        | MEDIUM   | 11    |
+| 8 | Add scene save/restore/cache system (RIPSCENE.C)    | MEDIUM   | 10    |
+| 9 | Add text window output (putch, puts, colors)        | MEDIUM   | 4     |
+| 10| Add text variable system (SetVar + full API)        | MEDIUM   | 9     |
+| 11| Add viewport system (get, coord xform, clip, reset) | MEDIUM   | 5     |
+| 12| Add core handlers (enter/exit graphics, palette query)| MEDIUM | 7     |
+| 13| Add BGI_WRAP.C UI widgets (21 remaining)            | LOW      | 21    |
+| 14| Add render_string_attr (attributed text)            | LOW      | 1     |
+| 15| Add optimized hline/vline                           | LOW      | 2     |
+| 16| Verify PieSlice vs Sector param handling            | LOW      | —     |
+| 17| Update ripscript.doc to match code names            | LOW      | —     |
+| 18| Port v1 extensions to v2-v4                         | AFTER v1 | —     |
 
 ### Port Path
 
 Once v1 is complete:
 v1 (ripui.pas) → v2 (rip2ext.pas) → v3 (rip3ext.pas) → v4 (rip4ext.pas)
+
+### C Source Files Used for Verification
+
+| File         | What verified                                    |
+|--------------|--------------------------------------------------|
+| RIP_DRAW.C   | All 24 drawing functions — 24/24 match           |
+| RIPPARSE.C   | L0 dispatch (15 cmds) + L1 dispatch (13 cmds)    |
+| RIPBTN.C     | Button/mouse interactive layer — 12 missing      |
+| RIPHANDS.C   | High-level handlers — 3 missing                  |
+| RIPIMAGE.C   | Image/icon operations — 3 missing                |
+| RIPTXT.C     | Text system — 4 missing                          |
+| RIPSCENE.C   | Scene/state management — 10 missing              |
+| RIPVIEW.C    | Viewport system — 5 missing                      |
+| RIPCORE.C    | Core handlers — 7 missing                        |
+| BGI_WRAP.C   | UI widgets — 21 missing (3 covered by ripui.pas) |
+| BGI_FONT.C   | Font rendering — 1 missing (render_string_attr)  |
+| ICONLOAD.C   | Icon management — 11 missing                     |
 
 ## 18. RIP Graphics Phases (from mystic/mdl/m_rip/RIP-GRAPHICS-PHASES.md)
 

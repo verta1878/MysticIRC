@@ -1340,3 +1340,10 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+---
+VERIFICATION NOTE (2026-09-29):
+This API doc has NOT been checked against the original RIPV2.TXT spec
+(800K, inside historical/ripterm.zip). Needs comparison to verify
+command coverage and parameter accuracy for v2.0 extensions.
+See RIP-GRAPHICS-PHASES.md TODO item #4.

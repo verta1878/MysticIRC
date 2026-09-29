@@ -59,3 +59,24 @@ These 6 protocol units need porting to mystic_test.
 ## Build Note
 
 mystfoss.pas requires `-Fumdl/m_serial` in the search path.
+
+## Protocol Port Status
+
+The 6 m_protocol_* units in mystic/ (stable) are from g00r00's original
+Mystic 1.12 code. They provide XModem, YModem, ZModem, Kermit file
+transfer protocols plus the base class and queue system. These have NOT
+been ported to mystic_test because:
+1. The protocol code depends on m_io_base which has been modified
+   (PurgeInputData/PurgeOutputData made Virtual in session 10)
+2. Need to verify the protocols still compile with the Virtual change
+3. mystic_test has bbs_crypt.pas which may interact with transfer protocols
+
+Priority: MEDIUM — needed before file transfer testing.
+
+## C Source Verification (2026-09-29)
+
+ripview API audit updated from RIPterm v1.54 C source:
+- Gap increased from ~30 to ~45 missing functions
+- Bar3D confirmed as real L1 command (was wrongly listed as dead code)
+- DrawPolygon (unfilled outline) genuinely missing
+- Full details in RIP-GRAPHICS-PHASES.md (repo root)

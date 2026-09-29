@@ -187,3 +187,20 @@ emitter; then Beziers/clipboard/long tail).
 - rip_surface.pas: all 49 abstract methods implemented.
 - Doc audit: reconcile all docs with current code.
 - New user email: debug logging added, needs testing.
+
+---
+
+## NOTE (2026-09-29)
+
+This document predates the ripview API audit and RIPterm C source
+verification. The master roadmap is now RIP-GRAPHICS-PHASES.md at repo
+root, which includes the full audit (sections 1-17), phase plans, and
+the C source cross-reference. This doc remains as the original design
+sketch for TTermRIP integration with Mystic's class hierarchy.
+
+Key changes since this was written:
+- TRIPEngine renamed to VIPEngine
+- ~45 functions identified as missing from ripview (was ~30)
+- Bar3D confirmed as real L1 command
+- Full L0/L1 dispatch tables documented from C source
+- m_output_graph.pas and m_output_rip.pas analyzed (Section 17)
