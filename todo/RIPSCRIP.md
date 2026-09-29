@@ -225,7 +225,7 @@ Define, ReadScene, and FileQuery.
 
 ## Verification Note (2026-09-29)
 
-RIPterm v1.54 C source (RIPPARSE.C) confirms:
+RIPterm v1.54 (RIPPARSE.C) confirms:
 - Level 0 commands: 29 dispatched
 - Level 1 commands: 13 dispatched (including Bar3D as 'O')
 - Total: 42 dispatched commands

@@ -192,15 +192,15 @@ emitter; then Beziers/clipboard/long tail).
 
 ## NOTE (2026-09-29)
 
-This document predates the ripview API audit and RIPterm C source
+This document predates the ripview API audit and RIPterm
 verification. The master roadmap is now RIP-GRAPHICS-PHASES.md at repo
 root, which includes the full audit (sections 1-17), phase plans, and
-the C source cross-reference. This doc remains as the original design
+the RIPterm cross-reference. This doc remains as the original design
 sketch for TTermRIP integration with Mystic's class hierarchy.
 
 Key changes since this was written:
 - TRIPEngine renamed to VIPEngine
 - ~45 functions identified as missing from ripview (was ~30)
 - Bar3D confirmed as real L1 command
-- Full L0/L1 dispatch tables documented from C source
+- Full L0/L1 dispatch tables documented from RIPterm
 - m_output_graph.pas and m_output_rip.pas analyzed (Section 17)

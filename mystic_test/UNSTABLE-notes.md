@@ -73,9 +73,9 @@ been ported to mystic_test because:
 
 Priority: MEDIUM — needed before file transfer testing.
 
-## C Source Verification (2026-09-29)
+## RIPterm Verification (2026-09-29)
 
-ripview API audit updated from RIPterm v1.54 C source:
+ripview API audit updated from RIPterm v1.54:
 - Gap increased from ~30 to ~45 missing functions
 - Bar3D confirmed as real L1 command (was wrongly listed as dead code)
 - DrawPolygon (unfilled outline) genuinely missing

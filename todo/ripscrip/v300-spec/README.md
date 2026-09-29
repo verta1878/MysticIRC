@@ -66,6 +66,6 @@ Underlying research (full data, byte layouts, opcode census): [script census](..
   - **[9.3 Host Command & Control Character Reference](9.3-host-command-reference.md)** - consolidated terminal→host reference: control characters, host-bound responses, host-side ANSI control
 
 ---
-VERIFICATION STATUS (2026-09-29): NOT YET CHECKED against RIPterm C
+VERIFICATION STATUS (2026-09-29): NOT YET CHECKED against RIPterm
 source or original RIPV2.TXT/v3 specs. Command dispatch tables verified
 in RIP-GRAPHICS-PHASES.md Section 2 — this spec may have discrepancies.

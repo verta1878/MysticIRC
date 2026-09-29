@@ -220,7 +220,7 @@ code uses different names. Mapping (doc → code):
   PieSlice/Sector → DrawSector, DrawPoly → DrawPolygon (MISSING),
   FillPoly → FillPolyScanline, FloodFill → FloodFill,
   Bar3D → DrawBar3D (MISSING — L1 cmd 'O')
-Verified against RIPterm v1.54 C source (RIP_DRAW.C) 2026-09-29.
+Verified against RIPterm v1.54 (RIP_DRAW.C) 2026-09-29.
 
 Procedure PutPixel (X, Y: SmallInt; Color: Byte)
 Set a single pixel. Respects viewport clipping and write mode.

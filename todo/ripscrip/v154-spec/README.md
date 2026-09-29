@@ -43,6 +43,6 @@ _Content-creator reference; binary layouts and parser edge cases live in the com
   - **[9.3 Host Command & Control Character Reference](9.3-host-command-reference.md)** - consolidated terminal→host reference: control characters and host-bound sequences
 
 ---
-VERIFICATION STATUS (2026-09-29): NOT YET CHECKED against RIPterm C
+VERIFICATION STATUS (2026-09-29): NOT YET CHECKED against RIPterm
 source or original RIPV2.TXT/v3 specs. Command dispatch tables verified
 in RIP-GRAPHICS-PHASES.md Section 2 — this spec may have discrepancies.

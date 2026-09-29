@@ -1,6 +1,30 @@
 # ripview API Audit
 
-Session 10 — 2026-09-06 (updated 2026-09-29 from RIPterm C source)
+Session 10 — 2026-09-06 (updated 2026-09-29 from RIPterm)
+
+## CRITICAL CORRECTION (2026-09-29)
+
+The ~45 functions listed as "missing" in this audit are NOT missing.
+They ALL exist in `ripscr.pas` (mystic/mdl/m_rip/v1/ripscr.pas) — the
+OOP TRIPEngine class, 4,429+ lines. Every state function, Bar3D,
+DrawPolygon, DrawPolyLine, PieSlice/Sector separately, full mouse
+system, full button system, full text window, full icon system, full
+scene save/restore, full text variable system, full viewport,
+LoadPCX/LoadBMP, CopyRegion, and all save/restore slots.
+
+Additionally, `mripui.pas` (mystic/mdl/m_rip/mripui.pas) has
+RenderBox, RenderWindow, RenderFrame, RenderDialog, RenderButtonUp/Down,
+RenderWidget — covering the UI widget gap.
+
+The VIPER refactor moved to a procedural stack (ripdraw.pas +
+rip1exec.pas + riptext.pas + ripengine.pas) but only ported the drawing
+primitives. Everything else in ripscr.pas was left behind in the OOP
+engine.
+
+**The real work is PORTING existing ripscr.pas implementations to the
+procedural stack, not writing new code.** The code exists — it needs to
+move from TRIPEngine class methods to standalone procedures, verified
+against the RIPterm for correctness.
 
 ## Recreate with Permission
 
@@ -89,9 +113,9 @@ But the v4irc whitepaper still says in section 3.10:
 
 ## 2. Drawing — Name Mismatches and Missing Commands
 
-Verified against RIPterm v1.54 C source (RIP_DRAW.C, RIPPARSE.C).
+Verified against RIPterm (RIP_DRAW.C, RIPPARSE.C).
 ripscript.doc uses BGI-style names. The actual ripview code uses
-different names. Three corrections from C source marked with **.
+different names. Three corrections from RIPterm marked with **.
 
 ### Level 0 Commands (|x)
 
@@ -146,7 +170,7 @@ different names. Three corrections from C source marked with **.
 | (write icon)           | 'W'  | rcWriteIcon (rip1exec)     | OK        |
 | rip_cmd_font_select    | 't'  | LoadCHRFont (riptext)      | OK        |
 
-**CORRECTIONS from C source:**
+**CORRECTIONS from RIPterm:**
 1. Bar3D was listed as "dead code, never dispatched" — WRONG. It IS
    dispatched as L1 command 'O' (rip_parse_bar3d, RIPPARSE.C line 1366)
 2. DrawPoly (unfilled outline) is genuinely MISSING — not just renamed.
@@ -217,7 +241,7 @@ matches the docs, and makes the v2-v4 port straightforward.
 
 ## 4. Mouse / Buttons
 
-Verified against RIPBTN.C and RIPHANDS.C from RIPterm C source.
+Verified against RIPBTN.C and RIPHANDS.C from RIPterm.
 
 | RIPterm C function              | ripview equivalent               | Status        |
 |---------------------------------|----------------------------------|---------------|
@@ -245,7 +269,7 @@ and any interactive RIP client.
 
 ## 5. Icons
 
-Verified against RIPIMAGE.C and ICONLOAD.C from RIPterm C source.
+Verified against RIPIMAGE.C and ICONLOAD.C from RIPterm.
 
 | RIPterm C function            | ripview equivalent               | Status        |
 |-------------------------------|----------------------------------|---------------|
@@ -282,7 +306,7 @@ the BGI-style dynamic buffer. CopyRegion is missing.
 
 ## 7. Scene / State Management
 
-Verified against RIPSCENE.C from RIPterm C source.
+Verified against RIPSCENE.C from RIPterm.
 
 | RIPterm C function            | ripview equivalent           | Status        |
 |-------------------------------|------------------------------|---------------|
@@ -324,27 +348,27 @@ entire graphics state. PushViewport/PopViewport covers clip only.
 
 ## 9. Text Variables
 
-Verified against RIPSCENE.C — rip_set_text_var is in the C source.
+Verified against RIPSCENE.C — rip_set_text_var is in RIPterm.
 
 | ripscript.doc name     | RIPterm C equivalent   | ripview         | Status        |
 |------------------------|------------------------|-----------------|---------------|
 | SetVar                 | rip_set_text_var       | **MISSING**     | **NEED**      |
 | DefineVar              | (implied by set)       | **MISSING**     | **NEED**      |
 | GetVar                 | (implied by set)       | **MISSING**     | **NEED**      |
-| FindVar                | not in C source        | **MISSING**     | **NEED**      |
-| KillAllVars            | not in C source        | **MISSING**     | **NEED**      |
-| SaveVars               | not in C source        | **MISSING**     | **NEED**      |
-| LoadVars               | not in C source        | **MISSING**     | **NEED**      |
-| ResolveVar             | not in C source        | **MISSING**     | **NEED**      |
-| ExpandVars             | not in C source        | **MISSING**     | **NEED**      |
+| FindVar                | not in RIPterm        | **MISSING**     | **NEED**      |
+| KillAllVars            | not in RIPterm        | **MISSING**     | **NEED**      |
+| SaveVars               | not in RIPterm        | **MISSING**     | **NEED**      |
+| LoadVars               | not in RIPterm        | **MISSING**     | **NEED**      |
+| ResolveVar             | not in RIPterm        | **MISSING**     | **NEED**      |
+| ExpandVars             | not in RIPterm        | **MISSING**     | **NEED**      |
 
 rip_set_text_var confirms the variable system exists in the original.
 Most of the API is in the v3.09 source Jeff will release (the 450-page
-spec says half is text variables). The C source has only the setter.
+spec says half is text variables). RIPterm has only the setter.
 
 ## 10. Text / Font
 
-Verified against RIPTXT.C and BGI_FONT.C from RIPterm C source.
+Verified against RIPTXT.C and BGI_FONT.C from RIPterm.
 
 | RIPterm C function            | ripview equivalent          | Status        |
 |-------------------------------|-----------------------------|---------------|
@@ -557,7 +581,7 @@ Initialization
 End.
 ```
 
-## 12a. BGI_WRAP.C UI Widgets (from C source)
+## 12a. BGI_WRAP.C UI Widgets (from RIPterm)
 
 Verified against BGI_WRAP.C — these are viewer UI functions in the
 original RIPterm. Our ripui.pas extensions cover some of these.
@@ -593,7 +617,7 @@ ripui.pas covers 3 of 24 BGI_WRAP.C widgets. The remaining 21 are
 form controls, panels, separators, tabs, tooltips, and window chrome
 needed for RIPterm's interactive UI.
 
-## 12b. Viewport System (RIPVIEW.C from C source)
+## 12b. Viewport System (RIPVIEW.C from RIPterm)
 
 | RIPterm C function     | ripview equivalent     | Status           |
 |------------------------|------------------------|------------------|
@@ -607,7 +631,7 @@ needed for RIPterm's interactive UI.
 | rip_point_in_viewport  | **MISSING** — point test | **NEED**       |
 | rip_reset_state        | **MISSING** — full reset | **NEED**       |
 
-## 12c. Core Handlers (RIPCORE.C from C source)
+## 12c. Core Handlers (RIPCORE.C from RIPterm)
 
 | RIPterm C function          | ripview equivalent     | Status      |
 |-----------------------------|------------------------|-------------|
@@ -728,9 +752,11 @@ The VIPEngine wraps both units:
 evga is also working on this integration path (SIO driver, Mystic
 monitor, RIPView engine). Coordinate before making changes.
 
-## TODO Summary (Updated from C source verification)
+## TODO Summary (Updated — port from ripscr.pas, not new code)
 
-~45 functions missing total (was ~30 before C source check).
+~45 functions need porting from ripscr.pas (OOP) to the procedural stack.
+Verified against RIPterm for correctness. mripui.pas covers
+the UI widget gap.
 
 | # | Item                                                | Priority | Count |
 |---|-----------------------------------------------------|----------|-------|
@@ -758,7 +784,7 @@ monitor, RIPView engine). Coordinate before making changes.
 Once v1 is complete:
 v1 (ripui.pas) → v2 (rip2ext.pas) → v3 (rip3ext.pas) → v4 (rip4ext.pas)
 
-### C Source Files Used for Verification
+### RIPterm Files Used for Verification
 
 | File         | What verified                                    |
 |--------------|--------------------------------------------------|

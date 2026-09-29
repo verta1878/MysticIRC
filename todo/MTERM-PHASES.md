@@ -257,7 +257,7 @@ Target: one core RIP engine shared by mterm, ripviewer, and mystic.
 
 ### VIPEngine Integration (from RIP-GRAPHICS-PHASES.md)
 
-mterm needs the following from the C source verification:
+mterm needs the following from RIPterm verification:
 - rip_check_mouse_click — click→command for button regions
 - rip_handle_mouse_move — hover tracking
 - rip_viewport_push/pop — already in ripui.pas
