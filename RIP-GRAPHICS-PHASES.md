@@ -1,6 +1,19 @@
 # ripview API Audit
 
-Session 10 — 2026-09-06 (updated 2026-09-29 from RIPterm)
+Session 10 — 2026-09-06 (updated 2026-09-30)
+
+## STATUS (2026-09-30)
+
+- RIPterm 1.54 source: **100% FINAL** (455 files, 844KB)
+- OOP→procedural port: **60+ functions** across ripengine, ripdraw, rip1parse, rip1exec
+- New units: **ripstate** (7), **riptextvar** (9), **ripmouse** (14), **ripicon** (8), **ripwidgets** (19)
+- L0 commands: **29/29 dispatched**
+- L1 commands: **14/14 dispatched** (Bar3D 'O' recovered)
+- Direct Canvas writes in rip1exec: **0** (was 25)
+- mconfig.exe: **v0.1** — FPC Graph display, keyboard input, mystic.dat I/O
+- VIPEngine: **documented** (VIPER.md) — TRIPEngine→VIPEngine rename pending
+- Remaining: render_string_attr, bgi_arrow, viewport push/pop, font loading
+- Blocked: fpc264irc ptcgraph for x86_64-linux (Patch 7b–9 done, needs push)
 
 ## CRITICAL CORRECTION (2026-09-29)
 
