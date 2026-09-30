@@ -24,6 +24,7 @@ Uses
   mtconn,
   mtxfer,
   mtphone,
+  mtcapture,
   RIPEngine, RIPDraw, RIPText, RIP1Parse, RIP1Exec,
   {$IFDEF HAVE_GRAPH}
     {$IFDEF UNIX}ptcgraph{$ELSE}Graph{$ENDIF},
@@ -69,6 +70,7 @@ Type
 Var
   Console  : {$IFDEF WINDOWS} TOutputWindows {$ELSE} TOutputLinux {$ENDIF};
   Keyboard : {$IFDEF WINDOWS} TInputWindows {$ELSE} TInputLinux {$ENDIF};
+  Capture  : TCapture;
 
   { Terminal cell buffer — circular scrollback }
   Buffer   : Array[0..SCROLLBACK - 1, 0..TERM_COLS - 1] of TTermCell;
@@ -99,7 +101,6 @@ Var
   { State }
   Connected  : Boolean;
   RIPMode    : Boolean;
-  Capturing  : Boolean;
   Done       : Boolean;
   ActivePage : Byte;  { 0=terminal, 1=settings }
 
@@ -144,7 +145,7 @@ Var
 Procedure DrawMenuBar;
 Begin
   Console.WriteXY(1, MENU_Y, $70,
-    StrPadR(' mterm  F2=Conn F3=Disc F4=Phone F5=Send F6=Recv F9=RIP ALT+X=Exit', TERM_W, ' '));
+    StrPadR(' mterm  F2=Conn F3=Disc F4=Phone F5=Send F6=Recv F9=RIP ALT+C=Cap ALT+X=Exit', TERM_W, ' '));
 End;
 
 Procedure DrawStatusBar;
@@ -167,7 +168,7 @@ Begin
 
   If PacingCPS > 0 Then Left := Left + ' ' + PacingLabel;
 
-  If Capturing Then Left := Left + ' CAP';
+  If Capture.Active Then Left := Left + ' CAP';
 
   { Right side: elapsed time + bytes }
   If Connected Then Begin
@@ -1238,7 +1239,7 @@ Begin
   Else Console.WriteXY(16, 12, $07, 'OFF');
 
   Console.WriteXY(5, 13, $07, 'Capture:   ');
-  If Capturing Then Console.WriteXY(16, 13, $0C, 'ON')
+  If Capture.Active Then Console.WriteXY(16, 13, $0C, 'ON')
   Else Console.WriteXY(16, 13, $07, 'OFF');
 
   Console.WriteXY(5, 14, $07, 'Pacing:    ');
@@ -1303,8 +1304,8 @@ Begin
         End;
         #45: Done := True;       { ALT+X = Exit }
         #46: Begin               { ALT+C = Toggle capture }
-          Capturing := Not Capturing;
-          If Capturing Then AddLine('*** Capture ON')
+          Capture.Toggle('mterm.log');
+          If Capture.Active Then AddLine('*** Capture ON → mterm.log')
           Else AddLine('*** Capture OFF');
           DrawStatusBar;
         End;
@@ -1362,7 +1363,7 @@ Begin
       DrawSettingsPage;
     End;
     'C', 'c': Begin
-      Capturing := Not Capturing;
+      Capture.Toggle('mterm.log');
       DrawSettingsPage;
     End;
     'P', 'p': Begin { Cycle pacing mode }
@@ -1443,7 +1444,7 @@ Begin
   GraphAvail := False;
   TextWinY1  := 0;
   TextWinActive := False;
-  Capturing  := False;
+  Capture    := TCapture.Create;
   Done       := False;
   ActivePage := 0;
   ConnHost   := '';
@@ -1477,6 +1478,8 @@ Begin
     If Connected And Conn.DataAvailable Then Begin
       RecvN := Conn.Receive(RecvBuf, SizeOf(RecvBuf));
       If RecvN > 0 Then Begin
+        If Capture.Active Then
+          Capture.WriteBuf(RecvBuf, RecvN);
         For RecvI := 0 to RecvN - 1 Do Begin
           TermProcessByte(RecvBuf[RecvI]);
           If PacingCPS > 0 Then Begin
@@ -1504,6 +1507,7 @@ Begin
   Until Done;
 
   If Connected Then Conn.Disconnect;
+  Capture.Free;
   Conn.Free;
   { Canvas is global, freed at unit finalization }
   Console.TextAttr := 7;

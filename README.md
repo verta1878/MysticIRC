@@ -9,6 +9,8 @@
 > rip4ext zero stubs (JPEG/GIF/PNG/HTML/Print/MPEG wired).
 > mterm v0.3: 1,514 lines — pacing, file transfer, text window, print, RIP auto-sense.
 > v1.54 print API. CHR font wiring shared. VIPEngine 323-line procedural wrapper.
+> mterm v0.3: 2,009 lines — phonebook edit+validate, capture/logging (ALT+C),
+> pacing, file transfer, text window, print, RIP auto-sense.
 > All v1 engine units complete — zero stubs. IRC whitepaper updated.
 > Built with **FPC 2.6.4irc r3.1+**. GPLv3.
 

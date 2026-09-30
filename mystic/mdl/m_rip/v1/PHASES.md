@@ -86,3 +86,4 @@ covering mystic_test, mterm, and ripview in one document.
 - rip3ext.pas: prnapi wired (282→312 lines), PrintPage Canvas→RGB24→driver, print chain complete v1→v3→v4
 - vipengine.pas: 323 lines, 30 exports — procedural wrapper for TRIPEngine, flat API for mterm/mconfig/ripview
 - All v1 engine units complete — no remaining stubs
+- mterm phonebook edit + capture/logging wired. 2,009 total lines

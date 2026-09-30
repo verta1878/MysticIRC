@@ -331,3 +331,9 @@ mterm needs the following from RIPterm verification:
 - rip3ext prnapi wired — print chain complete: v1.54 text (mterm PrintScrollback) → v3 graphics (rip3ext PrintPage) → v4 inherited
 - VIPEngine wrapper DONE — 323 lines, 30 procedural exports wrapping TRIPEngine
 - All 8 remaining items from session 10 list resolved
+
+### Session 10e (2026-09-30) — kiddo
+- Phonebook edit dialog — EditEntry 8 fields, EditNumField with range validation (Port 1-65535, Baud 0-921600, ComPort 0-9), ENTER cycles Type/Terminal, wired into A/E keys
+- Capture/logging — mtcapture.pas 115 lines (TCapture: Start/Stop/Toggle/WriteBuf, append, error-safe, flush), ALT+C toggle → mterm.log, receive loop feeds bytes, status bar shows CAP
+- Fixed 4 FPC 2.6.4 inline Var issues
+- mterm 1518 + mtphone 376 + mtcapture 115 = 2,009 lines total
