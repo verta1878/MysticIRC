@@ -45,7 +45,7 @@ unit ripscr;
 
 Interface
 
-Uses SysUtils, Math;
+Uses SysUtils, Math, RIPIcon, RIPText;
 
 {$H-}  // Use ShortStrings — AnsiStrings cause stack overflow in FPC 2.6.4
 
@@ -499,6 +499,12 @@ Type
     Function  LoadMask      (FileName: String; X, Y: SmallInt) : Boolean;
     Function  LoadIconMasked(IconFile, MaskFile: String; X, Y: SmallInt) : Boolean;
     Function  LoadHotIcon   (FileName: String; X, Y: SmallInt) : Boolean;
+
+    // ---- Icon cache (64 slots — load once, display many) ----
+    Function  IconLoadToSlot   (FileName: String; Slot: Integer) : Boolean;
+    Procedure IconDisplaySlot  (Slot: Integer; X, Y: SmallInt; Mode: Byte);
+    Procedure IconFreeSlot     (Slot: Integer);
+    Procedure IconFreeAll;
 
     // ---- Scene file ----
     Function  LoadScene     (FileName: String) : Boolean;
@@ -2305,6 +2311,28 @@ Begin
   Result := LoadIcon(FileName, X, Y, 0);
 End;
 
+// ---- Icon cache (64 slots — wraps RIPIcon procedural unit) ----
+
+Function TRIPEngine.IconLoadToSlot(FileName: String; Slot: Integer): Boolean;
+Begin
+  Result := RIPIcon.IconLoadToSlot(FileName, Slot);
+End;
+
+Procedure TRIPEngine.IconDisplaySlot(Slot: Integer; X, Y: SmallInt; Mode: Byte);
+Begin
+  RIPIcon.IconDisplaySlot(Slot, X, Y, Mode);
+End;
+
+Procedure TRIPEngine.IconFreeSlot(Slot: Integer);
+Begin
+  RIPIcon.IconFreeSlot(Slot);
+End;
+
+Procedure TRIPEngine.IconFreeAll;
+Begin
+  RIPIcon.IconFreeAll;
+End;
+
 // ---- Phase 2: Button enhancements ----
 
 Procedure TRIPEngine.DrawButtonEx (X0, Y0, X1, Y1: SmallInt;
@@ -3527,135 +3555,13 @@ Begin
   Result := RIP_MAX_Y;
 End;
 
-// ---- CHR vector font loading ----
+// ---- CHR vector font loading — delegates to RIPText procedural unit ----
 
 Function TRIPEngine.LoadCHR (AFontNum: Byte; FileName: String) : Boolean;
-// Load a Borland BGI .CHR stroked font file
-// Format: ASCII header ending with 0x1A, then binary prefix header,
-// then stroke data starting with '+' (0x2B) signature
-Type
-  TLoadBuf = Array[0..32767] of Byte;
-  PLoadBuf = ^TLoadBuf;
-Var
-  F        : File;
-  Data     : PLoadBuf;
-  FileLen  : LongInt;
-  I, Pos   : Integer;
-  PlusOff  : Integer;
-  OtStart  : Integer;
-  WtStart  : Integer;
-  SkStart  : Integer;
-  NC       : Word;
-  FC       : Byte;
-  B1, B2   : Byte;
-  SX, SY   : SmallInt;
-  Op       : Byte;
-  SIdx     : Word;
-  CharBase : Word;
 Begin
-  Result := False;
-
-  If (AFontNum < 1) or (AFontNum > 10) Then Exit;
-
-  Assign(F, FileName);
-  {$I-} System.Reset(F, 1); {$I+}
-  If IOResult <> 0 Then Exit;
-
-  New(Data);
-
-  FileLen := FileSize(F);
-  If FileLen > SizeOf(Data^) Then FileLen := SizeOf(Data^);
-  BlockRead(F, Data^, FileLen);
-  Close(F);
-
-  // Find '+' signature (0x2B) — marks start of stroke data header
-  PlusOff := -1;
-  For I := 80 to FileLen - 20 Do
-    If Data^[I] = $2B Then Begin
-      NC := Data^[I+1] OR (Data^[I+2] SHL 8);
-      FC := Data^[I+4];
-      If (NC >= 32) and (NC <= 256) and (FC >= 32) and (FC <= 127) Then Begin
-        PlusOff := I;
-        Break;
-      End;
-    End;
-
-  If PlusOff < 0 Then Begin Dispose(Data); Exit; End;
-
-  // Allocate font
-  If CHRFonts[AFontNum] <> Nil Then Dispose(CHRFonts[AFontNum]);
-  New(CHRFonts[AFontNum]);
-
-  With CHRFonts[AFontNum]^ Do Begin
-    Loaded    := True;
-    NumChars  := NC;
-    FirstChar := FC;
-
-    // Metrics from header
-    OrgToCap  := ShortInt(Data^[PlusOff + 8]);
-    OrgToBase := ShortInt(Data^[PlusOff + 9]);
-    OrgToDec  := ShortInt(Data^[PlusOff + 10]);
-
-    // Font name from prefix (4 bytes at known offset)
-    Name := '    ';
-
-    // Offset table: NumChars * 2 bytes starting at PlusOff + 16
-    OtStart := PlusOff + 16;
-    For I := 0 to NumChars - 1 Do
-      If I < RIP_MAX_CHR_CHARS Then
-        Offsets[I] := Data^[OtStart + I*2] OR (Data^[OtStart + I*2 + 1] SHL 8);
-
-    // Width table: NumChars bytes after offset table
-    WtStart := OtStart + NumChars * 2;
-    For I := 0 to NumChars - 1 Do
-      If I < RIP_MAX_CHR_CHARS Then
-        Widths[I] := Data^[WtStart + I];
-
-    // Stroke data starts after width table
-    SkStart := WtStart + NumChars;
-
-    // Parse all strokes into our array
-    NumStrokes := 0;
-
-    For I := 0 to NumChars - 1 Do Begin
-      If I >= RIP_MAX_CHR_CHARS Then Break;
-
-      // Store the base offset for this character
-      CharBase := NumStrokes;
-      Offsets[I] := CharBase;
-
-      Pos := SkStart + (Data[OtStart + I*2] OR (Data[OtStart + I*2 + 1] SHL 8));
-
-      Repeat
-        If (Pos + 1 >= FileLen) or (NumStrokes >= RIP_MAX_STROKES) Then Break;
-
-        B1 := Data[Pos];
-        B2 := Data[Pos + 1];
-
-        SX := B1 AND $7F;
-        SY := B2 AND $7F;
-        If SX >= 64 Then SX := SX - 128;
-        If SY >= 64 Then SY := SY - 128;
-
-        // Opcode: b1 bit7 = pen flag, b2 bit7 = draw/move
-        If (B1 AND $80 = 0) and (B2 AND $80 = 0) Then
-          Op := 0   // end of character
-        Else If (B2 AND $80 = 0) Then
-          Op := 1   // move to (pen up)
-        Else
-          Op := 2;  // draw to (pen down)
-
-        Strokes[NumStrokes].Op := Op;
-        Strokes[NumStrokes].X  := SX;
-        Strokes[NumStrokes].Y  := SY;
-        Inc(NumStrokes);
-        Inc(Pos, 2);
-      Until Op = 0;
-    End;
-  End;
-
-  Dispose(Data);
-  Result := True;
+  If Length(FileName) > 0 Then
+    RIPText.SetFontPath(ExtractFilePath(FileName));
+  Result := RIPText.LoadCHRFont(AFontNum);
 End;
 
 Procedure TRIPEngine.DrawTextCHR (X, Y: SmallInt; S: String; AFont, ASize: Byte);

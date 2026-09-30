@@ -19,27 +19,53 @@ DOS-first design. MDL Console/Keyboard shell (Free Vision stripped).
 | MT-2 | Menu hotkeys (all F-keys, ALT, CTRL) | DONE |
 | MT-3 | Status bar (connection, baud, elapsed, bytes) | DONE |
 | MT-4 | Terminal viewport — ANSI engine (cell buffer, CSI parser, SGR, scrollback) | DONE |
+| MT-5 | Phonebook dialog | DONE |
 | MT-6 | Virtual pages (page 0=terminal, page 1=settings) | DONE |
+| MT-8 | Wire RIP engine into viewport — Graph + text fallback | DONE (v0.3) — stubs until fpc264irc |
+| MT-14 | RIP v1.54 command completion | DONE |
+| MT-15 | ANSI baseline completion | DONE |
+| MT-16 | BGI stroked font parser (mripchr.pas — 10 vector fonts, all load) | DONE |
+| MT-17 | ICN icon file loader — 64-slot cache, load once display many | DONE (v0.3) |
+| MT-19 | RIP auto-sense (ESC[! query/response, ESC[1!/ESC[2! toggle) | DONE (v0.3) |
 
 ## Open Phases
 
 | Phase | What |
 |-------|------|
-| MT-5 | Phonebook dialog | DONE |
-| MT-7 | SDL graphics backend (SDL2 Linux/Win32/macOS/BSD + SDL 1.2 OS/2) — deferred until fpc264irc complete |
-| MT-8a | FPC screen mode change (ptcgraph InitGraph 640x350) | PENDING |
-| MT-8 | Wire RIP engine into viewport — needs MT-8a first |
-| MT-9 | DOS i8086 real-mode — INT 10h/VBE, no DPMI, no extender (Tier 1) — deferred until fpc264irc |
-| MT-10 | DOS i8086 + DPMI extender — Tier 2 (should work with i8086, TBD) — deferred until fpc264irc |
-| MT-13 | Amiga font loading (SDL_ttf) — deferred until fpc264irc complete |
-| MT-14 | RIP v1.54 command completion | DONE |
-| MT-15 | ANSI baseline completion | DONE |
-| MT-16 | BGI stroked font parser (mripchr.pas — 10 vector fonts, all load) | DONE |
-| MT-17 | ICN icon file loader (EGA bitplane format) |
+| MT-7 | SDL graphics backend (SDL2 Linux/Win32/macOS/BSD + SDL 1.2 OS/2) — deferred until fpc264irc |
+| MT-8a | FPC screen mode change (ptcgraph InitGraph 640x350) — STUBBED, waiting on fpc264irc ptcgraph |
+| MT-9 | DOS i8086 real-mode — INT 10h/VBE, no DPMI (Tier 1) — deferred until fpc264irc |
+| MT-10 | DOS i8086 + DPMI extender (Tier 2) — deferred until fpc264irc |
+| MT-13 | Amiga font loading (SDL_ttf) — deferred until fpc264irc |
 | MT-18 | Flood fill accuracy (stack limits matching RIPterm) |
-| MT-19 | RIP auto-sense (ESC[! query/response, ESC[1!/ESC[2! toggle) |
 | MT-20 | Unofficial RIP extensions — modern formats |
 | MT-21 | Character pacing / ANSI animation speed control |
+
+## Engine Status (2026-09-30)
+
+Both engines updated and synced:
+
+### Procedural stack (ripview)
+- **ripengine.pas** — 573 lines, 38 functions: state, cursor, viewport, text window (ANSI SGR→EGA), CopyRegion, system font, EnterGraphics/ExitGraphics
+- **ripdraw.pas** — all primitives + DrawPolygon + DrawBar3D
+- **riptext.pas** — font rendering, OutTextXY
+- **rip1parse.pas** — L0 (29) + L1 (14) dispatch
+- **rip1exec.pas** — all handlers, zero direct Canvas writes, uses RIPIcon for ICN
+- **ripicon.pas** — 8 direct render + 8 cache functions (64 slots)
+- **ripstate.pas** — 7 save/restore screen (10 slots)
+- **riptextvar.pas** — 9 text variable functions + built-ins
+- **ripmouse.pas** — 14 mouse field/button functions
+- **ripwidgets.pas** — 19 UI widget functions
+
+### OOP engine (ripscr.pas)
+- 145+ methods wrapping procedural units
+- Icon cache added (wraps ripicon.pas)
+- Uses RIPIcon for shared cache
+
+### Synced locations
+- mystic_ripview/source/ (canonical)
+- mystic/mdl/m_rip/ + v1/
+- mystic_test/mdl/m_rip/ + v1/
 
 ### MT-14 — RIP v1.54 Missing Commands
 
@@ -267,3 +293,41 @@ mterm needs the following from RIPterm verification:
 - rip_handle_mouse_move — hover tracking
 - rip_viewport_push/pop — already in ripui.pas
 - Full L0/L1 command parser matching RIPPARSE.C dispatch
+
+### Session 10b (2026-09-30) — kiddo
+
+- MT-8: RIP engine wired into viewport — Graph mode + text-mode fallback
+  - EnterRIPGraphics/LeaveRIPGraphics manage mode switch
+  - FlushCanvasToScreen copies canvas pixels to Graph screen
+  - HAVE_GRAPH conditional — stubs until fpc264irc ptcgraph ready
+  - Text-mode blit remains as fallback (block char 219 + EGA color)
+- MT-8a: Graph init stubbed with {$DEFINE HAVE_GRAPH} toggle
+- MT-19: RIP auto-sense complete — ESC[0! responds RIPSCRIP015400,
+  ESC[1! disables RIP + LeaveRIPGraphics, ESC[2! enables RIP + EnterRIPGraphics
+- Added RIPDraw + RIPText to Uses (procedural stack)
+- mterm v0.3 (2026.09.30)
+
+### Session 10c (2026-09-30) — kiddo
+
+- MT-17: ICN icon file loader — 64-slot cache (IconLoadToSlot/IconDisplaySlot/IconFreeAll), wired to both engines
+- MT-18: FloodFill rewritten — span-based (2000 spans, 24KB), matched RIPterm BGI_CORE.C, no 224KB visited buffer
+- MT-19: RIP auto-sense — ESC[0! responds RIPSCRIP015400, ESC[1!/ESC[2! toggle with graphics mode switch
+- MT-21: Character pacing — 6 modes (off/2400/9600/19200/38400/57600), P key in settings, throttled receive + ANSI viewer
+- File transfer wired — mtxfer.pas rewritten (273 lines), TConnIO adapter, TFileTransfer with Zmodem/Ymodem/Xmodem via Mystic protocol units
+- Text window wired — TWRenderChar renders 8x16 font on canvas, TermProcessByte routes non-RIP text through canvas text window
+- render_string_attr — riptext.pas: DrawBitmapChar16, RenderCharAttr, RenderStringAttr, full GfxText API (8 functions), 8x16 font include
+- bgi_arrow — DrawArrow in ripdraw.pas, 24/24 BGI_WRAP complete. Also added DrawPolygon + DrawBar3D
+- v1.54 print — PrintScrollback/PrintDialog/LPTPutChar, ALT+P hotkey, LPT1-3 on DOS / file on Linux
+- Viewport push/pop stack — 8 levels, ClipLine (Cohen-Sutherland), RIPToScreen/ScreenToRIP, ResetRIPState
+- CHR font wiring — LoadCHRFont/SetFontPath exported from riptext, ripscr.pas LoadCHR delegates (130 lines removed)
+- rip4ext.pas zero stubs — JPEG/GIF/PNG wired to jpgdecr/gifdecr/pngdecr, Print wired to prnapi, MPEG wired to mpgvdec/mpgvbuf
+- IRC whitepaper — HTML section expanded (6 subsections), print status table (v1-v4), decoder table fixed, title fixed to v4.0 IRC Fork
+- mterm v0.3 (2026-09-30) — 1,514 lines
+
+### Session 10d (2026-09-30) — kiddo
+- rip_query_palette closed — rcQuery (!|$) responds RIPSCRIP015400 via buffer pointer, no host connection needed
+- 5 remaining L1 commands wired: rcDefine, rcCopyRegion, rcReadScene, rcFileQuery, rcDelay
+- All v1.54 RIPscrip commands now dispatched and handled
+- rip3ext prnapi wired — print chain complete: v1.54 text (mterm PrintScrollback) → v3 graphics (rip3ext PrintPage) → v4 inherited
+- VIPEngine wrapper DONE — 323 lines, 30 procedural exports wrapping TRIPEngine
+- All 8 remaining items from session 10 list resolved

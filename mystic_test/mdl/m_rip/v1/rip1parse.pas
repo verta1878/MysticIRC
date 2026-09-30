@@ -48,6 +48,8 @@ Type
     rcMouse, rcKillMouseFields, rcButton, rcButtonStyle,
     { Palette }
     rcSetPalette, rcOnePalette,
+    { L1 extended + query }
+    rcDefine, rcQuery, rcCopyRegion, rcReadScene, rcFileQuery, rcDelay,
     { Reset }
     rcComment,
     rcNoMore
@@ -141,6 +143,12 @@ Begin
              'M': Begin Inc(Pos); Result := rcMouse; End;
              'U': Begin Inc(Pos); Result := rcButton; End;
              'B': Begin Inc(Pos); Result := rcButtonStyle; End;
+             'D': Begin Inc(Pos); Result := rcDefine; End;
+             'Q': Begin Inc(Pos); Result := rcQuery; End;
+             'F': Begin Inc(Pos); Result := rcFileQuery; End;
+             'G': Begin Inc(Pos); Result := rcCopyRegion; End;
+             'R': Begin Inc(Pos); Result := rcReadScene; End;
+             'E': Begin Inc(Pos); Result := rcDelay; End;
            End;
          End;
     'w': Result := rcTextWindow;
@@ -156,6 +164,7 @@ Begin
     'u': Result := rcButtonStyle;
     'Q': Result := rcSetPalette;
     'a': Result := rcOnePalette;
+    '$': Result := rcQuery;
     '!': Result := rcComment;
   End;
 End;

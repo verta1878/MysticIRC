@@ -14,11 +14,36 @@ Interface
 Uses SysUtils, RIPEngine, RIPDraw;
 
 Procedure DrawBitmapChar(Value: Byte; X0, Y0: Integer);
+Procedure DrawBitmapChar16(Value: Byte; X0, Y0, FG, BG: Integer);
 Procedure OutTextXY(X, Y: Integer; const Text: String);
 Procedure OutText(const Text: String);
 Procedure SetTextStyle(Font, Direction, CharSize: Integer);
 Function TextWidth(const Text: String): Integer;
 Function TextHeight: Integer;
+
+{ CHR vector font loading — exposed for direct use + OOP engine }
+Function  LoadCHRFont(FontNum: Byte): Boolean;
+Procedure SetFontPath(Const Path: String);
+
+{ Attributed text — renders string with EGA text attributes.
+  Each char uses fg/bg from the attribute byte (DOS-style).
+  Matched to RIPterm TEXTREN.C bmp_font_render_char + gfx_text_* API. }
+Procedure RenderStringAttr(X, Y: Integer; Const S: String; Attr: Byte);
+Procedure RenderCharAttr(X, Y: Integer; Ch: Byte; Attr: Byte);
+Procedure GfxTextPutCh(Ch: Byte);
+Procedure GfxTextPuts(Const S: String);
+Procedure GfxTextNewLine;
+Procedure GfxTextSetPos(X, Y: Integer);
+Procedure GfxTextSetColor(FG, BG: Integer);
+Function  GfxTextCharWidth(Ch: Byte): Integer;
+Function  GfxTextStringWidth(Const S: String): Integer;
+
+Var
+  GfxTextX, GfxTextY  : Integer;
+  GfxTextColor         : Integer;
+  GfxTextBgColor       : Integer;
+  GfxTextLeftMargin    : Integer;
+  GfxFontHeight        : Integer;
 
 Implementation
 
@@ -62,12 +87,20 @@ Var
   FontPath   : String = 'fonts' + DirectorySeparator;
 
 {$I rip_font8x8.inc}
+{$I rip_font8x16.inc}
 
 Procedure InitFonts;
 Var I: Integer;
 Begin
   For I := 1 to 10 Do CHRFonts[I] := Nil;
   FontsInit := True;
+End;
+
+Procedure SetFontPath(Const Path: String);
+Begin
+  FontPath := Path;
+  If (Length(FontPath) > 0) And (FontPath[Length(FontPath)] <> DirectorySeparator) Then
+    FontPath := FontPath + DirectorySeparator;
 End;
 
 Function LoadCHRFont(FontNum: Byte): Boolean;
@@ -331,4 +364,107 @@ Begin
   End Else
     Result := Canvas.FontSize * 8;
 End;
+
+{ ====================================================================
+  Attributed Text Rendering — matched to RIPterm TEXTREN.C
+  8x16 bitmap font with fg/bg color per character.
+  Used by RIP text window and any attributed text display.
+  ==================================================================== }
+
+Procedure DrawBitmapChar16(Value: Byte; X0, Y0, FG, BG: Integer);
+{ Render one character using 8x16 VGA bitmap font with fg/bg colors.
+  Matched to RIPterm bmp_font_render_char.
+  BG < 0 means transparent background (don't draw bg pixels). }
+Var
+  Row, Col: Integer;
+  Bits: Byte;
+Begin
+  For Row := 0 To 15 Do Begin
+    Bits := Font8x16[Value * 16 + Row];
+    For Col := 0 To 7 Do Begin
+      If (Bits And ($80 Shr Col)) <> 0 Then
+        PutPixel(X0 + Col, Y0 + Row, FG And 15)
+      Else If BG >= 0 Then
+        PutPixel(X0 + Col, Y0 + Row, BG And 15);
+    End;
+  End;
+End;
+
+Procedure RenderCharAttr(X, Y: Integer; Ch: Byte; Attr: Byte);
+{ Render one character with DOS text attribute byte.
+  Low nibble = fg color, high nibble = bg color. }
+Var FG, BG: Integer;
+Begin
+  FG := Attr And $0F;
+  BG := (Attr Shr 4) And $07;
+  DrawBitmapChar16(Ch, X, Y, FG, BG);
+End;
+
+Procedure RenderStringAttr(X, Y: Integer; Const S: String; Attr: Byte);
+{ Render a string with a single attribute — each char 8x16 with fg/bg.
+  Advances X by 8 pixels per character. }
+Var I: Integer;
+Begin
+  For I := 1 To Length(S) Do Begin
+    RenderCharAttr(X, Y, Ord(S[I]), Attr);
+    Inc(X, 8);
+  End;
+End;
+
+{ ---- gfx_text API — matches RIPterm TEXTREN.C gfx_text_* ---- }
+
+Procedure GfxTextPutCh(Ch: Byte);
+{ Render one char at current gfx text position and advance cursor }
+Begin
+  If GfxFontHeight = 16 Then
+    DrawBitmapChar16(Ch, GfxTextX, GfxTextY, GfxTextColor, GfxTextBgColor)
+  Else Begin
+    Canvas.FG := GfxTextColor And 15;
+    DrawBitmapChar(Ch, GfxTextX, GfxTextY);
+  End;
+  Inc(GfxTextX, 8);
+End;
+
+Procedure GfxTextPuts(Const S: String);
+Var I: Integer;
+Begin
+  For I := 1 To Length(S) Do
+    GfxTextPutCh(Ord(S[I]));
+End;
+
+Procedure GfxTextNewLine;
+Begin
+  GfxTextX := GfxTextLeftMargin;
+  Inc(GfxTextY, GfxFontHeight);
+End;
+
+Procedure GfxTextSetPos(X, Y: Integer);
+Begin
+  GfxTextX := X;
+  GfxTextY := Y;
+End;
+
+Procedure GfxTextSetColor(FG, BG: Integer);
+Begin
+  GfxTextColor := FG;
+  GfxTextBgColor := BG;
+End;
+
+Function GfxTextCharWidth(Ch: Byte): Integer;
+Begin
+  Result := 8; { Fixed-width bitmap font }
+End;
+
+Function GfxTextStringWidth(Const S: String): Integer;
+Begin
+  Result := Length(S) * 8;
+End;
+
+Initialization
+  GfxTextX := 0;
+  GfxTextY := 0;
+  GfxTextColor := 15;
+  GfxTextBgColor := 0;
+  GfxTextLeftMargin := 0;
+  GfxFontHeight := 16;
 End.

@@ -3,11 +3,13 @@
 > **GitHub:** https://github.com/verta1878/mysticbbsirc
 >
 > **Release: 2026-09-30** — Version 1.11IRC A5.
-> RIPterm 1.54 source 100% complete (455 files, GPLv3).
-> 60+ functions ported OOP→procedural. 5 new units (ripstate, riptextvar,
-> ripmouse, ripicon, ripwidgets). All 14 L1 commands dispatched.
-> mconfig.exe v0.1 — standalone BBS config tool (FPC Graph display).
-> 6 protocol units ported to mystic_test. VIPEngine documented.
+> ripengine 720 lines (viewport stack, ClipLine, transforms, ResetRIPState).
+> ripdraw 614 lines (24/24 BGI_WRAP, span FloodFill). riptext 470 lines
+> (attributed text, 8x16 font, GfxText API). ripicon 64-slot cache.
+> rip4ext zero stubs (JPEG/GIF/PNG/HTML/Print/MPEG wired).
+> mterm v0.3: 1,514 lines — pacing, file transfer, text window, print, RIP auto-sense.
+> v1.54 print API. CHR font wiring shared. VIPEngine 323-line procedural wrapper.
+> All v1 engine units complete — zero stubs. IRC whitepaper updated.
 > Built with **FPC 2.6.4irc r3.1+**. GPLv3.
 
 Based on **Mystic BBS** GPL source by James Coyle (g00r00).

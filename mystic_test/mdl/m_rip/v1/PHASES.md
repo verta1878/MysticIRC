@@ -67,3 +67,22 @@ Pre-VIPER code in attic/:
 
 See `RIP-GRAPHICS-PHASES.md` (repo root) for all RIP display phases
 covering mystic_test, mterm, and ripview in one document.
+
+### Session 10c (2026-09-30) — kiddo
+- ripengine.pas: 720 lines, 45+ functions (viewport stack, ClipLine, transforms, ResetRIPState)
+- riptext.pas: 470 lines, attributed text (DrawBitmapChar16, RenderStringAttr, GfxText API), LoadCHRFont exported
+- ripdraw.pas: 614 lines, DrawArrow (24/24 BGI_WRAP), DrawPolygon, DrawBar3D, span-based FloodFill
+- ripicon.pas: 64-slot cache, both engines wired
+- ripscr.pas: LoadCHR delegates to RIPText (130 lines removed), 4,341 lines
+- rip4ext.pas: 332 lines, zero stubs (JPEG/GIF/PNG/HTML/Print/MPEG all wired)
+- v1.54 print: mterm PrintScrollback/LPTPutChar/PrintDialog
+- CHR font: auto-load wired, shared between OOP and procedural
+
+### Session 10d (2026-09-30) — kiddo
+- rcQuery (!|$): responds RIPSCRIP015400 via QueryResponseBuf pointer
+- rcDefine (!|1D), rcCopyRegion (!|1G), rcReadScene (!|1R), rcFileQuery (!|1F), rcDelay (!|1E): all dispatched + handled
+- All L0 + L1 commands now have handlers — no unhandled commands remain
+- v1 engine complete (pending: VIPEngine wrapper, prnapi in rip3ext)
+- rip3ext.pas: prnapi wired (282→312 lines), PrintPage Canvas→RGB24→driver, print chain complete v1→v3→v4
+- vipengine.pas: 323 lines, 30 exports — procedural wrapper for TRIPEngine, flat API for mterm/mconfig/ripview
+- All v1 engine units complete — no remaining stubs

@@ -89,6 +89,20 @@ Type
     FillChar with 0 clears to black (palette index 0). }
   TPixelBuffer = Array[0..RIP_WIDTH-1, 0..RIP_HEIGHT-1] Of Byte;
 
+  { Fill pattern - 8x8 bitmap for user-defined fill }
+  TFillPattern = Array[0..7] Of Byte;
+
+  { Text window state - bottom portion of RIP screen for text I/O }
+  TTextWindow = Record
+    X0, Y0, X1, Y1 : Integer;  { pixel bounds }
+    FontW, FontH   : Integer;  { char cell size in pixels }
+    Cols, Rows     : Integer;  { text grid dimensions }
+    CurCol, CurRow : Integer;  { cursor position (0-based) }
+    Attr           : Byte;     { current SGR→EGA text attribute }
+    Wrap           : Boolean;  { line wrap enabled }
+    Active         : Boolean;  { text window is open }
+  End;
+
   { BGI canvas state - matches Borland Graphics Interface conventions.
     All drawing primitives read FG/FillColor/LineStyle from here.
     Viewport clips all PutPixel calls to ViewX1..ViewX2, ViewY1..ViewY2.
@@ -99,16 +113,23 @@ Type
     BG         : Byte;           { background color index (0-15)          }
     FillColor  : Byte;           { flood fill color (0-15)                }
     FillStyle  : Byte;           { fill pattern (0=empty, 1=solid, etc)   }
+    FillPat    : TFillPattern;   { user-defined fill pattern              }
     LineStyle  : Byte;           { line dash pattern (0=solid, 1=dotted)  }
+    LinePattern: Word;           { 16-bit line pattern for user style     }
     LineThick  : Integer;        { line thickness in pixels (1 or 3)      }
     WriteMode  : Byte;           { 0=COPY (overwrite), 1=XOR             }
     CurX, CurY: Integer;        { current cursor position (text output)  }
     ViewX1, ViewY1: Integer;     { viewport top-left (clip region)        }
     ViewX2, ViewY2: Integer;     { viewport bottom-right (clip region)    }
+    ViewClip   : Boolean;        { viewport clipping enabled              }
     Palette    : Array[0..15] Of LongWord; { current session palette      }
     FontNum    : Byte;           { current font (0=default 8x16 bitmap)   }
     FontDir    : Byte;           { text direction (0=horiz, 1=vert)       }
     FontSize   : Byte;           { text size multiplier                   }
+    TextJustH  : Byte;           { horizontal justify (0=left,1=ctr,2=rt) }
+    TextJustV  : Byte;           { vertical justify (0=bottom,1=ctr,2=top)}
+    TextWin    : TTextWindow;    { RIP text window state                  }
+    InGraphics : Boolean;        { true when graphics mode is active      }
   End;
 
 Var
@@ -121,45 +142,130 @@ Procedure InitCanvas;
 Procedure PutPixel(X, Y: Integer; Color: Byte);
 Function GetPixel(X, Y: Integer): Byte;
 
+{ Color/attribute state }
+Procedure SetColor(Color: Byte);
+Function  GetColor: Byte;
+Procedure SetBkColor(Color: Byte);
+Function  GetBkColor: Byte;
+
+{ Cursor movement }
+Procedure MoveTo(X, Y: Integer);
+Procedure MoveRel(DX, DY: Integer);
+Function  GetX: Integer;
+Function  GetY: Integer;
+
+{ Fill state }
+Procedure SetFillStyle(Style: Word; Color: Byte);
+Procedure SetFillPattern(Var Pattern: TFillPattern; Color: Byte);
+Procedure GetFillSettings(Var Style: Byte; Var Color: Byte);
+
+{ Line state }
+Procedure SetLineStyle(Style: Byte; Pattern: Word; Thick: Integer);
+Procedure GetLineSettings(Var Style: Byte; Var Pattern: Word; Var Thick: Integer);
+
+{ Write mode }
+Procedure SetWriteMode(Mode: Byte);
+Function  GetWriteMode: Byte;
+
+{ Text }
+Procedure SetTextJustify(Horiz, Vert: Byte);
+
+{ Viewport }
+Procedure SetViewPort(X0, Y0, X1, Y1: Integer; Clip: Boolean);
+Procedure GetViewPort(Var X0, Y0, X1, Y1: Integer);
+Procedure ResetViewPort;
+Function  ClipX(X: Integer): Integer;
+Function  ClipY(Y: Integer): Integer;
+Function  InView(X, Y: Integer): Boolean;
+Procedure CopyRegion(SrcX, SrcY, W, H, DstX, DstY: Integer);
+
+{ Viewport stack — nested viewports, matched to RIPterm RIPVIEW.C }
+Procedure ViewPortPush;
+Procedure ViewPortPop;
+Function  ViewPortDepth: Integer;
+
+{ Line clipping — Cohen-Sutherland, matched to RIPterm rip_clip_line }
+Function  ClipLine(Var X1, Y1, X2, Y2: Integer): Boolean;
+
+{ Coordinate transforms — RIP↔screen for VGA scaling }
+Procedure RIPToScreen(RX, RY: Integer; Var SX, SY: Integer);
+Procedure ScreenToRIP(SX, SY: Integer; Var RX, RY: Integer);
+
+{ Full state reset }
+Procedure ResetRIPState;
+
+{ Text window — bottom of RIP screen for text I/O }
+Procedure SetTextWindow(X0, Y0, X1, Y1: Integer; FontH: Byte);
+Procedure ResetTextWin;
+Procedure TextWinPutChar(Ch: Byte);
+Procedure TextWinWrite(Const S: String);
+Procedure TextWinScroll(Direction: Integer);
+Procedure ProcessTextAnsi(Const S: String);
+
+{ System font info }
+Function  GetSysFontW: Integer;
+Function  GetSysFontH: Integer;
+Function  GetSysCols: Integer;
+Function  GetSysRows: Integer;
+
+{ Graphics mode }
+Procedure EnterGraphics;
+Procedure ExitGraphics;
+
+Const
+  { Default system font dimensions }
+  SYS_FONT_W = 8;
+  SYS_FONT_H = 8;
+
+  { SGR color → EGA attribute mapping }
+  TW_SGR_TO_EGA : Array[0..7] Of Byte = (0, 4, 2, 6, 1, 5, 3, 7);
+
 Implementation
 
 Procedure InitCanvas;
-{ Allocate pixel buffer and set all state to EGA defaults.
-  Called once at program start. Canvas.Pixels is heap-allocated
-  because TPixelBuffer is 224KB - too large for the stack.
-  FillChar with 0 sets all pixels to color index 0 (black).
-  Viewport starts as full screen (0,0 to 639,349). }
 Begin
   New(Canvas.Pixels);
   FillChar(Canvas.Pixels^, SizeOf(TPixelBuffer), 0);
-  Canvas.FG := 15;         { white foreground }
-  Canvas.BG := 0;          { black background }
-  Canvas.FillColor := 0;   { fill with black }
-  Canvas.FillStyle := 1;   { solid fill }
-  Canvas.LineStyle := 0;   { solid line }
-  Canvas.LineThick := 1;   { 1 pixel thick }
-  Canvas.WriteMode := 0;   { copy mode (overwrite) }
+  Canvas.FG := 15;
+  Canvas.BG := 0;
+  Canvas.FillColor := 0;
+  Canvas.FillStyle := 1;
+  FillChar(Canvas.FillPat, SizeOf(TFillPattern), $FF);
+  Canvas.LineStyle := 0;
+  Canvas.LinePattern := $FFFF;
+  Canvas.LineThick := 1;
+  Canvas.WriteMode := 0;
   Canvas.CurX := 0;
   Canvas.CurY := 0;
   Canvas.ViewX1 := 0;
   Canvas.ViewY1 := 0;
-  Canvas.ViewX2 := RIP_WIDTH - 1;   { 639 }
-  Canvas.ViewY2 := RIP_HEIGHT - 1;  { 349 }
-  Canvas.FontNum := 0;     { default bitmap font }
-  Canvas.FontDir := 0;     { horizontal }
-  Canvas.FontSize := 1;    { 1x scale }
+  Canvas.ViewX2 := RIP_WIDTH - 1;
+  Canvas.ViewY2 := RIP_HEIGHT - 1;
+  Canvas.ViewClip := True;
+  Canvas.FontNum := 0;
+  Canvas.FontDir := 0;
+  Canvas.FontSize := 1;
+  Canvas.TextJustH := 0;
+  Canvas.TextJustV := 0;
+  Canvas.InGraphics := False;
   Move(EGA_PALETTE, Canvas.Palette, SizeOf(EGA_PALETTE));
+  { Text window defaults }
+  Canvas.TextWin.Active := False;
+  Canvas.TextWin.X0 := 0;
+  Canvas.TextWin.Y0 := RIP_HEIGHT - (4 * SYS_FONT_H);
+  Canvas.TextWin.X1 := RIP_WIDTH - 1;
+  Canvas.TextWin.Y1 := RIP_HEIGHT - 1;
+  Canvas.TextWin.FontW := SYS_FONT_W;
+  Canvas.TextWin.FontH := SYS_FONT_H;
+  Canvas.TextWin.Cols := RIP_WIDTH Div SYS_FONT_W;
+  Canvas.TextWin.Rows := 4;
+  Canvas.TextWin.CurCol := 0;
+  Canvas.TextWin.CurRow := 0;
+  Canvas.TextWin.Attr := 7;
+  Canvas.TextWin.Wrap := True;
 End;
 
 Procedure PutPixel(X, Y: Integer; Color: Byte);
-{ Set one pixel in the canvas buffer.
-  Coordinates are VIEWPORT-RELATIVE — offset by ViewX1/ViewY1.
-  Then clips to viewport bounds. Matched to JS BGI.js _putpixel:
-    x += vp.left; y += vp.top;
-  BUG FIX (Session 6): Was using absolute coordinates — viewport
-  only clipped without offsetting. v_VIEW test showed only one
-  viewport box because shapes at (16,16) weren't offset to
-  viewport 2 origin. }
 Var AX, AY: Integer;
 Begin
   AX := X + Canvas.ViewX1;
@@ -168,8 +274,8 @@ Begin
      (AY >= Canvas.ViewY1) And (AY <= Canvas.ViewY2) Then
     Canvas.Pixels^[AX, AY] := Color And 15;
 End;
+
 Function GetPixel(X, Y: Integer): Byte;
-{ Read pixel with viewport offset - matches JS getpixel. }
 Var AX, AY: Integer;
 Begin
   AX := X + Canvas.ViewX1;
@@ -178,6 +284,437 @@ Begin
     Result := Canvas.Pixels^[AX, AY]
   Else
     Result := 0;
+End;
+
+{ ---- Color/attribute state ---- }
+
+Procedure SetColor(Color: Byte);
+Begin Canvas.FG := Color And 15; End;
+
+Function GetColor: Byte;
+Begin Result := Canvas.FG; End;
+
+Procedure SetBkColor(Color: Byte);
+Begin Canvas.BG := Color And 15; End;
+
+Function GetBkColor: Byte;
+Begin Result := Canvas.BG; End;
+
+{ ---- Cursor movement ---- }
+
+Procedure MoveTo(X, Y: Integer);
+Begin Canvas.CurX := X; Canvas.CurY := Y; End;
+
+Procedure MoveRel(DX, DY: Integer);
+Begin Inc(Canvas.CurX, DX); Inc(Canvas.CurY, DY); End;
+
+Function GetX: Integer;
+Begin Result := Canvas.CurX; End;
+
+Function GetY: Integer;
+Begin Result := Canvas.CurY; End;
+
+{ ---- Fill state ---- }
+
+Procedure SetFillStyle(Style: Word; Color: Byte);
+Begin
+  Canvas.FillStyle := Style And $FF;
+  Canvas.FillColor := Color And 15;
+End;
+
+Procedure SetFillPattern(Var Pattern: TFillPattern; Color: Byte);
+Begin
+  Move(Pattern, Canvas.FillPat, SizeOf(TFillPattern));
+  Canvas.FillColor := Color And 15;
+  Canvas.FillStyle := 12; { user-defined }
+End;
+
+Procedure GetFillSettings(Var Style: Byte; Var Color: Byte);
+Begin
+  Style := Canvas.FillStyle;
+  Color := Canvas.FillColor;
+End;
+
+{ ---- Line state ---- }
+
+Procedure SetLineStyle(Style: Byte; Pattern: Word; Thick: Integer);
+Begin
+  Canvas.LineStyle := Style;
+  Canvas.LinePattern := Pattern;
+  Canvas.LineThick := Thick;
+End;
+
+Procedure GetLineSettings(Var Style: Byte; Var Pattern: Word; Var Thick: Integer);
+Begin
+  Style := Canvas.LineStyle;
+  Pattern := Canvas.LinePattern;
+  Thick := Canvas.LineThick;
+End;
+
+{ ---- Write mode ---- }
+
+Procedure SetWriteMode(Mode: Byte);
+Begin Canvas.WriteMode := Mode; End;
+
+Function GetWriteMode: Byte;
+Begin Result := Canvas.WriteMode; End;
+
+{ ---- Text ---- }
+
+Procedure SetTextJustify(Horiz, Vert: Byte);
+Begin
+  Canvas.TextJustH := Horiz;
+  Canvas.TextJustV := Vert;
+End;
+
+{ ---- Viewport ---- }
+
+Procedure SetViewPort(X0, Y0, X1, Y1: Integer; Clip: Boolean);
+Begin
+  If X0 < 0 Then X0 := 0;
+  If Y0 < 0 Then Y0 := 0;
+  If X1 >= RIP_WIDTH Then X1 := RIP_WIDTH - 1;
+  If Y1 >= RIP_HEIGHT Then Y1 := RIP_HEIGHT - 1;
+  Canvas.ViewX1 := X0;
+  Canvas.ViewY1 := Y0;
+  Canvas.ViewX2 := X1;
+  Canvas.ViewY2 := Y1;
+  Canvas.ViewClip := Clip;
+  Canvas.CurX := 0;
+  Canvas.CurY := 0;
+End;
+
+Procedure GetViewPort(Var X0, Y0, X1, Y1: Integer);
+Begin
+  X0 := Canvas.ViewX1; Y0 := Canvas.ViewY1;
+  X1 := Canvas.ViewX2; Y1 := Canvas.ViewY2;
+End;
+
+Procedure ResetViewPort;
+Begin
+  SetViewPort(0, 0, RIP_WIDTH - 1, RIP_HEIGHT - 1, True);
+End;
+
+Function ClipX(X: Integer): Integer;
+Begin
+  If X < Canvas.ViewX1 Then Result := Canvas.ViewX1
+  Else If X > Canvas.ViewX2 Then Result := Canvas.ViewX2
+  Else Result := X;
+End;
+
+Function ClipY(Y: Integer): Integer;
+Begin
+  If Y < Canvas.ViewY1 Then Result := Canvas.ViewY1
+  Else If Y > Canvas.ViewY2 Then Result := Canvas.ViewY2
+  Else Result := Y;
+End;
+
+Function InView(X, Y: Integer): Boolean;
+Begin
+  Result := (X >= Canvas.ViewX1) And (X <= Canvas.ViewX2) And
+            (Y >= Canvas.ViewY1) And (Y <= Canvas.ViewY2);
+End;
+
+Procedure CopyRegion(SrcX, SrcY, W, H, DstX, DstY: Integer);
+Var X, Y: Integer;
+Begin
+  For Y := 0 To H - 1 Do
+    For X := 0 To W - 1 Do
+      If InView(SrcX + X, SrcY + Y) And InView(DstX + X, DstY + Y) Then
+        Canvas.Pixels^[DstX + X, DstY + Y] := Canvas.Pixels^[SrcX + X, SrcY + Y];
+End;
+
+{ ---- Viewport stack — 8 levels, matched to RIPterm RIPVIEW.C ---- }
+
+Const
+  MAX_VP_STACK = 8;
+
+Type
+  TVPEntry = Record
+    X1, Y1, X2, Y2: Integer;
+    Clip: Boolean;
+  End;
+
+Var
+  VPStack: Array[0..MAX_VP_STACK - 1] Of TVPEntry;
+  VPSP: Integer = 0;
+
+Procedure ViewPortPush;
+Begin
+  If VPSP >= MAX_VP_STACK Then Exit;
+  VPStack[VPSP].X1 := Canvas.ViewX1;
+  VPStack[VPSP].Y1 := Canvas.ViewY1;
+  VPStack[VPSP].X2 := Canvas.ViewX2;
+  VPStack[VPSP].Y2 := Canvas.ViewY2;
+  VPStack[VPSP].Clip := Canvas.ViewClip;
+  Inc(VPSP);
+End;
+
+Procedure ViewPortPop;
+Begin
+  If VPSP <= 0 Then Exit;
+  Dec(VPSP);
+  SetViewPort(VPStack[VPSP].X1, VPStack[VPSP].Y1,
+              VPStack[VPSP].X2, VPStack[VPSP].Y2,
+              VPStack[VPSP].Clip);
+End;
+
+Function ViewPortDepth: Integer;
+Begin
+  Result := VPSP;
+End;
+
+{ ---- Cohen-Sutherland line clipping — matched to RIPterm rip_clip_line ---- }
+
+Function ClipLine(Var X1, Y1, X2, Y2: Integer): Boolean;
+Const
+  INSIDE = 0; LEFT = 1; RIGHT = 2; BOTTOM = 4; TOP = 8;
+
+  Function ComputeCode(X, Y: Integer): Integer;
+  Begin
+    Result := INSIDE;
+    If X < Canvas.ViewX1 Then Result := Result Or LEFT
+    Else If X > Canvas.ViewX2 Then Result := Result Or RIGHT;
+    If Y < Canvas.ViewY1 Then Result := Result Or TOP
+    Else If Y > Canvas.ViewY2 Then Result := Result Or BOTTOM;
+  End;
+
+Var
+  Code1, Code2, CodeOut: Integer;
+  X, Y: Integer;
+Begin
+  Code1 := ComputeCode(X1, Y1);
+  Code2 := ComputeCode(X2, Y2);
+  Result := False;
+
+  While True Do Begin
+    If (Code1 Or Code2) = 0 Then Begin
+      Result := True; Exit; { Both inside }
+    End;
+    If (Code1 And Code2) <> 0 Then Exit; { Both outside same edge }
+
+    If Code1 <> 0 Then CodeOut := Code1
+    Else CodeOut := Code2;
+
+    If (CodeOut And TOP) <> 0 Then Begin
+      X := X1 + LongInt(X2 - X1) * (Canvas.ViewY1 - Y1) Div (Y2 - Y1);
+      Y := Canvas.ViewY1;
+    End Else If (CodeOut And BOTTOM) <> 0 Then Begin
+      X := X1 + LongInt(X2 - X1) * (Canvas.ViewY2 - Y1) Div (Y2 - Y1);
+      Y := Canvas.ViewY2;
+    End Else If (CodeOut And RIGHT) <> 0 Then Begin
+      Y := Y1 + LongInt(Y2 - Y1) * (Canvas.ViewX2 - X1) Div (X2 - X1);
+      X := Canvas.ViewX2;
+    End Else Begin
+      Y := Y1 + LongInt(Y2 - Y1) * (Canvas.ViewX1 - X1) Div (X2 - X1);
+      X := Canvas.ViewX1;
+    End;
+
+    If CodeOut = Code1 Then Begin
+      X1 := X; Y1 := Y;
+      Code1 := ComputeCode(X1, Y1);
+    End Else Begin
+      X2 := X; Y2 := Y;
+      Code2 := ComputeCode(X2, Y2);
+    End;
+  End;
+End;
+
+{ ---- Coordinate transforms — RIP↔screen ---- }
+
+Procedure RIPToScreen(RX, RY: Integer; Var SX, SY: Integer);
+{ Transform RIP 640x350 coordinates to screen coordinates.
+  Currently 1:1 (EGA mode). When VGA 640x480 is added, scales Y. }
+Begin
+  SX := RX;
+  SY := RY;
+  { VGA scaling would be: SY := LongInt(RY) * 480 Div 350; }
+End;
+
+Procedure ScreenToRIP(SX, SY: Integer; Var RX, RY: Integer);
+Begin
+  RX := SX;
+  RY := SY;
+  { VGA scaling would be: RY := LongInt(SY) * 350 Div 480; }
+End;
+
+{ ---- Full state reset — matched to RIPterm rip_reset_state ---- }
+
+Procedure ResetRIPState;
+Begin
+  VPSP := 0;
+  ResetViewPort;
+  SetColor(15);
+  SetBkColor(0);
+  SetFillStyle(1, 15);
+  SetLineStyle(0, $FFFF, 1);
+  SetWriteMode(0);
+  SetTextJustify(0, 0);
+  Canvas.FontNum := 0;
+  Canvas.FontDir := 0;
+  Canvas.FontSize := 1;
+  Move(EGA_PALETTE, Canvas.Palette, SizeOf(EGA_PALETTE));
+  FillChar(Canvas.Pixels^, SizeOf(TPixelBuffer), 0);
+  ResetTextWin;
+End;
+
+Procedure SetTextWindow(X0, Y0, X1, Y1: Integer; FontH: Byte);
+Begin
+  Canvas.TextWin.X0 := X0;
+  Canvas.TextWin.Y0 := Y0;
+  Canvas.TextWin.X1 := X1;
+  Canvas.TextWin.Y1 := Y1;
+  If FontH = 0 Then FontH := SYS_FONT_H;
+  Canvas.TextWin.FontH := FontH;
+  Canvas.TextWin.FontW := SYS_FONT_W;
+  Canvas.TextWin.Cols := (X1 - X0 + 1) Div Canvas.TextWin.FontW;
+  Canvas.TextWin.Rows := (Y1 - Y0 + 1) Div Canvas.TextWin.FontH;
+  Canvas.TextWin.CurCol := 0;
+  Canvas.TextWin.CurRow := 0;
+  Canvas.TextWin.Attr := 7;
+  Canvas.TextWin.Active := True;
+End;
+
+Procedure ResetTextWin;
+Begin
+  Canvas.TextWin.Active := False;
+  Canvas.TextWin.CurCol := 0;
+  Canvas.TextWin.CurRow := 0;
+  Canvas.TextWin.Attr := 7;
+End;
+
+Procedure TextWinScroll(Direction: Integer);
+{ Scroll text window pixels up (Direction>0) or down (Direction<0) }
+Var X, Y, SrcY, LineH: Integer;
+Begin
+  If Not Canvas.TextWin.Active Then Exit;
+  LineH := Canvas.TextWin.FontH;
+  If Direction > 0 Then Begin
+    { Scroll up — copy rows up by LineH pixels }
+    For Y := Canvas.TextWin.Y0 To Canvas.TextWin.Y1 - LineH Do
+      For X := Canvas.TextWin.X0 To Canvas.TextWin.X1 Do Begin
+        SrcY := Y + LineH;
+        If SrcY <= Canvas.TextWin.Y1 Then
+          Canvas.Pixels^[X, Y] := Canvas.Pixels^[X, SrcY];
+      End;
+    { Clear bottom line }
+    For Y := Canvas.TextWin.Y1 - LineH + 1 To Canvas.TextWin.Y1 Do
+      For X := Canvas.TextWin.X0 To Canvas.TextWin.X1 Do
+        Canvas.Pixels^[X, Y] := Canvas.BG;
+  End;
+End;
+
+Procedure TextWinPutChar(Ch: Byte);
+{ Place one character in text window at current cursor, advance cursor }
+Begin
+  If Not Canvas.TextWin.Active Then Exit;
+  Case Ch Of
+    13: Canvas.TextWin.CurCol := 0;
+    10: Begin
+      Inc(Canvas.TextWin.CurRow);
+      If Canvas.TextWin.CurRow >= Canvas.TextWin.Rows Then Begin
+        TextWinScroll(1);
+        Canvas.TextWin.CurRow := Canvas.TextWin.Rows - 1;
+      End;
+    End;
+    8: If Canvas.TextWin.CurCol > 0 Then Dec(Canvas.TextWin.CurCol);
+  Else
+    { TODO: render glyph pixel-by-pixel using system font bitmap }
+    Inc(Canvas.TextWin.CurCol);
+    If Canvas.TextWin.CurCol >= Canvas.TextWin.Cols Then Begin
+      If Canvas.TextWin.Wrap Then Begin
+        Canvas.TextWin.CurCol := 0;
+        Inc(Canvas.TextWin.CurRow);
+        If Canvas.TextWin.CurRow >= Canvas.TextWin.Rows Then Begin
+          TextWinScroll(1);
+          Canvas.TextWin.CurRow := Canvas.TextWin.Rows - 1;
+        End;
+      End Else
+        Canvas.TextWin.CurCol := Canvas.TextWin.Cols - 1;
+    End;
+  End;
+End;
+
+Procedure TextWinWrite(Const S: String);
+Var I: Integer;
+Begin
+  For I := 1 To Length(S) Do
+    TextWinPutChar(Ord(S[I]));
+End;
+
+Procedure ProcessTextAnsi(Const S: String);
+{ Process ANSI escape sequences in text window.
+  Handles SGR (color) via TW_SGR_TO_EGA mapping.
+  Non-ESC bytes go through TextWinPutChar. }
+Var
+  I, N: Integer;
+  State: Byte; { 0=normal, 1=ESC, 2=CSI }
+  Params: String;
+  Code: Integer;
+  ParamVal: Integer;
+Begin
+  If Not Canvas.TextWin.Active Then Exit;
+  State := 0;
+  Params := '';
+  For I := 1 To Length(S) Do Begin
+    Case State Of
+      0: If S[I] = #27 Then State := 1
+         Else TextWinPutChar(Ord(S[I]));
+      1: If S[I] = '[' Then Begin State := 2; Params := ''; End
+         Else State := 0;
+      2: If (S[I] >= '0') And (S[I] <= ';') Then
+           Params := Params + S[I]
+         Else Begin
+           { Execute CSI command }
+           If S[I] = 'm' Then Begin { SGR }
+             { Parse semicolon-separated params }
+             Params := Params + ';';
+             While Length(Params) > 0 Do Begin
+               N := System.Pos(';', Params);
+               If N = 0 Then Break;
+               Val(Copy(Params, 1, N - 1), ParamVal, Code);
+               If Code <> 0 Then ParamVal := 0;
+               Delete(Params, 1, N);
+               Case ParamVal Of
+                 0: Canvas.TextWin.Attr := 7;
+                 1: Canvas.TextWin.Attr := Canvas.TextWin.Attr Or $08;
+                 5: Canvas.TextWin.Attr := Canvas.TextWin.Attr Or $80;
+                 30..37: Canvas.TextWin.Attr := (Canvas.TextWin.Attr And $F8) Or TW_SGR_TO_EGA[ParamVal - 30];
+                 40..47: Canvas.TextWin.Attr := (Canvas.TextWin.Attr And $8F) Or (TW_SGR_TO_EGA[ParamVal - 40] Shl 4);
+               End;
+             End;
+           End;
+           State := 0;
+         End;
+    End;
+  End;
+End;
+
+{ ---- System font info ---- }
+
+Function GetSysFontW: Integer;
+Begin Result := SYS_FONT_W; End;
+
+Function GetSysFontH: Integer;
+Begin Result := SYS_FONT_H; End;
+
+Function GetSysCols: Integer;
+Begin Result := RIP_WIDTH Div SYS_FONT_W; End;
+
+Function GetSysRows: Integer;
+Begin Result := RIP_HEIGHT Div SYS_FONT_H; End;
+
+{ ---- Graphics mode ---- }
+
+Procedure EnterGraphics;
+Begin
+  Canvas.InGraphics := True;
+  ResetViewPort;
+End;
+
+Procedure ExitGraphics;
+Begin
+  Canvas.InGraphics := False;
 End;
 
 End.

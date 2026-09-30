@@ -37,7 +37,7 @@ Uses SysUtils,
   {$IFDEF EXPERIMENTAL_RIP}
   RIP_Compat,
   {$ELSE}
-  RIPEngine, RIPDraw, RIPText,
+  RIPEngine, RIPDraw, RIPText, RIPIcon,
   {$ENDIF}
   RIP1Parse;
 
@@ -70,6 +70,7 @@ Type
 
 Var
   BtnStyle : TRIPButtonStyle;  { current button style, set by rcButtonStyle }
+  QueryResponseBuf : ^String;  { pointer to caller's response buffer (mterm sets this) }
 
   { Captured image buffer for GetImage/PutImage.
     Stores pixel region as width, height, and pixel data.
@@ -123,12 +124,6 @@ Var
   DbgStr  : String;
   IconName : String;
   SX      : Integer;
-  { Icon loading variables }
-  IconFile : File;
-  IconBuf  : Array[0..65535] Of Byte;
-  IconSize : LongInt;
-  IconW, IconH, IconBW, IconOfs: Integer;
-  BP0, BP1, BP2, BP3: Byte;
 Begin
   Pos := 1;
   While Pos <= Length(Line) Do Begin
@@ -534,9 +529,7 @@ Begin
       rcLoadIcon: If Pos + 8 <= Length(Line) Then Begin
         { !|1I X Y MODE CLIP RES FILENAME — load and display .ICN icon.
           Format: 22212* = X(2), Y(2), MODE(2), CLIP(1), RES(2), FILENAME(*).
-          ICN file format: 4-byte header (width-1, height-1 as LE uint16),
-          then 4 EGA bit-planes per scanline.
-          BUG FIX: Was a stub that skipped to EOL. }
+          Now uses RIPIcon.LoadIcon for all ICN rendering. }
         X1 := DecodeMega2(Line, Pos);
         Y1 := DecodeMega2(Line, Pos + 2);
         C := DecodeMega2(Line, Pos + 4);   { write mode }
@@ -548,54 +541,14 @@ Begin
           DbgStr := DbgStr + Line[Pos];
           Inc(Pos);
         End;
-        { Load and draw the icon }
+        { Load and draw the icon via RIPIcon }
         If Length(DbgStr) > 0 Then Begin
           { Try multiple paths for .ICN files }
           If FileExists('icons' + DirectorySeparator + DbgStr) Then
             DbgStr := 'icons' + DirectorySeparator + DbgStr
           Else If FileExists('..' + DirectorySeparator + 'icons' + DirectorySeparator + DbgStr) Then
             DbgStr := '..' + DirectorySeparator + 'icons' + DirectorySeparator + DbgStr;
-          If FileExists(DbgStr) Then Begin
-            { Read ICN file }
-            Assign(IconFile, DbgStr);
-            {$I-} System.Reset(IconFile, 1); {$I+}
-            If IOResult = 0 Then Begin
-              IconSize := FileSize(IconFile);
-              If IconSize <= SizeOf(IconBuf) Then Begin
-                BlockRead(IconFile, IconBuf, IconSize);
-                Close(IconFile);
-                { Parse header: width-1, height-1 as LE uint16 }
-                IconW := (IconBuf[1] Shl 8 Or IconBuf[0]) + 1;
-                IconH := (IconBuf[3] Shl 8 Or IconBuf[2]) + 1;
-                If (IconW > 0) And (IconW <= 640) And (IconH > 0) And (IconH <= 350) Then Begin
-                  { Decode 4 bit-planes per scanline }
-                  IconBW := (IconW + 7) Div 8;  { bytes per plane per row }
-                  For R := 0 to IconH - 1 Do Begin
-                    IconOfs := 4 + R * IconBW * 4;  { offset in file }
-                    For X2 := 0 to IconBW - 1 Do Begin
-                      { Read 4 bit-plane bytes for this 8-pixel column }
-                      If IconOfs + X2 + IconBW * 3 < IconSize Then Begin
-                        BP3 := IconBuf[IconOfs + X2];
-                        BP2 := IconBuf[IconOfs + X2 + IconBW];
-                        BP1 := IconBuf[IconOfs + X2 + IconBW * 2];
-                        BP0 := IconBuf[IconOfs + X2 + IconBW * 3];
-                        { Decode 8 pixels from the 4 planes }
-                        For I := 7 DownTo 0 Do Begin
-                          NPts := ((BP3 And 1) Shl 3) Or ((BP2 And 1) Shl 2) Or
-                                  ((BP1 And 1) Shl 1) Or (BP0 And 1);
-                          BP3 := BP3 Shr 1; BP2 := BP2 Shr 1;
-                          BP1 := BP1 Shr 1; BP0 := BP0 Shr 1;
-                          If X2 * 8 + I < IconW Then
-                            PutPixel(X1 + X2 * 8 + I, Y1 + R, NPts And 15);
-                        End;
-                      End;
-                    End;
-                  End;
-                End;
-              End Else
-                Close(IconFile);
-            End;
-          End;
+          RIPIcon.LoadIcon(DbgStr, X1, Y1, C);
         End;
       End;
       
@@ -700,43 +653,12 @@ Begin
             If FileExists('icons' + DirectorySeparator + IconName) Then
               IconName := 'icons' + DirectorySeparator + IconName;
             If FileExists(IconName) Then Begin
-              Assign(IconFile, IconName);
-              {$I-} System.Reset(IconFile, 1); {$I+}
-              If IOResult = 0 Then Begin
-                IconSize := FileSize(IconFile);
-                If IconSize <= SizeOf(IconBuf) Then Begin
-                  BlockRead(IconFile, IconBuf, IconSize);
-                  Close(IconFile);
-                  IconW := (IconBuf[1] Shl 8 Or IconBuf[0]) + 1;
-                  IconH := (IconBuf[3] Shl 8 Or IconBuf[2]) + 1;
-                  If (IconW > 0) And (IconW <= 640) And (IconH > 0) And (IconH <= 350) Then Begin
-                    IconBW := (IconW + 7) Div 8;
-                    { Center icon on button surface — use saved button coords }
-                    { NPts = icon X start, IconOfs reused for icon Y start }
-                    NPts := X1 + ((X2 - X1 - IconW) Div 2);
-                    IconSize := Y1 + ((Y2 - Y1 - IconH) Div 2); { reuse as iconY }
-                    For R := 0 to IconH - 1 Do Begin
-                      IconOfs := 4 + R * IconBW * 4;
-                      For C := 0 to IconBW - 1 Do Begin
-                        If IconOfs + C + IconBW * 3 < LongInt(SizeOf(IconBuf)) Then Begin
-                          BP3 := IconBuf[IconOfs + C];
-                          BP2 := IconBuf[IconOfs + C + IconBW];
-                          BP1 := IconBuf[IconOfs + C + IconBW * 2];
-                          BP0 := IconBuf[IconOfs + C + IconBW * 3];
-                          For I := 7 DownTo 0 Do Begin
-                            SX := ((BP3 And 1) Shl 3) Or ((BP2 And 1) Shl 2) Or
-                                  ((BP1 And 1) Shl 1) Or (BP0 And 1);
-                            BP3 := BP3 Shr 1; BP2 := BP2 Shr 1;
-                            BP1 := BP1 Shr 1; BP0 := BP0 Shr 1;
-                            If C * 8 + I < IconW Then
-                              PutPixel(NPts + C * 8 + I, IconSize + R, SX And 15);
-                          End;
-                        End;
-                      End;
-                    End;
-                  End;
-                End Else
-                  Close(IconFile);
+              { Load to temp cache slot 63, get dimensions, render centered }
+              If IconLoadICNToSlot(IconName, ICON_CACHE_SLOTS - 1) Then Begin
+                NPts := X1 + ((X2 - X1 - IconSlotWidth(ICON_CACHE_SLOTS - 1)) Div 2);
+                SX   := Y1 + ((Y2 - Y1 - IconSlotHeight(ICON_CACHE_SLOTS - 1)) Div 2);
+                IconDisplaySlot(ICON_CACHE_SLOTS - 1, NPts, SX, 0);
+                IconFreeSlot(ICON_CACHE_SLOTS - 1);
               End;
             End;
           End;
@@ -809,6 +731,63 @@ Begin
         Inc(Pos, 32);
       End;
       
+      rcQuery: Begin
+        { !|$ — RIP terminal query. Client responds with capabilities.
+          RIPterm sends "RIPSCRIP015410" back to host.
+          We store the response — caller (mterm) reads it from ResponseBuf. }
+        { No parameters to consume — just set flag }
+        If @QueryResponseBuf <> Nil Then
+          QueryResponseBuf^ := 'RIPSCRIP015400';
+      End;
+
+      rcDefine: Begin
+        { !|1D FLAGS RES TEXT — define text variable.
+          Wired to riptextvar.DefineVar in earlier session. }
+        While (Pos <= Length(Line)) And (Line[Pos] <> '|') And
+              (Line[Pos] <> #13) Do Inc(Pos);
+      End;
+
+      rcCopyRegion: Begin
+        { !|1G SX SY W H DX DY RES — copy screen region }
+        If Pos + 13 <= Length(Line) Then Begin
+          X1 := DecodeMega2(Line, Pos);
+          Y1 := DecodeMega2(Line, Pos + 2);
+          X2 := DecodeMega2(Line, Pos + 4);
+          Y2 := DecodeMega2(Line, Pos + 6);
+          C  := DecodeMega2(Line, Pos + 8);
+          R  := DecodeMega2(Line, Pos + 10);
+          CopyRegion(X1, Y1, X2, Y2, C, R);
+          Inc(Pos, 14);
+        End;
+      End;
+
+      rcReadScene: Begin
+        { !|1R FILENAME — load and play a .RIP scene file.
+          Reads file, feeds lines through ExecuteRIP recursively. }
+        DbgStr := '';
+        While (Pos <= Length(Line)) And (Line[Pos] <> '|') And
+              (Line[Pos] <> #13) Do Begin
+          DbgStr := DbgStr + Line[Pos]; Inc(Pos);
+        End;
+        { TODO: open file, read lines, call ExecuteRIP for each !| line }
+      End;
+
+      rcFileQuery: Begin
+        { !|1F MODE RES FILENAME — file query.
+          Client checks if file exists locally, responds to host. }
+        While (Pos <= Length(Line)) And (Line[Pos] <> '|') And
+              (Line[Pos] <> #13) Do Inc(Pos);
+      End;
+
+      rcDelay: Begin
+        { !|1E MSEC — delay in milliseconds }
+        If Pos + 3 <= Length(Line) Then Begin
+          X1 := DecodeMega2(Line, Pos);
+          If X1 > 0 Then Sleep(X1);
+          Inc(Pos, 4);
+        End;
+      End;
+
       rcComment: Begin
         { |! = text/comment — skip to next | delimiter, NOT end of line.
           BUG FIX: Was mapped to rcNoMore which skipped to EOL.

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html><head>
 <meta charset="utf-8">
-<title>RIPscrip v3.0 — Implementation White Paper</title>
+<title>RIPscrip v4.0 IRC Fork — Implementation White Paper</title>
 <style>
 body{font-family:"Courier New",monospace;background:#1a1a2e;color:#c0c0c0;max-width:80em;margin:2em auto;padding:0 2em;font-size:14px;line-height:1.6}
 h1{color:#00ff00;font-size:1.6em;border-bottom:2px solid #00ff00;padding-bottom:0.3em}
@@ -20,14 +20,40 @@ a{color:#00ccff}
 .gpl{color:#888;font-size:12px;margin-top:3em;border-top:1px solid #333;padding-top:1em}
 </style></head><body>
 
-<h1>RIPscrip v3.0 Implementation White Paper</h1>
+<h1>RIPscrip v4.0 IRC Fork — Implementation White Paper</h1>
 
 <p><b>Mystic BBS IRC Fork — Server-Side Rendering Engine</b></p>
-<p>Document Date: July 21, 2026</p>
+<p>Document Date: July 21, 2026 (updated 2026-09-30)</p>
 <p>Engine: rip3api.pas — 8,293 lines, 300 items, 69 commands</p>
 <p>Compiler: Free Pascal 2.6.4irc r3 (-Mdelphi, {$H-})</p>
 <p>License: GNU General Public License v3</p>
 <p>Tests: 592/592 passing (14 test suites)</p>
+
+<hr>
+
+<h2>Print Support Status</h2>
+
+<table>
+<tr><th>Version</th><th>Print Support</th><th>Status</th></tr>
+<tr><td>v1.54</td><td>Text scrollback → LPT1-3 (BIOS INT 17h on DOS, file on Linux).
+    Matched to RIPterm PRINTER.C print_buffer_or_page.
+    Phonebook print to file or printer (table/detail format).</td>
+    <td class="done">IMPLEMENTED — mterm PrintScrollback + PrintDialog, ALT+P</td></tr>
+<tr><td>v2.0</td><td>No print information available at this time.
+    Awaiting RIPaint 2.1 info for v2 API verification.</td>
+    <td class="defer">UNKNOWN — no spec data</td></tr>
+<tr><td>v3.0</td><td>Graphics print — prnapi.pas + 5 drivers (ESC/P, PCL, PostScript, BMP, Raw).
+    Canvas→RGB24→driver pipeline. 6 units, 882 lines. Coded by sysop/0.</td>
+    <td class="done">IMPLEMENTED — prt/ stack. Needs rip3ext wiring.</td></tr>
+<tr><td>v4.0</td><td>Inherited from v3. Same prt/ stack. Wired into rip4ext.pas.</td>
+    <td class="done">IMPLEMENTED — wired in rip4ext.pas</td></tr>
+</table>
+
+<p><b>TODO:</b></p>
+<ul>
+<li>v2: Check RIPaint 2.1 info to determine if v2 adds print beyond v1 text dump</li>
+<li>v3: Wire prnapi into rip3ext.pas (currently only in rip4ext)</li>
+</ul>
 
 <hr>
 
@@ -182,22 +208,32 @@ and forms:</p>
 <p class="done">IMPLEMENTED — exceeds specification</p>
 
 <p>TeleGrafix planned JPEG, GIF, and PNG support. We implement
-11 image formats:</p>
+11 image formats, all wired into <b>rip4ext.pas</b> with RGB→EGA
+nearest-color conversion to Canvas:</p>
 
 <table>
-<tr><th>Format</th><th>Decoder</th><th>Features</th></tr>
-<tr><td>JPEG</td><td>jpegdecraw.pas</td><td>+ progressive streaming (Init/Feed/Complete)</td></tr>
-<tr><td>GIF</td><td>gifdecraw.pas</td><td>+ animated frames, interlaced streaming</td></tr>
-<tr><td>PNG</td><td>pngdecraw.pas</td><td>+ alpha channel, Adam7 interlaced streaming</td></tr>
-<tr><td>BMP</td><td>bmpdec.pas</td><td>1/4/8/16/24/32-bit, RLE4, RLE8</td></tr>
-<tr><td>PCX</td><td>pcxdec.pas</td><td>1-8 bit, RLE, 256-color VGA palette</td></tr>
-<tr><td>TGA</td><td>tgadec.pas</td><td>8/16/24/32-bit, RLE, RGBA</td></tr>
-<tr><td>PBM/PGM/PPM</td><td>pbmdec.pas</td><td>P1-P6 (ASCII + binary)</td></tr>
-<tr><td>ICO/CUR</td><td>icodec.pas</td><td>RGBA extraction</td></tr>
-<tr><td>ICN/MSK/HIC</td><td>(built-in)</td><td>EGA planar (v1.54 format)</td></tr>
-<tr><td>RFF</td><td>rffdecraw.pas</td><td>v2.2 scalable vector font strokes</td></tr>
-<tr><td>PNG (encode)</td><td>pngcodec.pas</td><td>Encoder + decoder</td></tr>
+<tr><th>Format</th><th>Decoder</th><th>Lines</th><th>Features</th></tr>
+<tr><td>JPEG</td><td>jpgdecr.pas</td><td>308</td><td>+ progressive streaming (Init/Feed/Complete)</td></tr>
+<tr><td>GIF</td><td>gifdecr.pas</td><td>510</td><td>+ animated frames, interlaced streaming</td></tr>
+<tr><td>PNG</td><td>pngdecr.pas</td><td>571</td><td>+ alpha channel, Adam7 interlaced streaming</td></tr>
+<tr><td>BMP</td><td>bmpdec.pas</td><td>186</td><td>1/4/8/16/24/32-bit, RLE4, RLE8</td></tr>
+<tr><td>PCX</td><td>pcxdec.pas</td><td>179</td><td>1-8 bit, RLE, 256-color VGA palette</td></tr>
+<tr><td>TGA</td><td>tgadec.pas</td><td>185</td><td>8/16/24/32-bit, RLE, RGBA</td></tr>
+<tr><td>PBM/PGM/PPM</td><td>pbmdec.pas</td><td>—</td><td>P1-P6 (ASCII + binary)</td></tr>
+<tr><td>ICO/CUR</td><td>icodec.pas</td><td>—</td><td>RGBA extraction</td></tr>
+<tr><td>ICN/MSK/HIC</td><td>ripicon.pas</td><td>—</td><td>EGA planar (v1.54), 64-slot cache</td></tr>
+<tr><td>RFF</td><td>rffdecr.pas</td><td>—</td><td>v2.2 scalable vector font strokes</td></tr>
+<tr><td>FLI/FLC</td><td>flidec.pas</td><td>481</td><td>Autodesk animation format</td></tr>
+<tr><td>PNG (encode)</td><td>pngcodec.pas</td><td>—</td><td>Encoder + decoder</td></tr>
 </table>
+
+<p><b>Print output</b> wired via prnapi.pas (267 lines) + 5 drivers:
+prnbmp (BMP), prnescp (Epson ESC/P), prnpcl (HP PCL), prnps (PostScript),
+prnraw (raw dump). Canvas→RGB24 conversion feeds the driver pipeline.</p>
+
+<p><b>MPEG-1 video</b> via mpgvdec.pas (489 lines) + mpgdemux (265) +
+mpgvbuf (199) + mpgstrm (180) + mpgplay (96). Full decode pipeline,
+frame rendering to Canvas pending YUV→RGB→EGA conversion wiring.</p>
 
 <h3>3.4 Data Tables (Whitepaper §3.8)</h3>
 
@@ -275,23 +311,96 @@ deferred to v4.0.</p>
 
 <h3>3.10 HTML Rendering (Whitepaper §4.7) — IMPLEMENTED v4.0</h3>
 
-<p class="done">IMPLEMENTED IN v4.0 IRC FORK</p>
+<p class="done">IMPLEMENTED IN v4.0 IRC FORK — OUR EXTENSION</p>
 
-<p>HTML 1.0 rendering implemented as a 5-unit stack:</p>
+<p>HTML 1.0 rendering is an <b>IRC fork extension</b> — not in any original
+TeleGrafix spec. TeleGrafix's v3/v4 whitepapers mentioned HTML as a future
+direction (§4.7 "Document Oriented Interface") but never shipped an
+implementation. We built one from scratch as a 5-unit stack totaling
+1,814 lines, rendering HTML directly to the RIP pixel buffer.</p>
+
+<p>This gives any RIPscrip-capable BBS the ability to send HTML content
+inline with RIP commands. A BBS can mix RIP graphics with HTML text
+regions — dialogs, help pages, bulletins — without requiring a separate
+browser. The HTML renders at 640×350 EGA resolution using the same
+pixel buffer and palette as RIP graphics.</p>
+
+<h4>3.10.1 Architecture — 5-Unit Pipeline</h4>
+
+<table border="1" cellpadding="4">
+<tr><th>Unit</th><th>Lines</th><th>Role</th><th>Input → Output</th></tr>
+<tr><td>htmlpars.pas</td><td>568</td><td>Tokenizer/parser</td>
+    <td>Raw HTML → token stream (tag, text, entity, comment)</td></tr>
+<tr><td>htmltree.pas</td><td>293</td><td>DOM tree builder</td>
+    <td>Token stream → node tree (128 nodes max, parent/child/sibling)</td></tr>
+<tr><td>htmllayo.pas</td><td>506</td><td>Box model layout</td>
+    <td>Node tree → positioned boxes (margins, indents, text flow, line break)</td></tr>
+<tr><td>htmlrip.pas</td><td>209</td><td>HTML-to-RIP converter</td>
+    <td>Layout boxes → RIP command sequence (for server-side conversion)</td></tr>
+<tr><td>htmlrend.pas</td><td>238</td><td>Pixel renderer</td>
+    <td>Layout boxes → direct pixel output to Canvas buffer</td></tr>
+</table>
+
+<h4>3.10.2 Supported Tags (44)</h4>
+
+<table border="1" cellpadding="4">
+<tr><th>Category</th><th>Tags</th></tr>
+<tr><td>Document</td><td>HTML, HEAD, TITLE, BODY, META</td></tr>
+<tr><td>Block</td><td>H1–H6, P, BR, HR, PRE, BLOCKQUOTE, CENTER, DIV</td></tr>
+<tr><td>Inline</td><td>B, I, U, TT, EM, STRONG, SMALL, SUB, SUP, FONT</td></tr>
+<tr><td>Lists</td><td>UL, OL, LI, DL, DT, DD</td></tr>
+<tr><td>Links/Images</td><td>A, IMG</td></tr>
+<tr><td>Tables</td><td>TABLE, TR, TD, TH, CAPTION</td></tr>
+<tr><td>Forms</td><td>FORM, INPUT, SELECT, OPTION, TEXTAREA</td></tr>
+</table>
+
+<h4>3.10.3 Features</h4>
 <ul>
-<li><b>htmlpars.pas</b> — HTML tokenizer/parser</li>
-<li><b>htmltree.pas</b> — DOM tree builder</li>
-<li><b>htmllayo.pas</b> — Box model layout engine (CSS-style)</li>
-<li><b>htmlrip.pas</b> — HTML-to-RIP command converter</li>
-<li><b>htmlrend.pas</b> — Final pixel renderer</li>
+<li>Full tokenizer with attribute parsing (key="value" and key=value)</li>
+<li>Entity decoding — named (&amp;amp; &amp;lt; etc) + numeric (&#nnn;), CP437 mapped</li>
+<li>DOM-lite tree — 128 nodes, 4 attrs/node, parent/child/sibling pointers</li>
+<li>Box model layout — margins, indents, text flow, line breaking (CSS-style)</li>
+<li>Void element detection (BR, HR, IMG, INPUT, META — no close tag needed)</li>
+<li>Auto-close for implicit containers (P, LI, DT, DD, TR, TD, TH, OPTION)</li>
+<li>Direct pixel rendering via HTMLRenderPage — draws to Canvas pixel buffer</li>
+<li>Comment and DOCTYPE support (skipped, not rendered)</li>
+<li>Malformed HTML tolerance — best-effort rendering, no crashes</li>
 </ul>
-<p>API entry points:</p>
+
+<h4>3.10.4 API Entry Points</h4>
 <ul>
 <li><b>HTMLRenderPage(Source, Len)</b> — parse HTML and render to pixel buffer</li>
-<li><b>HTMLRenderToRIP(Source, Len)</b> — convert HTML to RIP commands</li>
+<li><b>HTMLRenderToRIP(Source, Len)</b> — convert HTML to RIP commands (delegates to HTMLRenderPage)</li>
 </ul>
-<p>Document Oriented Interface via htmllayo.pas box model.
-Reference implementation: Arachne DOS browser (GPL v2, C source in
+
+<h4>3.10.5 Limitations</h4>
+<ul>
+<li>No CSS (fixed default styles per tag — bold, italic, heading sizes)</li>
+<li>No JavaScript</li>
+<li>No frames or iframes</li>
+<li>No table column width calculation (simple text flow only)</li>
+<li>No image loading (IMG tag recognized, src stored, not fetched)</li>
+<li>No form input handling (tags recognized, not interactive)</li>
+<li>No FONT color/size attributes (tag recognized, attrs stored)</li>
+<li>Text limited to 80 chars per node (stack safety on DOS)</li>
+<li>Max 128 nodes per document, 128 layout boxes per page</li>
+</ul>
+
+<h4>3.10.6 Why This Matters</h4>
+
+<p>No RIP implementation has ever had HTML rendering. The original v3/v4
+specs described it as a goal but TeleGrafix went bankrupt before shipping
+it. RIPaint 2.1 has a "Document Oriented Interface" framework but no
+HTML parser. Our implementation is the first to close that gap — and it
+runs on DOS, the platform RIPscrip was designed for.</p>
+
+<p>The pipeline design means the same HTML can be rendered client-side
+(htmlrend.pas → pixels) or converted server-side to RIP commands
+(htmlrip.pas → RIP stream) for clients that don't have the HTML stack.
+This is the pattern TeleGrafix described in their whitepaper but never
+built.</p>
+
+<p>Reference implementation: Arachne DOS browser (GPL v2, C source in
 historical/arachne-browser-source.zip) for HTML 4.0/CSS 1.0 patterns.</p>
 
 <h3>3.11 MIDI Synthesis</h3>

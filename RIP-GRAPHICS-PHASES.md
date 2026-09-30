@@ -12,8 +12,20 @@ Session 10 — 2026-09-06 (updated 2026-09-30)
 - Direct Canvas writes in rip1exec: **0** (was 25)
 - mconfig.exe: **v0.1** — FPC Graph display, keyboard input, mystic.dat I/O
 - VIPEngine: **documented** (VIPER.md) — TRIPEngine→VIPEngine rename pending
-- Remaining: render_string_attr, bgi_arrow, viewport push/pop, font loading
-- Blocked: fpc264irc ptcgraph for x86_64-linux (Patch 7b–9 done, needs push)
+- ripengine.pas: **720 lines, 45+ functions** — state, cursor, viewport (8-level push/pop stack), text window (ANSI SGR→EGA), CopyRegion, ClipLine (Cohen-Sutherland), coordinate transforms, system font, EnterGraphics/ExitGraphics, ResetRIPState
+- riptext.pas: **470 lines** — 8x8 + 8x16 bitmap fonts, CHR vector fonts (10), attributed text rendering (RenderStringAttr, GfxText API), LoadCHRFont/SetFontPath exported
+- ripicon.pas: **64-slot icon cache** — load once display many; inline ICN decoder removed from rip1exec
+- ripdraw.pas: **614 lines** — DrawArrow (24/24 BGI_WRAP complete), DrawPolygon, DrawBar3D, span-based FloodFill (2000 spans, matched RIPterm)
+- rip4ext.pas: **332 lines, zero stubs** — JPEG/GIF/PNG/HTML/Print/MPEG all wired to real decoders
+- ripscr.pas (OOP): **4,341 lines** — LoadCHR delegates to RIPText (130 lines removed), icon cache wraps ripicon, Uses RIPIcon + RIPText
+- Both engines synced (OOP wraps procedural)
+- v1 CHR font wiring: DONE — auto-load on FontNum set, shared code
+- rcQuery (`!|$`): DONE — responds RIPSCRIP015400 via QueryResponseBuf pointer
+- rcDefine/rcCopyRegion/rcReadScene/rcFileQuery/rcDelay: DONE — all L1 commands dispatched and handled
+- rip3ext.pas: **312 lines** — prnapi wired (PrintPage: Canvas→RGB24→driver), v4 inherits
+- Print chain complete: v1.54 text (mterm) → v3 graphics (rip3ext) → v4 inherited (rip4ext)
+- vipengine.pas: **323 lines, 30 exports** — procedural wrapper for TRIPEngine (VIPInit/ProcessLine/Done + draw/state/mouse/var/font/screen/copy)
+- All v1 engine units complete. No remaining stubs
 
 ## CRITICAL CORRECTION (2026-09-29)
 

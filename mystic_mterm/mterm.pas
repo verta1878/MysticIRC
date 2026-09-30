@@ -6,17 +6,28 @@
 Program mterm;
 { mterm — Mystic Terminal
   DOS-first RIP/ANSI terminal emulator.
-  MDL Console/Keyboard shell (replaces Free Vision). }
+  MDL Console/Keyboard shell (replaces Free Vision).
+
+  Graphics mode: FPC Graph unit (ptcgraph on Linux, Graph on DOS).
+  Waiting on fpc264irc compiler for ptcgraph x86_64-linux support.
+  Until then, GraphAvail = False and text-mode blit is used. }
 
 {$H+}
+
+{ Define HAVE_GRAPH when fpc264irc has ptcgraph for this target }
+{ $DEFINE HAVE_GRAPH}
 
 Uses
   SysUtils,
   m_Strings,
   m_DateTime,
   mtconn,
+  mtxfer,
   mtphone,
-  RIPEngine, RIP1Parse, RIP1Exec,
+  RIPEngine, RIPDraw, RIPText, RIP1Parse, RIP1Exec,
+  {$IFDEF HAVE_GRAPH}
+    {$IFDEF UNIX}ptcgraph{$ELSE}Graph{$ENDIF},
+  {$ENDIF}
   {$IFDEF WINDOWS}
     m_Input_Windows,
     m_Output_Windows
@@ -36,8 +47,8 @@ Const
   STATUS_Y = 24;
   HELP_Y   = 25;
 
-  mtermVersion = '0.2';
-  mtermBuild   = '2026.08.16';
+  mtermVersion = '0.3';
+  mtermBuild   = '2026-09-30';
   mtermCrew    = 'verta1878 / sysop/0 / evga / kiddo / wrench';
 
   TERM_COLS = 80;
@@ -101,6 +112,12 @@ Var
   BytesIn    : LongInt;
   BytesOut   : LongInt;
 
+  { Character pacing — ANSI animation speed control }
+  PacingCPS  : LongInt;     { chars per second (0 = no throttle, full speed) }
+  PacingUS   : LongInt;     { microseconds per char (computed from CPS) }
+  PacingMode : Byte;        { 0=off, 1=9600, 2=19200, 3=38400, 4=57600, 5=custom }
+  PacingLast : Int64;       { timestamp of last char rendered (microseconds) }
+
   { Connection object }
   Conn       : TConnection;
 
@@ -113,6 +130,12 @@ Var
   RIPInited  : Boolean;        { true after InitCanvas called }
   RIPLineBuf : String;         { accumulate bytes until CR/LF }
   RIPActive  : Boolean;      { true when inside a RIP command sequence }
+
+  { Graphics mode state }
+  GraphMode  : Boolean;        { true = pixel output to Graph screen }
+  GraphAvail : Boolean;        { true = FPC Graph unit initialized OK }
+  TextWinY1  : Integer;        { text window top in pixel rows (RIP bottom 4 rows) }
+  TextWinActive : Boolean;     { true = RIP text window is open }
 
 { ====================================================================
   Drawing
@@ -142,6 +165,8 @@ Begin
   If RIPMode Then Left := Left + ' RIP'
   Else Left := Left + ' ANSI';
 
+  If PacingCPS > 0 Then Left := Left + ' ' + PacingLabel;
+
   If Capturing Then Left := Left + ' CAP';
 
   { Right side: elapsed time + bytes }
@@ -164,7 +189,7 @@ End;
 Procedure DrawHelpBar;
 Begin
   Console.WriteXY(1, HELP_Y, $30,
-    StrPadR(' ^B=Conn ^D=Disc ^P=Phone ^R=RIP ALT+A=ANSI ALT+C=Cap ALT+O=Cfg', TERM_W, ' '));
+    StrPadR(' ^B=Conn ^D=Disc ^R=RIP ALT+A=ANSI ALT+C=Cap ALT+P=Print', TERM_W, ' '));
 End;
 
 Procedure DumpScreen;
@@ -476,17 +501,109 @@ Begin
     '!': Begin { RIP auto-sense }
       { ESC[! or ESC[0! = query, ESC[1! = disable RIP, ESC[2! = enable RIP }
       Case Parts[0] of
-        0: ; { Query — would send RIPSCRIP015400 back }
-        1: RIPMode := False;
-        2: RIPMode := True;
+        0: Begin { Query — respond with RIPSCRIP version }
+          ResponseBuf := ResponseBuf + 'RIPSCRIP015400';
+        End;
+        1: Begin { Disable RIP }
+          If RIPMode Then Begin
+            RIPMode := False;
+            LeaveRIPGraphics;
+          End;
+        End;
+        2: Begin { Enable RIP }
+          If Not RIPMode Then Begin
+            RIPMode := True;
+            EnterRIPGraphics;
+          End;
+        End;
       End;
     End;
   End;
 End;
 
+{ ====================================================================
+  Graphics Mode — RIP pixel display via FPC Graph unit
+  Waiting on fpc264irc ptcgraph for x86_64-linux.
+  When HAVE_GRAPH is defined, these use real Graph calls.
+  Otherwise they're stubs and text-mode blit is the fallback.
+  ==================================================================== }
+
+Function InitGraphMode: Boolean;
+{ Try to enter 640x350 EGA graphics mode via FPC Graph.
+  Returns True if successful, False if Graph not available. }
+{$IFDEF HAVE_GRAPH}
+Var Gd, Gm: SmallInt;
+{$ENDIF}
+Begin
+  Result := False;
+  {$IFDEF HAVE_GRAPH}
+  Gd := EGA;
+  Gm := EGAHi;
+  InitGraph(Gd, Gm, '');
+  If GraphResult = grOk Then Begin
+    Result := True;
+  End;
+  {$ENDIF}
+End;
+
+Procedure ExitGraphMode;
+{ Return from graphics mode to text mode }
+Begin
+  {$IFDEF HAVE_GRAPH}
+  CloseGraph;
+  {$ENDIF}
+End;
+
+Procedure FlushCanvasToScreen;
+{ Copy RIP canvas pixels to the Graph screen.
+  Called after each RIP command batch to update display. }
+{$IFDEF HAVE_GRAPH}
+Var X, Y: Integer;
+{$ENDIF}
+Begin
+  If Not GraphAvail Then Exit;
+  {$IFDEF HAVE_GRAPH}
+  For Y := 0 To RIP_HEIGHT - 1 Do
+    For X := 0 To RIP_WIDTH - 1 Do
+      {$IFDEF UNIX}ptcgraph{$ELSE}Graph{$ENDIF}.PutPixel(X, Y, Canvas.Pixels^[X, Y]);
+  {$ENDIF}
+End;
+
+Procedure EnterRIPGraphics;
+{ Switch to graphics mode when RIP activates.
+  Initializes canvas + Graph screen. Falls back to text blit if no Graph. }
+Begin
+  If Not RIPInited Then Begin
+    InitCanvas;
+    EnterGraphics;
+    RIPInited := True;
+  End;
+  GraphAvail := InitGraphMode;
+  GraphMode := GraphAvail;
+  TextWinY1 := RIP_HEIGHT - (4 * 8);  { Bottom 4 rows = text window area }
+  TextWinActive := False;
+  If Not GraphAvail Then Begin
+    { Stub — text-mode blit fallback until fpc264irc has ptcgraph }
+  End;
+End;
+
+Procedure LeaveRIPGraphics;
+{ Switch back to text mode when RIP deactivates. }
+Begin
+  If GraphAvail Then Begin
+    ExitGraphMode;
+    GraphAvail := False;
+    GraphMode := False;
+  End;
+  { Redraw text screen }
+  Console.ClearScreen;
+  DrawScreen;
+End;
+
 Procedure RIPBlitToTerminal;
 { Copy RIP engine pixel buffer to mterm's terminal Buffer.
-  Maps 640x176 pixels (top 22 rows × 8px) to 80×22 character cells.
+  When GraphMode = True, pixels go to Graph screen via FlushCanvasToScreen.
+  When GraphMode = False (no Graph), maps 640x176 pixels to 80×22 cells.
   Each cell becomes a block char (219) colored by the dominant pixel. }
 Var
   Row, Col: Integer;
@@ -494,15 +611,52 @@ Var
   BufLine: Integer;
 Begin
   If Not RIPInited Then Exit;
+
+  If GraphMode Then Begin
+    { Real pixel output — direct to Graph screen }
+    FlushCanvasToScreen;
+    Exit;
+  End;
+
+  { Text-mode fallback — block char approximation }
   For Row := 0 To TERM_ROWS - 1 Do Begin
     BufLine := (BufTop + Row) Mod SCROLLBACK;
     For Col := 0 To TERM_COLS - 1 Do Begin
-      { Canvas.Pixels is [X, Y] }
       PIdx := Canvas.Pixels^[Col * 8, Row * 8];
       If PIdx > 15 Then PIdx := 0;
       Buffer[BufLine, Col].Ch := Chr(219);
       Buffer[BufLine, Col].Attr := PIdx;
     End;
+  End;
+End;
+
+Procedure TWRenderChar(Ch: Byte);
+{ Render one character into the RIP text window on the canvas.
+  Uses 8x16 bitmap font with current text window attribute.
+  Called when RIPMode is on and text window is active. }
+Var PX, PY: Integer;
+Begin
+  If Not Canvas.TextWin.Active Then Exit;
+  If Ch < 32 Then Exit; { Control chars handled by caller }
+  PX := Canvas.TextWin.X0 + (Canvas.TextWin.CurCol * Canvas.TextWin.FontW);
+  PY := Canvas.TextWin.Y0 + (Canvas.TextWin.CurRow * Canvas.TextWin.FontH);
+  If Canvas.TextWin.FontH = 16 Then
+    DrawBitmapChar16(Ch, PX, PY, Canvas.TextWin.Attr And $0F,
+                     (Canvas.TextWin.Attr Shr 4) And $07)
+  Else
+    RenderCharAttr(PX, PY, Ch, Canvas.TextWin.Attr);
+  { Advance cursor }
+  Inc(Canvas.TextWin.CurCol);
+  If Canvas.TextWin.CurCol >= Canvas.TextWin.Cols Then Begin
+    If Canvas.TextWin.Wrap Then Begin
+      Canvas.TextWin.CurCol := 0;
+      Inc(Canvas.TextWin.CurRow);
+      If Canvas.TextWin.CurRow >= Canvas.TextWin.Rows Then Begin
+        TextWinScroll(1);
+        Canvas.TextWin.CurRow := Canvas.TextWin.Rows - 1;
+      End;
+    End Else
+      Canvas.TextWin.CurCol := Canvas.TextWin.Cols - 1;
   End;
 End;
 
@@ -512,6 +666,10 @@ Begin
   If Length(Line) < 2 Then Exit;
   { Feed full line to procedural executor }
   ExecuteRIP(Line);
+  { Update mterm text window state from canvas }
+  TextWinActive := Canvas.TextWin.Active;
+  If TextWinActive Then
+    TextWinY1 := Canvas.TextWin.Y0;
   RIPBlitToTerminal;
   DrawTerminal;
 End;
@@ -543,7 +701,29 @@ Begin
         RIPLineBuf := '';
         Exit;
       End;
-      { Not a RIP line — flush buffer through ANSI, then process CR/LF }
+      { Not a RIP line — route through text window if active }
+      If Canvas.TextWin.Active Then Begin
+        { Flush accumulated text to canvas text window }
+        If Length(RIPLineBuf) > 0 Then Begin
+          For RecvI := 1 To Length(RIPLineBuf) Do
+            TWRenderChar(Ord(RIPLineBuf[RecvI]));
+          RIPLineBuf := '';
+        End;
+        { Process CR/LF in text window }
+        If Ch = #13 Then Canvas.TextWin.CurCol := 0;
+        If Ch = #10 Then Begin
+          Inc(Canvas.TextWin.CurRow);
+          If Canvas.TextWin.CurRow >= Canvas.TextWin.Rows Then Begin
+            TextWinScroll(1);
+            Canvas.TextWin.CurRow := Canvas.TextWin.Rows - 1;
+          End;
+        End;
+        { Blit text window area to display }
+        RIPBlitToTerminal;
+        DrawTerminal;
+        Exit;
+      End;
+      { No text window — flush through ANSI as before }
       If Length(RIPLineBuf) > 0 Then Begin
         RIPActive := True;
         FlushRIPBuf;
@@ -787,8 +967,16 @@ Begin
   End;
 End;
 
+Procedure XferStatus(Const Msg: String);
+Begin
+  AddLine(Msg);
+  DrawTerminal;
+  Console.BufFlush;
+End;
+
 Procedure SendFileDialog;
 Var FName: String;
+    Xfer: TFileTransfer;
 Begin
   FName := '';
   If InputDialog('Send File', 'Filename:', FName) Then Begin
@@ -800,21 +988,156 @@ Begin
       AddLine('Not connected.');
       Exit;
     End;
-    AddLine('Sending: ' + FName);
-    { TODO: wire to mtxfer Zmodem/Ymodem send }
-    AddLine('TODO: File transfer not wired yet');
+    If Not FileExists(FName) Then Begin
+      AddLine('File not found: ' + FName);
+      Exit;
+    End;
+    AddLine('Sending: ' + FName + ' (Zmodem)');
+    XferOnStatus := @XferStatus;
+    Xfer := TFileTransfer.Create(Conn);
+    Try
+      If Xfer.Send(FName, xpZmodem) Then
+        AddLine('Send complete.')
+      Else
+        AddLine('Send failed.');
+    Finally
+      Xfer.Free;
+    End;
+    DrawStatusBar;
   End;
 End;
 
 Procedure RecvFileDialog;
+Var Xfer: TFileTransfer;
 Begin
   If Not Connected Then Begin
     AddLine('Not connected.');
     Exit;
   End;
-  AddLine('Receiving file (Zmodem auto-detect)...');
-  { TODO: wire to mtxfer Zmodem receive }
-  AddLine('TODO: File transfer not wired yet');
+  AddLine('Receiving file (Zmodem)...');
+  XferOnStatus := @XferStatus;
+  Xfer := TFileTransfer.Create(Conn);
+  Try
+    Xfer.DownloadPath := '.';
+    If Xfer.Receive('.', xpZmodem) Then
+      AddLine('Receive complete.')
+    Else
+      AddLine('Receive failed or cancelled.');
+  Finally
+    Xfer.Free;
+  End;
+  DrawStatusBar;
+End;
+
+{ ====================================================================
+  Print API — v1.54 text scrollback print
+  Matched to RIPterm PRINTER.C: printer_not_setup, print_buffer_or_page
+  DOS: BIOS INT 17h to LPT1-3
+  Linux/Win: output to file (mterm_print.txt)
+  ==================================================================== }
+
+Var
+  PrinterPort : Integer;  { 0=none, 1=LPT1, 2=LPT2, 3=LPT3 }
+
+{$IFDEF GO32V2}
+Procedure LPTPutChar(Port: Integer; Ch: Byte);
+{ Send one byte to parallel printer via BIOS INT 17h }
+Var Regs: Registers;
+Begin
+  Regs.AH := 0;       { function 0 = print character }
+  Regs.AL := Ch;
+  Regs.DX := Port - 1; { LPT1=0, LPT2=1, LPT3=2 }
+  Intr($17, Regs);
+End;
+{$ENDIF}
+
+Procedure PrintScrollback(ToFile: Boolean);
+{ Print terminal scrollback buffer — page or entire buffer.
+  Matched to RIPterm print_buffer_or_page. }
+Var
+  F: Text;
+  Y, X, StartLine, EndLine, BufLine: Integer;
+  Line: String;
+  PrintAll: Boolean;
+  FName: String;
+Begin
+  PrintAll := True; { TODO: Page vs Buffer dialog }
+
+  If ToFile Then Begin
+    FName := 'mterm_print.txt';
+    Assign(F, FName);
+    {$I-} ReWrite(F); {$I+}
+    If IOResult <> 0 Then Begin
+      AddLine('Cannot open print file: ' + FName);
+      Exit;
+    End;
+  End;
+
+  If PrintAll Then Begin
+    StartLine := 0;
+    EndLine := TERM_ROWS - 1;
+    If TotalLines > TERM_ROWS Then
+      EndLine := TERM_ROWS - 1; { visible page }
+  End Else Begin
+    StartLine := 0;
+    EndLine := TERM_ROWS - 1;
+  End;
+
+  AddLine('Printing scrollback...');
+
+  For Y := StartLine To EndLine Do Begin
+    BufLine := (BufTop + Y) Mod SCROLLBACK;
+    Line := '';
+    For X := 0 To TERM_COLS - 1 Do
+      Line := Line + Buffer[BufLine, X].Ch;
+    { Trim trailing spaces }
+    While (Length(Line) > 0) And (Line[Length(Line)] = ' ') Do
+      SetLength(Line, Length(Line) - 1);
+
+    If ToFile Then
+      WriteLn(F, Line)
+    {$IFDEF GO32V2}
+    Else If PrinterPort > 0 Then Begin
+      For X := 1 To Length(Line) Do
+        LPTPutChar(PrinterPort, Ord(Line[X]));
+      LPTPutChar(PrinterPort, 13);
+      LPTPutChar(PrinterPort, 10);
+    End
+    {$ENDIF}
+    ;
+  End;
+
+  If ToFile Then Begin
+    Close(F);
+    AddLine('Printed to: ' + FName);
+  End
+  {$IFDEF GO32V2}
+  Else
+    AddLine('Printed to LPT' + Chr(Ord('0') + PrinterPort))
+  {$ENDIF}
+  ;
+End;
+
+Procedure PrintDialog;
+{ Print scrollback — choose file or printer (DOS only) }
+{$IFDEF GO32V2}
+Var Choice: String;
+{$ENDIF}
+Begin
+  {$IFDEF GO32V2}
+  If PrinterPort > 0 Then Begin
+    Choice := 'F';
+    If InputDialog('Print', 'F=File P=Printer:', Choice) Then Begin
+      If (Choice = 'P') Or (Choice = 'p') Then
+        PrintScrollback(False)
+      Else
+        PrintScrollback(True);
+    End;
+  End Else
+    PrintScrollback(True);
+  {$ELSE}
+  PrintScrollback(True);
+  {$ENDIF}
 End;
 
 Procedure ViewANSIDialog;
@@ -840,8 +1163,16 @@ Begin
     End;
     Repeat
       BlockRead(F, Buf, SizeOf(Buf), N);
-      For I := 0 to N - 1 Do
+      For I := 0 to N - 1 Do Begin
         TermProcessByte(Buf[I]);
+        If PacingCPS > 0 Then Begin
+          If (I And 7) = 7 Then Begin
+            DrawTerminal;
+            Console.BufFlush;
+          End;
+          PacingWait;
+        End;
+      End;
     Until N = 0;
     Close(F);
     DrawTerminal;
@@ -910,11 +1241,15 @@ Begin
   If Capturing Then Console.WriteXY(16, 13, $0C, 'ON')
   Else Console.WriteXY(16, 13, $07, 'OFF');
 
-  Console.WriteXY(3, 15, $0E, 'Terminal');
-  Console.WriteXY(5, 16, $07, 'Scrollback: ' + strI2S(TotalLines) + ' lines');
-  Console.WriteXY(5, 17, $07, 'Version:    mterm v' + mtermVersion);
+  Console.WriteXY(5, 14, $07, 'Pacing:    ');
+  If PacingCPS > 0 Then Console.WriteXY(16, 14, $0B, PacingLabel + ' baud')
+  Else Console.WriteXY(16, 14, $07, 'OFF (full speed)');
 
-  Console.WriteXY(1, 25, $70, StrPadR(' R=RIP  C=Capture  ESC=Back to terminal', TERM_W, ' '));
+  Console.WriteXY(3, 16, $0E, 'Terminal');
+  Console.WriteXY(5, 17, $07, 'Scrollback: ' + strI2S(TotalLines) + ' lines');
+  Console.WriteXY(5, 18, $07, 'Version:    mterm v' + mtermVersion);
+
+  Console.WriteXY(1, 25, $70, StrPadR(' R=RIP  C=Capture  P=Pacing  ESC=Back to terminal', TERM_W, ' '));
 End;
 
 Procedure FlipPage;
@@ -955,8 +1290,15 @@ Begin
         #64: RecvFileDialog;     { F6 }
         #67: Begin               { F9 = Toggle RIP }
           RIPMode := Not RIPMode;
-          If RIPMode Then AddLine('*** RIP mode ON')
-          Else AddLine('*** RIP mode OFF');
+          If RIPMode Then Begin
+            EnterRIPGraphics;
+            AddLine('*** RIP mode ON');
+            If Not GraphAvail Then
+              AddLine('*** Graphics stub — waiting on fpc264irc ptcgraph');
+          End Else Begin
+            LeaveRIPGraphics;
+            AddLine('*** RIP mode OFF');
+          End;
           DrawStatusBar;
         End;
         #45: Done := True;       { ALT+X = Exit }
@@ -971,6 +1313,7 @@ Begin
         #31: SendFileDialog;     { ALT+S = Send file }
         #19: RecvFileDialog;     { ALT+R = Recv file }
         #32: DumpScreen;         { ALT+D = Dump screen }
+        #25: PrintDialog;        { ALT+P = Print scrollback }
       End;
     End;
     #2:  ConnectDialog;          { CTRL+B }
@@ -983,8 +1326,15 @@ Begin
     #16: PhonebookDialog;        { CTRL+P }
     #18: Begin                   { CTRL+R = Toggle RIP }
       RIPMode := Not RIPMode;
-      If RIPMode Then AddLine('*** RIP mode ON')
-      Else AddLine('*** RIP mode OFF');
+      If RIPMode Then Begin
+        EnterRIPGraphics;
+        AddLine('*** RIP mode ON');
+        If Not GraphAvail Then
+          AddLine('*** Graphics stub — waiting on fpc264irc ptcgraph');
+      End Else Begin
+        LeaveRIPGraphics;
+        AddLine('*** RIP mode OFF');
+      End;
       DrawStatusBar;
     End;
   Else
@@ -1015,12 +1365,63 @@ Begin
       Capturing := Not Capturing;
       DrawSettingsPage;
     End;
+    'P', 'p': Begin { Cycle pacing mode }
+      Inc(PacingMode);
+      If PacingMode > 5 Then PacingMode := 0;
+      Case PacingMode Of
+        0: Begin PacingCPS := 0;     PacingUS := 0; End;       { Off — full speed }
+        1: Begin PacingCPS := 960;   PacingUS := 1042; End;    { 9600 baud }
+        2: Begin PacingCPS := 1920;  PacingUS := 521; End;     { 19200 baud }
+        3: Begin PacingCPS := 3840;  PacingUS := 260; End;     { 38400 baud }
+        4: Begin PacingCPS := 5760;  PacingUS := 174; End;     { 57600 baud }
+        5: Begin PacingCPS := 240;   PacingUS := 4167; End;    { 2400 baud (retro) }
+      End;
+      DrawSettingsPage;
+    End;
   End;
 End;
 
 { ====================================================================
-  Main
+  Character Pacing — ANSI animation speed control
   ==================================================================== }
+
+Function GetMicroseconds: Int64;
+{ Platform microsecond timer for pacing }
+Begin
+  {$IFDEF UNIX}
+  Result := Int64(TimerSeconds) * 1000000;
+  {$ELSE}
+  Result := Int64(TimerSeconds) * 1000000;
+  {$ENDIF}
+End;
+
+Procedure PacingWait;
+{ Wait until enough time has passed for the next character.
+  Called between each byte when pacing is enabled.
+  Uses busy-wait for sub-millisecond accuracy. }
+Var Now, Target: Int64;
+Begin
+  If PacingUS = 0 Then Exit;
+  Target := PacingLast + PacingUS;
+  Repeat
+    Now := GetMicroseconds;
+  Until Now >= Target;
+  PacingLast := Now;
+End;
+
+Function PacingLabel: String;
+{ Return current pacing mode label for status/settings display }
+Begin
+  Case PacingMode Of
+    0: Result := 'OFF';
+    1: Result := '9600';
+    2: Result := '19200';
+    3: Result := '38400';
+    4: Result := '57600';
+    5: Result := '2400';
+  Else Result := '?';
+  End;
+End;
 
 Begin
   {$IFDEF WINDOWS}
@@ -1038,6 +1439,10 @@ Begin
   RIPLineBuf := '';
   RIPActive  := False;
   RIPMode    := False;
+  GraphMode  := False;
+  GraphAvail := False;
+  TextWinY1  := 0;
+  TextWinActive := False;
   Capturing  := False;
   Done       := False;
   ActivePage := 0;
@@ -1048,6 +1453,11 @@ Begin
   ConnStart  := 0;
   BytesIn    := 0;
   BytesOut   := 0;
+  PacingCPS  := 0;
+  PacingUS   := 0;
+  PacingMode := 0;
+  PacingLast := 0;
+  PrinterPort := 0;  { no printer by default; set via settings }
   MsgCount   := 0;
 
   TermInit;
@@ -1067,8 +1477,17 @@ Begin
     If Connected And Conn.DataAvailable Then Begin
       RecvN := Conn.Receive(RecvBuf, SizeOf(RecvBuf));
       If RecvN > 0 Then Begin
-        For RecvI := 0 to RecvN - 1 Do
+        For RecvI := 0 to RecvN - 1 Do Begin
           TermProcessByte(RecvBuf[RecvI]);
+          If PacingCPS > 0 Then Begin
+            { Throttled — draw after each char for animation effect }
+            If (RecvI And 7) = 7 Then Begin
+              DrawTerminal;
+              Console.BufFlush;
+            End;
+            PacingWait;
+          End;
+        End;
         Inc(BytesIn, RecvN);
         DrawTerminal;
       End Else If RecvN < 0 Then Begin

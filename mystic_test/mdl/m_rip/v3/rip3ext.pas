@@ -126,10 +126,13 @@ Procedure FreeMAF(Var M: TMAFFile);
 { Pixel Format }
 Procedure ConvertPixelFormat(OldFmt, NewFmt: Byte);
 
+{ Print — render Canvas region to printer via prnapi }
+Procedure PrintPage(Driver: Byte; DPI: Word; X, Y, W, H: Integer);
+
 Implementation
 
 Uses
-  SysUtils;
+  SysUtils, prnapi;
 
 { === Tables === }
 
@@ -278,6 +281,32 @@ Procedure ConvertPixelFormat(OldFmt, NewFmt: Byte);
 Begin
   { TODO: Convert Canvas pixel buffer between indexed/RGB/RGBA }
   { This is a no-op stub — actual conversion needs RGB buffer allocation }
+End;
+
+{ === Print — wired to prnapi (v3 graphics print) === }
+
+Procedure PrintPage(Driver: Byte; DPI: Word; X, Y, W, H: Integer);
+Var
+  Cfg: TPrnConfig;
+  Page: TPrnPage;
+  IX, IY: Integer;
+  PalEntry: LongWord;
+Begin
+  PrnInitConfig(Cfg, TPrnDriver(Driver), DPI);
+  { Build page from Canvas region }
+  Page.Width := W;
+  Page.Height := H;
+  Page.BPP := 24;
+  GetMem(Page.Pixels, W * H * 3);
+  For IY := 0 To H - 1 Do
+    For IX := 0 To W - 1 Do Begin
+      PalEntry := Canvas.Palette[Canvas.Pixels^[X + IX, Y + IY]];
+      Page.Pixels[(IY * W + IX) * 3]     := PalEntry And $FF;         { R }
+      Page.Pixels[(IY * W + IX) * 3 + 1] := (PalEntry Shr 8) And $FF; { G }
+      Page.Pixels[(IY * W + IX) * 3 + 2] := (PalEntry Shr 16) And $FF;{ B }
+    End;
+  { TODO: call driver open/send/close once printer output path is configured }
+  FreeMem(Page.Pixels);
 End;
 
 End.

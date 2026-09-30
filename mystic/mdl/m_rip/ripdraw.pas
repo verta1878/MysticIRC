@@ -56,6 +56,9 @@ Procedure DrawArcLines(CX, CY, StAngle, EndAngle, XRad, YRad: Integer; Color: By
 Procedure DrawSector(CX, CY, StAngle, EndAngle, XRad, YRad: Integer;
                      OutColor, FillCol: Byte);
 Procedure FillPolyScanline(NPts: Integer; Var Pts: Array Of Integer; Color: Byte);
+Procedure DrawPolygon(NPts: Integer; Var Pts: Array Of Integer; Color: Byte);
+Procedure DrawBar3D(X1, Y1, X2, Y2, Depth: Integer; TopFlag: Boolean; Color: Byte);
+Procedure DrawArrow(X, Y, Size: Integer; Direction: Byte);
 
 { Phase 2 — BGI state setters }
 Procedure SetLineStyle(Style: Byte; Thick: Integer);
@@ -296,92 +299,92 @@ Begin
 End;
 
 Procedure FloodFill(X0, Y0: Integer; Border: Byte);
-{ Scanline flood fill — matched exactly to RIPtermJS BGI.js _floodfill.
-  
-  KEY DIFFERENCES from our previous implementation:
-  1. Scanline finder (x1, x2) ONLY checks border on main canvas
-     — does NOT check visited buffer. This ensures full scanlines
-     are processed even if parts were visited in a previous pass.
-  2. Span detection checks visited buffer (fillpixels) to avoid
-     re-queueing already-processed areas.
-  3. Edge pixels at viewport boundaries are skipped in span detection
-     (matches JS "intentional bug to prevent flooding through edges").
-  4. Uses heap-allocated visited buffer (224KB of booleans).
-  
-  BUG FIX (Session 6 Run 16): Previous version checked Visited in
-  scanline finder which caused fills to stop at pattern gaps and
-  fill outside shapes instead of inside (DRAGON01 green background). }
+{ Span-based scanline flood fill — matched to RIPterm's BGI_CORE.C scanline_fill.
+  Uses a span stack (x1, x2, y, dy) instead of a point stack + visited buffer.
+  RIPterm uses FILL_STACK_SIZE = 2000; we match this limit exactly.
+
+  Key differences from our previous implementation:
+  - No 224KB visited buffer — checks fill_color instead
+  - Span stack (2000 entries) vs point stack (65536 entries)
+  - Pushes entire horizontal spans, not individual pixels
+  - Matches RIPterm's stack overflow behavior for edge cases
+
+  BUG HISTORY: Previous version used point stack + visited buffer.
+  Worked correctly but used 224KB heap + 128KB stack. This version
+  uses ~24KB total (2000 * 12 bytes). }
+Const
+  FILL_STACK_SIZE = 2000;
 Type
-  TPoint = Record X, Y: Integer; End;
-  TVisited = Array[0..RIP_WIDTH-1, 0..RIP_HEIGHT-1] Of Boolean;
-  PVisited = ^TVisited;
+  TFillSpan = Record X1, X2, Y, DY: Integer; End;
 Var
-  Stack: Array[0..65535] Of TPoint;
-  Visited: PVisited;
-  SP, X, Y, X1, X2: Integer;
-  SpanUp, SpanDn: Boolean;
+  Stack: Array[0..FILL_STACK_SIZE - 1] Of TFillSpan;
+  SP: Integer;
+  FillCol: Byte;
+  MaxX, MaxY: Integer;
+  LX, RX, NY, X1, X2, PY, DY: Integer;
+  I: Integer;
 
-Begin
-  If (X0 < 0) Or (X0 >= RIP_WIDTH) Or (Y0 < 0) Or (Y0 >= RIP_HEIGHT) Then Exit;
-  If GetPixel(X0, Y0) = Border Then Exit;
-
-  New(Visited);
-  FillChar(Visited^, SizeOf(TVisited), 0);
-
-  SP := 0;
-  Stack[SP].X := X0; Stack[SP].Y := Y0; Inc(SP);
-
-  While SP > 0 Do Begin
-    Dec(SP); X := Stack[SP].X; Y := Stack[SP].Y;
-
-    { Find left end — ONLY check border on canvas, NOT visited }
-    X1 := X;
-    While (X1 >= 0) And (GetPixel(X1, Y) <> Border) Do Dec(X1);
-    Inc(X1);
-
-    { Find right end — ONLY check border on canvas, NOT visited }
-    X2 := X + 1;
-    While (X2 < RIP_WIDTH) And (GetPixel(X2, Y) <> Border) Do Inc(X2);
-    Dec(X2);
-
-    SpanUp := False; SpanDn := False;
-
-    For X := X1 to X2 Do Begin
-      { Draw pixel with fill pattern }
-      PutFillPixel(X, Y, Canvas.FillColor);
-      { Mark as visited }
-      Visited^[X, Y] := True;
-
-      { Skip edge pixels — matches JS viewport edge prevention }
-      If (X <= 0) Or (X >= RIP_WIDTH - 1) Then Continue;
-
-      { Check span above — use visited buffer for detection }
-      If (Not SpanUp) And (Y > 0) And
-         (GetPixel(X, Y-1) <> Border) And
-         (Not Visited^[X, Y-1]) Then Begin
-        If SP < 65535 Then Begin
-          Stack[SP].X := X; Stack[SP].Y := Y-1; Inc(SP);
-        End;
-        SpanUp := True;
-      End Else If SpanUp And (Y > 0) And
-         (GetPixel(X, Y-1) = Border) Then
-        SpanUp := False;
-
-      { Check span below }
-      If (Not SpanDn) And (Y < RIP_HEIGHT - 1) And
-         (GetPixel(X, Y+1) <> Border) And
-         (Not Visited^[X, Y+1]) Then Begin
-        If SP < 65535 Then Begin
-          Stack[SP].X := X; Stack[SP].Y := Y+1; Inc(SP);
-        End;
-        SpanDn := True;
-      End Else If SpanDn And (Y < RIP_HEIGHT - 1) And
-         (GetPixel(X, Y+1) = Border) Then
-        SpanDn := False;
+  Procedure FillPush(AX1, AX2, AY, ADY: Integer);
+  Begin
+    If SP < FILL_STACK_SIZE Then Begin
+      Stack[SP].X1 := AX1;
+      Stack[SP].X2 := AX2;
+      Stack[SP].Y := AY;
+      Stack[SP].DY := ADY;
+      Inc(SP);
     End;
   End;
 
-  Dispose(Visited);
+  Function FillPop(Var AX1, AX2, AY, ADY: Integer): Boolean;
+  Begin
+    If SP <= 0 Then Begin Result := False; Exit; End;
+    Dec(SP);
+    AX1 := Stack[SP].X1;
+    AX2 := Stack[SP].X2;
+    AY  := Stack[SP].Y;
+    ADY := Stack[SP].DY;
+    Result := True;
+  End;
+
+Begin
+  If (X0 < 0) Or (X0 >= RIP_WIDTH) Or (Y0 < 0) Or (Y0 >= RIP_HEIGHT) Then Exit;
+
+  FillCol := Canvas.FillColor;
+  MaxX := RIP_WIDTH - 1;
+  MaxY := RIP_HEIGHT - 1;
+
+  { Don't fill if seed is border or already fill color }
+  If (GetPixel(X0, Y0) = Border) Or (GetPixel(X0, Y0) = FillCol) Then Exit;
+
+  SP := 0;
+  FillPush(X0, X0, Y0, 1);
+  FillPush(X0, X0, Y0 - 1, -1);
+
+  While FillPop(X1, X2, PY, DY) Do Begin
+    NY := PY + DY;
+    If (NY < 0) Or (NY > MaxY) Then Continue;
+
+    { Scan left from X1 }
+    LX := X1;
+    While (LX > 0) And (GetPixel(LX - 1, NY) <> Border) And
+          (GetPixel(LX - 1, NY) <> FillCol) Do Dec(LX);
+
+    { Scan right from X1 }
+    RX := X1;
+    While (RX < MaxX) And (GetPixel(RX + 1, NY) <> Border) And
+          (GetPixel(RX + 1, NY) <> FillCol) Do Inc(RX);
+
+    { Fill the span with pattern }
+    For I := LX To RX Do
+      PutFillPixel(I, NY, FillCol);
+
+    { Push span for next scanline in same direction }
+    FillPush(LX, RX, NY, DY);
+
+    { Check for turns — spans that extend beyond the parent }
+    If LX < X1 Then FillPush(LX, X1 - 1, NY, -DY);
+    If RX > X2 Then FillPush(X2 + 1, RX, NY, -DY);
+  End;
 End;
 Procedure DrawBezier(NumSeg: Integer; Pts: Array Of Integer; Color: Byte);
 { Cubic bezier curve. NumSeg line segments from P0 to P3.
@@ -529,6 +532,83 @@ Begin
   Canvas.ViewY1 := Y1;
   Canvas.ViewX2 := X2;
   Canvas.ViewY2 := Y2;
+End;
+
+Procedure DrawPolygon(NPts: Integer; Var Pts: Array Of Integer; Color: Byte);
+{ Draw an unfilled polygon outline — connects consecutive point pairs
+  and closes back to the first point. Pts = [x0,y0, x1,y1, ...].
+  Ported from ripscr.pas TRIPEngine.DrawPolygon. }
+Var I, X1, Y1, X2, Y2: Integer;
+Begin
+  If NPts < 2 Then Exit;
+  For I := 0 To NPts - 2 Do Begin
+    X1 := Pts[I * 2];     Y1 := Pts[I * 2 + 1];
+    X2 := Pts[(I+1) * 2]; Y2 := Pts[(I+1) * 2 + 1];
+    DrawLine(X1, Y1, X2, Y2, Color);
+  End;
+  { Close polygon — last point to first }
+  DrawLine(Pts[(NPts-1)*2], Pts[(NPts-1)*2+1], Pts[0], Pts[1], Color);
+End;
+
+Procedure DrawBar3D(X1, Y1, X2, Y2, Depth: Integer; TopFlag: Boolean; Color: Byte);
+{ Draw a 3D bar — filled front face + 3D depth lines on right and top.
+  Matched to RIPterm L1 'O' command and BGI Bar3D.
+  Front face filled with current fill style/color.
+  Depth lines drawn with Color (outline color). }
+Var FillCol: Byte;
+Begin
+  { Fill front face }
+  FillCol := Canvas.FillColor;
+  FillRect(X1, Y1, X2, Y2, FillCol);
+  { Outline front face }
+  DrawRect(X1, Y1, X2, Y2, Color);
+  { Right side depth }
+  If Depth > 0 Then Begin
+    DrawLine(X2, Y1, X2 + Depth, Y1 - Depth, Color);
+    DrawLine(X2 + Depth, Y1 - Depth, X2 + Depth, Y2 - Depth, Color);
+    DrawLine(X2, Y2, X2 + Depth, Y2 - Depth, Color);
+    { Top face }
+    If TopFlag Then Begin
+      DrawLine(X1, Y1, X1 + Depth, Y1 - Depth, Color);
+      DrawLine(X1 + Depth, Y1 - Depth, X2 + Depth, Y1 - Depth, Color);
+    End;
+  End;
+End;
+
+Procedure DrawArrow(X, Y, Size: Integer; Direction: Byte);
+{ Draw a filled arrow pointing in a direction.
+  Direction: 0=right, 1=down, 2=left, 3=up.
+  Matched to RIPterm BGI_WRAP.C bgi_arrow — last of 24 BGI_WRAP functions.
+  Uses FillPolyScanline for the filled triangle. }
+Var
+  Half: Integer;
+  Pts: Array[0..5] Of Integer;
+Begin
+  Half := Size Div 2;
+  Case Direction Of
+    0: Begin { Right }
+      Pts[0] := X;        Pts[1] := Y - Half;
+      Pts[2] := X + Size; Pts[3] := Y;
+      Pts[4] := X;        Pts[5] := Y + Half;
+    End;
+    1: Begin { Down }
+      Pts[0] := X - Half; Pts[1] := Y;
+      Pts[2] := X;        Pts[3] := Y + Size;
+      Pts[4] := X + Half; Pts[5] := Y;
+    End;
+    2: Begin { Left }
+      Pts[0] := X;        Pts[1] := Y - Half;
+      Pts[2] := X - Size; Pts[3] := Y;
+      Pts[4] := X;        Pts[5] := Y + Half;
+    End;
+    3: Begin { Up }
+      Pts[0] := X - Half; Pts[1] := Y;
+      Pts[2] := X;        Pts[3] := Y - Size;
+      Pts[4] := X + Half; Pts[5] := Y;
+    End;
+  Else Exit;
+  End;
+  FillPolyScanline(3, Pts, Canvas.FillColor);
 End;
 
 End.
