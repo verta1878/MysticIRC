@@ -2,9 +2,12 @@
 
 > **GitHub:** https://github.com/verta1878/mysticbbsirc
 >
-> **Release: 2026-09-06** — Version 1.11IRC A4.
-> VIPER complete — shared rendering stack (mdl/m_rip/), v2-v4 slim extensions.
-> MIS compiles. mterm TCP + RIP mode. Theme flags fixed. cleanup.bat.
+> **Release: 2026-09-30** — Version 1.11IRC A5.
+> RIPterm 1.54 source 100% complete (455 files, GPLv3).
+> 60+ functions ported OOP→procedural. 5 new units (ripstate, riptextvar,
+> ripmouse, ripicon, ripwidgets). All 14 L1 commands dispatched.
+> mconfig.exe v0.1 — standalone BBS config tool (FPC Graph display).
+> 6 protocol units ported to mystic_test. VIPEngine documented.
 > Built with **FPC 2.6.4irc r3.1+**. GPLv3.
 
 Based on **Mystic BBS** GPL source by James Coyle (g00r00).
@@ -20,10 +23,11 @@ Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
 | bob | Compiler engineer, OpenWatcom, Glide, 3dfx drivers |
 | evga | Display, Mystic, SIO rebuild |
 | kiddo | Protocols, RIPscrip |
-| wrench | Transport, FOSSIL, DVI/HDMI |
+| wrench | Transport, FOSSIL, serial |
 | hexadecimal | PCBoard, Cyclades |
 | byte | Program discovery |
 | DotMatrix | Documentation sourcing |
+| fabric | FPGA, Voodoo 6 5000 Spinal |
 
 ```
 mdl/                     Mystic Development Library (79 units)

@@ -173,3 +173,44 @@ These must be resolved during each VIPER phase before merging code:
 - Code that assumes DOS (Graph unit, VGA hardware, Mem[], Port[]) without ifdefs
 - fpc264irc cross-compiler targets GO32V2 — all code must compile there
 - **Rule:** Every platform-specific call wrapped in {$IFDEF}. Test compile on Linux native. Cross-compile check for GO32V2 when possible
+
+## VIPEngine Status (2026-09-30)
+
+### Procedural stack complete — VIPEngine wrapper next
+
+The OOP→procedural port is done. All RIPscrip rendering now goes through
+these procedural units instead of TRIPEngine methods:
+
+| Unit | Functions | Maps to RIPterm |
+|------|-----------|-----------------|
+| ripengine.pas | 38 | RIPCORE.C, BGI_CORE.C, TEXTWIN.C |
+| ripdraw.pas | DrawPolygon, DrawBar3D + all primitives | RIP_DRAW.C, BGI_WRAP.C |
+| rip1parse.pas | L0 (29) + L1 (14) dispatch | RIPPARSE.C |
+| rip1exec.pas | All handlers, zero Canvas writes | DISPATCH.C, RIPHANDS.C |
+| riptext.pas | Font rendering, OutTextXY | BGI_FONT.C, TEXTREN.C |
+| ripstate.pas | 7 — save/restore screen (10 slots) | RIPSCENE.C, SCENEMGR.C |
+| riptextvar.pas | 9 — $variables + built-ins | STRVAR.C |
+| ripmouse.pas | 14 — mouse fields, buttons, focus | BUTTONS.C, RIPBTN.C |
+| ripicon.pas | 8 — GetImage/PutImage/LoadIcon/PCX | ICONLOAD.C, RIPIMAGE.C |
+| ripwidgets.pas | 19 — 3D boxes, scrollbars, checkboxes | DLGDRAW.C, DLGFRMW.C |
+
+### VIPEngine = thin wrapper
+
+VIPEngine will be a procedural unit that:
+1. Holds all engine state in a record (not a class)
+2. Calls through to the units above
+3. Provides Init/Done + the public API mterm and mystic_test need
+4. Replaces TRIPEngine (ripscr.pas) as the entry point
+
+### Remaining before VIPEngine
+
+- render_string_attr (attributed text — TEXTREN.C)
+- bgi_arrow (last BGI_WRAP function)
+- Viewport push/pop stack (RIPVIEW.C)
+- CHR font loading (RIPTXT.C rip_load_chr_font)
+- rip_query_palette (needs host connection)
+
+### RIPterm 1.54 source: 100% FINAL
+
+455 files, 844KB. All cross-referencing against ripview is now
+against the complete source, not the partial.

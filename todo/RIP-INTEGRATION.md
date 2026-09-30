@@ -1,5 +1,9 @@
 # RIP in Mystic a38 — integration design (mapped to the real source)
 
+**Updated 2026-09-30:** RIPterm 1.54 source 100% complete. 60+ functions
+ported to procedural stack. VIPEngine wrapper documented (VIPER.md), pending
+creation. See RIP-GRAPHICS-PHASES.md and v1/PHASES.md for full status.
+
 *Now written against the actual Mystic a38 tree, not a sketch. Maps the RIP client
 engine we built (`ripterm_client_v0`) onto Mystic's real classes and files.*
 

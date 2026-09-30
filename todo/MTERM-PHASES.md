@@ -1,5 +1,10 @@
 # mterm — Phase Tracking
 
+**Updated 2026-09-30:** RIPterm 1.54 source 100% complete (455 files).
+The procedural rendering stack is ready — mterm will use VIPEngine once
+the wrapper is created. RIPterm has the full terminal emulator reference
+(ANSI, modem, serial, keyboard, file transfer) in its 100% source.
+
 ## What Is mterm?
 
 mterm is a standalone RIP/ANSI terminal emulator for Mystic BBS.

@@ -38,6 +38,21 @@
 - Theme.dat regenerated with correct RecTheme layout (Flags field at offset 0)
 - FONT-2/3: IBM VGA 8x14 and 8x16 fonts from ROM dumps (CLOSED)
 
+### Session 10
+- RIPterm 1.54 source: 100% FINAL (455 files, 844KB, GPLv3)
+- RIPterm verification: all 12 files cross-referenced against ripview
+- Critical correction: ~45 "missing" functions exist in ripscr.pas OOP class
+- Bar3D (L1 'O') recovered — was wrongly listed as dead code
+- 60+ functions ported OOP→procedural across ripengine, ripdraw, rip1parse, rip1exec
+- 5 new units: ripstate (7), riptextvar (9), ripmouse (14), ripicon (8), ripwidgets (19)
+- All 14 L1 commands dispatched in rip1parse.pas
+- Zero direct Canvas writes in rip1exec.pas (was 25)
+- 6 protocol units ported to mystic_test/mdl/ (xmodem/ymodem/zmodem/kermit/base/queue)
+- SDL files moved to mdl/sdl/ canonical path
+- mconfig.exe v0.1: FPC Graph display, keyboard input, reads/writes mystic.dat
+- VIPEngine documented in VIPER.md — TRIPEngine→VIPEngine wrapper pending
+- 16+ docs updated, all "C source" refs changed to "RIPterm"
+
 ## OPEN
 
 All open phases tracked in `RIP-GRAPHICS-PHASES.md`.
