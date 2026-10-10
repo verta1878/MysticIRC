@@ -2,6 +2,7 @@
   Copyright (C) 2026 FPC264IRC Contributors.
   License: GNU General Public License v3.0.
   Credits: verta1878, sysop/0, evga, kiddo, wrench. }
+{$MODE OBJFPC}
 {$H+}
 Unit mtphone;
 { Phonebook — saved BBS connections.

@@ -12,6 +12,7 @@ Program mterm;
   Waiting on fpc264irc compiler for ptcgraph x86_64-linux support.
   Until then, GraphAvail = False and text-mode blit is used. }
 
+{$MODE OBJFPC}
 {$H+}
 
 { Define HAVE_GRAPH when fpc264irc has ptcgraph for this target }
