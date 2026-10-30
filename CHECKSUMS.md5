@@ -5428,3 +5428,9 @@ b250f6ed23fd70f0fd0b414cc84c3129  ./todo/ripscrip/v32-riplib/README.md
 3dba7b75cb8a2a65cc2efbdf2338ebd8  ./mystic_ripview/CHECKPOINT.TXT
 2dac195e8b7624146a326a2d98bf45c7  ./mystic_ripview/STATUS.TXT
 2a3fbe4b93c944582c406f57672d1d4f  ./mystic_ripview/NEXT.TXT
+7fbe89248aa1609330341d63ef75e3ea  mystic_ripview/source/riputf8.pas
+f93d2dfc6eecce5975be99cdcad17f45  mystic_ripview/source/ripengine.pas
+0ac5edc9abbe696af72039ebe88a3a46  mystic_ripview/source/riptext.pas
+7ef29c7e6bc0a13be58c2fa6a3334000  mystic_mterm/STATUS.TXT
+af5ca48cef2d349ab4c0e94e5ac4d5da  mystic_mterm/NEXT.TXT
+6f4f49c001bfb5412b29030539b2c5de  mystic_mterm/CHECKPOINT.TXT

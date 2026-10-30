@@ -11,7 +11,7 @@ Unit RIPText;
 
 Interface
 
-Uses SysUtils, RIPEngine, RIPDraw;
+Uses SysUtils, RIPEngine, RIPDraw, riputf8;
 
 Procedure DrawBitmapChar(Value: Byte; X0, Y0: Integer);
 Procedure DrawBitmapChar16(Value: Byte; X0, Y0, FG, BG: Integer);
@@ -293,6 +293,9 @@ Var
   I, R, C: Integer;
   ActualScale: Double;
   YOffset: Integer;
+  Pos: Integer;
+  DR: TUTF8DecodeResult;
+  GlyphByte: Byte;
 Begin
   Canvas.CurX := X; Canvas.CurY := Y;
   If (Canvas.FontNum >= 1) And (Canvas.FontNum <= 10) Then Begin
@@ -309,13 +312,31 @@ Begin
           Canvas.CurX := X + YOffset;
         End;
       End;
-      For I := 1 to Length(Text) Do
-        DrawCHRChar(Canvas.FontNum, Ord(Text[I]), Canvas.CurX, Canvas.CurY);
+      If Canvas.UTF8Mode Then Begin
+        Pos := 1;
+        While Pos <= Length(Text) Do Begin
+          DR := DecodeUTF8Char(Text, Pos);
+          GlyphByte := UnicodeToCP437(DR.CodePoint);
+          DrawCHRChar(Canvas.FontNum, GlyphByte, Canvas.CurX, Canvas.CurY);
+          Inc(Pos, DR.Advance);
+        End;
+      End Else
+        For I := 1 to Length(Text) Do
+          DrawCHRChar(Canvas.FontNum, Ord(Text[I]), Canvas.CurX, Canvas.CurY);
       Exit;
     End;
   End;
-  For I := 1 to Length(Text) Do
-    DrawBitmapChar(Ord(Text[I]), Canvas.CurX, Canvas.CurY);
+  If Canvas.UTF8Mode Then Begin
+    Pos := 1;
+    While Pos <= Length(Text) Do Begin
+      DR := DecodeUTF8Char(Text, Pos);
+      GlyphByte := UnicodeToCP437(DR.CodePoint);
+      DrawBitmapChar(GlyphByte, Canvas.CurX, Canvas.CurY);
+      Inc(Pos, DR.Advance);
+    End;
+  End Else
+    For I := 1 to Length(Text) Do
+      DrawBitmapChar(Ord(Text[I]), Canvas.CurX, Canvas.CurY);
 End;
 
 Procedure OutText(const Text: String);
@@ -334,6 +355,10 @@ End;
 Function TextWidth(const Text: String): Integer;
 Var I, C, W: Integer;
     ActualScale: Double;
+    Pos: Integer;
+    DR: TUTF8DecodeResult;
+    GlyphByte: Byte;
+    CharCount: Integer;
 Begin
   If (Canvas.FontNum >= 1) And (Canvas.FontNum <= 10) And
      (CHRFonts[Canvas.FontNum] <> Nil) And
@@ -341,15 +366,32 @@ Begin
     If Canvas.FontSize <= 10 Then ActualScale := FontScales[Canvas.FontSize]
     Else ActualScale := 1.0;
     W := 0;
-    With CHRFonts[Canvas.FontNum]^ Do
-      For I := 1 to Length(Text) Do Begin
-        C := Ord(Text[I]) - FirstChar;
-        If (C >= 0) And (C < NumChars) Then
-          W := W + Widths[C];
+    If Canvas.UTF8Mode Then Begin
+      Pos := 1;
+      While Pos <= Length(Text) Do Begin
+        DR := DecodeUTF8Char(Text, Pos);
+        GlyphByte := UnicodeToCP437(DR.CodePoint);
+        With CHRFonts[Canvas.FontNum]^ Do Begin
+          C := GlyphByte - FirstChar;
+          If (C >= 0) And (C < NumChars) Then
+            W := W + Widths[C];
+        End;
+        Inc(Pos, DR.Advance);
       End;
+    End Else
+      With CHRFonts[Canvas.FontNum]^ Do
+        For I := 1 to Length(Text) Do Begin
+          C := Ord(Text[I]) - FirstChar;
+          If (C >= 0) And (C < NumChars) Then
+            W := W + Widths[C];
+        End;
     Result := Trunc(W * ActualScale);
-  End Else
-    Result := Length(Text) * Canvas.FontSize * 8;
+  End Else Begin
+    If Canvas.UTF8Mode Then
+      Result := UTF8Len(Text) * Canvas.FontSize * 8
+    Else
+      Result := Length(Text) * Canvas.FontSize * 8;
+  End;
 End;
 
 Function TextHeight: Integer;
@@ -402,13 +444,25 @@ End;
 
 Procedure RenderStringAttr(X, Y: Integer; Const S: String; Attr: Byte);
 { Render a string with a single attribute — each char 8x16 with fg/bg.
-  Advances X by 8 pixels per character. }
+  Advances X by 8 pixels per character.
+  UTF-8 aware: when Canvas.UTF8Mode, decodes UTF-8 → CP437 per glyph. }
 Var I: Integer;
+    Pos: Integer;
+    DR: TUTF8DecodeResult;
 Begin
-  For I := 1 To Length(S) Do Begin
-    RenderCharAttr(X, Y, Ord(S[I]), Attr);
-    Inc(X, 8);
-  End;
+  If Canvas.UTF8Mode Then Begin
+    Pos := 1;
+    While Pos <= Length(S) Do Begin
+      DR := DecodeUTF8Char(S, Pos);
+      RenderCharAttr(X, Y, UnicodeToCP437(DR.CodePoint), Attr);
+      Inc(X, 8);
+      Inc(Pos, DR.Advance);
+    End;
+  End Else
+    For I := 1 To Length(S) Do Begin
+      RenderCharAttr(X, Y, Ord(S[I]), Attr);
+      Inc(X, 8);
+    End;
 End;
 
 { ---- gfx_text API — matches RIPterm TEXTREN.C gfx_text_* ---- }
@@ -427,9 +481,19 @@ End;
 
 Procedure GfxTextPuts(Const S: String);
 Var I: Integer;
+    Pos: Integer;
+    DR: TUTF8DecodeResult;
 Begin
-  For I := 1 To Length(S) Do
-    GfxTextPutCh(Ord(S[I]));
+  If Canvas.UTF8Mode Then Begin
+    Pos := 1;
+    While Pos <= Length(S) Do Begin
+      DR := DecodeUTF8Char(S, Pos);
+      GfxTextPutCh(UnicodeToCP437(DR.CodePoint));
+      Inc(Pos, DR.Advance);
+    End;
+  End Else
+    For I := 1 To Length(S) Do
+      GfxTextPutCh(Ord(S[I]));
 End;
 
 Procedure GfxTextNewLine;
@@ -457,7 +521,10 @@ End;
 
 Function GfxTextStringWidth(Const S: String): Integer;
 Begin
-  Result := Length(S) * 8;
+  If Canvas.UTF8Mode Then
+    Result := UTF8Len(S) * 8
+  Else
+    Result := Length(S) * 8;
 End;
 
 Initialization

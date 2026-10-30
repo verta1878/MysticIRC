@@ -19,3 +19,20 @@ UTF-8 extension (RIPscrip 3.0) wired into mterm:
     OutTextXY does codepoint iteration for both CHR and bitmap paths,
     TextWidth counts codepoints (UTF8Len) for bitmap, maps via UnicodeToCP437
     for CHR widths. Constructor inits FUTF8Mode := False.
+
+--- 2026-10-30 — kiddo cowork session (continued) ---
+RT154SRC verify: 5-way parallel cross-check of ripengine/ripdraw/riptext/
+  rip1exec/ripicon/ripstate/ripmouse/ripwidgets/riptextvar against RIPterm
+  C reference (RIP_DRAW.C, RIPCORE.C, RIPTXT.C, RIPPARSE.C, etc.).
+  Result: PASS — 0 critical issues. 1 minor: mouse field capacity 128
+  (spec-correct) vs RIPterm's 384. 12 Pascal extensions beyond reference.
+  6 RIPterm features correctly omitted (INT 33h, protocol, clipboard, etc.).
+UTF8Mode→riptext integration: Canvas.UTF8Mode wired into riptext.pas —
+  DrawText, MeasureText, DrawString all UTF-8 aware via DecodeUTF8Char.
+  riputf8.pas (12,659B, full codec) committed to share at
+  mystic_ripview/source/riputf8.pas.
+  ripengine.pas updated (24,146B) — UTF8Mode field in Canvas record.
+  riptext.pas updated (15,696B) — uses riputf8, 13 UTF8 references.
+CAPTURE: mtcapture.pas already on share (4,035B), verified against
+  CAPTURE.C reference — byte count, pause, validation all matched.
+Items 1-3 COMPLETE. Next: makemenu/mconfig (#4), then MRP (#5 LAST).

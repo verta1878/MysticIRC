@@ -132,6 +132,7 @@ Type
     InGraphics : Boolean;        { true when graphics mode is active      }
     SceneDone  : Boolean;        { true after !|# end-scene boundary      }
     Dirty      : Boolean;        { true when canvas changed since last blit}
+    UTF8Mode   : Boolean;        { true = text strings are UTF-8 encoded  }
   End;
 
 Var
@@ -260,6 +261,7 @@ Begin
   Canvas.InGraphics := False;
   Canvas.SceneDone := False;
   Canvas.Dirty := False;
+  Canvas.UTF8Mode := False;
   Move(EGA_PALETTE, Canvas.Palette, SizeOf(EGA_PALETTE));
   { Text window defaults }
   Canvas.TextWin.Active := False;
@@ -570,6 +572,7 @@ Begin
   ResetTextWin;
   Canvas.SceneDone := False;
   Canvas.Dirty := False;
+  Canvas.UTF8Mode := False;
 End;
 
 Procedure EndScene;

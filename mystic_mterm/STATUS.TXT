@@ -20,6 +20,8 @@ RIP ENGINE UNITS (shared with ripview)
 [DONE]  mtrip.pas        — RIP engine integration, viewport wired (MT-8)
 [DONE]  mtripgfx.pas     — RIP graphics rendering (UTF-8 aware: OutTextXY/TextWidth)
 [DONE]  mtrip_test.pas   — RIP test harness
+[DONE]  riputf8.pas      — shared UTF-8 codec (DecodeUTF8Char, CP437↔Unicode, ForEachCodePoint)
+[DONE]  riptext.pas      — RIP text rendering (UTF-8 aware: DrawText, MeasureText, DrawString)
 
 FEATURES
 --------
@@ -29,16 +31,18 @@ FEATURES
 [DONE]  Text-mode blit fallback
 [DONE]  HAVE_GRAPH enabled in mystic_mterm (2026-10-29)
 [DONE]  Graphics mode — 640x350 EGA via ptcgraph/Graph
+[DONE]  RT154SRC verify — cross-check PASS (0 critical, 1 minor mouse field cap)
+[DONE]  UTF8Mode→riptext integration — Canvas.UTF8Mode wired, riputf8 unit on share
+[DONE]  CAPTURE fixes — mtcapture.pas verified against CAPTURE.C reference
 [TODO]  Flatten mtphone/mtcapture/mtxfer into single program (lead direction)
 [TODO]  80x25 not 80x24 — verify text window rows (from RIPtel PATCH.txt)
 [TODO]  NAWS telnet reply — report window size to BBS (from RIPtel PATCH.txt)
 [TODO]  Telnet "send location" reply fix (from RIPtel PATCH.txt)
 [TODO]  Batched repaints — check FlushCanvasToScreen frequency
 [TODO]  Screen transition (WIPE) timing/pacing
+[TODO]  makemenu/mconfig
+[TODO]  MRP extension (MRP-6 through MRP-20)
 
 VERIFICATION NEEDED
 -------------------
-[DONE]   UTF-8 extension — riputf8 wired into mterm.pas (RIPLineBuf flush)
-                           and mtripgfx.pas (TRIPCanvas.OutTextXY/TextWidth).
-                           FUTF8Mode property on TRIPCanvas.
-[DONE]   CAPTURE.C vs mtcapture.pas — byte count, pause, validation ALL FIXED
+(none currently)
