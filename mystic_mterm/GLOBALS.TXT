@@ -1,0 +1,35 @@
+GLOBALS.TXT — mterm build knobs and bug tracker
+=================================================
+
+BUILD KNOBS
+-----------
+Name          Location          0                    1
+-----------   ---------------   ------------------   -------------------
+HAVE_GRAPH    mterm.pas         text-mode only       graphics mode (ptcgraph/Graph)
+                                (fallback when       (ENABLED — default in
+                                Graph init fails)    mystic_mterm as of 2026-10-29)
+
+MODE DECLARATIONS
+-----------------
+Unit              Mode            Notes
+---------------   -------------   -----------------------------------
+mterm.pas         {$MODE OBJFPC}  Added 2026-10-02 (was missing)
+mtphone.pas       {$MODE OBJFPC}  Added 2026-10-02 (was missing)
+mtcapture.pas     (inherits)      No explicit mode needed
+RIP units         {$MODE DELPHI}  Plus {$H-} for ShortString
+
+FPC 2.6.4 KNOWN ISSUES (from compatibility audit)
+--------------------------------------------------
+BUG-029: AnsiString heap — not hit (we use ShortString via {$H-})
+BUG-036: += operators — not used
+BUG-037: abstract methods — not used
+BUG-043: dl.o glibc 2.34+ — helps mterm linking on modern Linux
+
+OPEN BUGS / ISSUES
+-------------------
+1. ✅ HAVE_GRAPH enabled in mystic_mterm (2026-10-29)
+2. mtcapture.pas missing byte count tracking
+3. mtcapture.pas missing pause mode
+4. mtcapture.pas missing filename validation
+5. .o files still needed from sysop/0's build script (until .o→.a cleanup)
+6. Units mtphone/mtcapture/mtxfer to be flattened into single program (future)

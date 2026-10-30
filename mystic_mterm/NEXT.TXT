@@ -1,0 +1,39 @@
+NEXT.TXT — mterm cold-start (read this first)
+================================================
+Project: mterm (Mystic BBS terminal emulator)
+Location: mystic_mterm/
+Version: v0.3 (LOCKED — date tracks builds, never bump)
+Compiler: FPC 2.6.4irc
+Crew: kiddo (Protocols, RIPscrip)
+Repo: verta1878/MysticIRC
+
+CURRENT STATE
+-------------
+mterm v0.3 — 1976 lines across 3 units:
+  mterm.pas      ~1518 lines  main program, {$MODE OBJFPC}
+  mtphone.pas     ~376 lines  phonebook, {$MODE OBJFPC}
+  mtcapture.pas   ~115 lines  capture/logging
+
+Additional units in this directory but shared with other projects:
+  mtconfig.pas, mtconn.pas, mtserial.pas, mtsound.pas, mtterm.pas,
+  mtxfer.pas, mtrip.pas, mtripgfx.pas, mtrip_test.pas, editor.pas,
+  keytest.pas, M_OPS.PAS, mt_spell.pas, userconf.pas,
+  OL_*.pas (OpenOLMS units), olmscfg.pas, olmsmnt.pas, openolms*.pas,
+  molms.pas, upgrade1.pas, upgrade2.pas
+
+RIP engine wired into viewport (MT-8). Graph mode stubs present
+(HAVE_GRAPH conditional). Text-mode blit fallback working.
+RIP auto-sense complete (MT-19, responds RIPSCRIP015400).
+
+WHAT TO DO NEXT
+---------------
+1. PRIORITY: Get HAVE_GRAPH working in mystic_mterm (currently enabled
+   in mystic_test/mterm.pas only — mystic_mterm still stubbed).
+   ptcgraph PPUs available on GitHub (Graph 3.0.4 backport, commit
+   e4abf435). Need .o files from sysop/0's build script until
+   .o→.a cleanup lands.
+
+2. After graphics mode: RT154SRC command verification, CAPTURE fixes
+   (byte count + pause mode), IMG/TIFF decoders, UTF-8, MRP (last).
+
+READ ORDER: NEXT.TXT → RULES.TXT → STATUS.TXT → do work → run test

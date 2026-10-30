@@ -1,23 +1,25 @@
 # Mystic BBS 1.11IRC — Community Fork
 
-> **GitHub:** https://github.com/verta1878/mysticbbsirc
+> **GitHub:** https://github.com/verta1878/MysticIRC
 >
-> **Release: 2026-09-30** — Version 1.11IRC A5.
-> ripengine 720 lines (viewport stack, ClipLine, transforms, ResetRIPState).
-> ripdraw 614 lines (24/24 BGI_WRAP, span FloodFill). riptext 470 lines
-> (attributed text, 8x16 font, GfxText API). ripicon 64-slot cache.
-> rip4ext zero stubs (JPEG/GIF/PNG/HTML/Print/MPEG wired).
-> mterm v0.3: 1,514 lines — pacing, file transfer, text window, print, RIP auto-sense.
-> v1.54 print API. CHR font wiring shared. VIPEngine 323-line procedural wrapper.
-> mterm v0.3: 2,009 lines — phonebook edit+validate, capture/logging (ALT+C),
-> pacing, file transfer, text window, print, RIP auto-sense.
-> All v1 engine units complete — zero stubs. IRC whitepaper updated.
+> **Release: 2026-10-29** — Version 1.11IRC A5.
+> v1 engine COMPLETE — zero stubs, all L0/L1 commands dispatched.
+> ripengine 22,601 lines (viewport, state, UTF8Mode, SceneDone, EndScene).
+> ripdraw 21,601 lines (24/24 BGI_WRAP, DrawPolygon, DrawBar3D, span FloodFill).
+> riptext 13,689 lines (attributed text, UTF-8 aware, CHR vector fonts).
+> ripicon 12,541 lines (64-slot cache, LoadPCX, LoadIMG, LoadTIF).
+> riputf8.pas shared UTF-8 codec (CP437↔Unicode bidirectional).
+> rip1exec 34,780 lines (L1 executor, End Scene, ReadScene, PutImage modes 0-4).
+> RT154SRC verified — 42/42 parse, 34 exec, 3 stubs correct.
+> RIPaint 674/674 decompiled source staged as reference.
+> mterm v0.3: 2,009 lines — phonebook, capture, pacing, RIP auto-sense.
+> mconfig v0.1. VIPEngine 323-line procedural wrapper.
+> OpenOLMS released (mystic_molms/, 37 units, 8 programs).
 > Built with **FPC 2.6.4irc r3.1+**. GPLv3.
 
 Based on **Mystic BBS** GPL source by James Coyle (g00r00).
 Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
 
-## Directory Structure
 ## Team
 
 | Handle | Role |
@@ -33,45 +35,50 @@ Maintained by verta1878, Ecstasy BBS, FTN 1:152/158.
 | DotMatrix | Documentation sourcing |
 | fabric | FPGA, Voodoo 6 5000 Spinal |
 
+## Directory Structure
+
 ```
-mdl/                     Mystic Development Library (79 units)
-  m_rip/                   RIP engine + tools (shared by ripview, mystic, mterm)
-    v1/                      RIPscrip v1.54 engine (ripscr.pas)
-    rip_canvas.pas           Canvas abstraction
-    rip_surface.pas          Software raster backend
-    rip_term.pas             Terminal integration (TTermRip)
-    v1/ - v4/                Version-specific engines and tests
-    v2/                      RIPscrip v2.0 engine (kiddo)
-    v3/                      RIPscrip v3.0 engine (kiddo)
-    v4/                      RIPscrip v4.0 engine (kiddo)
-    rip_canvas.pas           Canvas/surface primitives
-    rip_render.pas           BMP/screen renderer
-    rip_surface.pas          Software raster backend
-    rip_term.pas             Terminal integration
-    rip_window.pas           Viewport management
-    ans2rip.pas              ANSI→RIP converter
-    ans2png.pas              ANSI→BMP renderer
-    ripmake.pas              RIP file builder
-    mkicons.pas              Icon generator
 mystic/                  BBS core (clean, no RIP)
 mystic_test/             BBS core + RIP integration + A4 fixes
   mdl/                     Local copy of MDL (self-contained build)
 mystic_ansiedit/         ANSI editor (ansiedit + PCBDraw support)
-mystic_mterm/            mterm terminal emulator (85 files)
-mystic_molms/            MOLMS offline mail system (36 files)
-mystic_ripview/          RIPView v1.0.0 — Pascal RIP viewer (12 source, 565 total)
+mystic_crypt/            CryptLib SSH/TLS example
+mystic_mailer/           BINKP/FidoNet mailer
+mystic_makemenu/         Menu builder
+mystic_misdos/           DOS Waiting-For-Caller (modem/BinkP/local login)
+  misdos.pas               WFC main loop — clock, modem watch, BinkP sniff
+  misdos_commands.pas      Hot-key handlers (U/S/P/E/X/D/Q editors)
+  misdos_screen.pas        ANSI screen loader + live clock/node fields
+  wfc.ans                  80x25 CP437 WFC screen (classic 1.06 reconstruction)
+mystic_modem/            Modem/FOSSIL front-end
+mystic_molms/            OpenOLMS offline mail (37 units, 8 programs, GPLv3)
+mystic_mterm/            mterm terminal emulator
+  mterm.pas                Main terminal (44,201 bytes)
+  mtrip.pas                RIP engine integration (35,044 bytes)
+  mtripgfx.pas             RIP graphics rendering (29,722 bytes)
+  mtcapture.pas            Capture/logging (ALT+C)
+  mtphone.pas              Phonebook edit+validate
+  + mtconn, mtconfig, mtserial, mtsound, mtxfer, mtterm
+mystic_perl/             Perl DLL integration
+mystic_ripview/          RIPView — Pascal RIP browser
+  source/                  Main units + fonts/
+    ripview.pas              Main viewer/browser (17,917 lines)
+    ripengine.pas            Engine core (22,601 lines)
+    ripdraw.pas              Drawing primitives (21,601 lines)
+    riptext.pas              Text rendering, UTF-8 aware (13,689 lines)
+    ripicon.pas              64-slot icon cache + LoadPCX/IMG/TIF (12,541 lines)
+    ripwidgets.pas           19 UI widgets (7,529 lines)
+    riputf8.pas              UTF-8 codec (CP437↔Unicode)
+    + ripstate, riptextvar, ripmouse, ripbmp, ripdelta,
+      riprender, ripbindec, riplayerdec, riptile, rip_compat
+  source/v1/               v1 engine
+    rip1exec.pas             L1 executor (34,780 lines)
+    rip1parse.pas            L1 parser, 14 commands (5,431 lines)
+  tools/                   Converter/test tools
+  js-reference/            JavaScript RIPterm reference impl
 mystic_sdl/              SDL2 graphical terminal
 mystic_spell/            Hunspell spell check binding + SETUP.md
-mystic_crypt/            CryptLib SSH/TLS example
-mystic_modem/            Modem/FOSSIL front-end
-mystic_mailer/           BINKP/FidoNet mailer
 mystic_texteditor/       Text editor standalone
-mystic_misdos/           DOS Waiting-For-Caller example (modem/BinkP/local login)
-  misdos.pas               WFC main loop — clock, modem watch, BinkP sniff
-  misdos_commands.pas      Hot-key handlers (U/S/P/E/X/D/Q editors, answer, quit)
-  misdos_screen.pas        ANSI screen loader + live clock/node fields
-  wfc.ans                  80×25 CP437 WFC screen (classic 1.06 reconstruction)
-mystic_perl/             Perl DLL integration
 examples/
   ripart/                  RIP art, fonts, icons (single source of truth)
     art/                     226 RIP files (16colo.rs corpus + test suite)
@@ -97,6 +104,7 @@ todo/                    Documentation + phase tracking
 historical/
   ripterm154/              RIPterm 1.54 DOS binary (Carl Gorringe archive)
 attic/                   Retired code and archives
+docs/                    Build documentation
 ```
 
 ## BBS Binaries (18 Win32 PE32 i386)
@@ -122,23 +130,28 @@ attic/                   Retired code and archives
 | ans2rip | ✅ |
 | ans2png | ✅ |
 
-## Key Features (1.11IRC A4)
+## Key Features (1.11IRC A5)
 
 - g00r00 1.10 A38 base with A39-A63 features ported
 - g00r00 1.11 A1-A3 items: VAR records, TimerMS, FormatDate, Searchlight menus
-- RIPscrip v1.54: RIP engine v1-v4, RIPView 42/42 commands pixel-perfect
+- RIPscrip v1.54: v1 engine COMPLETE — zero stubs, 42/42 commands pixel-perfect
+- End Scene (`!|#`): full state reset + SceneDone flag
+- RT154SRC verified against RIPterm reference (42/42 parse, 34 exec)
+- RIPaint 674/674 decompiled source as engine reference
+- LoadIMG (GEM raster), LoadTIF (baseline TIFF) decoders in icon cache
+- UTF-8 extension: riputf8.pas codec, Canvas.UTF8Mode, all text funcs aware
 - Password MD5 hashing with auto-upgrade (bbs_crypt.pas)
 - Hunspell spell check in FS editor
 - Serial v1.1 + FOSSIL driver + IRQ ring buffer
 - mterm terminal emulator (ANSI engine + RIP v1.54 client parser)
-- MOLMS offline mail system (QWK/BlueWave/Hudson/JAM)
+- OpenOLMS offline mail system (QWK/BlueWave/Hudson/JAM, 37 units)
 - SDL_mixer audio (WAV/MID/MOD/MP3/OGG)
-- MIS 1.12 rebuild plan (tabbed UI, ASCII art header, ESC menu)
 - Stale node detection, MIS shutdown fix, ANSI editor fix
 - Zmodem >2GB file transfers (Int64)
 - HS/Link bidirectional protocol (clean-room Pascal, 1067 lines)
 - Embedded taskbar/tray icon (utrayit + mkicon)
 - 20 MPL scripts, 237 functions documented
+- Engine version: RIPSCRIP030002 (matches RIPtel 3.1 patched)
 
 ## Build
 

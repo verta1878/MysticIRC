@@ -130,6 +130,7 @@ Type
     TextJustV  : Byte;           { vertical justify (0=bottom,1=ctr,2=top)}
     TextWin    : TTextWindow;    { RIP text window state                  }
     InGraphics : Boolean;        { true when graphics mode is active      }
+    SceneDone  : Boolean;        { true after !|# end-scene boundary      }
   End;
 
 Var
@@ -194,6 +195,9 @@ Procedure ScreenToRIP(SX, SY: Integer; Var RX, RY: Integer);
 { Full state reset }
 Procedure ResetRIPState;
 
+{ End scene — full reset + scene boundary flag }
+Procedure EndScene;
+
 { Text window — bottom of RIP screen for text I/O }
 Procedure SetTextWindow(X0, Y0, X1, Y1: Integer; FontH: Byte);
 Procedure ResetTextWin;
@@ -248,6 +252,7 @@ Begin
   Canvas.TextJustH := 0;
   Canvas.TextJustV := 0;
   Canvas.InGraphics := False;
+  Canvas.SceneDone := False;
   Move(EGA_PALETTE, Canvas.Palette, SizeOf(EGA_PALETTE));
   { Text window defaults }
   Canvas.TextWin.Active := False;
@@ -556,6 +561,19 @@ Begin
   Move(EGA_PALETTE, Canvas.Palette, SizeOf(EGA_PALETTE));
   FillChar(Canvas.Pixels^, SizeOf(TPixelBuffer), 0);
   ResetTextWin;
+  Canvas.SceneDone := False;
+End;
+
+Procedure EndScene;
+{ RIPscrip !|# end-scene boundary. Resets all graphics state to defaults
+  and signals that the current scene is complete. This is the proper
+  scene boundary marker — viewers use SceneDone to know when a scene
+  has finished rendering and is ready for display/flush. }
+Begin
+  ResetRIPState;
+  Canvas.SceneDone := True;
+  If DebugMode Then
+    WriteLn('[EndScene] Scene boundary — state reset, SceneDone=True');
 End;
 
 Procedure SetTextWindow(X0, Y0, X1, Y1: Integer; FontH: Byte);

@@ -18,7 +18,7 @@ Uses
   SysUtils, Keyboard,
   {$IFDEF UNIX}ptcgraph, ptcmouse{$ELSE}Graph{$ENDIF},
   RIPEngine, RIPDraw, RIPText, RIPWidgets, RIPMouse, RIPState,
-  RIPTextVar, RIPBmp;
+  RIPTextVar, RIPBmp, MRP_Render;
 
 {$I records.pas}
 
@@ -126,9 +126,10 @@ Begin
   DrawMenuItem(MX, Y,       MW, '2. System Paths',        Selection = 1); Y := Y + 24;
   DrawMenuItem(MX, Y,       MW, '3. New User Settings',   Selection = 2); Y := Y + 24;
   DrawMenuItem(MX, Y,       MW, '4. Console / Status Bar', Selection = 3); Y := Y + 24;
+  DrawMenuItem(MX, Y,       MW, '5. Menu Editor (MRP)',    Selection = 4); Y := Y + 24;
   DrawSeparatorH(MX, MX + MW, Y + 2, CLR_BRIGHT, CLR_SHADOW);
   Y := Y + 8;
-  DrawMenuItem(MX, Y,       MW, 'Q. Save and Quit',       Selection = 4);
+  DrawMenuItem(MX, Y,       MW, 'Q. Save and Quit',       Selection = 5);
 
   If HasConfig Then
     DrawStatusBar('Loaded: ' + ConfigPath + ' | Arrows/Enter/Q')
@@ -780,6 +781,122 @@ Begin
   End;
 End;
 
+{ ---- Menu Editor (MRP) page ---- }
+
+Var
+  MRPMenu    : TMRPMenu;
+  MRPLoaded  : Boolean;
+  MRPFile    : String;
+
+Procedure DrawMRPPage(CurItem: Integer);
+Begin
+  If MRPLoaded Then
+    MRP_RenderMenu(MRPMenu, CurItem)
+  Else Begin
+    FillRect(0, 0, RIP_WIDTH - 1, RIP_HEIGHT - 1, 1);
+    DrawRaisedBox(0, 0, RIP_WIDTH - 1, 28, 7, 15, 8);
+    SetColor(0);
+    DrawTextCentered(0, 0, RIP_WIDTH - 1, 28, 'Menu Editor (MRP)', 0);
+    SetColor(14);
+    OutTextXY(10, 50, 'No menu loaded.');
+    OutTextXY(10, 70, 'Place a .MNU file next to mconfig or');
+    OutTextXY(10, 90, 'pass it as parameter: mconfig menu.mnu');
+    FillRect(0, RIP_HEIGHT - 16, RIP_WIDTH - 1, RIP_HEIGHT - 1, 0);
+    SetColor(11);
+    OutTextXY(8, RIP_HEIGHT - 14, 'ESC=Back');
+  End;
+  FlushToScreen;
+End;
+
+Procedure RunMenuEditor;
+Var
+  CurItem    : Integer;
+  MRPRunning : Boolean;
+  MK         : TKeyEvent;
+  MCode      : Word;
+Begin
+  { Try to load a menu file }
+  MRPLoaded := False;
+  MRPFile := '';
+
+  { Check for .mnu file: command line param 2, or 'main.mnu' beside us }
+  If ParamCount >= 2 Then
+    MRPFile := ParamStr(2);
+  If (MRPFile = '') And FileExists('main.mnu') Then
+    MRPFile := 'main.mnu';
+  If (MRPFile = '') And FileExists('menus/main.mnu') Then
+    MRPFile := 'menus/main.mnu';
+
+  If MRPFile <> '' Then
+    MRPLoaded := MRP_LoadMenu(MRPFile, MRPMenu);
+
+  CurItem := 1;
+  MRPRunning := True;
+  DrawMRPPage(CurItem);
+
+  While MRPRunning Do Begin
+    MK := GetKeyEvent;
+    MK := TranslateKeyEvent(MK);
+    MCode := GetKeyEventCode(MK);
+
+    Case MCode Of
+      $4800: Begin { Up }
+        If MRPLoaded And (CurItem > 1) Then Dec(CurItem);
+        DrawMRPPage(CurItem);
+      End;
+      $5000: Begin { Down }
+        If MRPLoaded And (CurItem < MRPMenu.NumItems) Then Inc(CurItem);
+        DrawMRPPage(CurItem);
+      End;
+      $4B00: Begin { Left — if item has JumpLeft }
+        If MRPLoaded And (MRPMenu.Items[CurItem].JumpLeft > 0) And
+           (MRPMenu.Items[CurItem].JumpLeft <= MRPMenu.NumItems) Then Begin
+          CurItem := MRPMenu.Items[CurItem].JumpLeft;
+          DrawMRPPage(CurItem);
+        End;
+      End;
+      $4D00: Begin { Right — if item has JumpRight }
+        If MRPLoaded And (MRPMenu.Items[CurItem].JumpRight > 0) And
+           (MRPMenu.Items[CurItem].JumpRight <= MRPMenu.NumItems) Then Begin
+          CurItem := MRPMenu.Items[CurItem].JumpRight;
+          DrawMRPPage(CurItem);
+        End;
+      End;
+      $000D: Begin { Enter — show item detail }
+        If MRPLoaded And (CurItem >= 1) And (CurItem <= MRPMenu.NumItems) Then Begin
+          { Show item info overlay }
+          DrawRaisedBox(50, 80, RIP_WIDTH - 50, 260, 7, 15, 8);
+          SetColor(0);
+          OutTextXY(60, 85, 'Item ' + IntToStr(CurItem) + ': ' +
+                    MRP_StripPipes(MRPMenu.Items[CurItem].Text));
+          OutTextXY(60, 100, 'HotKey: ' + MRPMenu.Items[CurItem].HotKey);
+          OutTextXY(60, 115, 'Access: ' + MRPMenu.Items[CurItem].Access);
+          OutTextXY(60, 130, 'X,Y: ' + IntToStr(MRPMenu.Items[CurItem].X) +
+                    ',' + IntToStr(MRPMenu.Items[CurItem].Y));
+          OutTextXY(60, 145, 'Jumps: U=' + IntToStr(MRPMenu.Items[CurItem].JumpUp) +
+                    ' D=' + IntToStr(MRPMenu.Items[CurItem].JumpDown) +
+                    ' L=' + IntToStr(MRPMenu.Items[CurItem].JumpLeft) +
+                    ' R=' + IntToStr(MRPMenu.Items[CurItem].JumpRight));
+          OutTextXY(60, 160, 'Commands: ' + IntToStr(MRPMenu.Items[CurItem].Commands));
+          If MRPMenu.Items[CurItem].Commands >= 1 Then
+            OutTextXY(60, 175, '  1: ' + MRPMenu.Items[CurItem].Cmds[1].MenuCmd +
+                      ' → ' + MRPMenu.Items[CurItem].Cmds[1].Data);
+          If MRPMenu.Items[CurItem].Commands >= 2 Then
+            OutTextXY(60, 190, '  2: ' + MRPMenu.Items[CurItem].Cmds[2].MenuCmd +
+                      ' → ' + MRPMenu.Items[CurItem].Cmds[2].Data);
+
+          SetColor(8);
+          OutTextXY(60, 240, 'Press any key to close');
+          FlushToScreen;
+          GetKeyEvent; { wait for keypress }
+          DrawMRPPage(CurItem);
+        End;
+      End;
+      $001B: MRPRunning := False; { ESC }
+    End;
+  End;
+End;
+
 { ---- Main ---- }
 
 Begin
@@ -817,7 +934,7 @@ Begin
         DrawMainMenu;
       End;
       $5000: Begin { Down }
-        If Selection < 4 Then Inc(Selection);
+        If Selection < 5 Then Inc(Selection);
         DrawMainMenu;
       End;
       $000D: Begin { Enter }
@@ -826,7 +943,8 @@ Begin
           1: Begin RunSystemPaths; DrawMainMenu; End;
           2: Begin RunNewUserSettings; DrawMainMenu; End;
           3: Begin RunConsoleSettings; DrawMainMenu; End;
-          4: Running := False;
+          4: Begin RunMenuEditor; DrawMainMenu; End;
+          5: Running := False;
         End;
       End;
       $0071, $0051: Running := False; { Q/q }

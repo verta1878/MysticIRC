@@ -1,0 +1,42 @@
+RULES.TXT — ripview codegen and build rules
+=============================================
+
+COMPILER
+--------
+- FPC 2.6.4irc (custom cross-compiler from verta1878/fpc264irc)
+- RIP units use {$MODE DELPHI} {$H-} (ShortString, no AnsiString)
+- NO SDL dependency — FPC Graph unit only (Borland BGI equivalent)
+- ptcgraph on Linux, Graph on DOS
+- Project-wide display decision applies: FPC Graph unit only
+
+BUILD TARGETS
+-------------
+- Linux (primary dev target, ptcgraph)
+- DOS (Graph unit native)
+- Win32, OS/2 (via fpc264irc cross-compiler)
+
+CODE RULES
+----------
+- No inline Var declarations (FPC 2.6.4 limitation)
+- No += operators (BUG-036)
+- No abstract methods (BUG-037)
+- Reference only rule: never reference "C source" publicly — say
+  "RIPterm" instead (source is unreleased to public)
+- Code is ours, Pascal from scratch
+- RIPAINT decompiled source used as REFERENCE ONLY (lead confirmed)
+- Both engines (ripscr.pas OOP + procedural stack) kept in sync
+- All procedural units synced across mystic/, mystic_test/,
+  mystic_ripview/
+
+REFERENCE PRIORITY (from sysop/0):
+  1. MENUSYS.C — MRP record structure (saved for LAST)
+  2. CAPTURE.C — mtcapture.pas validation
+  3. RT154SRC — v1 engine verification (next after graphics mode)
+  4. ICONLIB.C — ripicon.pas validation (done ✅)
+  5. IMG2ICON/TIF2ICON/PCX2ICON — FPC converters (not urgent)
+
+SAFETY
+------
+- NEVER work on the live copy — snapshot a backup FIRST
+- NEVER commit .o or .s files (build artifacts)
+- Only .ppu, .rst, .a and source belong in the repo

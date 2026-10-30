@@ -1,0 +1,41 @@
+GLOBALS.TXT — ripview state variables and bug tracker
+======================================================
+
+CANVAS RECORD (ripengine.pas)
+-----------------------------
+Field           Type              Purpose
+-----------     ---------------   ---------------------------------
+FillPat         FillPatternType   current fill pattern
+LinePattern     Word              current line pattern
+ViewClip        TRect             viewport clipping rectangle
+TextJustH       Integer           horizontal text justification
+TextJustV       Integer           vertical text justification
+TTextWindow     record            text window state (ANSI SGR→EGA)
+InGraphics      Boolean           true when in graphics mode
+
+ICON CACHE (ripicon.pas)
+------------------------
+icon_data[64]   — 64-slot icon cache (matches RIPterm exactly)
+Functions: IconLoadToSlot, IconDisplaySlot, IconFreeSlot, IconFreeAll
+Formats: ICN (4-plane EGA), PCX (LoadPCX)
+TODO: LoadIMG, LoadTIF (same pattern as LoadPCX)
+
+ENGINE STATE (ripstate.pas)
+---------------------------
+7 state management functions — color, fill, line, writemode
+
+MODE DECLARATIONS
+-----------------
+All RIP units: {$MODE DELPHI} {$H-} (ShortString, no AnsiString)
+
+OPEN BUGS / ISSUES
+-------------------
+1. LoadIMG decoder missing — ripview can't display .IMG in RIP scenes
+2. LoadTIF decoder missing — ripview can't display .TIFF in RIP scenes
+3. RT154SRC command verification not yet done (zero stubs, needs verify)
+4. .o files in source/ should be cleaned (build artifacts in repo)
+   ripbmp.o, ripdraw.o, ripengine.o, ripicon.o, ripmouse.o,
+   ripstate.o, riptext.o, riptextvar.o, ripwidgets.o, ripview.o,
+   rip1exec.o, rip1parse.o
+5. UTF-8 extension design (RIPscrip 3.0) — future
+6. MRP items 6-20 — LAST priority

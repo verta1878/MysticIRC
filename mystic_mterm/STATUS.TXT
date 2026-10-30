@@ -1,0 +1,44 @@
+STATUS.TXT — mterm per-unit status
+====================================
+Legend: [DONE] [WIP] [STUB] [TODO] [VERIFY]
+
+CORE UNITS
+----------
+[DONE]  mterm.pas        — main program, 1518 lines, {$MODE OBJFPC}
+[DONE]  mtphone.pas      — phonebook edit/validate, 376 lines
+[DONE]  mtcapture.pas    — capture/logging, 173 lines (byte count, pause, validation)
+[STUB]  mtconfig.pas     — config loading
+[DONE]  mtconn.pas       — connection handling
+[STUB]  mtserial.pas     — serial port
+[STUB]  mtsound.pas      — sound
+[DONE]  mtterm.pas       — terminal emulation
+[STUB]  mtxfer.pas       — file transfer
+[DONE]  editor.pas       — text editor
+
+RIP ENGINE UNITS (shared with ripview)
+--------------------------------------
+[DONE]  mtrip.pas        — RIP engine integration, viewport wired (MT-8)
+[DONE]  mtripgfx.pas     — RIP graphics rendering (UTF-8 aware: OutTextXY/TextWidth)
+[DONE]  mtrip_test.pas   — RIP test harness
+
+FEATURES
+--------
+[DONE]  RIP auto-sense (MT-19, responds RIPSCRIP015400)
+[DONE]  Phonebook edit dialog (8 fields, range validation)
+[DONE]  Capture/logging (ALT+C toggle, append mode)
+[DONE]  Text-mode blit fallback
+[DONE]  HAVE_GRAPH enabled in mystic_mterm (2026-10-29)
+[DONE]  Graphics mode — 640x350 EGA via ptcgraph/Graph
+[TODO]  Flatten mtphone/mtcapture/mtxfer into single program (lead direction)
+[TODO]  80x25 not 80x24 — verify text window rows (from RIPtel PATCH.txt)
+[TODO]  NAWS telnet reply — report window size to BBS (from RIPtel PATCH.txt)
+[TODO]  Telnet "send location" reply fix (from RIPtel PATCH.txt)
+[TODO]  Batched repaints — check FlushCanvasToScreen frequency
+[TODO]  Screen transition (WIPE) timing/pacing
+
+VERIFICATION NEEDED
+-------------------
+[DONE]   UTF-8 extension — riputf8 wired into mterm.pas (RIPLineBuf flush)
+                           and mtripgfx.pas (TRIPCanvas.OutTextXY/TextWidth).
+                           FUTF8Mode property on TRIPCanvas.
+[DONE]   CAPTURE.C vs mtcapture.pas — byte count, pause, validation ALL FIXED

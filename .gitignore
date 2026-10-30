@@ -62,6 +62,10 @@ mystic_test/temp1/*
 mystic_test/logs/*
 mystic_test/semaphore/*
 
+# Crew memory exports (local only, not in repo)
+kiddo-memory-backup-*
+RGTWV102.ZIP
+
 # Editor / OS cruft
 *.bak
 *.orig

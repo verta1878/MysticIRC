@@ -1,8 +1,16 @@
 *.mys binary
 *.tar.gz binary
 *.zip binary
+*.ZIP binary
 *.linux-x86_64 binary
 *.exe binary
+# Source files — LF everywhere
+*.pas text eol=lf
+*.md text eol=lf
+*.TXT text eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+*.bat text eol=crlf
 
 # BBS/DOS text artifacts must stay CRLF regardless of host OS (cross-compile
 # safe): file listings, release docs, and door/ANSI text the BBS serves.

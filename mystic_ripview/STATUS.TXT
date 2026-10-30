@@ -1,0 +1,71 @@
+STATUS.TXT — ripview per-unit status
+======================================
+Legend: [DONE] [WIP] [STUB] [TODO] [VERIFY]
+
+MAIN
+----
+[DONE]  ripview.pas      — main viewer/browser program (17,917 lines)
+
+ENGINE CORE
+-----------
+[DONE]  ripengine.pas    — state, cursor, viewport, text window, ANSI SGR→EGA
+                           Canvas: FillPat, LinePattern, ViewClip, TextJust,
+                           TTextWindow, InGraphics, UTF8Mode, SceneDone.
+                           EnterGraphics/ExitGraphics, EndScene (full reset + flag)
+[DONE]  riputf8.pas      — shared UTF-8 codec (DecodeUTF8Char, EncodeUTF8Char,
+                           CP437ToUnicode, UnicodeToCP437, UTF8ToCP437, CP437ToUTF8,
+                           UTF8Len). Full 256-entry CP437↔Unicode bidirectional map
+[DONE]  ripdraw.pas      — all 24 drawing commands match RIPterm (DrawPolygon,
+                           DrawBar3D added from porting session)
+[DONE]  riptext.pas      — text rendering (UTF-8 aware when Canvas.UTF8Mode)
+[DONE]  riptextvar.pas   — text variables (9 functions)
+[DONE]  ripstate.pas     — state management (7 functions)
+[DONE]  ripmouse.pas     — mouse handling (14 functions)
+[DONE]  ripwidgets.pas   — 19 UI widgets + HLine/VLine
+[DONE]  ripicon.pas      — 64-slot icon cache ✅ matches RIPterm icon_data[64]
+                           LoadPCX, ICN 4-plane EGA format verified
+                           LoadIMG (GEM raster: 1/4-plane, RLE scanlines)
+                           LoadTIF (baseline TIFF: 1/4/8-bit, PackBits)
+[DONE]  ripbmp.pas       — BMP handling
+[DONE]  riprender.pas    — rendering pipeline
+[DONE]  ripdelta.pas     — delta encoding
+[DONE]  ripbindec.pas    — binary decoder
+[DONE]  riplayerdec.pas  — layer decoder
+[DONE]  riptile.pas      — tile support
+[DONE]  rip_compat.pas   — compatibility layer
+
+V1 ENGINE
+---------
+[DONE]  rip1parse.pas    — L1 parser, all 14 commands dispatched
+[DONE]  rip1exec.pas     — L1 executor, 0 direct Canvas writes remaining
+                           BeginText/EndText/RegionText implemented
+                           ReadScene file loading + recursive ExecuteRIP
+                           PutImage modes 0-4 (COPY/XOR/OR/AND/NOT)
+                           rcResetWindows (!|#) calls EndScene (scene boundary)
+
+OOP ENGINE (kept in sync)
+-------------------------
+[DONE]  ripscr.pas       — 4,429-line OOP TRIPEngine (in mystic/)
+
+TOOLS
+-----
+[DONE]  ans2png.pas, ans2rip.pas, chg2rip.pas, mkicons.pas,
+        rip_sample.pas, rip_view.pas, ripmake.pas
+[DONE]  test_phase3.pas, test_ans2rip.pas, test_rip_files.pas
+
+PENDING WORK
+------------
+[DONE]   RT154SRC — 42/42 parse, 34 exec, 3 stubs correct, 3 text cmds FIXED
+[DONE]   LoadIMG decoder in ripicon.pas (GEM raster, 1/4-plane, RLE)
+[DONE]   LoadTIF decoder in ripicon.pas (baseline TIFF, PackBits)
+[DONE]   UTF-8 extension (RIPscrip 3.0) — riputf8.pas shared codec unit,
+                           Canvas.UTF8Mode flag, OutTextXY/TextWidth/GfxTextPuts/
+                           RenderStringAttr/GfxTextStringWidth all UTF-8 aware
+[DONE]   End Scene — rcResetWindows calls EndScene (full state reset + SceneDone flag)
+[DONE]   Broken items 1-5 audit: DrawPolygon, Bar3D, PieSlice/Sector, state wrappers ALL exist
+[TODO]   Broken items 6-39 — mouse/buttons, icons, scene mgmt, text vars, fonts, viewport
+[TODO]   MRP extension (items 6-20, LAST priority)
+[TODO]   SAUCE trimming on .RIP file open (from RIPtel PATCH.txt)
+[TODO]   Reset canvas before file load (from RIPtel PATCH.txt)
+[TODO]   Batched repaints — check FlushCanvasToScreen frequency
+[TODO]   Screen transition (WIPE) timing/pacing

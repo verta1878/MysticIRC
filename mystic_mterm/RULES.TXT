@@ -1,0 +1,49 @@
+RULES.TXT — mterm codegen and build rules
+==========================================
+
+COMPILER
+--------
+- FPC 2.6.4irc (custom cross-compiler from verta1878/fpc264irc)
+- mterm.pas and mtphone.pas use {$MODE OBJFPC}
+- RIP units use {$MODE DELPHI} {$H-} (ShortString, no AnsiString)
+- NO SDL dependency — FPC Graph unit only (Borland BGI equivalent)
+- ptcgraph on Linux, Graph on DOS
+- HAVE_GRAPH = conditional compile flag for graphics mode
+  0 = text-mode only (current default in mystic_mterm)
+  1 = graphics mode enabled (currently only in mystic_test/mterm.pas)
+
+VERSION RULE
+------------
+- Version LOCKED at v0.3 — NEVER bump the version number
+- Use date to track builds (same pattern as mconfig v0.1)
+
+BUILD TARGETS
+-------------
+- Linux (primary dev target, ptcgraph)
+- DOS (Graph unit native)
+- Win32, OS/2 (via fpc264irc cross-compiler)
+
+CODE RULES
+----------
+- No inline Var declarations (FPC 2.6.4 doesn't support them)
+- No += operators (BUG-036)
+- No abstract methods (BUG-037)
+- Reference only rule: never reference "C source" publicly — say
+  "RIPterm" instead (source is unreleased to public)
+- Code is ours, Pascal from scratch — reference only from RIPterm
+- Both engines (ripscr.pas OOP + procedural stack) kept in sync
+- All procedural units synced across mystic/, mystic_test/,
+  mystic_ripview/
+
+BUILD KNOBS (document every 0/1 toggle)
+----------------------------------------
+HAVE_GRAPH:
+  0 = text-mode terminal, no graphics unit linked
+  1 = graphics mode, links ptcgraph (Linux) or Graph (DOS)
+  Location: mterm.pas, conditional {$IFDEF HAVE_GRAPH}
+
+SAFETY
+------
+- NEVER work on the live copy — snapshot a backup FIRST
+- NEVER commit .o or .s files (build artifacts)
+- Only .ppu, .rst, .a and source belong in the repo

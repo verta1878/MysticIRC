@@ -35,6 +35,7 @@ type
     FBtnBevSize: Byte;
     FBtnDFore, FBtnBright, FBtnDark, FBtnSurface, FBtnCorner: Byte;
     FCurX, FCurY: Integer; { current position for text }
+    FUTF8Mode: Boolean;    { true = text is UTF-8, false = CP437 }
     FPalette: array[0..15] of TRGBColor; { live palette, modifiable by |a and |Q }
     procedure HLine(X1, X2, Y: Integer; Color: Byte);
     procedure VLine(X, Y1, Y2: Integer; Color: Byte);
@@ -99,6 +100,7 @@ type
     property BtnDark: Byte read FBtnDark write FBtnDark;
     property BtnSurface: Byte read FBtnSurface write FBtnSurface;
     property BtnCorner: Byte read FBtnCorner write FBtnCorner;
+    property UTF8Mode: Boolean read FUTF8Mode write FUTF8Mode;
     property Pixels[X, Y: Integer]: Byte read GetPixelRaw write PutPixelRaw;
   end;
 
@@ -142,7 +144,7 @@ const
 
 implementation
 
-uses SysUtils, Classes, Math;
+uses SysUtils, Classes, Math, riputf8;
 
 const
   CHR_MAX_CHARS   = 256;
@@ -193,6 +195,7 @@ begin
   FFontSize := 1;
   FCurX := 0;
   FCurY := 0;
+  FUTF8Mode := False;
   FViewX1 := 0; FViewY1 := 0;
   FViewX2 := RIP_WIDTH - 1; FViewY2 := RIP_HEIGHT - 1;
   { Init palette from EGA defaults }
@@ -699,6 +702,7 @@ end;
 
 procedure TRIPCanvas.OutTextXY(X, Y: Integer; const Text: String);
 var I: Integer; ActualScale: Double; YOffset: Integer;
+    DR: TUTF8DecodeResult; GlyphByte: Byte;
 begin
   FCurX := X; FCurY := Y;
   if (FFontNum >= 1) and (FFontNum <= 10) then begin
@@ -710,13 +714,31 @@ begin
         if FFontDir = 0 then FCurY := Y + YOffset
         else FCurX := X + YOffset;
       end;
-      for I := 1 to Length(Text) do
-        DrawCHRChar(FFontNum, Ord(Text[I]), FCurX, FCurY);
+      if FUTF8Mode then begin
+        I := 1;
+        while I <= Length(Text) do begin
+          DR := DecodeUTF8Char(Text, I);
+          GlyphByte := UnicodeToCP437(DR.CodePoint);
+          DrawCHRChar(FFontNum, GlyphByte, FCurX, FCurY);
+          Inc(I, DR.Advance);
+        end;
+      end else
+        for I := 1 to Length(Text) do
+          DrawCHRChar(FFontNum, Ord(Text[I]), FCurX, FCurY);
       Exit;
     end;
   end;
-  for I := 1 to Length(Text) do
-    DrawBitmapChar(Ord(Text[I]), FCurX, FCurY);
+  if FUTF8Mode then begin
+    I := 1;
+    while I <= Length(Text) do begin
+      DR := DecodeUTF8Char(Text, I);
+      GlyphByte := UnicodeToCP437(DR.CodePoint);
+      DrawBitmapChar(GlyphByte, FCurX, FCurY);
+      Inc(I, DR.Advance);
+    end;
+  end else
+    for I := 1 to Length(Text) do
+      DrawBitmapChar(Ord(Text[I]), FCurX, FCurY);
 end;
 
 procedure TRIPCanvas.SetTextStyle(Font, Direction, CharSize: Integer);
@@ -729,20 +751,37 @@ end;
 
 function TRIPCanvas.TextWidth(const Text: String): Integer;
 var I, C, W: Integer; ActualScale: Double;
+    DR: TUTF8DecodeResult; GlyphByte: Byte;
 begin
   if (FFontNum >= 1) and (FFontNum <= 10) and
      (CHRFonts[FFontNum] <> nil) and CHRFonts[FFontNum]^.Loaded then begin
     if FFontSize <= 10 then ActualScale := FontScales[FFontSize]
     else ActualScale := 1.0;
     W := 0;
-    with CHRFonts[FFontNum]^ do
-      for I := 1 to Length(Text) do begin
-        C := Ord(Text[I]) - FirstChar;
-        if (C >= 0) and (C < NumChars) then W := W + Widths[C];
+    if FUTF8Mode then begin
+      I := 1;
+      while I <= Length(Text) do begin
+        DR := DecodeUTF8Char(Text, I);
+        GlyphByte := UnicodeToCP437(DR.CodePoint);
+        with CHRFonts[FFontNum]^ do begin
+          C := GlyphByte - FirstChar;
+          if (C >= 0) and (C < NumChars) then W := W + Widths[C];
+        end;
+        Inc(I, DR.Advance);
       end;
+    end else
+      with CHRFonts[FFontNum]^ do
+        for I := 1 to Length(Text) do begin
+          C := Ord(Text[I]) - FirstChar;
+          if (C >= 0) and (C < NumChars) then W := W + Widths[C];
+        end;
     Result := Trunc(W * ActualScale);
-  end else
-    Result := Length(Text) * FFontSize * 8;
+  end else begin
+    if FUTF8Mode then
+      Result := UTF8Len(Text) * FFontSize * 8
+    else
+      Result := Length(Text) * FFontSize * 8;
+  end;
 end;
 
 function TRIPCanvas.TextHeight: Integer;

@@ -71,6 +71,8 @@ Type
 Var
   BtnStyle : TRIPButtonStyle;  { current button style, set by rcButtonStyle }
   QueryResponseBuf : ^String;  { pointer to caller's response buffer (mterm sets this) }
+  InTextBlock : Boolean;       { true between BeginText (!|t) and EndText (!|E) }
+  TextBlockBuf : String;       { accumulates text lines during text block mode }
 
   { Captured image buffer for GetImage/PutImage.
     Stores pixel region as width, height, and pixel data.
@@ -124,6 +126,7 @@ Var
   DbgStr  : String;
   IconName : String;
   SX      : Integer;
+  FFile   : Text;
 Begin
   Pos := 1;
   While Pos <= Length(Line) Do Begin
@@ -133,7 +136,15 @@ Begin
       commands on multi-command lines. DRAGON01 went from 99.9% diff
       to rendering correctly after this fix. }
     If (Line[Pos] <> '!') And (Line[Pos] <> '|') Then Begin
-      Inc(Pos);
+      { In text block mode, accumulate non-command text }
+      If InTextBlock Then Begin
+        While (Pos <= Length(Line)) And (Line[Pos] <> '!') And
+              (Line[Pos] <> '|') Do Begin
+          TextBlockBuf := TextBlockBuf + Line[Pos];
+          Inc(Pos);
+        End;
+      End Else
+        Inc(Pos);
       Continue;
     End;
     
@@ -202,12 +213,10 @@ Begin
       End;
       
       rcResetWindows: Begin
-        Canvas.ViewX1 := 0;
-        Canvas.ViewY1 := 0;
-        Canvas.ViewX2 := RIP_WIDTH - 1;
-        Canvas.ViewY2 := RIP_HEIGHT - 1;
-        Canvas.CurX := 0;
-        Canvas.CurY := 0;
+        { !|# is the RIPscrip end-scene boundary marker.
+          Full state reset: palette, colors, fill, line style, viewport,
+          text window, cursor, pixel buffer — then flag scene complete. }
+        EndScene;
       End;
       
       rcHome: Begin
@@ -261,6 +270,24 @@ Begin
         OutText(DbgStr);
       End;
       
+      rcBeginText: Begin
+        { !|t — enter text block mode. Subsequent raw text (not RIP
+          commands) is rendered as wrapped text in the text window
+          until EndText (!|E) is received. }
+        InTextBlock := True;
+        TextBlockBuf := '';
+      End;
+
+      rcEndText: Begin
+        { !|E — end text block mode. Flush accumulated text. }
+        If InTextBlock Then Begin
+          If Length(TextBlockBuf) > 0 Then
+            OutText(TextBlockBuf);
+          InTextBlock := False;
+          TextBlockBuf := '';
+        End;
+      End;
+
       rcFontStyle: If Pos + 7 <= Length(Line) Then Begin
         { !|Y FONT DIR SIZE RES — 4x 2-digit mega }
         X1 := DecodeMega2(Line, Pos);     { font }
@@ -519,6 +546,9 @@ Begin
                 Case C Of
                   0: Canvas.Pixels^[X1+I, Y1+R] := CapturedImage.Data[I, R];
                   1: Canvas.Pixels^[X1+I, Y1+R] := Canvas.Pixels^[X1+I, Y1+R] Xor CapturedImage.Data[I, R];
+                  2: Canvas.Pixels^[X1+I, Y1+R] := Canvas.Pixels^[X1+I, Y1+R] Or CapturedImage.Data[I, R];
+                  3: Canvas.Pixels^[X1+I, Y1+R] := Canvas.Pixels^[X1+I, Y1+R] And CapturedImage.Data[I, R];
+                  4: Canvas.Pixels^[X1+I, Y1+R] := Not CapturedImage.Data[I, R];
                 Else
                   Canvas.Pixels^[X1+I, Y1+R] := CapturedImage.Data[I, R];
                 End;
@@ -740,6 +770,26 @@ Begin
           QueryResponseBuf^ := 'RIPSCRIP015400';
       End;
 
+      rcRegionText: If Pos + 9 <= Length(Line) Then Begin
+        { !|1T JUSTIFY X0 Y0 X1 Y1 — define text region with word wrap.
+          Text follows on subsequent lines until next RIP command.
+          Format: 12222 = 9 chars (justify 1-digit, coords 4×2-digit). }
+        C := Ord(Line[Pos]) - Ord('0');  { justify: 0=left, 1=center, 2=right }
+        X1 := DecodeMega2(Line, Pos + 1);
+        Y1 := DecodeMega2(Line, Pos + 3);
+        X2 := DecodeMega2(Line, Pos + 5);
+        Y2 := DecodeMega2(Line, Pos + 7);
+        { Set text window to the defined region }
+        Canvas.ViewX1 := X1;
+        Canvas.ViewY1 := Y1;
+        Canvas.ViewX2 := X2;
+        Canvas.ViewY2 := Y2;
+        Canvas.CurX := X1;
+        Canvas.CurY := Y1;
+        Canvas.TextJustH := C;
+        Inc(Pos, 9);
+      End;
+
       rcDefine: Begin
         { !|1D FLAGS RES TEXT — define text variable.
           Wired to riptextvar.DefineVar in earlier session. }
@@ -769,7 +819,19 @@ Begin
               (Line[Pos] <> #13) Do Begin
           DbgStr := DbgStr + Line[Pos]; Inc(Pos);
         End;
-        { TODO: open file, read lines, call ExecuteRIP for each !| line }
+        { Load and execute the .RIP scene file }
+        If (Length(DbgStr) > 0) And FileExists(DbgStr) Then Begin
+          Assign(FFile, DbgStr);
+          {$I-} Reset(FFile); {$I+}
+          If IOResult = 0 Then Begin
+            While Not EOF(FFile) Do Begin
+              ReadLn(FFile, IconName);
+              If Length(IconName) > 0 Then
+                ExecuteRIP(IconName);
+            End;
+            Close(FFile);
+          End;
+        End;
       End;
 
       rcFileQuery: Begin

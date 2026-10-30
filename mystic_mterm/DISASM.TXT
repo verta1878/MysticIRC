@@ -1,0 +1,33 @@
+DISASM.TXT — mterm reference file pointers
+=============================================
+
+mterm is NEW CODE (not a decompilation project), so there is no
+disassembly to match against. This file tracks reference sources used
+during development.
+
+REFERENCE SOURCES
+-----------------
+RIPterm 1.54 (RT154SRC):
+  - CAPTURE.C    → validates mtcapture.pas (append/toggle/char-write)
+                   ✅ ALL 3 FIXES LANDED: byte count, pause mode, filename validation
+  - MENUSYS.C    → MRP extension reference (but MRP uses Mystic structures,
+                   NOT RIPterm's rip_button_data[256*8])
+  - ICONLIB.C    → validates ripicon.pas 64-slot cache ✅ confirmed match
+  - BUTTONS.C    → button handling reference
+  - BTNDATA.C    → button data reference
+
+RIPaint (decompiled):
+  - RIPAINT-NAMED-FUNCS.txt — 675 named C functions from symbol table
+  - RIPAINT-PHASE4C.c — decompiled source
+  Reference only, code is ours, Pascal from scratch.
+
+RTerm (Apache 2.0, Electron/TypeScript):
+  - Themes: concept reference for mterm theme system (use Mystic's
+    own theme system, not RTerm's)
+  - Terminal features: concept only (search scrollback, clickable URLs,
+    auto-resize, drag-drop, scrollbar auto-hide)
+  - AI agent: NOT taken
+  - Serial config: NOT taken
+
+RULE: reference only — our code is ours, Pascal from scratch.
+RULE: never reference "C source" publicly — say "RIPterm" instead.

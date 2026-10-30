@@ -1,0 +1,21 @@
+CHECKPOINT.TXT — mterm session log (append-only)
+==================================================
+Session detail goes HERE, not in memory.
+
+--- 2026-10-29 — kiddo cowork session ---
+9-file toolkit created for mystic_mterm/.
+Priority order set: toolkit → graphics → RT154SRC verify → CAPTURE
+fixes → IMG/TIFF → UTF-8 → MRP (last).
+CAPTURE fixes landed in mtcapture.pas: byte count (Int64), pause mode
+(Pause/Resume/TogglePause), filename validation (InvalidChars set).
+74 → 173 lines. Compiles clean, zero warnings.
+HAVE_GRAPH enabled in mterm.pas — uncommented {$DEFINE HAVE_GRAPH}.
+Graphics mode live: 640x350 EGA via ptcgraph (Unix) / Graph (DOS/Win).
+FlushCanvasToScreen pixel blit active. Text-mode fallback retained.
+UTF-8 extension (RIPscrip 3.0) wired into mterm:
+  mterm.pas: riputf8 in uses, RIPLineBuf flush loop does DecodeUTF8Char →
+    UnicodeToCP437 → TWRenderChar when Canvas.UTF8Mode.
+  mtripgfx.pas: riputf8 in uses, FUTF8Mode field + UTF8Mode property,
+    OutTextXY does codepoint iteration for both CHR and bitmap paths,
+    TextWidth counts codepoints (UTF8Len) for bitmap, maps via UnicodeToCP437
+    for CHR widths. Constructor inits FUTF8Mode := False.

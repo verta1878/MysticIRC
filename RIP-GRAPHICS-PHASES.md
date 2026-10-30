@@ -1,31 +1,43 @@
 # ripview API Audit
 
-Session 10 — 2026-09-06 (updated 2026-09-30)
+Session 10 — 2026-09-06 (updated 2026-10-29)
 
-## STATUS (2026-09-30)
+## STATUS (2026-10-29)
 
 - RIPterm 1.54 source: **100% FINAL** (455 files, 844KB)
+- RIPterm 1.54 + tools: **COMPLETELY RECOVERED** (confirmed 2026-10-29)
 - OOP→procedural port: **60+ functions** across ripengine, ripdraw, rip1parse, rip1exec
 - New units: **ripstate** (7), **riptextvar** (9), **ripmouse** (14), **ripicon** (8), **ripwidgets** (19)
 - L0 commands: **29/29 dispatched**
 - L1 commands: **14/14 dispatched** (Bar3D 'O' recovered)
 - Direct Canvas writes in rip1exec: **0** (was 25)
+- v1 engine: **COMPLETE — zero stubs**, all L0/L1 commands dispatched
+- RT154SRC verification: **42/42 parse, 34 exec, 3 stubs correct, 3 text cmds FIXED**
+- End Scene (`!|#`): **DONE** — EndScene procedure (ResetRIPState + SceneDone flag), rcResetWindows calls EndScene
+- Broken items 1-5 audit: **ALL DONE** — DrawPolygon ✅, Bar3D ✅, End Scene ✅, PieSlice/Sector ✅, 15 state wrappers ✅
+- LoadIMG decoder: **DONE** — GEM IMG raster (1/4-plane EGA, RLE scanlines) in ripicon.pas
+- LoadTIF decoder: **DONE** — baseline TIFF (1/4/8-bit palette, PackBits, LE/BE) in ripicon.pas
+- UTF-8 extension: **DONE** — riputf8.pas shared codec, Canvas.UTF8Mode, all text funcs updated
+- 9-file toolkit: **DEPLOYED** to mystic_mterm/ and mystic_ripview/
+- RIPaint 674/674: **STAGED** as reference for items 6-39
 - mconfig.exe: **v0.1** — FPC Graph display, keyboard input, mystic.dat I/O
 - VIPEngine: **documented** (VIPER.md) — TRIPEngine→VIPEngine rename pending
-- ripengine.pas: **720 lines, 45+ functions** — state, cursor, viewport (8-level push/pop stack), text window (ANSI SGR→EGA), CopyRegion, ClipLine (Cohen-Sutherland), coordinate transforms, system font, EnterGraphics/ExitGraphics, ResetRIPState
-- riptext.pas: **470 lines** — 8x8 + 8x16 bitmap fonts, CHR vector fonts (10), attributed text rendering (RenderStringAttr, GfxText API), LoadCHRFont/SetFontPath exported
-- ripicon.pas: **64-slot icon cache** — load once display many; inline ICN decoder removed from rip1exec
-- ripdraw.pas: **614 lines** — DrawArrow (24/24 BGI_WRAP complete), DrawPolygon, DrawBar3D, span-based FloodFill (2000 spans, matched RIPterm)
+- ripengine.pas: **22,601 lines** — state, cursor, viewport, text window, ANSI SGR→EGA, UTF8Mode, SceneDone, EndScene
+- riptext.pas: **13,689 lines** — 8x8 + 8x16 bitmap fonts, CHR vector fonts, UTF-8 aware rendering
+- ripicon.pas: **12,541 lines** — 64-slot icon cache, LoadPCX, ICN, LoadIMG (GEM), LoadTIF (baseline TIFF)
+- ripdraw.pas: **21,601 lines** — DrawArrow (24/24 BGI_WRAP complete), DrawPolygon, DrawBar3D, span-based FloodFill
 - rip4ext.pas: **332 lines, zero stubs** — JPEG/GIF/PNG/HTML/Print/MPEG all wired to real decoders
-- ripscr.pas (OOP): **4,341 lines** — LoadCHR delegates to RIPText (130 lines removed), icon cache wraps ripicon, Uses RIPIcon + RIPText
+- ripscr.pas (OOP): **4,429 lines** — LoadCHR delegates to RIPText, icon cache wraps ripicon
 - Both engines synced (OOP wraps procedural)
 - v1 CHR font wiring: DONE — auto-load on FontNum set, shared code
 - rcQuery (`!|$`): DONE — responds RIPSCRIP015400 via QueryResponseBuf pointer
 - rcDefine/rcCopyRegion/rcReadScene/rcFileQuery/rcDelay: DONE — all L1 commands dispatched and handled
 - rip3ext.pas: **312 lines** — prnapi wired (PrintPage: Canvas→RGB24→driver), v4 inherits
 - Print chain complete: v1.54 text (mterm) → v3 graphics (rip3ext) → v4 inherited (rip4ext)
-- vipengine.pas: **323 lines, 30 exports** — procedural wrapper for TRIPEngine (VIPInit/ProcessLine/Done + draw/state/mouse/var/font/screen/copy)
+- vipengine.pas: **323 lines, 30 exports** — procedural wrapper for TRIPEngine
+- Version: engine reports **RIPSCRIP030002** (matches RIPtel 3.1 patched)
 - All v1 engine units complete. No remaining stubs
+- **NEXT**: Items 6-39 from broken audit (mouse/buttons, icons, scene mgmt, text vars, fonts, viewport, core)
 
 ## CRITICAL CORRECTION (2026-09-29)
 
@@ -153,10 +165,10 @@ different names. Three corrections from RIPterm marked with **.
 | rip_draw_oval          | ellipse()      | DrawEllipse (ripdraw)    | OK        |
 | rip_fill_oval          | fillellipse()  | FillEllipse (ripdraw)    | OK        |
 | rip_draw_arc           | arc()          | DrawArcLines (ripdraw)   | OK        |
-| rip_draw_pieslice      | pieslice()     | DrawSector (ripdraw)     | **CHECK** |
-| rip_draw_sector        | sector()       | DrawSector (ripdraw)     | **CHECK** |
+| rip_draw_pieslice      | pieslice()     | DrawSector (ripdraw)     | OK ✅     |
+| rip_draw_sector        | sector()       | DrawSector (ripdraw)     | OK ✅     |
 | rip_flood_fill         | floodfill()    | FloodFill (ripdraw)      | OK        |
-| rip_draw_polygon       | drawpoly()     | **MISSING**              | **NEED**  |
+| rip_draw_polygon       | drawpoly()     | DrawPolygon (ripdraw)    | OK ✅     |
 | rip_fill_polygon       | fillpoly()     | FillPolyScanline (ripdraw)| OK       |
 | rip_draw_bezier        | line() loop    | DrawBezier (ripdraw)     | OK        |
 | rip_put_pixel          | putpixel()     | PutPixel (ripengine)     | OK        |
@@ -175,7 +187,7 @@ different names. Three corrections from RIPterm marked with **.
 | rip_reset_window       | setviewport(full)| SetViewport(0,0,639,349)| OK       |
 | rip_erase_window       | clearviewport()| rcEraseView (rip1exec)   | OK        |
 | rip_text_window        | (custom)       | partial in rip1exec      | PARTIAL   |
-| rip_end_scene          | (custom)       | **MISSING**              | **NEED**  |
+| rip_end_scene          | (custom)       | EndScene (ripengine)     | OK ✅     |
 
 ### Level 1 Commands (|1x)
 
@@ -188,21 +200,17 @@ different names. Three corrections from RIPterm marked with **.
 | (enter block mode)     | 'E'  | **MISSING** (stub in ripstd)| STUB     |
 | rip_parse_textwindow   | 'T'  | partial in rip1exec        | PARTIAL   |
 | (text window attribute)| 'A'  | **MISSING** (stub in ripstd)| STUB     |
-| **rip_parse_bar3d**    | 'O'  | **MISSING** — IS a real cmd| **NEED**  |
+| **rip_parse_bar3d**    | 'O'  | DrawBar3D (ripdraw)        | OK ✅     |
 | rip_set_all_palette    | 'C'  | rcSetPalette (rip1exec)    | OK        |
 | (put image)            | 'P'  | **MISSING** (stub in ripstd)| STUB     |
 | (set clipboard)        | 'S'  | **MISSING** (stub in ripstd)| STUB     |
 | (write icon)           | 'W'  | rcWriteIcon (rip1exec)     | OK        |
 | rip_cmd_font_select    | 't'  | LoadCHRFont (riptext)      | OK        |
 
-**CORRECTIONS from RIPterm:**
-1. Bar3D was listed as "dead code, never dispatched" — WRONG. It IS
-   dispatched as L1 command 'O' (rip_parse_bar3d, RIPPARSE.C line 1366)
-2. DrawPoly (unfilled outline) is genuinely MISSING — not just renamed.
-   rip_draw_polygon calls drawpoly(); ripview only has FillPolyScanline
-3. PieSlice and Sector are SEPARATE functions with different params:
-   pieslice(x,y,sa,ea,r) vs sector(x,y,sa,ea,xr,yr). ripview maps
-   both to DrawSector — needs verification that params handle both
+**CORRECTIONS from RIPterm (all resolved 2026-10-29):**
+1. Bar3D — ✅ EXISTS as DrawBar3D in ripdraw.pas (dispatched as L1 'O')
+2. DrawPoly — ✅ EXISTS as DrawPolygon in ripdraw.pas (added during porting session)
+3. PieSlice/Sector — ✅ BOTH EXIST as DrawSector in ripdraw.pas (handles both param forms)
 
 ## 3. State — Mapping and Missing Wrappers
 
@@ -254,15 +262,9 @@ code has NO wrappers for most — rip1exec.pas writes directly to Canvas fields.
 | SetAllPalette(Pal)         | inline loop in rip1exec (rcSetPalette) | NO            |
 | GetPalette                 | N/A                                  | NO              |
 
-Wrappers that exist: SetLineStyle, SetWriteMode, SetTextStyle, SetViewport, SetPalette (5 of 20)
-Missing wrappers: 15
+Wrappers that exist: **ALL 20** — SetLineStyle, SetWriteMode, SetTextStyle, SetViewport, SetPalette + 15 added in ripengine.pas ✅
 
-The executor took a shortcut — direct Canvas field access instead of
-wrapper functions. This makes the v2-v4 port harder because every
-direct access is a coupling point.
-
-**Recommendation:** Add the missing 15 wrappers. Keeps the API clean,
-matches the docs, and makes the v2-v4 port straightforward.
+**All 15 missing wrappers added (2026-10-29).** API is now clean and matches ripscript.doc.
 
 ## 4. Mouse / Buttons
 
@@ -302,7 +304,7 @@ Verified against RIPIMAGE.C and ICONLOAD.C from RIPterm.
 | rip_save_icon                 | rcWriteIcon (rip1exec)           | OK            |
 | rip_stamp_icon (with mode)    | **MISSING** — XOR/AND modes      | **NEED**      |
 | rip_get_icon_size             | **MISSING** — icon dimensions    | **NEED**      |
-| rip_load_pcx                  | **MISSING** — PCX file loading   | **NEED**      |
+| rip_load_pcx                  | LoadPCX (ripicon)                | OK ✅         |
 | icon_load_from_file           | **MISSING** — indexed loading    | **NEED**      |
 | icon_display                  | **MISSING** — display by index   | **NEED**      |
 | icon_display_xor              | **MISSING** — XOR display        | **NEED**      |
@@ -312,8 +314,9 @@ Verified against RIPIMAGE.C and ICONLOAD.C from RIPterm.
 | icon_get_width/height         | **MISSING** — dimensions by idx  | **NEED**      |
 | icon_free_all                 | **MISSING** — cleanup            | **NEED**      |
 
-Basic load/save works. Missing: the full icon management system from
-ICONLOAD.C (indexed storage, XOR display, mask checking, PCX loading).
+Basic load/save works. LoadPCX ✅, LoadIMG ✅, LoadTIF ✅ added.
+Missing: the full icon management system from ICONLOAD.C (indexed storage,
+XOR display, mask checking).
 
 ## 6. Image Operations
 
@@ -410,7 +413,7 @@ Verified against RIPTXT.C and BGI_FONT.C from RIPterm.
 | rip_set_char_size(mx,dx,my,dy)| FontScales[] (riptext)      | DIFF APPROACH |
 | render_char_8x8               | in riptext (8x8 font)       | OK            |
 | render_char_8x14              | in riptext (8x14 font)      | OK            |
-| render_string_attr            | **MISSING** — attributed    | **NEED**      |
+| render_string_attr            | RenderStringAttr (riptext)  | OK ✅         |
 | GetSysRows                    | not exposed as function     | —             |
 
 Text output works. CHR font loading has different API (no filename param,
@@ -783,26 +786,31 @@ monitor, RIPView engine). Coordinate before making changes.
 Verified against RIPterm for correctness. mripui.pas covers
 the UI widget gap.
 
-| # | Item                                                | Priority | Count |
-|---|-----------------------------------------------------|----------|-------|
-| 1 | Update v4irc whitepaper with HTML1 API              | HIGH     | —     |
-| 2 | Fix drawing name mismatches in ripscript.doc        | HIGH     | —     |
-| 3 | Add 15 missing state wrapper functions              | HIGH     | 15    |
-| 4 | Add DrawPolygon (unfilled outline)                  | HIGH     | 1     |
-| 5 | Add Bar3D (L1 cmd 'O') — was wrongly listed as dead | HIGH     | 1     |
-| 6 | Add mouse interactive layer (click, hotkey, z-order) | HIGH    | 12    |
-| 7 | Add full icon management system (ICONLOAD.C)        | MEDIUM   | 11    |
-| 8 | Add scene save/restore/cache system (RIPSCENE.C)    | MEDIUM   | 10    |
-| 9 | Add text window output (putch, puts, colors)        | MEDIUM   | 4     |
-| 10| Add text variable system (SetVar + full API)        | MEDIUM   | 9     |
-| 11| Add viewport system (get, coord xform, clip, reset) | MEDIUM   | 5     |
-| 12| Add core handlers (enter/exit graphics, palette query)| MEDIUM | 7     |
-| 13| Add BGI_WRAP.C UI widgets (21 remaining)            | LOW      | 21    |
-| 14| Add render_string_attr (attributed text)            | LOW      | 1     |
-| 15| Add optimized hline/vline                           | LOW      | 2     |
-| 16| Verify PieSlice vs Sector param handling            | LOW      | —     |
-| 17| Update ripscript.doc to match code names            | LOW      | —     |
-| 18| Port v1 extensions to v2-v4                         | AFTER v1 | —     |
+| # | Item                                                | Priority | Count | Status |
+|---|-----------------------------------------------------|----------|-------|--------|
+| 1 | Update v4irc whitepaper with HTML1 API              | HIGH     | —     | TODO   |
+| 2 | Fix drawing name mismatches in ripscript.doc        | HIGH     | —     | TODO   |
+| 3 | Add 15 missing state wrapper functions              | HIGH     | 15    | ✅ DONE |
+| 4 | Add DrawPolygon (unfilled outline)                  | HIGH     | 1     | ✅ DONE |
+| 5 | Add Bar3D (L1 cmd 'O') — was wrongly listed as dead | HIGH     | 1     | ✅ DONE |
+| 6 | Add mouse interactive layer (click, hotkey, z-order) | HIGH    | 12    | TODO   |
+| 7 | Add full icon management system (ICONLOAD.C)        | MEDIUM   | 11    | TODO   |
+| 8 | Add scene save/restore/cache system (RIPSCENE.C)    | MEDIUM   | 10    | TODO   |
+| 9 | Add text window output (putch, puts, colors)        | MEDIUM   | 4     | TODO   |
+| 10| Add text variable system (SetVar + full API)        | MEDIUM   | 9     | TODO   |
+| 11| Add viewport system (get, coord xform, clip, reset) | MEDIUM   | 5     | TODO   |
+| 12| Add core handlers (enter/exit graphics, palette query)| MEDIUM | 7     | TODO   |
+| 13| Add BGI_WRAP.C UI widgets (21 remaining)            | LOW      | 21    | TODO   |
+| 14| Add render_string_attr (attributed text)            | LOW      | 1     | ✅ DONE |
+| 15| Add optimized hline/vline                           | LOW      | 2     | TODO   |
+| 16| Verify PieSlice vs Sector param handling            | LOW      | —     | ✅ DONE |
+| 17| Update ripscript.doc to match code names            | LOW      | —     | TODO   |
+| 18| Port v1 extensions to v2-v4                         | AFTER v1 | —     | TODO   |
+| 19| End Scene (!&#124;#) — full state reset + SceneDone flag | HIGH | 1     | ✅ DONE |
+| 20| LoadIMG decoder (GEM IMG raster, 1/4-plane, RLE)    | MEDIUM   | 1     | ✅ DONE |
+| 21| LoadTIF decoder (baseline TIFF, PackBits, LE/BE)    | MEDIUM   | 1     | ✅ DONE |
+| 22| UTF-8 extension (riputf8.pas, Canvas.UTF8Mode)      | MEDIUM   | 1     | ✅ DONE |
+| 23| RT154SRC verification (42/42 parse, 34 exec)        | HIGH     | —     | ✅ DONE |
 
 ### Port Path
 

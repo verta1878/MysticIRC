@@ -1,0 +1,59 @@
+SEGMAP.TXT — ripview unit dependency map
+=========================================
+
+DIRECTORY LAYOUT
+----------------
+mystic_ripview/
+├── source/                  — main source tree
+│   ├── v1/                  — v1 RIPscrip engine
+│   │   ├── rip1parse.pas    — L1 command parser (14 commands)
+│   │   └── rip1exec.pas     — L1 command executor
+│   ├── fonts/               — BGI CHR fonts (BOLD, EURO, GOTH, etc.)
+│   ├── ripview.pas          — main viewer/browser program
+│   ├── ripengine.pas        — engine core (state, viewport, text window)
+│   ├── ripdraw.pas          — drawing primitives (24 commands)
+│   ├── riptext.pas          — text rendering
+│   ├── riptextvar.pas       — text variables
+│   ├── ripstate.pas         — state management
+│   ├── ripmouse.pas         — mouse handling
+│   ├── ripicon.pas          — icon cache (PCX, ICN, TODO: IMG, TIF)
+│   ├── ripwidgets.pas       — UI widgets
+│   ├── ripbmp.pas           — BMP handling
+│   ├── riprender.pas        — render pipeline
+│   ├── ripdelta.pas         — delta encoding
+│   ├── ripbindec.pas        — binary decoder
+│   ├── riplayerdec.pas      — layer decoder
+│   ├── riptile.pas          — tile support
+│   └── rip_compat.pas       — compatibility layer
+├── tools/                   — converter and test tools
+│   ├── ans2png.pas, ans2rip.pas, chg2rip.pas
+│   ├── mkicons.pas, rip_sample.pas, rip_view.pas, ripmake.pas
+│   └── test_*.pas           — test scripts
+├── js-reference/            — JavaScript RIPterm reference implementation
+│   ├── src/                 — JS source (BGI.js 104KB, ripterm.js 127KB)
+│   └── old-v2/              — older v2 JS
+├── docs/                    — documentation (ripjsapi.html 1.9MB)
+└── test-output-ripdraw/     — BMP test outputs
+
+UNIT DEPENDENCY TREE
+--------------------
+ripview.pas (main program)
+├── ripengine.pas
+│   ├── ripstate.pas
+│   ├── riptextvar.pas
+│   └── (Graph/ptcgraph)
+├── ripdraw.pas
+├── riptext.pas
+├── ripmouse.pas
+├── ripicon.pas
+├── ripwidgets.pas
+├── ripbmp.pas
+├── riprender.pas
+├── ripdelta.pas / ripbindec.pas / riplayerdec.pas / riptile.pas
+├── rip_compat.pas
+└── v1/rip1parse.pas
+    └── v1/rip1exec.pas
+
+SYNC RULE: procedural units synced across mystic/, mystic_test/,
+           mystic_ripview/. OOP engine (ripscr.pas) in mystic/ kept
+           in sync with procedural stack.

@@ -1,10 +1,61 @@
-# Mystic BBS 1.10 A38 — Community IRC Fork — Release Notes
+# Mystic BBS 1.11IRC — Community Fork — Release Notes
 
-**Release date:** 2026-07-09
-**Base:** Mystic BBS 1.10 alpha 38 (A38), brought to ~1.10 A39 feature level
-**Repository:** https://github.com/verta1878/mystic-bbs-irc
+**Repository:** https://github.com/verta1878/MysticIRC
 **License:** GNU General Public License v3 (GPLv3)
 **Live node:** Ecstasy BBS — FidoNet 152/158 — tnabbs.org
+
+================================================================================
+## Release: 1.11IRC A5 — 2026-10-29
+
+### RIPView Engine (v1 COMPLETE)
+
+- v1 engine: zero stubs, all L0/L1 commands dispatched
+- RT154SRC verified against RIPterm reference: 42/42 parse, 34 exec, 3 stubs correct
+- RIPaint 674/674 decompiled source staged as engine reference
+- End Scene (`!|#`): EndScene procedure (ResetRIPState + SceneDone flag), rcResetWindows calls EndScene
+- Broken items 1-5 audit: ALL DONE — DrawPolygon, Bar3D, PieSlice/Sector, 15 state wrappers all exist
+- LoadIMG decoder: GEM IMG raster (1/4-plane EGA, RLE scanlines) in ripicon.pas
+- LoadTIF decoder: baseline TIFF (1/4/8-bit palette, PackBits, LE/BE byte order) in ripicon.pas
+- IconLoadToSlot auto-detect for .IMG/.TIF/.TIFF extensions
+- UTF-8 extension: riputf8.pas shared codec (CP437↔Unicode bidirectional, 1-4 byte decode/encode, overlong/surrogate rejection)
+- Canvas.UTF8Mode flag, OutTextXY/TextWidth/GfxTextPuts/RenderStringAttr/GfxTextStringWidth all UTF-8 aware
+- Engine reports RIPSCRIP030002 (matches RIPtel 3.1 patched)
+
+### Unit Line Counts (as of A5)
+
+| Unit | Lines | Notes |
+|------|-------|-------|
+| ripview.pas | 17,917 | Main viewer/browser |
+| ripengine.pas | 22,601 | Engine core (state, viewport, UTF8Mode, SceneDone, EndScene) |
+| ripdraw.pas | 21,601 | 24/24 drawing primitives |
+| riptext.pas | 13,689 | Text rendering, UTF-8 aware |
+| ripicon.pas | 12,541 | 64-slot cache + LoadPCX/LoadIMG/LoadTIF |
+| rip1exec.pas | 34,780 | v1 L1 executor (End Scene, ReadScene, PutImage modes 0-4) |
+| rip1parse.pas | 5,431 | v1 L1 parser (14 commands) |
+| ripwidgets.pas | 7,529 | 19 UI widgets |
+
+### Other A5 Changes
+
+- 9-file toolkit deployed to mystic_mterm/ and mystic_ripview/
+- make_clean.bat: Windows build cleaner for repo root
+- OpenOLMS released: mystic_molms/, 37 units, 8 programs, GPLv3
+- BeginText/EndText/RegionText implemented in rip1exec.pas
+- ReadScene file loading + recursive ExecuteRIP
+- PutImage modes 2-4 (OR/AND/NOT) added
+- RIP-GRAPHICS-PHASES.md fully updated with completion status
+
+### Remaining Work
+
+- Items 6-39 from broken audit: mouse/buttons, icons, scene mgmt, text vars, fonts, viewport, core
+- MRP extension (items 6-20, LAST priority)
+- SAUCE trimming on .RIP file open
+- Reset canvas before file load
+- Batched repaints, screen transition timing
+
+================================================================================
+## Release: 1.10 A38 (initial fork) — 2026-07-09
+
+**Base:** Mystic BBS 1.10 alpha 38 (A38), brought to ~1.10 A39 feature level
 
 This document is the single, complete reference for the release: what's in it,
 which platforms it runs on, how the binaries and source are packaged, how to

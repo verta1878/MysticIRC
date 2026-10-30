@@ -1,0 +1,44 @@
+DISASM.TXT — ripview reference file pointers
+===============================================
+
+ripview is new code but VERIFIED against RIPterm references.
+This file tracks all reference sources and verification status.
+
+REFERENCE SOURCES — RT154SRC (RIPterm 1.54)
+--------------------------------------------
+File              Purpose                          Status
+--------------    ----------------------------     --------
+ICONLIB.C         ripicon.pas 64-slot cache         ✅ VERIFIED
+                  ICN 4-plane EGA format             matches icon_data[64]
+CAPTURE.C         mtcapture.pas validation           ✅ VERIFIED + FIXED
+                  byte count, pause, filename val    all 3 fixes landed
+MENUSYS.C         MRP record structure               reviewed, saved for LAST
+                  (MRP uses Mystic structures,       (lead's direction)
+                  NOT rip_button_data[256*8])
+BUTTONS.C         button handling                    reviewed
+BTNDATA.C         button data                        reviewed
+RIP_DRAW.C        24 drawing commands                ✅ all match
+
+RT154SRC COMMAND VERIFICATION (2026-10-29 — DONE):
+  42/42 commands parse correctly. Zero parameter format errors.
+  34/42 fully executed, 3 correct stubs, 3 missing, 1 TODO.
+  Full report: RT154SRC-VERIFY.txt in session.
+  MISSING: BeginText, EndText, RegionText (text block rendering)
+  TODO: ReadScene (filename parsed, file loading not wired)
+  MINOR: PutImage modes 2-4 (OR/AND/NOT) fall through to COPY
+
+REFERENCE SOURCES — RIPAINT (decompiled)
+-----------------------------------------
+RIPAINT-NAMED-FUNCS.txt — 675 named C functions from symbol table
+RIPAINT-PHASE4C.c — decompiled source
+RIPaint 2.1 = verification target (not decompile), gives v2/v3 API info.
+Rule: reference only, code is ours, Pascal from scratch.
+
+DG FINDING (from RIPterm work, 2026-09-29):
+  14 DGROUP variable refs MISSING from compiled binary = 14 unmatched
+  functions. Full offset hit list in /areas/ripterm154.md.
+  ACTION: declare all 14 variables, write functions from disassembly.
+  (This is ripterm154 work, not ripview, but feeds verification)
+
+RULE: reference only — our code is ours, Pascal from scratch.
+RULE: never reference "C source" publicly — say "RIPterm" instead.

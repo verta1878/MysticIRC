@@ -16,7 +16,7 @@ Program mterm;
 {$H+}
 
 { Define HAVE_GRAPH when fpc264irc has ptcgraph for this target }
-{ $DEFINE HAVE_GRAPH}
+{$DEFINE HAVE_GRAPH}
 
 Uses
   SysUtils,
@@ -585,7 +585,7 @@ Begin
   TextWinY1 := RIP_HEIGHT - (4 * 8);  { Bottom 4 rows = text window area }
   TextWinActive := False;
   If Not GraphAvail Then Begin
-    { Stub — text-mode blit fallback until fpc264irc has ptcgraph }
+    { Text-mode blit fallback — Graph init failed or unavailable }
   End;
 End;
 

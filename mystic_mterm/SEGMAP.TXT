@@ -1,0 +1,49 @@
+SEGMAP.TXT — mterm unit dependency map
+=======================================
+
+mterm is a Pascal project (not a segmented binary), so this file
+documents the unit dependency tree instead of segment/section mapping.
+
+UNIT DEPENDENCY TREE
+--------------------
+mterm.pas (main program)
+├── mtphone.pas       — phonebook management
+├── mtcapture.pas     — capture/logging
+├── mtconfig.pas      — configuration
+├── mtconn.pas        — connection handling
+├── mtserial.pas      — serial port
+├── mtsound.pas       — sound
+├── mtterm.pas        — terminal emulation
+├── mtxfer.pas        — file transfer
+├── mtrip.pas         — RIP engine integration
+│   ├── mtripgfx.pas  — RIP graphics
+│   └── (RIP engine units from mystic_ripview/source/)
+├── editor.pas        — text editor
+├── M_OPS.PAS         — Mystic operations
+└── (FPC standard units: Graph/ptcgraph, CRT, SysUtils, etc.)
+
+RIP ENGINE UNITS (shared across projects)
+------------------------------------------
+ripengine.pas    — 573 lines, 38 functions (state, cursor, viewport, text window)
+ripdraw.pas      — drawing primitives (DrawPolygon, DrawBar3D)
+riptext.pas      — text rendering
+riptextvar.pas   — text variables
+ripstate.pas     — state management
+ripmouse.pas     — mouse handling
+ripicon.pas      — 64-slot icon cache (LoadPCX, ICN decode)
+ripwidgets.pas   — 19 UI widgets + HLine/VLine
+ripbmp.pas       — BMP handling
+riprender.pas    — rendering
+rip1parse.pas    — L1 command parser (14 commands dispatched)
+rip1exec.pas     — L1 command executor (0 direct Canvas writes)
+
+SYNC RULE: procedural units synced across mystic/, mystic_test/,
+           mystic_ripview/. Both OOP (ripscr.pas) and procedural
+           engines kept in sync.
+
+FILE LOCATIONS
+--------------
+mystic_mterm/         — this project (mterm + local units)
+mystic_ripview/source/ — RIP engine units (canonical)
+mystic_test/          — mconfig build area, HAVE_GRAPH test bed
+mystic/               — Mystic BBS core

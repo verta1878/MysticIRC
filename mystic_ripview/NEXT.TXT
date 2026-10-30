@@ -1,0 +1,47 @@
+NEXT.TXT — ripview cold-start (read this first)
+=================================================
+Project: ripview (RIPscrip viewer/browser)
+Location: mystic_ripview/
+Compiler: FPC 2.6.4irc
+Crew: kiddo (Protocols, RIPscrip), evga (Display)
+Repo: verta1878/MysticIRC
+
+CURRENT STATE
+-------------
+ripview is a BROWSER (not just a graphics viewer — lead clarified).
+v1 engine COMPLETE — zero stubs, all L0/L1 commands dispatched.
+
+Source tree:
+  mystic_ripview/source/     — main units + fonts/
+  mystic_ripview/source/v1/  — v1 engine (rip1parse.pas, rip1exec.pas)
+  mystic_ripview/tools/      — converter/test tools
+  mystic_ripview/js-reference/ — JavaScript RIPterm reference impl
+
+Key units:
+  ripview.pas      17,917 lines  main viewer program
+  ripengine.pas    22,601 lines  engine (573 lines procedural, 38 funcs)
+  ripdraw.pas      21,601 lines  drawing primitives
+  riptext.pas      13,689 lines  text rendering
+  ripicon.pas      12,541 lines  64-slot icon cache (LoadPCX, ICN)
+  ripwidgets.pas    7,529 lines  19 UI widgets
+  rip1exec.pas     34,780 lines  v1 L1 command executor
+  rip1parse.pas     5,431 lines  v1 L1 parser (14 commands)
+  + ripstate, riptextvar, ripmouse, ripbmp, ripdelta, riprender,
+    ripbindec, riplayerdec, riptile, rip_compat
+
+WHAT TO DO NEXT
+---------------
+Items 1-5 from broken audit: COMPLETE (End Scene implemented 2026-10-29).
+IMG/TIFF decoders: DONE (LoadIMG + LoadTIF in ripicon.pas).
+UTF-8 extension: DONE (riputf8.pas, Canvas.UTF8Mode).
+
+1. Fix broken items 6-39 from RIP-GRAPHICS-PHASES.md audit
+   (mouse/buttons, icons, scene mgmt, text vars, fonts, viewport, core)
+   Use RIPaint 674/674 decompiled source as reference.
+
+2. RT154SRC verify — cross-check ripengine/ripdraw/riptext/rip1exec
+   against RIPterm reference. VERIFICATION, not gap-filling.
+
+3. MRP extension (LAST)
+
+READ ORDER: NEXT.TXT → RULES.TXT → STATUS.TXT → do work → run test

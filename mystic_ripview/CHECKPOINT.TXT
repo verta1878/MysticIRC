@@ -1,0 +1,47 @@
+CHECKPOINT.TXT — ripview session log (append-only)
+====================================================
+Session detail goes HERE, not in memory.
+
+--- 2026-10-29 — kiddo cowork session ---
+9-file toolkit created for mystic_ripview/.
+v1 engine is zero stubs — all verification, no gap-filling.
+ICONLIB.C validation complete (64-slot cache confirmed match).
+Priority: graphics mode (mterm) → RT154SRC verify → IMG/TIFF → UTF-8 → MRP.
+RT154SRC verification complete — 42/42 parse, 34 fully executed, 3 stubs OK.
+rip1exec.pas: BeginText/EndText/RegionText implemented (text block mode).
+rip1exec.pas: ReadScene wired (file load + recursive ExecuteRIP).
+rip1exec.pas: PutImage modes 2-4 (OR/AND/NOT) added.
+RT154SRC-VERIFY.txt committed to mystic_ripview/.
+ripicon.pas: LoadIMG added — GEM IMG raster decoder (1/4-plane EGA,
+  big-endian header, RLE: solid runs, pattern runs, literal runs,
+  vertical replication). Handles mono + 16-color.
+ripicon.pas: LoadTIF added — baseline TIFF decoder (1/4/8-bit palette,
+  uncompressed + PackBits, LE/BE byte order, multi-strip).
+  EGAFromRGB maps TIFF palette → nearest EGA color.
+IconLoadToSlot auto-detect updated for .IMG/.TIF/.TIFF extensions.
+riputf8.pas created — shared UTF-8 codec unit (CP437↔Unicode bidirectional
+  mapping from Unicode.org CP437.TXT, 1-4 byte UTF-8 decode/encode,
+  overlong/surrogate rejection, U+FFFD fallback).
+ripengine.pas: UTF8Mode Boolean added to TBGICanvas record.
+riptext.pas: OutTextXY, TextWidth, GfxTextPuts, RenderStringAttr,
+  GfxTextStringWidth all updated — codepoint iteration via DecodeUTF8Char
+  when Canvas.UTF8Mode, UnicodeToCP437 for glyph lookup.
+Version: engine reports RIPSCRIP030002 (matches RIPtel 3.1 patched).
+
+--- 2026-10-29 — kiddo cowork session (continued) ---
+make_clean.bat created for MysticIRC repo root (Windows build cleaner).
+  Replaces make_clean.sh — cleans .ppu/.o/.a/.or/.res/.s, output dirs,
+  executables, .mpx, linker artifacts. Also deletes .sh scripts.
+RIPaint 674/674 decompiled source staged as reference for ripview engine.
+  Key scene functions: _RESET_SCENE_THINGS, _COMPLETELY_CLEAR_SCREEN,
+  _CLEAR_SETTINGS, _SHOW_SCENE_INVIS_POINTS, _OPTIMIZE_SCENE.
+Broken items 1-5 audit:
+  #1 DrawPolygon — EXISTS in ripdraw.pas (already done)
+  #2 Bar3D — EXISTS in ripdraw.pas (already done)
+  #3 End Scene — IMPLEMENTED: added SceneDone flag to TBGICanvas,
+     added EndScene procedure (ResetRIPState + SceneDone=True),
+     rcResetWindows handler in rip1exec.pas now calls EndScene
+     (was only resetting viewport+cursor)
+  #4 PieSlice/Sector — EXISTS in ripdraw.pas (already done)
+  #5 15 state wrappers — ALL 15 EXIST in ripengine.pas (already done)
+Items 1-5: COMPLETE.
