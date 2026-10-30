@@ -130,6 +130,8 @@ Type
     TextJustV  : Byte;           { vertical justify (0=bottom,1=ctr,2=top)}
     TextWin    : TTextWindow;    { RIP text window state                  }
     InGraphics : Boolean;        { true when graphics mode is active      }
+    SceneDone  : Boolean;        { true after !|# end-scene boundary      }
+    Dirty      : Boolean;        { true when canvas changed since last blit}
   End;
 
 Var
@@ -193,6 +195,14 @@ Procedure ScreenToRIP(SX, SY: Integer; Var RX, RY: Integer);
 
 { Full state reset }
 Procedure ResetRIPState;
+
+{ End scene — full reset + scene boundary flag }
+Procedure EndScene;
+
+{ Palette wrappers — match RIPterm RIPCORE.C API }
+Procedure GetPalette(Var Pal: Array Of LongWord);
+Procedure SetPalette(Const Pal: Array Of LongWord);
+Function  QueryGraphics: Boolean;
 
 { Text window — bottom of RIP screen for text I/O }
 Procedure SetTextWindow(X0, Y0, X1, Y1: Integer; FontH: Byte);
@@ -556,6 +566,20 @@ Begin
   Move(EGA_PALETTE, Canvas.Palette, SizeOf(EGA_PALETTE));
   FillChar(Canvas.Pixels^, SizeOf(TPixelBuffer), 0);
   ResetTextWin;
+  Canvas.SceneDone := False;
+  Canvas.Dirty := False;
+End;
+
+Procedure EndScene;
+{ RIPscrip !|# end-scene boundary. Resets all graphics state to defaults
+  and signals that the current scene is complete. This is the proper
+  scene boundary marker — viewers use SceneDone to know when a scene
+  has finished rendering and is ready for display/flush. }
+Begin
+  ResetRIPState;
+  Canvas.SceneDone := True;
+  If DebugMode Then
+    WriteLn('[EndScene] Scene boundary — state reset, SceneDone=True');
 End;
 
 Procedure SetTextWindow(X0, Y0, X1, Y1: Integer; FontH: Byte);
@@ -703,6 +727,31 @@ Begin Result := RIP_WIDTH Div SYS_FONT_W; End;
 
 Function GetSysRows: Integer;
 Begin Result := RIP_HEIGHT Div SYS_FONT_H; End;
+
+{ ---- Palette wrappers ---- }
+
+Procedure GetPalette(Var Pal: Array Of LongWord);
+Var
+  I : Integer;
+Begin
+  For I := 0 To 15 Do
+    If I <= High(Pal) Then
+      Pal[I] := Canvas.Palette[I];
+End;
+
+Procedure SetPalette(Const Pal: Array Of LongWord);
+Var
+  I : Integer;
+Begin
+  For I := 0 To 15 Do
+    If I <= High(Pal) Then
+      Canvas.Palette[I] := Pal[I];
+End;
+
+Function QueryGraphics: Boolean;
+Begin
+  QueryGraphics := Canvas.InGraphics;
+End;
 
 { ---- Graphics mode ---- }
 

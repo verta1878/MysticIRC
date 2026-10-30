@@ -564,6 +564,8 @@ Var X, Y: Integer;
 {$ENDIF}
 Begin
   If Not GraphAvail Then Exit;
+  If Not Canvas.Dirty Then Exit;  { skip blit if nothing changed }
+  Canvas.Dirty := False;
   {$IFDEF HAVE_GRAPH}
   For Y := 0 To RIP_HEIGHT - 1 Do
     For X := 0 To RIP_WIDTH - 1 Do
@@ -668,6 +670,7 @@ Begin
   If Length(Line) < 2 Then Exit;
   { Feed full line to procedural executor }
   ExecuteRIP(Line);
+  Canvas.Dirty := True;  { mark for blit after command batch }
   { Update mterm text window state from canvas }
   TextWinActive := Canvas.TextWin.Active;
   If TextWinActive Then
@@ -721,6 +724,7 @@ Begin
           End;
         End;
         { Blit text window area to display }
+        Canvas.Dirty := True;
         RIPBlitToTerminal;
         DrawTerminal;
         Exit;

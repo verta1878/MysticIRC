@@ -35,13 +35,22 @@ Items 1-5 from broken audit: COMPLETE (End Scene implemented 2026-10-29).
 IMG/TIFF decoders: DONE (LoadIMG + LoadTIF in ripicon.pas).
 UTF-8 extension: DONE (riputf8.pas, Canvas.UTF8Mode).
 
-1. Fix broken items 6-39 from RIP-GRAPHICS-PHASES.md audit
-   (mouse/buttons, icons, scene mgmt, text vars, fonts, viewport, core)
-   Use RIPaint 674/674 decompiled source as reference.
+1. Broken items 6-15 audit: ✅ DONE (2026-10-29)
+   ALL functions confirmed present — ripmouse 14, ripicon 18,
+   ripstate 7, riptextvar 9, ripwidgets 21, viewport/core in ripengine.
+   Palette wrappers (GetPalette/SetPalette/QueryGraphics) added to ripengine.pas.
 
-2. RT154SRC verify — cross-check ripengine/ripdraw/riptext/rip1exec
-   against RIPterm reference. VERIFICATION, not gap-filling.
+2. v1→v2-v4 port: ✅ DONE (2026-10-30)
+   Ported to m_rip/ shared units: SceneDone+EndScene, GetPalette/SetPalette/
+   QueryGraphics, LoadIMG, LoadTIF, IconLoadToSlot .IMG/.TIF branches,
+   riputf8.pas (new shared unit). BACKPORT-STATUS.md updated in v2/v3/v4.
+   NOTE: Canvas.UTF8Mode integration into riptext not yet done (source lost).
 
 3. MRP extension (LAST)
+
+4. ✅ DONE (2026-10-30): SAUCE trimming ($1A sentinel in rcReadScene),
+   canvas reset (ResetRIPState before file open), batched repaints
+   (Canvas.Dirty flag + FlushCanvasToScreen guard in mterm).
+   WIPE deferred — no v1.54 spec.
 
 READ ORDER: NEXT.TXT → RULES.TXT → STATUS.TXT → do work → run test

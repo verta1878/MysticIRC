@@ -19,3 +19,12 @@ Fixes backported from ripviewer to mystic_rip/v3/rip3api.pas:
 - [x] CHR vector font loading
 - [x] Fill patterns (FillPats array)
 - [x] RGB pixel mode (v3 supports both indexed and RGB)
+
+## PORTED FROM RIPVIEW (2026-10-30)
+- [x] SceneDone field + EndScene procedure (ripengine.pas)
+- [x] GetPalette/SetPalette/QueryGraphics palette wrappers (ripengine.pas)
+- [x] LoadIMG decoder — GEM IMG raster, 1/4-plane EGA, RLE (ripicon.pas)
+- [x] LoadTIF decoder — baseline TIFF, PackBits, LE/BE, multi-strip (ripicon.pas)
+- [x] riputf8.pas — CP437↔Unicode bidirectional codec (new shared unit)
+- [x] IconLoadToSlot updated for .IMG/.TIF/.TIFF extensions (ripicon.pas)
+

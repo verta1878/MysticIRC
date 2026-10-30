@@ -3329,7 +3329,7 @@ da9ea734dac5a018fe841f6284c049fc  ./mystic/mdl/m_rip/rip_render.pas
 212a20cc71830de408d118d897081ab3  ./mystic/mdl/m_rip/rip_window.pas
 743b5077b4522924aa4ee39ade8bcb6d  ./mystic/mdl/m_rip/ripbmp.pas
 41627b0aedd4f5e3e2ada81111c3c907  ./mystic/mdl/m_rip/ripdraw.pas
-864a0b48f05dad6d9414b2aa20715610  ./mystic/mdl/m_rip/ripengine.pas
+ff5216f68aecc28b4c3259be392763db  ./mystic/mdl/m_rip/ripengine.pas
 cbcdf1881bee337e1a4364836d2882e7  ./mystic/mdl/m_rip/riptext.pas
 ccaed90de069459c7be6e93a8b8aa485  ./mystic/mdl/m_rip/tchr.pas
 a848ffdc2ea20b615589e21d914089c7  ./mystic/mdl/m_rip/test_chrfont.pas
@@ -4140,7 +4140,7 @@ a9c868df3454d6b300a6fe377ee515ec  ./mystic_mterm/molms.pas
 c1b7f082668d6590573122fec013f371  ./mystic_mterm/mtcapture.pas
 517c9bdafa699737a8a23a07a533cf98  ./mystic_mterm/mtconfig.pas
 4ae92591f30b14b4bd347977bb5299c9  ./mystic_mterm/mtconn.pas
-c8951dbc12ff7d20f4619a1f98d91f60  ./mystic_mterm/mterm.pas
+67656978bf6505eaa30c8402b459b970  ./mystic_mterm/mterm.pas
 5d0f27f4c304b8b55ce7e6440153a938  ./mystic_mterm/mtphone.pas
 6d99710b0f60577e24804d404dcae126  ./mystic_mterm/mtrip.pas
 b798e0692cdd2f27298d66f363c0dbc6  ./mystic_mterm/mtrip_test.pas
@@ -4216,13 +4216,13 @@ a6d500698ba9b68e904392c3b3aa9b8f  ./mystic_ripview/source/fonts/TRIP.CHR
 27686ef8578cddb07305634b518fe113  ./mystic_ripview/source/ripdecraw.pas
 a7878c9f42e67fcd88c96b0e1beab180  ./mystic_ripview/source/ripdelta.pas
 41627b0aedd4f5e3e2ada81111c3c907  ./mystic_ripview/source/ripdraw.pas
-864a0b48f05dad6d9414b2aa20715610  ./mystic_ripview/source/ripengine.pas
+fedb3c8b8c471b20a70456c12db7ab4d  ./mystic_ripview/source/ripengine.pas
 4007ae90d74e046cf887a55b4557a443  ./mystic_ripview/source/riplayerdec.pas
 8bff70d7d3e524c40f82fd7550853c18  ./mystic_ripview/source/riprender.pas
 cbcdf1881bee337e1a4364836d2882e7  ./mystic_ripview/source/riptext.pas
 a4ecf7a4aa83b12b36b612fb391dc038  ./mystic_ripview/source/riptile.pas
 832363f4d95ef7c3590c491f112a066a  ./mystic_ripview/source/ripview.pas
-0c19d6fc84e7b9a01e3ff9c1a59acf91  ./mystic_ripview/source/v1/rip1exec.pas
+5cbe679481463b43afea871afc425106  ./mystic_ripview/source/v1/rip1exec.pas
 c27402d68bc6280a73ab22605ce5d712  ./mystic_ripview/source/v1/rip1parse.pas
 efc9d947bc021653ab7e57ab3f40b567  ./mystic_ripview/t_ripdraw
 1564623f57dce7727ac9d050e8a4545f  ./mystic_ripview/test-output-ripdraw/BILL.bmp
@@ -5425,3 +5425,6 @@ b250f6ed23fd70f0fd0b414cc84c3129  ./todo/ripscrip/v32-riplib/README.md
 63516ff99e85d2b1c6f835864c8f25f3  ./todo/sourceclean.md
 8004142d69ea14a0a7424730217a9afc  ./todo/viper-verify.bat
 974f2acb653e26455554922b3c403a15  ./todo/whatsnew_g00r00_upto_A38.md
+3dba7b75cb8a2a65cc2efbdf2338ebd8  ./mystic_ripview/CHECKPOINT.TXT
+2dac195e8b7624146a326a2d98bf45c7  ./mystic_ripview/STATUS.TXT
+2a3fbe4b93c944582c406f57672d1d4f  ./mystic_ripview/NEXT.TXT

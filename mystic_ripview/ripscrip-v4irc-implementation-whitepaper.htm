@@ -291,23 +291,27 @@ goal. We implement a full audio subsystem:</p>
 <tr><td>CP437 8x8/8x14</td><td>Bitmap</td><td>Built-in, 256 chars, 5 system text modes</td></tr>
 </table>
 
-<h3>3.8 Full-Motion Video (Whitepaper §4.2)</h3>
+<h3>3.8 Full-Motion Video (Whitepaper §4.2) — IMPLEMENTED v4.0</h3>
 
-<p class="defer">DEFERRED TO v4.0</p>
+<p class="done">IMPLEMENTED IN v4.0 IRC FORK</p>
 
-<p>TeleGrafix planned full-motion video as a future goal. Our
-v3.0 engine provides animation support through frame counters,
-cue points, and progressive rendering codecs. Full video codec
-support (AVI/MPEG decoding) is deferred to v4.0.</p>
+<p>MPEG-1 video decoding via a 5-unit pipeline: mpgdemux.pas (265 lines,
+demuxer), mpgvdec.pas (489 lines, video decoder), mpgvbuf.pas (199 lines,
+frame buffer), mpgstrm.pas (180 lines, stream handler), mpgplay.pas
+(96 lines, playback controller). FLI/FLC animation via flidec.pas.</p>
 
-<h3>3.9 Document Oriented Interface (Whitepaper §4.6)</h3>
+<p>API: MPEGOpen(FileName), MPEGGetFrameCount, MPEGRenderFrame(FrameIdx),
+MPEGClose. Frame rendering to Canvas pending YUV→RGB→EGA conversion wiring.</p>
 
-<p class="defer">DEFERRED TO v4.0</p>
+<h3>3.9 Document Oriented Interface (Whitepaper §4.6) — IMPLEMENTED v4.0</h3>
 
-<p>TeleGrafix envisioned a page layout engine within RIPscrip.
-Our v3.0 table and form system (Phase 20) provides structured
-data presentation. A general-purpose document layout engine is
-deferred to v4.0.</p>
+<p class="done">IMPLEMENTED IN v4.0 IRC FORK</p>
+
+<p>htmllayo.pas (506 lines) implements a CSS-style box model layout engine:
+text flow, margins, padding, block/inline elements, page concept.
+This provides the document-oriented interface that TeleGrafix envisioned
+but never shipped. The layout engine feeds both the pixel renderer
+(htmlrend.pas) and the RIP command translator (htmlrip.pas).</p>
 
 <h3>3.10 HTML Rendering (Whitepaper §4.7) — IMPLEMENTED v4.0</h3>
 

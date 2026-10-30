@@ -131,6 +131,7 @@ Type
     TextWin    : TTextWindow;    { RIP text window state                  }
     InGraphics : Boolean;        { true when graphics mode is active      }
     SceneDone  : Boolean;        { true after !|# end-scene boundary      }
+    Dirty      : Boolean;        { true when canvas changed since last blit}
   End;
 
 Var
@@ -212,6 +213,11 @@ Function  GetSysFontH: Integer;
 Function  GetSysCols: Integer;
 Function  GetSysRows: Integer;
 
+{ Palette wrappers — match RIPterm RIPCORE.C API }
+Procedure GetPalette(Var Pal: Array Of LongWord);
+Procedure SetPalette(Const Pal: Array Of LongWord);
+Function  QueryGraphics: Boolean;
+
 { Graphics mode }
 Procedure EnterGraphics;
 Procedure ExitGraphics;
@@ -253,6 +259,7 @@ Begin
   Canvas.TextJustV := 0;
   Canvas.InGraphics := False;
   Canvas.SceneDone := False;
+  Canvas.Dirty := False;
   Move(EGA_PALETTE, Canvas.Palette, SizeOf(EGA_PALETTE));
   { Text window defaults }
   Canvas.TextWin.Active := False;
@@ -562,6 +569,7 @@ Begin
   FillChar(Canvas.Pixels^, SizeOf(TPixelBuffer), 0);
   ResetTextWin;
   Canvas.SceneDone := False;
+  Canvas.Dirty := False;
 End;
 
 Procedure EndScene;
@@ -721,6 +729,31 @@ Begin Result := RIP_WIDTH Div SYS_FONT_W; End;
 
 Function GetSysRows: Integer;
 Begin Result := RIP_HEIGHT Div SYS_FONT_H; End;
+
+{ ---- Palette wrappers ---- }
+
+Procedure GetPalette(Var Pal: Array Of LongWord);
+Var
+  I : Integer;
+Begin
+  For I := 0 To 15 Do
+    If I <= High(Pal) Then
+      Pal[I] := Canvas.Palette[I];
+End;
+
+Procedure SetPalette(Const Pal: Array Of LongWord);
+Var
+  I : Integer;
+Begin
+  For I := 0 To 15 Do
+    If I <= High(Pal) Then
+      Canvas.Palette[I] := Pal[I];
+End;
+
+Function QueryGraphics: Boolean;
+Begin
+  QueryGraphics := Canvas.InGraphics;
+End;
 
 { ---- Graphics mode ---- }
 

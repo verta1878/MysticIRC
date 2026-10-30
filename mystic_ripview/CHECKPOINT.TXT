@@ -45,3 +45,38 @@ Broken items 1-5 audit:
   #4 PieSlice/Sector — EXISTS in ripdraw.pas (already done)
   #5 15 state wrappers — ALL 15 EXIST in ripengine.pas (already done)
 Items 1-5: COMPLETE.
+
+2026-10-29 — Items 6-15 audit COMPLETE
+  #6-11, 13-15: ALL functions already exist in source
+  #12: 3 palette wrappers (GetPalette/SetPalette/QueryGraphics) ADDED to ripengine.pas
+  Items 6-15: COMPLETE.
+
+2026-10-30 — Doc updates (items 1, 2, 17) COMPLETE
+  #1: v4irc whitepaper updated — sections 3.8 (MPEG) and 3.9 (DOI) changed from DEFERRED to IMPLEMENTED
+  #2/#17: ripscript.doc MISSING markers removed (DrawPolygon, DrawBar3D both present)
+  Items 1, 2, 17: COMPLETE.
+
+2026-10-30 — v1→v2-v4 port (item 18) COMPLETE
+  Ported to m_rip/ shared engine (mterm):
+  - ripengine.pas: SceneDone field in TBGICanvas, EndScene procedure,
+    SceneDone:=False in ResetRIPState, GetPalette/SetPalette/QueryGraphics
+  - ripicon.pas: LoadIMG (GEM IMG raster decoder, ~370 lines),
+    LoadTIF (baseline TIFF decoder, ~375 lines),
+    IconLoadToSlot updated for .IMG/.TIF/.TIFF extension branches
+  - riputf8.pas: copied as new shared unit (483 lines, CP437↔Unicode codec)
+  - BACKPORT-STATUS.md updated in v2/, v3/, v4/
+  NOTE: Canvas.UTF8Mode field + riptext.pas UTF-8 integration NOT ported —
+    source was lost from ripview (CHECKPOINT says added, but not in file on disk).
+  Item 18: COMPLETE (minus UTF8Mode integration).
+
+2026-10-30 — Item 4 (SAUCE/canvas reset/batched repaints/WIPE) COMPLETE
+  SAUCE trimming: rip1exec.pas rcReadScene — stops reading at $1A sentinel byte
+    (SAUCE records begin with $1A+"SAUCE" at EOF-128). Simple line-level check.
+  Canvas reset: ResetRIPState call added before file open in rcReadScene.
+    Ensures clean state when loading new .RIP scene files.
+  Batched repaints: Canvas.Dirty flag added to TBGICanvas (ripengine.pas, both
+    ripview and mterm). FlushCanvasToScreen in mterm.pas skips full pixel copy
+    when Dirty=False. Set True after ExecuteRIP and text window writes.
+    Initialized False in ResetRIPState.
+  WIPE timing: DEFERRED — no WIPE command in RIPscrip v1.54 spec. WIPE is a
+    v2.0+ screen transition concept. No code to add for v1 engine.

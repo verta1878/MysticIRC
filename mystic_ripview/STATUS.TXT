@@ -12,6 +12,7 @@ ENGINE CORE
                            Canvas: FillPat, LinePattern, ViewClip, TextJust,
                            TTextWindow, InGraphics, UTF8Mode, SceneDone.
                            EnterGraphics/ExitGraphics, EndScene (full reset + flag)
+                           GetPalette/SetPalette/QueryGraphics palette wrappers
 [DONE]  riputf8.pas      — shared UTF-8 codec (DecodeUTF8Char, EncodeUTF8Char,
                            CP437ToUnicode, UnicodeToCP437, UTF8ToCP437, CP437ToUTF8,
                            UTF8Len). Full 256-entry CP437↔Unicode bidirectional map
@@ -63,9 +64,14 @@ PENDING WORK
                            RenderStringAttr/GfxTextStringWidth all UTF-8 aware
 [DONE]   End Scene — rcResetWindows calls EndScene (full state reset + SceneDone flag)
 [DONE]   Broken items 1-5 audit: DrawPolygon, Bar3D, PieSlice/Sector, state wrappers ALL exist
-[TODO]   Broken items 6-39 — mouse/buttons, icons, scene mgmt, text vars, fonts, viewport
+[DONE]   Broken items 6-15 — ALL confirmed present in source (2026-10-29 audit):
+                           ripmouse.pas 14 funcs, ripicon.pas 18 funcs,
+                           ripstate.pas 7 funcs, riptextvar.pas 9 funcs,
+                           ripwidgets.pas 19+2 funcs, ripengine.pas (viewport/core)
+[DONE]   v1→v2-v4 port — SceneDone+EndScene, palette wrappers, LoadIMG, LoadTIF,
+                          riputf8.pas, IconLoadToSlot updates ported to m_rip/ (2026-10-30)
 [TODO]   MRP extension (items 6-20, LAST priority)
-[TODO]   SAUCE trimming on .RIP file open (from RIPtel PATCH.txt)
-[TODO]   Reset canvas before file load (from RIPtel PATCH.txt)
-[TODO]   Batched repaints — check FlushCanvasToScreen frequency
-[TODO]   Screen transition (WIPE) timing/pacing
+[DONE]   SAUCE trimming — rcReadScene stops at $1A sentinel (2026-10-30)
+[DONE]   Canvas reset — ResetRIPState before file open in rcReadScene (2026-10-30)
+[DONE]   Batched repaints — Canvas.Dirty flag, FlushCanvasToScreen skips when clean (2026-10-30)
+[DEFER]  Screen transition (WIPE) — no spec in v1.54, deferred to v2.0+

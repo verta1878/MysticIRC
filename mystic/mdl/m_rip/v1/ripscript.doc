@@ -217,10 +217,10 @@ NOTE: ripscript.doc uses BGI-style names for the API. The actual ripview
 code uses different names. Mapping (doc → code):
   Line → DrawLine, Rectangle → DrawRect, Bar → FillRect,
   Circle → DrawCircle, Ellipse → DrawEllipse, Arc → DrawArcLines,
-  PieSlice/Sector → DrawSector, DrawPoly → DrawPolygon (MISSING),
+  PieSlice/Sector → DrawSector, DrawPoly → DrawPolygon,
   FillPoly → FillPolyScanline, FloodFill → FloodFill,
-  Bar3D → DrawBar3D (MISSING — L1 cmd 'O')
-Verified against RIPterm v1.54 (RIP_DRAW.C) 2026-09-29.
+  Bar3D → DrawBar3D (L1 cmd 'O')
+Verified against RIPterm v1.54 (RIP_DRAW.C) 2026-10-30. All commands present.
 
 Procedure PutPixel (X, Y: SmallInt; Color: Byte)
 Set a single pixel. Respects viewport clipping and write mode.

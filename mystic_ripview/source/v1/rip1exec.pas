@@ -821,11 +821,17 @@ Begin
         End;
         { Load and execute the .RIP scene file }
         If (Length(DbgStr) > 0) And FileExists(DbgStr) Then Begin
+          { Reset canvas state before loading new scene (RIPtel PATCH.txt) }
+          ResetRIPState;
+
           Assign(FFile, DbgStr);
           {$I-} Reset(FFile); {$I+}
           If IOResult = 0 Then Begin
             While Not EOF(FFile) Do Begin
               ReadLn(FFile, IconName);
+              { Stop at SAUCE record — first byte $1A is the sentinel }
+              If (Length(IconName) > 0) And (Ord(IconName[1]) = $1A) Then
+                Break;
               If Length(IconName) > 0 Then
                 ExecuteRIP(IconName);
             End;
